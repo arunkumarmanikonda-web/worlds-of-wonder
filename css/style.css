@@ -481,12 +481,15 @@ ul { list-style: none; }
   position: absolute; inset: 0;
 }
 
-/* Each slide */
+/* Each slide — isolation:isolate creates a NEW stacking context
+   so .logo-blend-wrap's mix-blend-mode:screen blends against
+   the slide's own dark overlay (not the white page bg behind) */
 .hc-slide {
   position: absolute; inset: 0;
   opacity: 0;
   transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
   pointer-events: none;
+  isolation: isolate;
 }
 .hc-slide.active {
   opacity: 1;
@@ -542,6 +545,8 @@ ul { list-style: none; }
   align-items: center; justify-content: center;
   text-align: center;
   padding: 120px 32px 160px;
+  /* Allow children to blend through to the slide background */
+  isolation: auto;
 }
 .hc-badge {
   display: inline-block;
@@ -620,20 +625,32 @@ ul { list-style: none; }
 
 /* ============================================================
    WOW LOGO ON DARK BACKGROUNDS
-   The logo PNG has a white background.
-   We wrap it in .logo-blend-wrap which uses mix-blend-mode:screen
-   on the WRAPPER (not the img) — this bypasses stacking context
-   issues caused by parent transforms/opacity/will-change.
-   The img itself has filter:none — untouched, hard adopted.
+   The logo PNG has a solid white background — no transparency.
+   We use mix-blend-mode: multiply on the wrapper.
+   multiply: white(255) × dark_bg = dark_bg (white vanishes)
+             red(shield) × dark_bg = visible coloured result
+   This is the CORRECT blend mode for white-bg logos on dark.
+   screen was wrong — screen makes dark colours invisible.
    ============================================================ */
 
-/* Blend wrapper — sits around the logo img on dark sections */
+/* ── Logo blend wrapper ──────────────────────────────────────
+   screen blend: white(255,255,255) + any_color = white (invisible on dark bg)
+                 red(220,38,38)     + dark      = visible warm red
+                 black(0,0,0)       + any_color = 0 (invisible — subtext hides, that's ok)
+   The wrapper must be a direct child of the dark section root,
+   NOT inside any element with z-index, transform, opacity, or will-change.
+   We force this by using mix-blend-mode on the img directly AND
+   removing filter:none override so browser can apply blend.
+   ──────────────────────────────────────────────────────────── */
 .logo-blend-wrap {
   display: inline-block;
-  mix-blend-mode: screen;
-  /* screen on dark bg: white→invisible, red shield→visible */
-  isolation: auto !important;
   line-height: 0;
+  /* No isolation, no z-index, no transform — keeps blend context open */
+}
+.logo-blend-wrap img {
+  mix-blend-mode: screen !important;
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 /* Hero carousel slides — dark overlay background */
@@ -643,11 +660,9 @@ ul { list-style: none; }
   width: auto;
   margin: 0 auto 22px;
   object-fit: contain;
-  filter: none !important;
-  opacity: 1 !important;
+  opacity: 1;
 }
 
-/* Wrap .hero-wow-logo with .logo-blend-wrap in HTML for blend to work */
 .hc-content .hero-wow-logo {
   display: block;
 }
@@ -807,12 +822,10 @@ ul { list-style: none; }
   margin-bottom: 28px;
 }
 
-/* Universal dark-section logo — img is untouched, wrap handles blend */
+/* Universal dark-section logo — blend handled by .logo-blend-wrap wrapper */
 .dark-section-logo {
-  filter: none !important;
-  opacity: 1 !important;
   display: block;
-  /* blend is handled by parent .logo-blend-wrap */
+  opacity: 1;
 }
 
 /* Responsive video banner */
@@ -1354,6 +1367,7 @@ h1 .accent-blue { color: var(--cyan); }
 .cta-section {
   position: relative; overflow: hidden; padding: 88px 0;
   background: linear-gradient(135deg, #060e24 0%, #0a1a55 50%, #0d2260 100%);
+  isolation: isolate; /* allows screen blend on logo-blend-wrap children */
 }
 .cta-section-bg {
   position: absolute; inset: 0;
@@ -1372,6 +1386,7 @@ h1 .accent-blue { color: var(--cyan); }
   border-radius: var(--r-xl); padding: 56px;
   display: flex; align-items: center; justify-content: space-between;
   gap: 40px; position: relative; overflow: hidden; box-shadow: var(--s4);
+  isolation: isolate; /* allows screen blend on logo-blend-wrap children */
 }
 .passport-banner::before {
   content: ''; position: absolute; inset: 0;
