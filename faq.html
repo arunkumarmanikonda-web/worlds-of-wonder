@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ — Frequently Asked Questions | Worlds of Wonder, Noida</title>
+  <meta name="description" content="Get answers to all your questions about Worlds of Wonder Noida. Ticket prices, park timings, safety, refunds, group bookings, WOW Passport, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .faq-hero {
+      background: linear-gradient(135deg,#060e24,#003D82,#0055B3);
+      padding: 120px 0 72px;
+      text-align: center;
+    }
+
+    .faq-hero h1 { font-family:'Nunito',sans-serif; font-size:clamp(30px,5vw,52px); font-weight:900; color:#fff; margin-bottom:12px; }
+    .faq-hero p  { font-size:17px; color:rgba(255,255,255,.8); max-width:500px; margin:0 auto 24px; line-height:1.6; }
+
+    /* Search Box */
+    .faq-search-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .faq-search {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      color: #080E1E;
+      outline: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,.2);
+    }
+
+    .faq-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+    }
+
+    /* Category Pills */
+    .faq-cats {
+      background: #fff;
+      border-bottom: 1px solid #DDE3EE;
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .faq-cats-inner {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .faq-cat-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 30px;
+      border: 1.5px solid #DDE3EE;
+      background: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #6B7280;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .faq-cat-btn:hover { border-color: #0055B3; color: #0055B3; background: #EBF3FF; }
+    .faq-cat-btn.active { background: #0055B3; border-color: #0055B3; color: #fff; }
+
+    /* Body */
+    .faq-body { background: #F7F9FC; padding: 48px 0 80px; }
+
+    .faq-layout { display: grid; grid-template-columns: 240px 1fr; gap: 28px; }
+
+    /* Sidebar nav */
+    .faq-nav {
+      position: sticky;
+      top: 80px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid #DDE3EE;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      height: fit-content;
+    }
+
+    .faq-nav-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #6B7280; padding: 0 8px 10px; border-bottom: 1px solid #DDE3EE; margin-bottom: 10px; }
+
+    .faq-nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6B7280;
+      transition: all .15s;
+      margin-bottom: 2px;
+    }
+
+    .faq-nav a:hover { background: #EBF3FF; color: #0055B3; }
+    .faq-nav a.active { background: #EBF3FF; color: #0055B3; font-weight: 800; }
+
+    /* FAQ Sections */
+    .faq-section { margin-bottom: 32px; }
+
+    .faq-section-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #080E1E;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #DDE3EE;
+    }
+
+    /* FAQ Accordion */
+    .faq-item {
+      background: #fff;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #DDE3EE;
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+
+    .faq-item.open { box-shadow: 0 4px 16px rgba(0,0,0,.08); border-color: #0055B3; }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 16px 20px;
+      text-align: left;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #080E1E;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      line-height: 1.4;
+    }
+
+    .faq-q-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #EBF3FF;
+      color: #0055B3;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform .25s, background .2s;
+    }
+
+    .faq-item.open .faq-q-icon { transform: rotate(45deg); background: #0055B3; color: #fff; }
+
+    .faq-a {
+      font-size: 14px;
+      color: #1A2235;
+      line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .35s ease, padding .35s;
+      padding: 0 20px;
+    }
+
+    .faq-item.open .faq-a { max-height: 400px; padding: 0 20px 18px; }
+
+    .faq-a a { color: #0055B3; font-weight: 700; }
+
+    /* Not found */
+    .faq-no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6B7280;
+    }
+
+    .faq-no-results .nr-icon { font-size: 56px; margin-bottom: 12px; }
+    .faq-no-results h3 { font-size: 20px; font-weight: 800; color: #1A2235; margin-bottom: 8px; }
+
+    /* Helpful vote */
+    .faq-helpful {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #F0F4FA;
+      font-size: 12px;
+      color: #6B7280;
+    }
+
+    .faq-vote-btn {
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid #DDE3EE;
+      background: #F7F9FC;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      transition: all .15s;
+    }
+
+    .faq-vote-btn:hover { border-color: #0055B3; background: #EBF3FF; color: #0055B3; }
+    .faq-vote-btn.voted { background: #E6F7F1; border-color: #0A9B5F; color: #0A9B5F; }
+
+    /* CTA Card */
+    .faq-cta-card {
+      background: linear-gradient(135deg,#060e24,#0d2260);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .faq-layout { grid-template-columns: 1fr; }
+      .faq-nav { position: static; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="faq-hero">
+  <div class="container" style="position:relative;z-index:2;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:6px 20px;font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">
+      ❓ FAQ
+    </div>
+    <h1>Frequently Asked Questions</h1>
+    <p>Find quick answers to the most common questions about visiting Worlds of Wonder, Noida.</p>
+    <div class="faq-search-wrap">
+      <span class="faq-search-icon">🔍</span>
+      <input type="text" class="faq-search" id="faq-search" placeholder="Search questions... e.g. refund, timings, parking" oninput="searchFaq(this.value)" />
+    </div>
+  </div>
+</section>
+
+<!-- ── CATEGORY PILLS ──────────────────────────────────── -->
+<div class="faq-cats">
+  <div class="faq-cats-inner">
+    <button class="faq-cat-btn active" onclick="filterFaqCat('all',this)">All</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('tickets',this)">🎫 Tickets</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('timings',this)">🕙 Timings</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('safety',this)">🛡 Safety</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('passport',this)">⭐ Passport</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('groups',this)">👥 Groups</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('facilities',this)">🏟 Facilities</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('food',this)">🍔 Food</button>
+    <button class="faq-cat-btn" onclick="filterFaqCat('transport',this)">🚗 Getting Here</button>
+  </div>
+</div>
+
+<!-- ── BODY ─────────────────────────────────────────────── -->
+<div class="faq-body">
+  <div class="container">
+    <div class="faq-layout">
+
+      <!-- Sidebar Nav -->
+      <div class="faq-nav">
+        <div class="faq-nav-title">Categories</div>
+        <a href="#sec-tickets" class="active">🎫 Tickets and Pricing</a>
+        <a href="#sec-timings">🕙 Timings and Entry</a>
+        <a href="#sec-safety">🛡 Safety and Rules</a>
+        <a href="#sec-passport">⭐ WOW Passport</a>
+        <a href="#sec-groups">👥 Groups and Events</a>
+        <a href="#sec-facilities">🏟 Park Facilities</a>
+        <a href="#sec-food">🍔 Food and Dining</a>
+        <a href="#sec-transport">🚗 Getting Here</a>
+        <a href="#sec-refunds">↩ Refunds and Changes</a>
+      </div>
+
+      <!-- FAQ Content -->
+      <div id="faq-content">
+
+        <!-- Section: Tickets -->
+        <div class="faq-section" id="sec-tickets" data-cat="tickets">
+          <div class="faq-section-title">🎫 Tickets and Pricing</div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              What are the ticket prices at Worlds of Wonder?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              <p>Current day-entry ticket prices (inclusive of 18% GST):</p>
+              <ul style="margin:8px 0 8px 16px;line-height:2;">
+                <li>Water Park Adult: <strong>₹1,299</strong> per person</li>
+                <li>Amusement Park Adult: <strong>₹1,199</strong> per person</li>
+                <li>Combo (Both Parks): <strong>₹1,999</strong> per person — Save ₹499!</li>
+                <li>WOW Passport (Annual): <strong>₹4,999</strong> per year</li>
+              </ul>
+              <p>Child concessions apply for heights 90–130 cm. Infants below 90 cm / 3 yrs enter FREE.</p>
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are there discounts for groups?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes! Group discounts are available:
+              <ul style="margin:8px 0 8px 16px;line-height:2;">
+                <li>4 to 9 guests: ₹75 off per ticket</li>
+                <li>10 to 24 guests: ₹125 off per ticket</li>
+                <li>25+ guests: Contact us for custom pricing at <a href="/cdn-cgi/l/email-protection#66011409131615261109140a02150900110908020314480f08"><span class="__cf_email__" data-cfemail="80e7f2eff5f0f3c0f7eff2ece4f3efe6f7efeee4e5f2aee9ee">[email&#160;protected]</span></a></li>
+              </ul>
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are there special concession rates?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes. Special concession rates apply for: Senior Citizens (60+ years), Armed Forces personnel (with valid ID), and Differently Abled visitors. Present a valid government-issued ID at the booking counter for these rates. Contact our helpline for current concession pricing.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Can I buy tickets at the gate or only online?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Tickets are available both at the park gate and online. However, online booking is strongly recommended as: (1) peak weekends sell out, (2) you get instant QR delivery, (3) no booking fee, (4) you skip the queue at the gate. Book at <a href="book/water-park.html">worldsofwonder.in/book</a>.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Timings -->
+        <div class="faq-section" id="sec-timings" data-cat="timings">
+          <div class="faq-section-title">🕙 Timings and Entry</div>
+
+          <div class="faq-item" data-cat="timings">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              What are the park opening hours?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              The park is open <strong>daily from 10:00 AM to 6:00 PM</strong>. Last entry is at <strong>4:00 PM</strong>. On Saturdays, Sundays, and public holidays, extended hours apply (9:00 AM to 7:00 PM). Call 080-6909-0000 to confirm holiday hours.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="timings">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Is the park open on all public holidays and rainy days?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes, the park is open 365 days a year including all public holidays. In the event of heavy rain or severe weather advisory, specific water rides may be closed temporarily for safety. The park itself remains open. Guests are advised to check our website or call ahead during monsoon season.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="timings">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are re-entries allowed if I exit the park?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Day-entry ticket holders are not permitted to re-enter after exiting the park. WOW Passport holders may exit and re-enter on the same day by showing their passport QR. If you need to exit briefly for an emergency, speak to the gate staff before leaving.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Safety -->
+        <div class="faq-section" id="sec-safety" data-cat="safety">
+          <div class="faq-section-title">🛡 Safety and Rules</div>
+
+          <div class="faq-item" data-cat="safety">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              What items are not allowed inside the park?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              The following are strictly prohibited: outside food and beverages, alcoholic drinks, glass containers, sharp objects, drones, professional cameras (DSLR), pets, and fireworks. Bags are subject to security screening at the entrance.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="safety">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are there height restrictions for rides?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes, most thrill rides have minimum height requirements for safety. Common restrictions: Roller Coasters and Speed Slides — minimum 120 cm. Family rides — minimum 90 cm or accompanied by adult. Please check individual ride boards at the park. Children below the minimum height will not be permitted on those rides.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="safety">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Is there a first aid facility at the park?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes. A fully equipped First Aid Centre is located near the main entrance and at two additional points within the park. Trained medical staff are on duty during all park hours. For emergencies, call the Park Control Room at 0120-456-7890.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Passport -->
+        <div class="faq-section" id="sec-passport" data-cat="passport">
+          <div class="faq-section-title">⭐ WOW Passport</div>
+
+          <div class="faq-item" data-cat="passport">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              What is WOW Passport and how much does it cost?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              WOW Passport is the annual unlimited membership that gives you unrestricted access to both the Water Park and the Amusement Park for 365 days. Pricing: Individual ₹4,999, Couple ₹8,999, Family (2+2) ₹15,999. It pays for itself in just 4 visits!
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="passport">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Does the passport cover all rides, or are some extra-charge?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              The WOW Passport covers standard entry to all rides in both parks. Certain premium experiences such as special VIP event tickets, F&B, lockers, and merchandise are charged separately. However, passport holders get 10-20% discount on F&B and 15% on merchandise.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Groups -->
+        <div class="faq-section" id="sec-groups" data-cat="groups">
+          <div class="faq-section-title">👥 Groups and Events</div>
+
+          <div class="faq-item" data-cat="groups">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              How do I book for a school trip or corporate event?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Use our online <a href="book/group.html">Group Booking form</a> or call 080-6909-0000 for groups of 10 or more. We offer bulk pricing, coach parking, dedicated entry lanes, custom catering, and on-ground coordination for schools, colleges, and corporate teams.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="groups">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Can I host a birthday party at WOW?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Absolutely! WOW offers dedicated birthday party packages starting from ₹499 per guest (minimum 10 guests). Packages include decorated seating area, cake-cutting zone, F&B vouchers, and a special birthday announcement. Contact our events team at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="315447545f454271465e435d55425e57465e5f5554431f585f">[email&#160;protected]</a>.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Facilities -->
+        <div class="faq-section" id="sec-facilities" data-cat="facilities">
+          <div class="faq-section-title">🏟 Park Facilities</div>
+
+          <div class="faq-item" data-cat="facilities">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are changing rooms and lockers available?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes. Separate changing rooms for men and women are available near the Water Park entrance. Lockers are available for a ₹10 refundable coin deposit. You will receive the coin back when you return the key.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="facilities">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Is there parking available at the park?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes, paid parking is available on-site for cars, bikes, and buses. Charges are applicable. There is also a dedicated drop-off/pick-up zone at the main entrance for cabs and autos. On weekends, a free shuttle service runs from Noida City Centre Metro Station.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="facilities">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are there wheelchair and accessibility facilities?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              WOW is committed to being an inclusive experience. Wheelchair ramps are available at key entry and exit points. Accessible restrooms are available at multiple locations. Certain ride platforms are accessible. Differently abled guests also receive a concession on ticket price with valid ID.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Food -->
+        <div class="faq-section" id="sec-food" data-cat="food">
+          <div class="faq-section-title">🍔 Food and Dining</div>
+
+          <div class="faq-item" data-cat="food">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Can I bring outside food and drinks?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              No. Outside food and beverages are not permitted inside the park. However, multiple food courts, casual dining, snack kiosks, and beverage counters are available inside with a wide range of vegetarian and non-vegetarian options. Baby food and infant formula are permitted.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="food">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Are vegetarian, Jain, and allergy-friendly food options available?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes. The food courts offer a wide selection of vegetarian dishes. Jain and specific dietary requirements can be accommodated at the main food court — please inform the staff. For severe allergies, it is advisable to consult with park F&B management before visiting.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Getting Here -->
+        <div class="faq-section" id="sec-transport" data-cat="transport">
+          <div class="faq-section-title">🚗 Getting Here</div>
+
+          <div class="faq-item" data-cat="transport">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Where is Worlds of Wonder located?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Worlds of Wonder is located at <strong>A-2, Sector 38A, Noida, Uttar Pradesh 201301</strong>. It is approximately 15 minutes from Noida City Centre Metro Station (Blue Line). <a href="https://maps.google.com/?q=Worlds+of+Wonder+Noida" target="_blank">Open in Google Maps</a>.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="transport">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Is there a free shuttle service?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes. A free shuttle service is available on Saturdays, Sundays, and public holidays from Noida City Centre Metro Station. The shuttle runs every 30 minutes from 9:00 AM. No pre-booking is required — just show your valid park ticket to board.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section: Refunds -->
+        <div class="faq-section" id="sec-refunds" data-cat="tickets">
+          <div class="faq-section-title">↩ Refunds and Changes</div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Can I get a refund on my ticket?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Day-entry tickets are generally non-refundable. However, if the park closes due to operational reasons or severe weather on your visit date, a full credit valid for 60 days will be issued. One reschedule is permitted with 24 hours notice. For assistance, call 080-6909-0000.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+          <div class="faq-item" data-cat="tickets">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Can I change my visit date after booking?
+              <span class="faq-q-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Yes, one free date change is allowed per booking if requested at least 24 hours before the original visit date. Call our helpline at 080-6909-0000 or email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3c4f494c4c534e487c4b534e50584f535a4b535258594e125552">[email&#160;protected]</a> with your booking ID and preferred new date.
+              <div class="faq-helpful">Was this helpful? <button class="faq-vote-btn" onclick="vote(this,'yes')">👍 Yes</button> <button class="faq-vote-btn" onclick="vote(this,'no')">👎 No</button></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CTA Card -->
+        <div class="faq-cta-card">
+          <h3 style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;margin-bottom:8px;">Still Have Questions?</h3>
+          <p style="font-size:14px;color:rgba(255,255,255,.8);margin-bottom:16px;">Our support team is here to help. Get in touch via phone, email, or WhatsApp.</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+            <a href="tel:08069090000" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:14px;font-weight:700;text-decoration:none;">
+              📞 Call Us
+            </a>
+            <a href="contact.html" style="display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:10px;background:#0055B3;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">
+              ✉️ Send Message
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/shell.js"></script>
+<script>
+// Toggle FAQ item
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// Filter by category
+function filterFaqCat(cat, btn) {
+  document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.faq-section').forEach(sec => {
+    if (cat === 'all' || sec.dataset.cat === cat) {
+      sec.style.display = '';
+    } else {
+      sec.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.faq-item').forEach(item => {
+    if (cat === 'all' || item.dataset.cat === cat) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+// Search
+function searchFaq(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) {
+    document.querySelectorAll('.faq-item').forEach(i => i.style.display = '');
+    document.querySelectorAll('.faq-section').forEach(s => s.style.display = '');
+    return;
+  }
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.faq-section').forEach(sec => {
+    const visibleItems = sec.querySelectorAll('.faq-item:not([style*="display: none"])');
+    sec.style.display = visibleItems.length > 0 ? '' : 'none';
+  });
+}
+
+// Vote helpful
+function vote(btn, type) {
+  btn.classList.add('voted');
+  btn.textContent = type === 'yes' ? '👍 Thanks!' : '👎 Noted';
+  btn.disabled = true;
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('.faq-nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    document.querySelectorAll('.faq-nav a').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
