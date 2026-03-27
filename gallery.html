@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Gallery — Worlds of Wonder, Noida</title>
+  <meta name="description" content="Explore the Worlds of Wonder gallery. See photos of Water Park, Amusement Park rides, Wave Pool, Roller Coasters, Live Shows, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .gal-hero {
+      background: linear-gradient(135deg,#060e24,#0a1a45,#0d2260);
+      padding: 120px 0 72px;
+      text-align: center;
+    }
+
+    .gal-hero h1 { font-family:'Nunito',sans-serif; font-size:clamp(32px,5vw,52px); font-weight:900; color:#fff; margin-bottom:12px; }
+    .gal-hero p  { font-size:17px; color:rgba(255,255,255,.8); max-width:480px; margin:0 auto 28px; line-height:1.6; }
+
+    /* Filters */
+    .gal-filters {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 32px 0 24px;
+      background: #fff;
+      border-bottom: 1px solid #DDE3EE;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .gal-filter-btn {
+      padding: 8px 20px;
+      border-radius: 30px;
+      border: 1.5px solid #DDE3EE;
+      background: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #6B7280;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .gal-filter-btn:hover { border-color: #0055B3; color: #0055B3; background: #EBF3FF; }
+    .gal-filter-btn.active { background: #0055B3; border-color: #0055B3; color: #fff; }
+
+    /* Gallery Grid */
+    .gal-body { background: #F7F9FC; padding: 36px 0 80px; }
+
+    .gal-grid {
+      columns: 4;
+      column-gap: 14px;
+    }
+
+    .gal-item {
+      break-inside: avoid;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      background: #DDE3EE;
+    }
+
+    .gal-item:hover .gal-overlay { opacity: 1; }
+
+    .gal-thumb {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      transition: transform .3s ease;
+    }
+
+    .gal-item:hover .gal-thumb { transform: scale(1.04); }
+
+    /* Placeholder colored blocks for images */
+    .gal-placeholder {
+      width: 100%;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: rgba(255,255,255,.6);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+    }
+
+    .gal-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,14,30,.8) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .25s;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+
+    .gal-overlay-text { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; }
+    .gal-overlay-tag  { font-size: 11px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+
+    /* Count row */
+    .gal-count { font-size: 14px; color: #6B7280; margin-bottom: 20px; font-weight: 600; }
+
+    /* Lightbox */
+    .gal-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.92);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .gal-lightbox.active { display: flex; }
+
+    .gal-lb-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 28px;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+    }
+
+    .gal-lb-img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 16px;
+      object-fit: contain;
+    }
+
+    .gal-lb-placeholder {
+      width: 700px;
+      max-width: 90vw;
+      height: 480px;
+      max-height: 80vh;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    .gal-lb-caption { color: #fff; font-size: 15px; font-weight: 700; margin-top: 16px; text-align: center; }
+    .gal-lb-sub { color: rgba(255,255,255,.6); font-size: 13px; margin-top: 4px; }
+
+    .gal-lb-nav {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .gal-lb-btn {
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: background .2s;
+    }
+
+    .gal-lb-btn:hover { background: rgba(255,255,255,.2); }
+
+    /* Responsive */
+    @media (max-width: 1100px) { .gal-grid { columns: 3; } }
+    @media (max-width: 768px)  { .gal-grid { columns: 2; } }
+    @media (max-width: 480px)  { .gal-grid { columns: 2; } .gal-filter-btn { padding: 6px 14px; font-size: 13px; } }
+  </style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── HERO ─────────────────────────────────────────────── -->
+<section class="gal-hero">
+  <div class="container" style="position:relative;z-index:2;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:6px 20px;font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">
+      📸 Photo Gallery
+    </div>
+    <h1>See the Magic of WOW</h1>
+    <p>Browse photos from our Water Park, Amusement Park, live shows, and guest moments.</p>
+    <a href="book/water-park.html" class="btn btn-accent" style="font-size:16px;padding:14px 32px;">
+      🎫 Book Your Visit
+    </a>
+  </div>
+</section>
+
+<!-- ── FILTER TABS ─────────────────────────────────────── -->
+<div class="gal-filters" id="gal-filters">
+  <button class="gal-filter-btn active" data-cat="all" onclick="filterGallery('all',this)">All Photos</button>
+  <button class="gal-filter-btn" data-cat="water" onclick="filterGallery('water',this)">🌊 Water Park</button>
+  <button class="gal-filter-btn" data-cat="amusement" onclick="filterGallery('amusement',this)">🎢 Amusement Park</button>
+  <button class="gal-filter-btn" data-cat="rides" onclick="filterGallery('rides',this)">🎡 Rides</button>
+  <button class="gal-filter-btn" data-cat="shows" onclick="filterGallery('shows',this)">🎪 Live Shows</button>
+  <button class="gal-filter-btn" data-cat="food" onclick="filterGallery('food',this)">🍔 Food and Dining</button>
+  <button class="gal-filter-btn" data-cat="kids" onclick="filterGallery('kids',this)">👧 Kids Zone</button>
+  <button class="gal-filter-btn" data-cat="events" onclick="filterGallery('events',this)">🎉 Events</button>
+</div>
+
+<!-- ── GALLERY BODY ─────────────────────────────────────── -->
+<div class="gal-body">
+  <div class="container">
+    <div class="gal-count" id="gal-count">Showing all 32 photos</div>
+
+    <div class="gal-grid" id="gal-grid">
+      <!-- Gallery items are rendered by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- ── LIGHTBOX ─────────────────────────────────────────── -->
+<div class="gal-lightbox" id="gal-lightbox">
+  <button class="gal-lb-close" onclick="closeLightbox()">✕</button>
+  <div class="gal-lb-placeholder" id="lb-placeholder" style="background:#0a1628;"></div>
+  <div class="gal-lb-caption" id="lb-caption"></div>
+  <div class="gal-lb-sub" id="lb-sub"></div>
+  <div class="gal-lb-nav">
+    <button class="gal-lb-btn" onclick="prevLb()">← Previous</button>
+    <button class="gal-lb-btn" id="lb-counter">1 / 32</button>
+    <button class="gal-lb-btn" onclick="nextLb()">Next →</button>
+  </div>
+</div>
+
+<!-- ── CTA ───────────────────────────────────────────────── -->
+<section style="padding:72px 0;background:linear-gradient(135deg,#060e24,#0d2260);text-align:center;">
+  <div class="container">
+    <h2 style="font-family:'Nunito',sans-serif;font-size:clamp(26px,4vw,40px);font-weight:900;color:#fff;margin-bottom:12px;">
+      Ready to Create Your Own Memories?
+    </h2>
+    <p style="font-size:16px;color:rgba(255,255,255,.8);max-width:400px;margin:0 auto 28px;">
+      Book your visit today and experience the thrill firsthand!
+    </p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+      <a href="book/water-park.html" class="btn" style="background:linear-gradient(135deg,#0077CC,#00AADD);color:#fff;font-size:16px;padding:14px 28px;">
+        🌊 Water Park — ₹1,299
+      </a>
+      <a href="book/combo.html" class="btn btn-accent" style="font-size:16px;padding:14px 28px;">
+        🏆 Combo — ₹1,999
+      </a>
+    </div>
+  </div>
+</section>
+
+</div><!-- /app -->
+<script src="js/shell.js"></script>
+<script>
+const GALLERY_ITEMS = [
+  { id:1, cat:'water', emoji:'🌊', color:'#0a3d7a', caption:'Giant Wave Pool', sub:'Water Park · 2,500 sq m', h:260 },
+  { id:2, cat:'amusement', emoji:'🎢', color:'#2a0a5e', caption:'Rockin Roller Coaster', sub:'Amusement Park · Steel Coaster', h:200 },
+  { id:3, cat:'water', emoji:'💦', color:'#0055B3', caption:'Boomerango Slide', sub:'Water Park · Extreme Thrill', h:240 },
+  { id:4, cat:'shows', emoji:'🎪', color:'#7A0066', caption:'Live Acrobatics Show', sub:'Daily at 12 PM and 4 PM', h:180 },
+  { id:5, cat:'rides', emoji:'🎡', color:'#003D82', caption:'Giant Wheel (40m)', sub:'Amusement Park · Panoramic Views', h:300 },
+  { id:6, cat:'kids', emoji:'🧒', color:'#0A7A4E', caption:'Kids Splash Zone', sub:'Water Park · Ages 2-10', h:220 },
+  { id:7, cat:'water', emoji:'🛶', color:'#006A8E', caption:'Lazy River', sub:'Water Park · 300m Float Circuit', h:200 },
+  { id:8, cat:'rides', emoji:'🎠', color:'#5E35B1', caption:'Columbus Pendulum', sub:'Amusement Park · Swings 70 Degrees', h:260 },
+  { id:9, cat:'food', emoji:'🍔', color:'#7A3A00', caption:'Park Food Court', sub:'Multiple Cuisine Options', h:220 },
+  { id:10, cat:'events', emoji:'🎉', color:'#B8860B', caption:'WOW Birthday Party', sub:'Birthday Packages from ₹499/guest', h:200 },
+  { id:11, cat:'water', emoji:'🚿', color:'#0077CC', caption:'Rain Disco Zone', sub:'Water Park · Music and Rain Effect', h:280 },
+  { id:12, cat:'amusement', emoji:'🏎', color:'#1a0533', caption:'Bumper Cars Arena', sub:'Amusement Park · Electric Cars', h:220 },
+  { id:13, cat:'water', emoji:'🏊', color:'#023d7a', caption:'Adult Swimming Pool', sub:'Water Park · 25m Pool', h:200 },
+  { id:14, cat:'shows', emoji:'🎭', color:'#4A0066', caption:'Cultural Performance', sub:'Live Shows · Included with Entry', h:240 },
+  { id:15, cat:'rides', emoji:'🎆', color:'#1a0a4a', caption:'Techno Jump Ride', sub:'Amusement Park · Extreme Thrill', h:260 },
+  { id:16, cat:'events', emoji:'🎓', color:'#065C38', caption:'School Trip Day', sub:'Bulk Pricing for Schools', h:200 },
+  { id:17, cat:'water', emoji:'🌀', color:'#0a5280', caption:'Speed Slides', sub:'Water Park · Near Vertical Drop', h:240 },
+  { id:18, cat:'food', emoji:'🍕', color:'#8B2500', caption:'Pizza and Snack Corner', sub:'Quick Bites Inside Park', h:200 },
+  { id:19, cat:'amusement', emoji:'⚡', color:'#2d0a7a', caption:'Break Dance Ride', sub:'Amusement Park · Spinning Thrills', h:280 },
+  { id:20, cat:'kids', emoji:'🎨', color:'#0A5C38', caption:'Kids Activity Zone', sub:'Crafts, Games, and Fun', h:220 },
+  { id:21, cat:'rides', emoji:'🚀', color:'#1a3a7a', caption:'Sky Rider', sub:'Amusement Park · High Altitude', h:260 },
+  { id:22, cat:'water', emoji:'🏄', color:'#004080', caption:'Tube Slides', sub:'Water Park · Enclosed Twists', h:200 },
+  { id:23, cat:'events', emoji:'🌙', color:'#0a0a2a', caption:'Night Carnival', sub:'Special Evening Events', h:240 },
+  { id:24, cat:'shows', emoji:'🎤', color:'#3a0066', caption:'Live Music at the Park', sub:'Weekend Performances', h:200 },
+  { id:25, cat:'water', emoji:'🛝', color:'#0066A0', caption:'Mat Racer Slides', sub:'Water Park · 5-Lane Racing', h:220 },
+  { id:26, cat:'amusement', emoji:'🎯', color:'#1a0040', caption:'Adventure Zone', sub:'Archery, Rock Climbing, More', h:200 },
+  { id:27, cat:'events', emoji:'💒', color:'#3d0050', caption:'Wedding Celebrations', sub:'Unique Venue Packages', h:280 },
+  { id:28, cat:'kids', emoji:'🎠', color:'#065C30', caption:'Carousel Rides', sub:'Kids Amusement Park · Safe', h:200 },
+  { id:29, cat:'water', emoji:'🌊', color:'#003366', caption:'Multi-Activity Pool', sub:'Water Park · Team Games', h:240 },
+  { id:30, cat:'food', emoji:'🥤', color:'#5C2800', caption:'Juice and Smoothie Bar', sub:'Fresh Beverages In-Park', h:200 },
+  { id:31, cat:'rides', emoji:'🎡', color:'#2a0060', caption:'Mini Ferris Wheel', sub:'Kids and Family Ride', h:220 },
+  { id:32, cat:'events', emoji:'🎊', color:'#7A4A00', caption:'New Year Celebration', sub:'Special Events Throughout Year', h:260 }
+];
+
+let currentCat = 'all';
+let currentIdx = 0;
+let filteredItems = [...GALLERY_ITEMS];
+
+function renderGallery(items) {
+  const grid = document.getElementById('gal-grid');
+  const count = document.getElementById('gal-count');
+  count.textContent = 'Showing ' + items.length + ' of ' + GALLERY_ITEMS.length + ' photos';
+  grid.innerHTML = items.map((item, i) => `
+    <div class="gal-item" data-idx="${i}" onclick="openLightbox(${i})">
+      <div class="gal-placeholder" style="height:${item.h}px;background:${item.color};">
+        ${item.emoji}
+      </div>
+      <div class="gal-overlay">
+        <div>
+          <div class="gal-overlay-tag">${item.cat.toUpperCase()}</div>
+          <div class="gal-overlay-text">${item.caption}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterGallery(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.gal-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filteredItems = cat === 'all' ? [...GALLERY_ITEMS] : GALLERY_ITEMS.filter(i => i.cat === cat);
+  renderGallery(filteredItems);
+}
+
+function openLightbox(idx) {
+  currentIdx = idx;
+  updateLightbox();
+  document.getElementById('gal-lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('gal-lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function updateLightbox() {
+  const item = filteredItems[currentIdx];
+  if(!item) return;
+  const ph = document.getElementById('lb-placeholder');
+  ph.style.background = item.color;
+  ph.textContent = item.emoji;
+  ph.style.fontSize = '100px';
+  document.getElementById('lb-caption').textContent = item.caption;
+  document.getElementById('lb-sub').textContent = item.sub;
+  document.getElementById('lb-counter').textContent = (currentIdx+1) + ' / ' + filteredItems.length;
+}
+
+function prevLb() {
+  currentIdx = (currentIdx - 1 + filteredItems.length) % filteredItems.length;
+  updateLightbox();
+}
+
+function nextLb() {
+  currentIdx = (currentIdx + 1) % filteredItems.length;
+  updateLightbox();
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeLightbox();
+  if(e.key === 'ArrowLeft') prevLb();
+  if(e.key === 'ArrowRight') nextLb();
+});
+
+// Click outside to close
+document.getElementById('gal-lightbox').addEventListener('click', e => {
+  if(e.target === document.getElementById('gal-lightbox')) closeLightbox();
+});
+
+// Initial render
+renderGallery(filteredItems);
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
