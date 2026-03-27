@@ -324,6 +324,12 @@ ul { list-style: none; }
   object-fit: contain;
   transition: transform .25s;
   filter: none !important;
+  /* screen blend: hides white bg when nav is transparent over dark hero */
+  mix-blend-mode: screen;
+}
+/* When scrolled (white nav bg) — switch to multiply so white bg is invisible on white */
+.site-header.scrolled .nav-logo-img {
+  mix-blend-mode: multiply;
 }
 .nav-logo:hover .nav-logo-img { transform: scale(1.04); }
 
@@ -613,17 +619,28 @@ ul { list-style: none; }
 }
 
 /* ============================================================
-   HERO CAROUSEL — WOW Logo on slides (dark background)
+   WOW LOGO ON DARK BACKGROUNDS
+   mix-blend-mode: multiply makes the white canvas invisible
+   on dark/coloured backgrounds — only the red shield shows.
+   Hard adopted — logo image untouched, no filter, no edits.
    ============================================================ */
+
+/* Hero carousel slides — dark overlay background */
 .hero-wow-logo {
   display: block;
-  height: 68px;
+  height: 72px;
   width: auto;
-  margin: 0 auto 24px;
+  margin: 0 auto 22px;
+  object-fit: contain;
   filter: none !important;
   opacity: 1 !important;
-  object-fit: contain;
-  /* Hard adopted — no changes, no filters */
+  mix-blend-mode: multiply;
+  /* On dark backgrounds multiply hides white → only shield visible */
+}
+
+/* Because hero overlay is dark, we need screen blend instead */
+.hc-content .hero-wow-logo {
+  mix-blend-mode: screen;
 }
 
 /* YouTube BG container + injected iframe — covers full slide */
@@ -670,6 +687,7 @@ ul { list-style: none; }
 .vb-logo {
   height: 64px; width: auto; margin-bottom: 24px;
   filter: none !important; opacity: 1 !important; display: block;
+  mix-blend-mode: screen; /* hides white bg on dark section */
   /* Hard adopted — no changes ever */
 }
 .vb-title {
@@ -709,7 +727,11 @@ ul { list-style: none; }
   cursor: pointer;
   border-radius: 20px;
   overflow: hidden;
-  background: #000;
+  background: #0a0f28;
+  /* Ensure it's visible even if thumbnail is slow */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .yt-facade-thumb {
   position: absolute;
@@ -720,6 +742,7 @@ ul { list-style: none; }
   object-position: center;
   display: block;
   transition: transform .4s ease, opacity .3s;
+  background: #0a1540; /* shows while image loads */
 }
 .yt-facade:hover .yt-facade-thumb {
   transform: scale(1.03);
@@ -761,10 +784,26 @@ ul { list-style: none; }
   text-transform: uppercase;
 }
 
-/* Passport logo position */
+/* Passport logo — dark background, screen blend hides white */
 .passport-logo {
   position: absolute; top: 28px; right: 28px;
   z-index: 2;
+}
+.passport-logo img {
+  mix-blend-mode: screen; /* hides white bg on dark banner */
+}
+
+/* CTA section logo — dark navy background */
+.cta-inner img[alt="Worlds of Wonder"] {
+  mix-blend-mode: screen;
+}
+
+/* Universal dark-section logo class — hard adopted, no filter, white bg hidden via screen blend */
+.dark-section-logo {
+  filter: none !important;
+  opacity: 1 !important;
+  mix-blend-mode: screen;
+  /* screen blend: white areas become invisible on dark bg, coloured shield remains */
 }
 
 /* Responsive video banner */
@@ -1553,6 +1592,7 @@ h1 .accent-blue { color: var(--cyan); }
   max-width: 280px;
   object-fit: contain;
   filter: none !important;
+  mix-blend-mode: screen; /* hides white bg on dark footer */
 }
 .footer-grid {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
@@ -1691,4 +1731,107 @@ h1 .accent-blue { color: var(--cyan); }
   .passport-banner .passport-title { font-size: 24px; }
   .feature-strip { grid-template-columns: 1fr; }
   .feature-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
+}
+
+/* ============================================================
+   MOBILE ENHANCEMENTS — Extended (≤640px)
+   ============================================================ */
+@media (max-width: 640px) {
+  /* Quick Book Bar — stack vertically on mobile */
+  .qbb-inner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 12px;
+  }
+  .qbb-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex: none;
+  }
+  .qbb-tabs .qbb-tab:last-child {
+    grid-column: span 2;
+  }
+  .qbb-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .qbb-input { width: 100% !important; }
+  .qbb-book-btn { width: 100% !important; text-align: center; }
+
+  /* Hero carousel on small phones */
+  .hero-wow-logo { height: 48px !important; margin-bottom: 14px; }
+  .hc-stats { padding: 12px 10px; gap: 0; }
+  .hcs-sep { display: none; }
+  .hcs-item { flex: 1; text-align: center; border-right: 1px solid rgba(255,255,255,.1); padding: 0 6px; }
+  .hcs-item:last-child { border-right: none; }
+
+  /* CTA section mobile */
+  .cta-btns { gap: 10px; }
+  .cta-btns .btn { width: 100%; max-width: 320px; justify-content: center; }
+
+  /* Passport banner mobile */
+  .passport-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .passport-logo { position: static; margin: 0 auto 20px; display: block; text-align: center; }
+  .passport-content { text-align: center; }
+
+  /* Pricing cards — single column with max width */
+  .pricing-grid { grid-template-columns: 1fr !important; max-width: 380px !important; }
+
+  /* Rides grid — 1 column on small */
+  .rides-grid { grid-template-columns: 1fr !important; }
+
+  /* Park hero — more padding top for nav */
+  .park-hero { min-height: 100svh; }
+  .park-hero-content { padding-top: 120px; padding-bottom: 60px; }
+  .park-hero-meta { gap: 8px; }
+  .meta-chip { font-size: 12px; padding: 5px 12px; }
+
+  /* Section headers */
+  .section-tag { font-size: 11px; }
+  .section-title { font-size: clamp(22px, 6vw, 34px) !important; }
+  .section-sub { font-size: 14px; }
+
+  /* Video banner — stacked */
+  .video-banner-section {
+    flex-direction: column;
+    padding: 48px 0;
+    gap: 28px;
+    text-align: center;
+  }
+  .vb-content { padding: 0 20px; align-items: center; }
+  .vb-frame-wrap { padding: 0 20px; width: 100%; }
+  .vb-title { font-size: clamp(24px, 6vw, 36px); }
+
+  /* Explore cards */
+  .exp-cards { grid-template-columns: 1fr !important; }
+  .exp-cards .exp-card:last-child { grid-column: span 1 !important; max-height: none !important; }
+
+  /* Info grid */
+  .info-grid { grid-template-columns: 1fr !important; }
+  .info-card { padding: 24px 20px; }
+
+  /* Footer mobile improvements */
+  .footer-logo-strip { text-align: center; }
+  .footer-social { justify-content: center; }
+
+  /* Attraction cards horizontal scroll on small */
+  .attraction-scroll { padding: 0 16px 20px; }
+
+  /* Offer strip */
+  .offer-strip { font-size: 13px; }
+
+  /* Dark section logos on mobile */
+  .dark-section-logo { height: 48px !important; }
+}
+
+/* ── Tablet improvements (641–900px) ── */
+@media (min-width: 641px) and (max-width: 900px) {
+  .qbb-inner { gap: 10px; }
+  .qbb-fields { flex-wrap: nowrap; }
+  .pricing-grid { grid-template-columns: 1fr 1fr; }
+  .rides-grid { grid-template-columns: repeat(2, 1fr); }
+  .deals-grid { grid-template-columns: repeat(2, 1fr); }
 }
