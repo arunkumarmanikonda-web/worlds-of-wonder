@@ -3,133 +3,998 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Offers &amp; Deals — Worlds of Wonder</title>
+  <title>Offers &amp; Deals — Worlds of Wonder Noida</title>
+  <meta name="description" content="Latest deals, flash sales and group discounts at Worlds of Wonder Noida. Water Park from ₹1,299, Amusement Park from ₹1,199, Combo from ₹1,999. Book online for best rates." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Offers Page Specific Styles ── */
+
+    /* Hero */
+    .offers-hero {
+      position: relative;
+      min-height: 52vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0a0f28 0%, #0d2260 40%, #1a3a8f 70%, #0a1540 100%);
+    }
+    .offers-hero-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 70% at 15% 50%, rgba(245,168,0,.12), transparent),
+        radial-gradient(ellipse 50% 60% at 85% 30%, rgba(0,85,179,.18), transparent);
+    }
+    .offers-hero-deco {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .offers-hero-deco span {
+      position: absolute;
+      font-size: clamp(60px, 8vw, 120px);
+      opacity: .06;
+      animation: floatDeco 8s ease-in-out infinite;
+    }
+    .offers-hero-deco span:nth-child(1) { top: 10%; left: 5%;  animation-delay: 0s; }
+    .offers-hero-deco span:nth-child(2) { top: 60%; left: 20%; animation-delay: 1.5s; font-size: 80px; }
+    .offers-hero-deco span:nth-child(3) { top: 20%; right: 10%; animation-delay: 3s; }
+    .offers-hero-deco span:nth-child(4) { top: 70%; right: 5%;  animation-delay: 4.5s; font-size: 90px; }
+    @keyframes floatDeco {
+      0%,100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-20px) rotate(8deg); }
+    }
+    .offers-hero-content {
+      position: relative; z-index: 2;
+      max-width: 1380px; margin: 0 auto;
+      padding: 80px clamp(20px, 5vw, 60px);
+      display: flex; flex-direction: column; align-items: flex-start;
+    }
+    .offers-hero-logo {
+      height: 64px; width: auto; margin-bottom: 24px;
+      filter: none !important; opacity: 1 !important;
+      mix-blend-mode: screen;
+    }
+    .offers-hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245,168,0,.15); color: var(--accent);
+      border: 1px solid rgba(245,168,0,.3);
+      border-radius: 50px; padding: 6px 16px;
+      font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .offers-hero h1 {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(36px, 5.5vw, 76px);
+      font-weight: 900; color: white; line-height: 1.06;
+      letter-spacing: -.03em; margin-bottom: 20px;
+    }
+    .offers-hero h1 .accent { color: var(--accent); }
+    .offers-hero-sub {
+      font-size: clamp(15px, 1.8vw, 18px);
+      color: rgba(255,255,255,.7);
+      max-width: 580px; line-height: 1.7; margin-bottom: 36px;
+    }
+    .hero-badge-row {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .hero-stat-badge {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85);
+    }
+    .hero-stat-badge strong { color: var(--accent); }
+
+    /* Flash Sale Banner */
+    .flash-sale-banner {
+      background: linear-gradient(90deg, #c2410c 0%, #ea580c 40%, #f97316 70%, #c2410c 100%);
+      background-size: 200% auto;
+      animation: flashBg 4s linear infinite;
+      padding: 0;
+      overflow: hidden;
+    }
+    @keyframes flashBg {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    .flash-sale-inner {
+      max-width: 1380px; margin: 0 auto;
+      padding: 18px clamp(20px, 5vw, 60px);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; flex-wrap: wrap;
+    }
+    .flash-label {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .flash-label .flash-icon {
+      font-size: 28px;
+      animation: pulse 1s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.2); }
+    }
+    .flash-label .flash-text {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(16px, 2.2vw, 22px);
+      font-weight: 900; color: white;
+      letter-spacing: -.01em;
+    }
+    .flash-label .flash-text span { font-size: .75em; font-weight: 600; opacity: .85; }
+    .flash-countdown {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .flash-countdown .cd-unit {
+      background: rgba(0,0,0,.25);
+      border-radius: 8px; padding: 6px 12px;
+      text-align: center; min-width: 56px;
+    }
+    .cd-num {
+      font-family: 'Nunito', sans-serif;
+      font-size: 26px; font-weight: 900; color: white;
+      line-height: 1; display: block;
+    }
+    .cd-lbl {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: rgba(255,255,255,.7);
+    }
+    .cd-sep { font-size: 24px; font-weight: 900; color: white; margin: 0 2px; }
+    .flash-book-btn {
+      background: white; color: #c2410c;
+      border: none; border-radius: 50px;
+      padding: 12px 28px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px; font-weight: 900;
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+      text-decoration: none; white-space: nowrap;
+    }
+    .flash-book-btn:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+
+    /* Deal Filter Tabs */
+    .deal-filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center; margin-bottom: 40px;
+    }
+    .deal-filter-btn {
+      padding: 9px 22px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border2);
+      background: white; color: var(--text2);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .deal-filter-btn:hover,
+    .deal-filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    /* Deal Cards Grid */
+    .deals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .deal-card {
+      background: white;
+      border-radius: var(--r-lg);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform .25s, box-shadow .25s;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+    .deal-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.12);
+    }
+    .deal-card.featured-deal {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(245,168,0,.25), var(--shadow);
+    }
+    .deal-card.flash-deal {
+      border-color: #ea580c;
+      box-shadow: 0 0 0 2px rgba(234,88,12,.2), var(--shadow);
+    }
+
+    /* Card ribbon */
+    .deal-ribbon {
+      position: absolute; top: 16px; right: -28px;
+      background: var(--accent); color: white;
+      font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .06em;
+      padding: 4px 40px;
+      transform: rotate(35deg);
+    }
+    .deal-ribbon.red { background: #ea580c; }
+    .deal-ribbon.green { background: #16a34a; }
+    .deal-ribbon.purple { background: #7c3aed; }
+
+    /* Card header */
+    .deal-card-header {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px; position: relative; overflow: hidden;
+    }
+    .dch-water    { background: linear-gradient(135deg, #0ea5e9, #0284c7, #0369a1); }
+    .dch-amusement{ background: linear-gradient(135deg, #7c3aed, #6d28d9, #5b21b6); }
+    .dch-combo    { background: linear-gradient(135deg, #d97706, #b45309, #92400e); }
+    .dch-passport { background: linear-gradient(135deg, #0d2260, #1a3a8f, #0055B3); }
+    .dch-group    { background: linear-gradient(135deg, #065f46, #047857, #059669); }
+    .dch-flash    { background: linear-gradient(135deg, #9a3412, #c2410c, #ea580c); }
+    .dch-seasonal { background: linear-gradient(135deg, #134e4a, #0f766e, #14b8a6); }
+    .dch-kids     { background: linear-gradient(135deg, #be185d, #db2777, #ec4899); }
+
+    /* Card body */
+    .deal-card-body {
+      padding: 24px; flex: 1; display: flex; flex-direction: column;
+    }
+    .deal-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      padding: 4px 10px; border-radius: 50px; margin-bottom: 10px;
+    }
+    .deal-tag.water    { background: #e0f2fe; color: #0369a1; }
+    .deal-tag.amusement{ background: #ede9fe; color: #5b21b6; }
+    .deal-tag.combo    { background: #fef3c7; color: #92400e; }
+    .deal-tag.flash    { background: #ffedd5; color: #9a3412; }
+    .deal-tag.group    { background: #dcfce7; color: #15803d; }
+    .deal-tag.passport { background: #dbeafe; color: #1d4ed8; }
+    .deal-tag.kids     { background: #fce7f3; color: #9d174d; }
+    .deal-tag.seasonal { background: #ccfbf1; color: #0f766e; }
+
+    .deal-card h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px; font-weight: 900; color: var(--text);
+      margin-bottom: 8px; line-height: 1.25;
+    }
+    .deal-desc {
+      font-size: 14px; color: var(--text2); line-height: 1.65;
+      margin-bottom: 18px; flex: 1;
+    }
+
+    /* Savings highlight */
+    .deal-savings {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg); border-radius: var(--r-sm);
+      padding: 14px 16px; margin-bottom: 18px;
+    }
+    .deal-save-amount {
+      font-family: 'Nunito', sans-serif;
+      font-size: 32px; font-weight: 900;
+      color: #16a34a; line-height: 1;
+    }
+    .deal-save-label {
+      font-size: 13px; color: var(--text2); line-height: 1.4;
+    }
+    .deal-save-label strong { color: var(--text); font-weight: 700; }
+    .deal-original {
+      font-size: 12px; color: var(--text3);
+      text-decoration: line-through; display: block;
+    }
+
+    /* Validity */
+    .deal-validity {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text3); margin-bottom: 16px;
+    }
+    .deal-validity.urgent { color: #dc2626; font-weight: 600; }
+    .validity-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #16a34a; flex-shrink: 0;
+    }
+    .validity-dot.red { background: #dc2626; animation: blink 1.2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* Promo code chip */
+    .promo-code-chip {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(90deg, #f0fdf4, #dcfce7);
+      border: 1.5px dashed #86efac;
+      border-radius: var(--r-sm); padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .promo-code-chip .code {
+      font-family: 'Courier New', monospace;
+      font-size: 15px; font-weight: 700; color: #15803d;
+      letter-spacing: .1em;
+    }
+    .promo-copy-btn {
+      font-size: 12px; font-weight: 700;
+      color: var(--primary); border: none;
+      background: transparent; cursor: pointer; padding: 4px 8px;
+      border-radius: 6px; transition: background .15s;
+    }
+    .promo-copy-btn:hover { background: #dbeafe; }
+
+    /* CTA mini countdown in card */
+    .card-countdown {
+      display: flex; gap: 6px; align-items: center; margin-bottom: 14px;
+    }
+    .card-cd-unit {
+      background: #fff7ed; border: 1px solid #fed7aa;
+      border-radius: 6px; padding: 4px 8px; text-align: center;
+    }
+    .card-cd-num {
+      display: block; font-family: 'Nunito', sans-serif;
+      font-size: 18px; font-weight: 900; color: #ea580c; line-height: 1;
+    }
+    .card-cd-lbl {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: #c2410c;
+    }
+    .card-cd-sep { font-size: 18px; font-weight: 900; color: #ea580c; }
+
+    /* Offer not-to-miss banner */
+    .dont-miss-strip {
+      background: linear-gradient(90deg, var(--primary-dk), var(--primary), var(--teal));
+      padding: 20px clamp(20px, 5vw, 60px);
+      display: flex; align-items: center; justify-content: center;
+      gap: 24px; flex-wrap: wrap; text-align: center;
+    }
+    .dont-miss-strip p {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 800; color: white; margin: 0;
+    }
+    .dont-miss-strip p span { color: var(--accent); }
+
+    /* Seasonal deals section */
+    .seasonal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px; margin-top: 32px;
+    }
+    .seasonal-card {
+      border-radius: var(--r);
+      padding: 28px 24px;
+      position: relative; overflow: hidden;
+      color: white;
+    }
+    .seasonal-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.2);
+    }
+    .seasonal-card > * { position: relative; z-index: 1; }
+    .seasonal-card h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 22px; font-weight: 900; margin-bottom: 8px;
+    }
+    .seasonal-card p { font-size: 14px; opacity: .85; line-height: 1.6; margin-bottom: 18px; }
+    .seasonal-card .sc-badge {
+      display: inline-block; background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 50px; padding: 4px 14px;
+      font-size: 12px; font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    /* Concessions table */
+    .concession-table {
+      width: 100%; border-collapse: collapse;
+      background: white; border-radius: var(--r);
+      overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .concession-table th {
+      background: var(--ink2); color: white;
+      padding: 14px 20px; font-size: 13px;
+      font-weight: 700; text-align: left;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    .concession-table td {
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      font-size: 14px; color: var(--text);
+    }
+    .concession-table tr:last-child td { border-bottom: none; }
+    .concession-table tr:nth-child(even) td { background: var(--bg); }
+    .ct-badge {
+      display: inline-block; border-radius: 50px;
+      padding: 3px 10px; font-size: 11px; font-weight: 700;
+    }
+    .ct-badge.free   { background: #dcfce7; color: #15803d; }
+    .ct-badge.disc   { background: #dbeafe; color: #1d4ed8; }
+    .ct-badge.full   { background: var(--bg2); color: var(--text2); }
+
+    /* Newsletter */
+    .newsletter-section {
+      background: linear-gradient(135deg, #0a0f28, #0d2260);
+      padding: 80px clamp(20px, 5vw, 60px);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .newsletter-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 50% 100%, rgba(245,168,0,.1), transparent);
+    }
+    .newsletter-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
+    .newsletter-logo {
+      height: 56px; width: auto; margin: 0 auto 24px; display: block;
+      filter: none !important; opacity: 1 !important;
+      mix-blend-mode: screen;
+    }
+    .newsletter-inner h2 {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 900; color: white; margin-bottom: 12px;
+    }
+    .newsletter-inner h2 span { color: var(--accent); }
+    .newsletter-inner p { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; margin-bottom: 30px; }
+    .newsletter-form {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    }
+    .newsletter-form input {
+      flex: 1; min-width: 200px;
+      padding: 14px 20px; border-radius: 50px;
+      border: 1.5px solid rgba(255,255,255,.15);
+      background: rgba(255,255,255,.08);
+      color: white; font-size: 15px;
+      outline: none; transition: border-color .2s;
+    }
+    .newsletter-form input::placeholder { color: rgba(255,255,255,.4); }
+    .newsletter-form input:focus { border-color: var(--accent); }
+    .newsletter-form button {
+      padding: 14px 30px; border-radius: 50px;
+      background: var(--accent); color: var(--ink);
+      border: none; font-family: 'Nunito', sans-serif;
+      font-size: 15px; font-weight: 900; cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      white-space: nowrap;
+    }
+    .newsletter-form button:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(245,168,0,.35); }
+    .newsletter-note { font-size: 12px; color: rgba(255,255,255,.35); margin-top: 14px; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .deals-grid { grid-template-columns: 1fr; }
+      .flash-sale-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .flash-countdown { flex-wrap: wrap; }
+      .deal-card-header { height: 120px; font-size: 52px; }
+      .seasonal-grid { grid-template-columns: 1fr; }
+      .concession-table { font-size: 13px; }
+      .concession-table th, .concession-table td { padding: 10px 14px; }
+    }
+  </style>
 </head>
 <body>
 <div id="app">
 
-  <section class="park-hero" style="min-height:50vh;">
-    <div class="park-hero-bg" style="background:linear-gradient(160deg,#7c2d12 0%,#c2410c 50%,#ea580c 100%);"></div>
-    <div class="park-hero-visual">🏷</div>
-    <div class="container park-hero-content">
-      <span class="park-hero-tag">Current Promotions</span>
-      <h1>Deals That Make<br>Your Day Sweeter</h1>
-      <p>Group discounts, combo savings, and seasonal deals — always better value when you book online.</p>
+  <!-- ===== HERO ===== -->
+  <section class="offers-hero">
+    <div class="offers-hero-bg"></div>
+    <div class="offers-hero-deco">
+      <span>🏷</span><span>💰</span><span>🎟</span><span>⚡</span>
+    </div>
+    <div class="offers-hero-content">
+      <!-- WOW Logo — HARD ADOPTED — on dark background -->
+      <img src="images/logo.png" alt="Worlds of Wonder" class="offers-hero-logo dark-section-logo" />
+      <div class="offers-hero-eyebrow">🔥 Hot Deals &amp; Flash Sales</div>
+      <h1>Save Big.<br><span class="accent">Play Bigger.</span></h1>
+      <p class="offers-hero-sub">Group discounts, seasonal flash sales, promo codes and annual passport — every deal you need to make your WOW day even more epic.</p>
+      <div class="hero-badge-row">
+        <div class="hero-stat-badge">🌊 Water Park from <strong>₹1,299</strong></div>
+        <div class="hero-stat-badge">🎢 Amusement from <strong>₹1,199</strong></div>
+        <div class="hero-stat-badge">🎟 Combo from <strong>₹1,999</strong></div>
+        <div class="hero-stat-badge">🪪 Passport <strong>₹4,999/yr</strong></div>
+      </div>
     </div>
   </section>
 
-  <div class="offer-strip">
-    <div class="offer-strip-inner">
-      <div class="offer-strip-item">⚡ All discounts applied automatically at checkout</div>
-      <div class="offer-dot"></div>
-      <div class="offer-strip-item">📱 Best prices online — no booking fee</div>
+  <!-- ===== FLASH SALE BANNER ===== -->
+  <div class="flash-sale-banner">
+    <div class="flash-sale-inner">
+      <div class="flash-label">
+        <span class="flash-icon">⚡</span>
+        <div class="flash-text">
+          FLASH SALE — Combo Tickets<br>
+          <span>₹200 OFF this weekend only · Use code WOWFLASH</span>
+        </div>
+      </div>
+      <div class="flash-countdown" id="flash-countdown">
+        <div class="cd-unit"><span class="cd-num" id="fc-h">00</span><span class="cd-lbl">Hrs</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="fc-m">00</span><span class="cd-lbl">Min</span></div>
+        <span class="cd-sep">:</span>
+        <div class="cd-unit"><span class="cd-num" id="fc-s">00</span><span class="cd-lbl">Sec</span></div>
+      </div>
+      <a href="book/combo.html" class="flash-book-btn">Grab Deal →</a>
     </div>
   </div>
 
+  <!-- ===== OFFER STRIP ===== -->
+  <div class="offer-strip">
+    <div class="offer-strip-inner">
+      <span class="offer-strip-item">⚡ All discounts auto-applied at checkout — no code needed for group deals</span>
+      <span class="offer-dot">★</span>
+      <span class="offer-strip-item">📱 Best prices always online — zero booking fee</span>
+      <span class="offer-dot">★</span>
+      <span class="offer-strip-item">👶 Kids under 90 cm / 3 yrs enter FREE</span>
+      <span class="offer-dot">★</span>
+      <span class="offer-strip-item">🎖 Special rates for Senior Citizens, Armed Forces &amp; Differently Abled</span>
+      <span class="offer-dot">★</span>
+      <span class="offer-strip-item">⚡ All discounts auto-applied at checkout — no code needed for group deals</span>
+      <span class="offer-dot">★</span>
+      <span class="offer-strip-item">📱 Best prices always online — zero booking fee</span>
+    </div>
+  </div>
+
+  <!-- ===== ALL DEALS GRID ===== -->
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag orange">Always-On Deals</span>
-        <h2 class="section-title">Save More, Enjoy More</h2>
-        <p class="section-sub">These discounts are always available — no promo code needed, automatically applied.</p>
+        <span class="section-tag">Current Promotions</span>
+        <h2 class="section-title">Every Deal, All in One Place</h2>
+        <p class="section-sub">From group discounts to flash sales — pick the best deal for your visit.</p>
       </div>
 
-      <div class="ticket-grid">
-        <div class="ticket-card">
-          <div class="ticket-badge green">Auto-applied</div>
-          <div class="ticket-card-header water">🌊</div>
-          <div class="ticket-card-body">
-            <h3>Water Park Group Deal</h3>
-            <p class="ticket-card-desc">Book 4 or more Water Park tickets and save ₹75 per person.</p>
-            <div class="ticket-price-row">
-              <div class="ticket-price" style="color:var(--wow-green);font-size:28px;">₹75</div>
-              <span class="ticket-per">saved / ticket · 4+ tickets</span>
+      <!-- Filter Tabs -->
+      <div class="deal-filters">
+        <button class="deal-filter-btn active" data-filter="all" onclick="filterDeals(this)">All Deals</button>
+        <button class="deal-filter-btn" data-filter="group" onclick="filterDeals(this)">👥 Group</button>
+        <button class="deal-filter-btn" data-filter="flash" onclick="filterDeals(this)">⚡ Flash Sale</button>
+        <button class="deal-filter-btn" data-filter="seasonal" onclick="filterDeals(this)">🌤 Seasonal</button>
+        <button class="deal-filter-btn" data-filter="kids" onclick="filterDeals(this)">👶 Kids &amp; Family</button>
+        <button class="deal-filter-btn" data-filter="annual" onclick="filterDeals(this)">🪪 Passport</button>
+      </div>
+
+      <div class="deals-grid" id="deals-grid">
+
+        <!-- Deal 1: Flash Combo -->
+        <div class="deal-card flash-deal" data-category="flash">
+          <div class="deal-ribbon red">Flash Sale</div>
+          <div class="deal-card-header dch-flash">⚡</div>
+          <div class="deal-card-body">
+            <div class="deal-tag flash">⚡ Flash Sale</div>
+            <h3>Weekend Flash: Combo ₹200 OFF</h3>
+            <p class="deal-desc">This weekend only — grab both parks at an unbeatable price. Use code at checkout for instant ₹200 discount on every Combo ticket.</p>
+            <div class="card-countdown">
+              <div class="card-cd-unit"><span class="card-cd-num" id="cc-h1">00</span><span class="card-cd-lbl">Hrs</span></div>
+              <span class="card-cd-sep">:</span>
+              <div class="card-cd-unit"><span class="card-cd-num" id="cc-m1">00</span><span class="card-cd-lbl">Min</span></div>
+              <span class="card-cd-sep">:</span>
+              <div class="card-cd-unit"><span class="card-cd-num" id="cc-s1">00</span><span class="card-cd-lbl">Sec</span></div>
             </div>
-            <div class="ticket-features">
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>No promo code needed</div>
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Valid all year round</div>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹200</div>
+              <div class="deal-save-label">
+                <strong>off per ticket</strong>
+                <span class="deal-original">Regular ₹1,999 → Flash ₹1,799</span>
+              </div>
             </div>
-            <a href="book/water-park.html" class="btn btn-blue" style="width:100%;justify-content:center;">Book Water Park</a>
+            <div class="promo-code-chip">
+              <span class="code">WOWFLASH</span>
+              <button class="promo-copy-btn" onclick="copyCode('WOWFLASH', this)">📋 Copy</button>
+            </div>
+            <div class="deal-validity urgent">
+              <div class="validity-dot red"></div>
+              Expires end of weekend — limited tickets
+            </div>
+            <a href="book/combo.html" class="btn btn-primary" style="width:100%;justify-content:center;">Book Combo with Code →</a>
           </div>
         </div>
 
-        <div class="ticket-card">
-          <div class="ticket-badge green">Auto-applied</div>
-          <div class="ticket-card-header amusement">🎢</div>
-          <div class="ticket-card-body">
-            <h3>Amusement Park Group Deal</h3>
-            <p class="ticket-card-desc">Book 4 or more Amusement Park tickets and save ₹50 per person.</p>
-            <div class="ticket-price-row">
-              <div class="ticket-price" style="color:var(--wow-green);font-size:28px;">₹50</div>
-              <span class="ticket-per">saved / ticket · 4+ tickets</span>
+        <!-- Deal 2: Group Water Park -->
+        <div class="deal-card" data-category="group">
+          <div class="deal-card-header dch-water">🌊</div>
+          <div class="deal-card-body">
+            <div class="deal-tag water">👥 Group Deal</div>
+            <h3>Water Park Group Discount</h3>
+            <p class="deal-desc">Book 4 or more Water Park tickets together and save ₹75 per person — automatically. No code, no hassle.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹75</div>
+              <div class="deal-save-label">
+                <strong>per ticket saved</strong>
+                <span class="deal-original">4+ tickets · auto-applied</span>
+              </div>
             </div>
-            <div class="ticket-features">
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>No promo code needed</div>
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Valid all year round</div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Always on · Valid all year round
             </div>
-            <a href="book/amusement-park.html" class="btn" style="width:100%;justify-content:center;background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;">Book Amusement Park</a>
+            <a href="book/water-park.html" class="btn btn-blue" style="width:100%;justify-content:center;">Book Water Park →</a>
           </div>
         </div>
 
-        <div class="ticket-card featured">
-          <div class="ticket-badge">Best Value</div>
-          <div class="ticket-card-header combo">🎟</div>
-          <div class="ticket-card-body">
+        <!-- Deal 3: Group Amusement -->
+        <div class="deal-card" data-category="group">
+          <div class="deal-card-header dch-amusement">🎢</div>
+          <div class="deal-card-body">
+            <div class="deal-tag amusement">👥 Group Deal</div>
+            <h3>Amusement Park Group Discount</h3>
+            <p class="deal-desc">Heading to the amusement park with 4+ people? Save ₹50 per ticket automatically when you add 4 or more tickets.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹50</div>
+              <div class="deal-save-label">
+                <strong>per ticket saved</strong>
+                <span class="deal-original">4+ tickets · auto-applied</span>
+              </div>
+            </div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Always on · Valid all year round
+            </div>
+            <a href="book/amusement-park.html" class="btn" style="width:100%;justify-content:center;background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;">Book Amusement →</a>
+          </div>
+        </div>
+
+        <!-- Deal 4: Combo Best Value -->
+        <div class="deal-card featured-deal" data-category="group">
+          <div class="deal-ribbon">Best Value</div>
+          <div class="deal-card-header dch-combo">🎟</div>
+          <div class="deal-card-body">
+            <div class="deal-tag combo">🏆 Best Value</div>
             <h3>WOW Combo — Both Parks</h3>
-            <p class="ticket-card-desc">Book Combo and get both parks for less than the price of buying separately.</p>
-            <div class="ticket-price-row">
-              <div class="ticket-price" style="color:var(--wow-green);font-size:28px;">₹499</div>
-              <span class="ticket-per">saved vs. separate tickets</span>
+            <p class="deal-desc">Skip buying two separate tickets. The Combo gives you full access to both the Water Park and Amusement Park for one price — saving ₹499 vs. buying separately.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹499</div>
+              <div class="deal-save-label">
+                <strong>saved vs. separate tickets</strong>
+                <span class="deal-original">Water ₹1,299 + Amusement ₹1,199 = ₹2,498</span>
+              </div>
             </div>
-            <div class="ticket-features">
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Water Park + Amusement Park</div>
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Group deal from 4+ tickets (₹125 more!)</div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Always available · Best value for full-day visits
             </div>
-            <a href="book/combo.html" class="btn btn-primary" style="width:100%;justify-content:center;">Book Combo Now</a>
+            <a href="book/combo.html" class="btn btn-primary" style="width:100%;justify-content:center;">Grab Combo — ₹1,999 →</a>
           </div>
         </div>
 
-        <div class="ticket-card">
-          <div class="ticket-badge purple">Membership</div>
-          <div class="ticket-card-header passport">🪪</div>
-          <div class="ticket-card-body">
-            <h3>WOW Passport</h3>
-            <p class="ticket-card-desc">Annual membership. Both parks. Unlimited visits. Best value for frequent visitors.</p>
-            <div class="ticket-price-row">
-              <div class="ticket-price"><sup>₹</sup>4,999</div>
-              <span class="ticket-per">per year</span>
+        <!-- Deal 5: Summer Splash Flash -->
+        <div class="deal-card flash-deal" data-category="flash seasonal">
+          <div class="deal-ribbon red">Limited Time</div>
+          <div class="deal-card-header dch-seasonal">☀️</div>
+          <div class="deal-card-body">
+            <div class="deal-tag seasonal">☀️ Summer Sale</div>
+            <h3>Summer Splash — Water Park 15% OFF</h3>
+            <p class="deal-desc">Beat the summer heat with 15% off Water Park tickets booked in advance. Cool rides, giant wave pool and lazy river awaits.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">15%</div>
+              <div class="deal-save-label">
+                <strong>off Water Park tickets</strong>
+                <span class="deal-original">Book 3+ days ahead · Online only</span>
+              </div>
             </div>
-            <div class="ticket-features">
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Unlimited visits all year</div>
-              <div class="ticket-feature"><div class="tick"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1.5 5l2.5 2.5 4.5-5"/></svg></div>Pays for itself in 4 visits</div>
+            <div class="promo-code-chip">
+              <span class="code">SUMMER15</span>
+              <button class="promo-copy-btn" onclick="copyCode('SUMMER15', this)">📋 Copy</button>
             </div>
-            <a href="passport.html" class="btn btn-outline" style="width:100%;justify-content:center;">Get Passport</a>
+            <div class="deal-validity urgent">
+              <div class="validity-dot red"></div>
+              Valid through end of season — don't miss it
+            </div>
+            <a href="book/water-park.html" class="btn btn-blue" style="width:100%;justify-content:center;">Book Summer Deal →</a>
           </div>
         </div>
-      </div>
+
+        <!-- Deal 6: Kids FREE -->
+        <div class="deal-card" data-category="kids">
+          <div class="deal-ribbon green">Always Free</div>
+          <div class="deal-card-header dch-kids">👶</div>
+          <div class="deal-card-body">
+            <div class="deal-tag kids">👶 Kids &amp; Family</div>
+            <h3>Kids Under 90 cm / 3 Yrs — FREE</h3>
+            <p class="deal-desc">Children under 90 cm in height or 3 years of age enter both parks absolutely free. No tickets needed for tiny adventurers!</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">100%</div>
+              <div class="deal-save-label">
+                <strong>free entry for small kids</strong>
+                <span class="deal-original">Height under 90 cm OR age under 3 yrs</span>
+              </div>
+            </div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Permanent policy · No booking required
+            </div>
+            <a href="book/water-park.html" class="btn btn-primary" style="width:100%;justify-content:center;">Book Family Tickets →</a>
+          </div>
+        </div>
+
+        <!-- Deal 7: Birthday Party -->
+        <div class="deal-card" data-category="kids group">
+          <div class="deal-card-header dch-kids">🎂</div>
+          <div class="deal-card-body">
+            <div class="deal-tag kids">🎂 Birthday Special</div>
+            <h3>Birthday Party Package</h3>
+            <p class="deal-desc">Celebrate birthdays at WOW! Special party packages from ₹499/guest — includes dedicated host, themed zone, custom banners and group entry priority.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹499</div>
+              <div class="deal-save-label">
+                <strong>per guest packages</strong>
+                <span class="deal-original">Min. 15 guests · Includes entry + party zone</span>
+              </div>
+            </div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Book 7 days in advance for availability
+            </div>
+            <a href="contact.html" class="btn btn-primary" style="width:100%;justify-content:center;">Enquire Now →</a>
+          </div>
+        </div>
+
+        <!-- Deal 8: Corporate / School -->
+        <div class="deal-card" data-category="group">
+          <div class="deal-card-header dch-group">🏢</div>
+          <div class="deal-card-body">
+            <div class="deal-tag group">🏢 Corporate / School</div>
+            <h3>Large Group Deal — 20+ People</h3>
+            <p class="deal-desc">Special negotiated rates for corporate outings, school trips and college events. Save ₹125+ per person on groups of 20 or more.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹125+</div>
+              <div class="deal-save-label">
+                <strong>per person for 20+ group</strong>
+                <span class="deal-original">Includes GST invoice + dedicated host</span>
+              </div>
+            </div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Get a custom quote in under 24 hours
+            </div>
+            <a href="groups/corporate.html" class="btn btn-primary" style="width:100%;justify-content:center;">Get Group Quote →</a>
+          </div>
+        </div>
+
+        <!-- Deal 9: WOW Passport -->
+        <div class="deal-card featured-deal" data-category="annual">
+          <div class="deal-ribbon purple">Annual Pass</div>
+          <div class="deal-card-header dch-passport">🪪</div>
+          <div class="deal-card-body">
+            <div class="deal-tag passport">🪪 Annual Passport</div>
+            <h3>WOW Passport — Unlimited All Year</h3>
+            <p class="deal-desc">Visit both parks as many times as you want for an entire year. Pays for itself in just 3 visits. Members also get priority access and exclusive event invites.</p>
+            <div class="deal-savings">
+              <div class="deal-save-amount">₹4,999</div>
+              <div class="deal-save-label">
+                <strong>per year · both parks</strong>
+                <span class="deal-original">Unlimited visits · 365 days valid</span>
+              </div>
+            </div>
+            <div class="deal-validity">
+              <div class="validity-dot"></div>
+              Pays for itself in just 3 visits
+            </div>
+            <a href="passport.html" class="btn btn-primary" style="width:100%;justify-content:center;">Get WOW Passport →</a>
+          </div>
+        </div>
+
+      </div><!-- /.deals-grid -->
     </div>
   </section>
 
+  <!-- ===== DON'T MISS STRIP ===== -->
+  <div class="dont-miss-strip">
+    <p>🎟 Book online and get the <span>best guaranteed price</span> — zero booking fee, instant QR ticket delivery.</p>
+    <a href="book/combo.html" class="btn btn-gold btn-lg">Book Now →</a>
+  </div>
+
+  <!-- ===== SEASONAL DEALS ===== -->
   <section class="section bg-light">
-    <div class="container-sm">
-      <div style="background:white;border-radius:24px;padding:40px;text-align:center;box-shadow:var(--shadow);">
-        <div style="font-size:48px;margin-bottom:16px;">🔔</div>
-        <h2 style="font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;margin-bottom:8px;">Get Flash Deal Alerts</h2>
-        <p style="color:var(--text2);margin-bottom:24px;">Holiday season deals, monsoon discounts and limited-time offers — delivered to your phone first.</p>
-        <div style="display:flex;gap:12px;max-width:440px;margin:0 auto;">
-          <input class="input" type="tel" placeholder="Your 10-digit mobile" style="flex:1;" />
-          <button class="btn btn-primary" onclick="alert('You\'re subscribed! We\'ll send you the best deals via SMS.')">Notify Me</button>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Seasonal Promotions</span>
+        <h2 class="section-title">Deals for Every Season</h2>
+        <p class="section-sub">Special offers that change with the calendar — bookmark this page and check back often.</p>
+      </div>
+
+      <div class="seasonal-grid">
+        <div class="seasonal-card" style="background:linear-gradient(135deg,#0369a1,#0ea5e9);">
+          <span class="sc-badge">☀️ Summer Special</span>
+          <h3>Monsoon Madness Sale</h3>
+          <p>Splash in the wave pool while it rains outside! Monsoon season means special midweek prices on Water Park tickets.</p>
+          <a href="book/water-park.html" class="btn btn-white btn-sm">Book Now</a>
         </div>
-        <p style="font-size:12px;color:var(--text3);margin-top:12px;">No spam. Unsubscribe anytime. We promise.</p>
+        <div class="seasonal-card" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+          <span class="sc-badge">🪔 Festive Season</span>
+          <h3>Festive Family Combo</h3>
+          <p>Diwali, Holi, and school holiday season bring special family packages. Check availability and grab your festival deal early.</p>
+          <a href="book/combo.html" class="btn btn-white btn-sm">View Package</a>
+        </div>
+        <div class="seasonal-card" style="background:linear-gradient(135deg,#065f46,#059669);">
+          <span class="sc-badge">🎒 Back to School</span>
+          <h3>Student Groups — Flat ₹100 OFF</h3>
+          <p>School groups and college trips get flat ₹100 off per ticket on orders of 30+. Valid ID / school letter required at entry.</p>
+          <a href="groups/schools.html" class="btn btn-white btn-sm">Plan a Trip</a>
+        </div>
+        <div class="seasonal-card" style="background:linear-gradient(135deg,#c2410c,#ea580c);">
+          <span class="sc-badge">🎉 New Year</span>
+          <h3>New Year's Day Extravaganza</h3>
+          <p>Ring in the New Year with a mega WOW day — special pricing, live entertainment and exclusive fireworks-themed decor across both parks.</p>
+          <a href="contact.html" class="btn btn-white btn-sm">Notify Me</a>
+        </div>
       </div>
     </div>
   </section>
 
-</div>
+  <!-- ===== CONCESSION RATES ===== -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Special Concessions</span>
+        <h2 class="section-title">Rates for Every Visitor</h2>
+        <p class="section-sub">We believe everyone deserves a WOW experience. Concession rates automatically applied at entry — valid ID required.</p>
+      </div>
+
+      <div style="overflow-x:auto;border-radius:var(--r);box-shadow:var(--shadow-sm);">
+        <table class="concession-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Water Park</th>
+              <th>Amusement Park</th>
+              <th>Combo</th>
+              <th>Required ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>👶 Kids under 90 cm / 3 yrs</td>
+              <td><span class="ct-badge free">FREE</span></td>
+              <td><span class="ct-badge free">FREE</span></td>
+              <td><span class="ct-badge free">FREE</span></td>
+              <td>None required</td>
+            </tr>
+            <tr>
+              <td>👶 Kids 3–12 yrs (90–130 cm)</td>
+              <td><span class="ct-badge disc">₹999</span></td>
+              <td><span class="ct-badge disc">₹899</span></td>
+              <td><span class="ct-badge disc">₹1,499</span></td>
+              <td>Birth certificate / School ID</td>
+            </tr>
+            <tr>
+              <td>🧓 Senior Citizens (60+ yrs)</td>
+              <td><span class="ct-badge disc">₹999</span></td>
+              <td><span class="ct-badge disc">₹899</span></td>
+              <td><span class="ct-badge disc">₹1,599</span></td>
+              <td>Aadhar / Voter ID</td>
+            </tr>
+            <tr>
+              <td>🎖 Armed Forces &amp; Veterans</td>
+              <td><span class="ct-badge disc">₹999</span></td>
+              <td><span class="ct-badge disc">₹899</span></td>
+              <td><span class="ct-badge disc">₹1,599</span></td>
+              <td>Service ID / Ex-Serviceman Card</td>
+            </tr>
+            <tr>
+              <td>♿ Differently Abled</td>
+              <td><span class="ct-badge disc">₹999</span></td>
+              <td><span class="ct-badge disc">₹899</span></td>
+              <td><span class="ct-badge disc">₹1,499</span></td>
+              <td>Disability certificate</td>
+            </tr>
+            <tr>
+              <td>👨‍👩‍👧‍👦 Standard Adult (13+ yrs)</td>
+              <td><span class="ct-badge full">₹1,299</span></td>
+              <td><span class="ct-badge full">₹1,199</span></td>
+              <td><span class="ct-badge full">₹1,999</span></td>
+              <td>No ID required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:13px;color:var(--text3);margin-top:16px;text-align:center;">
+        All prices include 18% GST. Concession rates subject to change without notice. Valid at main ticket counter and online booking.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== NEWSLETTER / DEAL ALERTS ===== -->
+  <section class="newsletter-section">
+    <div class="newsletter-inner">
+      <!-- WOW Logo — HARD ADOPTED — on dark background -->
+      <img src="images/logo.png" alt="Worlds of Wonder" class="newsletter-logo dark-section-logo" />
+      <h2>Get <span>Flash Deal</span> Alerts First</h2>
+      <p>Holiday season mega-sales, monsoon discounts and limited-time flash offers — delivered straight to your mobile. Be first in line, pay less.</p>
+      <div class="newsletter-form">
+        <input type="tel" id="nl-phone" placeholder="📱 Your 10-digit mobile number" maxlength="10" />
+        <button onclick="subscribeAlert()">Get Alerts 🔔</button>
+      </div>
+      <p class="newsletter-note">✓ Zero spam &nbsp;·&nbsp; ✓ Max 2 messages/month &nbsp;·&nbsp; ✓ Unsubscribe anytime</p>
+      <div id="nl-success" style="display:none;margin-top:16px;color:var(--accent);font-weight:700;font-size:15px;">
+        🎉 You're subscribed! We'll send you the best WOW deals first.
+      </div>
+    </div>
+  </section>
+
+</div><!-- #app -->
 <script src="js/shell.js"></script>
-</body>
+<script>
+/* ── Flash sale countdown: ends next Sunday midnight ── */
+function getNextSundayMidnight() {
+  const now  = new Date();
+  const day  = now.getDay(); // 0=Sun
+  const daysToSunday = day === 0 ? 7 : 7 - day;
+  const next = new Date(now);
+  next.setDate(now.getDate() + daysToSunday);
+  next.setHours(23, 59, 59, 0);
+  return next;
+}
+
+const flashEnd = getNextSundayMidnight();
+
+function updateCountdowns() {
+  const now   = new Date();
+  const diff  = Math.max(0, flashEnd - now);
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+
+  const pad = n => String(n).padStart(2,'0');
+
+  /* Flash banner */
+  const fh = document.getElementById('fc-h');
+  const fm = document.getElementById('fc-m');
+  const fs = document.getElementById('fc-s');
+  if (fh) fh.textContent = pad(h);
+  if (fm) fm.textContent = pad(m);
+  if (fs) fs.textContent = pad(s);
+
+  /* Card #1 mini countdown */
+  const ch = document.getElementById('cc-h1');
+  const cm = document.getElementById('cc-m1');
+  const cs = document.getElementById('cc-s1');
+  if (ch) ch.textContent = pad(h);
+  if (cm) cm.textContent = pad(m);
+  if (cs) cs.textContent = pad(s);
+}
+
+setInterval(updateCountdowns, 1000);
+updateCountdowns();
+
+/* ── Filter deals ── */
+function filterDeals(btn) {
+  document.querySelectorAll('.deal-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filter = btn.dataset.filter;
+  document.querySelectorAll('.deal-card').forEach(card => {
+    const cats = card.dataset.category || '';
+    if (filter === 'all' || cats.includes(filter)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+/* ── Copy promo code ── */
+function copyCode(code, btn) {
+  navigator.clipboard.writeText(code).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    btn.style.color = '#15803d';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.color = '';
+    }, 2000);
+  }).catch(() => {
+    /* Fallback for older browsers */
+    const el = document.createElement('textarea');
+    el.value = code;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+/* ── Newsletter subscribe ── */
+function subscribeAlert() {
+  const phone = document.getElementById('nl-phone').value.trim();
+  if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
+    alert('Please enter a valid 10-digit mobile number.');
+    return;
+  }
+  document.getElementById('nl-success').style.display = 'block';
+  document.getElementById('nl-phone').value = '';
+}
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
