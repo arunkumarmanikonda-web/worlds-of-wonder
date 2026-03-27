@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Rides &amp; Attractions — Worlds of Wonder, Noida</title>
+  <meta name="description" content="Explore all 50+ rides and attractions at Worlds of Wonder Noida — Wave Pool, Rockin Roller, Lazy River, Giant Wheel, Boomerango, Kids Zone and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- Hero -->
+  <section class="rides-hero">
+    <div class="rides-hero-overlay"></div>
+    <div class="container rides-hero-inner">
+      <div class="section-tag section-tag--teal">🎢 Rides &amp; Attractions</div>
+      <h1 class="rides-hero-title">50+ Rides. Zero Boring Moments.</h1>
+      <p class="rides-hero-sub">From white-knuckle drops to chill lazy rivers — two parks, every kind of thrill, and something brilliant for every single guest.</p>
+      <div class="rides-hero-tabs">
+        <button class="rides-tab active" onclick="filterRides('all',this)">All Rides</button>
+        <button class="rides-tab" onclick="filterRides('water',this)">🌊 Water Park</button>
+        <button class="rides-tab" onclick="filterRides('amusement',this)">🎢 Amusement Park</button>
+        <button class="rides-tab" onclick="filterRides('kids',this)">👶 Kids &amp; Family</button>
+        <button class="rides-tab" onclick="filterRides('thrill',this)">⚡ Thrill</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rides grid -->
+  <section class="section" style="background:#f4f7fb;">
+    <div class="container">
+      <div class="rides-grid" id="rides-grid">
+
+        <!-- Water Park Rides -->
+        <div class="ride-card" data-park="water" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-wave-pool.jpg" alt="Giant Wave Pool" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--thrill">Thrill</span></div>
+          <h3>Giant Wave Pool</h3>
+          <p>2,500 sq m of artificial ocean waves. Stand, swim, or just get knocked off your feet — the wave pool is the heart of WOW.</p>
+          <div class="rc-meta"><span>📏 Min height: None</span><span>👶 Family friendly</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-tube-slides.jpg" alt="Tube Slides" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--thrill">Thrill</span></div>
+          <h3>Tube Slides</h3>
+          <p>Spiral into darkness on single and double tube slides. Near-blackout sections, tight curves, and a splash-pool finish. Heart-rate guaranteed.</p>
+          <div class="rc-meta"><span>📏 Min height: 120 cm</span><span>⚡ Thrill ride</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-water-slides.jpg" alt="Surf Hill Speed Slides" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--thrill">Extreme</span></div>
+          <h3>Surf Hill — Speed Slides</h3>
+          <p>25 m drop. 60° gradient. Reach speeds of 60+ km/h on the steepest slides in Delhi NCR. This one is not for the faint-hearted.</p>
+          <div class="rc-meta"><span>📏 Min height: 130 cm</span><span>⚡ Extreme thrill</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="kids">
+          <div class="rc-img-wrap"><img src="images/ride-lazy-river.jpg" alt="Lazy River" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--kids">Relaxed</span></div>
+          <h3>Lazy River</h3>
+          <p>300 m of slow, scenic floating. Grab a ring and drift through lush landscaped surroundings. The perfect break between thrill rides.</p>
+          <div class="rc-meta"><span>📏 No min height</span><span>👶 All ages</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="kids">
+          <div class="rc-img-wrap"><img src="images/ride-kids-splash.jpg" alt="Kids Splash Zone" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--kids">Kids</span></div>
+          <h3>Kids Splash Zone</h3>
+          <p>Dedicated water-play area for ages 2–10. Shallow pools, mini slides, tipping buckets, and spray jets at a safe, supervised height.</p>
+          <div class="rc-meta"><span>📏 Ages 2–10</span><span>👶 Kids only</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-boomerango.jpg" alt="Boomerango Funnel Slide" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--thrill">Thrill</span></div>
+          <h3>Boomerango — Funnel Slide</h3>
+          <p>Ride in a 4-person raft, plunge into a giant funnel, and sway side to side before dropping through the exit. Screaming is mandatory.</p>
+          <div class="rc-meta"><span>📏 Min height: 120 cm</span><span>🛶 Family raft</span></div>
+        </div>
+
+        <div class="ride-card" data-park="water" data-type="thrill">
+          <div class="rc-img-wrap" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);display:flex;align-items:center;justify-content:center;"><span style="font-size:60px;">💃</span></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--water">🌊 Water Park</span><span class="rc-tag rc-tag--kids">All Ages</span></div>
+          <h3>Rain Disco</h3>
+          <p>Twilight water party with pulsing music, coloured LED rain showers, and a covered dance floor. The most Instagrammable moment in the park.</p>
+          <div class="rc-meta"><span>🕔 4:30–6:00 PM daily</span><span>✨ Evening special</span></div>
+        </div>
+
+        <!-- Amusement Park Rides -->
+        <div class="ride-card" data-park="amusement" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-rockin-roller.jpg" alt="Rockin Roller Coaster" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--thrill">Extreme</span></div>
+          <h3>Rockin Roller</h3>
+          <p>Delhi NCR's most intense steel coaster. Multiple loops, inversions, and a 360° barrel roll at 85 km/h. The signature WOW experience.</p>
+          <div class="rc-meta"><span>📏 Min height: 140 cm</span><span>⚡ Extreme thrill</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-giant-wheel.jpg" alt="Giant Wheel" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--kids">Family</span></div>
+          <h3>Giant Wheel</h3>
+          <p>40 m Ferris wheel with fully enclosed gondolas. Breathtaking 360° views over Noida and Delhi. Beautiful at sunset.</p>
+          <div class="rc-meta"><span>📏 Min height: 90 cm</span><span>👶 Family friendly</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-pendulum.jpg" alt="Columbus Pendulum" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--thrill">Thrill</span></div>
+          <h3>Columbus — Swinging Pendulum</h3>
+          <p>A full-size swinging ship that reaches 70° — the stomach-drop feeling at the top of each arc is something you'll feel for hours after.</p>
+          <div class="rc-meta"><span>📏 Min height: 120 cm</span><span>⚡ Thrill ride</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="kids">
+          <div class="rc-img-wrap"><img src="images/ride-bumper-cars.jpg" alt="Bumper Cars" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--kids">Family</span></div>
+          <h3>Bumper Cars</h3>
+          <p>Full-sized electric bumper cars in a dedicated arena. Crash, dodge, and spin your way around. The ride that makes grandparents forget their age.</p>
+          <div class="rc-meta"><span>📏 Min height: 100 cm</span><span>👶 All ages</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="kids">
+          <div class="rc-img-wrap"><img src="images/ride-ferris-wheel.jpg" alt="Kids Zone" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--kids">Kids</span></div>
+          <h3>Kids Zone</h3>
+          <p>A dedicated area with 8+ age-appropriate rides including mini coaster, teacups, carousel, and a sky tower. Perfect for little ones aged 3–10.</p>
+          <div class="rc-meta"><span>📏 Ages 3–10</span><span>👶 Kids zone</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="kids">
+          <div class="rc-img-wrap" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;"><span style="font-size:60px;">🎭</span></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--kids">Show</span></div>
+          <h3>Live Shows Daily</h3>
+          <p>Acrobatics, magic, live music, and street performance at the park's main stage. Two shows daily at 12:00 PM and 4:00 PM — free with any ticket.</p>
+          <div class="rc-meta"><span>🕛 12 PM &amp; 4 PM</span><span>🎟 Free with entry</span></div>
+        </div>
+
+        <div class="ride-card" data-park="amusement" data-type="thrill">
+          <div class="rc-img-wrap"><img src="images/ride-roller-coaster.jpg" alt="Roller Coaster" loading="lazy" /></div>
+          <div class="rc-tags"><span class="rc-tag rc-tag--amusement">🎢 Amusement</span><span class="rc-tag rc-tag--thrill">Thrill</span></div>
+          <h3>Family Coaster</h3>
+          <p>A gentler coaster with dips, turns, and a long track — designed for families and first-time coaster riders. Still plenty of fun.</p>
+          <div class="rc-meta"><span>📏 Min height: 110 cm</span><span>👶 Family friendly</span></div>
+        </div>
+
+      </div><!-- /#rides-grid -->
+    </div>
+  </section>
+
+  <!-- Book CTA -->
+  <section class="section" style="background:linear-gradient(135deg,#0a1628 0%,#1a2a50 100%);padding:60px 0;">
+    <div class="container" style="text-align:center;">
+      <h2 style="font-family:'Nunito',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:900;color:white;margin-bottom:12px;">Ready to Ride All of These?</h2>
+      <p style="font-size:17px;color:rgba(255,255,255,.7);max-width:540px;margin:0 auto 32px;line-height:1.7;">Book online today and skip the gate queue entirely. Your QR is in your inbox in minutes.</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="book/water-park.html" class="btn btn-xl btn-primary">🌊 Book Water Park</a>
+        <a href="book/amusement-park.html" class="btn btn-xl" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;">🎢 Book Amusement Park</a>
+        <a href="book/combo.html" class="btn btn-xl" style="background:linear-gradient(135deg,#FF6B00,#e05500);color:white;">🎟 Combo — Both Parks</a>
+      </div>
+    </div>
+  </section>
+
+</div><!-- #app -->
+<style>
+.rides-hero{position:relative;min-height:460px;display:flex;align-items:flex-end;background:linear-gradient(160deg,#0a1628 0%,#0044a0 60%,#006EE6 100%);padding-bottom:0;}
+.rides-hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 80% 30%,rgba(0,200,180,.12),transparent);pointer-events:none;}
+.rides-hero-inner{position:relative;z-index:1;padding-top:120px;padding-bottom:0;width:100%;}
+.rides-hero-title{font-family:'Nunito',sans-serif;font-size:clamp(30px,5vw,58px);font-weight:900;color:white;line-height:1.1;margin:14px 0 14px;letter-spacing:-.03em;}
+.rides-hero-sub{font-size:16.5px;color:rgba(255,255,255,.8);line-height:1.7;margin-bottom:24px;max-width:600px;}
+.rides-hero-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:0;margin-bottom:0;}
+.rides-tab{padding:10px 20px;border-radius:10px 10px 0 0;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.rides-tab.active,.rides-tab:hover{background:white;color:#0a1628;}
+.rides-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:8px;}
+.ride-card{background:white;border:1px solid #e5edf8;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;}
+.ride-card:hover{transform:translateY(-5px);box-shadow:0 12px 28px rgba(0,0,0,.1);}
+.ride-card.hidden{display:none;}
+.rc-img-wrap{height:180px;overflow:hidden;}
+.rc-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .3s;}
+.ride-card:hover .rc-img-wrap img{transform:scale(1.05);}
+.rc-tags{display:flex;gap:6px;padding:12px 14px 4px;flex-wrap:wrap;}
+.rc-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;}
+.rc-tag--water{background:#eef6ff;color:#006EE6;}
+.rc-tag--amusement{background:#f5f0ff;color:#7c3aed;}
+.rc-tag--thrill{background:#fff8f0;color:#FF6B00;}
+.rc-tag--kids{background:#f0fdf4;color:#059669;}
+.ride-card h3{font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:#0a1628;padding:0 14px 6px;margin:4px 0 0;}
+.ride-card p{font-size:13px;color:#5a6a80;line-height:1.6;padding:0 14px 10px;}
+.rc-meta{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap;}
+.rc-meta span{font-size:11.5px;color:#718096;background:#f8faff;border-radius:6px;padding:3px 8px;}
+@media(max-width:1100px){.rides-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){.rides-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.rides-grid{grid-template-columns:1fr;}.rides-hero-tabs{gap:6px;}.rides-tab{font-size:13px;padding:8px 14px;}}
+</style>
+<script>
+function filterRides(filter, btn) {
+  document.querySelectorAll('.rides-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ride-card').forEach(card => {
+    if (filter === 'all') {
+      card.classList.remove('hidden');
+    } else if (filter === 'water' || filter === 'amusement') {
+      card.classList.toggle('hidden', card.dataset.park !== filter);
+    } else {
+      // kids or thrill — show cross-park
+      card.classList.toggle('hidden', card.dataset.type !== filter);
+    }
+  });
+}
+</script>
+<script src="js/shell.js"></script>
+</body>
+</html>

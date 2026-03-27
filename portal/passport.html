@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Passport — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+  <div class="portal-dashboard">
+    <!-- Sidebar -->
+    <aside class="portal-sidebar" id="portal-sidebar">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" /></a>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="my-bookings.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Bookings</a>
+        <a href="passport.html" class="portal-sidenav-item active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>My Passport</a>
+        <a href="profile.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+        <a href="offers.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>My Offers</a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to Website</a>
+        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+      </nav>
+    </aside>
+
+    <main class="portal-main">
+      <div id="portal-loading" class="portal-loading"><div class="portal-spinner"></div><p>Loading passport…</p></div>
+      <div id="portal-content" style="display:none;">
+
+        <div class="portal-main-header">
+          <div>
+            <h1 class="portal-main-title">My Passport</h1>
+            <p class="portal-main-sub">Your annual membership — unlimited visits, all year round</p>
+          </div>
+        </div>
+
+        <!-- No passport state -->
+        <div id="no-passport">
+          <div class="portal-card" style="text-align:center;padding:52px 24px;">
+            <div style="font-size:64px;margin-bottom:16px;">🪪</div>
+            <h2 style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#0a1628;margin-bottom:10px;">No Active Passport</h2>
+            <p style="font-size:15px;color:#5a6a80;line-height:1.7;max-width:480px;margin:0 auto 28px;">You don't have an active WOW Passport. Buy once and visit as many times as your heart desires — all year round, both parks.</p>
+
+            <!-- Passport plans -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:left;margin-bottom:28px;max-width:700px;margin-left:auto;margin-right:auto;">
+              <div class="portal-card" style="border-top:3px solid #006EE6;">
+                <div style="font-size:28px;margin-bottom:8px;">🌊</div>
+                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Water Park Passport</div>
+                <div style="font-size:22px;font-weight:900;color:#006EE6;font-family:'Nunito',sans-serif;">₹2,999</div>
+                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
+                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
+                  <li>✅ Unlimited Water Park visits</li>
+                  <li>✅ 365-day validity</li>
+                  <li>✅ Member-only offers</li>
+                </ul>
+              </div>
+              <div class="portal-card" style="border-top:3px solid #7c3aed;">
+                <div style="font-size:28px;margin-bottom:8px;">🎢</div>
+                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Amusement Passport</div>
+                <div style="font-size:22px;font-weight:900;color:#7c3aed;font-family:'Nunito',sans-serif;">₹2,499</div>
+                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
+                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
+                  <li>✅ Unlimited Amusement visits</li>
+                  <li>✅ 365-day validity</li>
+                  <li>✅ Member-only offers</li>
+                </ul>
+              </div>
+              <div class="portal-card" style="border-top:3px solid #FF6B00;">
+                <div style="font-size:28px;margin-bottom:8px;">🎟</div>
+                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Combo Passport</div>
+                <div style="font-size:22px;font-weight:900;color:#FF6B00;font-family:'Nunito',sans-serif;">₹4,999</div>
+                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
+                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
+                  <li>✅ Both parks, unlimited</li>
+                  <li>✅ 365-day validity</li>
+                  <li>✅ Pays off in 3 visits</li>
+                </ul>
+              </div>
+            </div>
+
+            <a href="../passport.html" class="btn btn-primary" style="font-size:15px;padding:12px 32px;">
+              🪪 View Passport Plans &amp; Buy
+            </a>
+          </div>
+        </div>
+
+        <!-- Active passport state (shown when user has one) -->
+        <div id="active-passport" style="display:none;">
+          <div class="portal-card" style="background:linear-gradient(135deg,#0a1628,#1a2a4a);color:white;padding:32px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+              <div>
+                <div style="font-size:12px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Active Passport</div>
+                <div id="passport-plan-name" style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#F5A800;margin-bottom:4px;">WOW Combo Passport</div>
+                <div id="passport-member-no" style="font-size:13px;color:rgba(255,255,255,.5);">Member No: WOW-XXXX-XXXX</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px;">Valid Until</div>
+                <div id="passport-expiry" style="font-size:20px;font-weight:800;color:white;">—</div>
+                <div id="passport-days-left" style="font-size:13px;color:#86efac;margin-top:4px;">— days remaining</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+
+  const app  = initializeApp(WOW_FB_CONFIG);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    document.getElementById('portal-loading').style.display = 'none';
+    document.getElementById('portal-content').style.display = 'block';
+
+    // Check for active passport in Firestore
+    try {
+      const snap = await getDoc(doc(db, 'passports', user.uid));
+      if (snap.exists() && snap.data().status === 'active') {
+        const data = snap.data();
+        document.getElementById('no-passport').style.display = 'none';
+        document.getElementById('active-passport').style.display = 'block';
+        document.getElementById('passport-plan-name').textContent = data.planName || 'WOW Passport';
+        document.getElementById('passport-member-no').textContent = 'Member No: ' + (data.membershipNumber || '—');
+        const exp = data.validTo?.toDate();
+        if (exp) {
+          document.getElementById('passport-expiry').textContent = exp.toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+          const days = Math.ceil((exp - new Date()) / 86400000);
+          document.getElementById('passport-days-left').textContent = days > 0 ? `${days} days remaining` : 'Expired';
+        }
+      }
+    } catch {}
+  });
+
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../index.html';
+  });
+</script>
+</body>
+</html>

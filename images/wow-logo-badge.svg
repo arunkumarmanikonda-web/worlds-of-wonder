@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 76" width="200" height="76">
+  <defs>
+    <filter id="txtShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-color="rgba(0,0,0,0.55)"/>
+    </filter>
+    <filter id="badgeShadow" x="-8%" y="-8%" width="116%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.35)"/>
+    </filter>
+  </defs>
+  <!-- Navy border -->
+  <path d="M 10,4 Q 100,1 190,4 L 187,46 Q 168,66 100,72 Q 32,66 13,46 Z"
+        fill="#1a237e" filter="url(#badgeShadow)"/>
+  <!-- Red fill -->
+  <path d="M 15,8 Q 100,5 185,8 L 182,44 Q 164,62 100,68 Q 36,62 18,44 Z"
+        fill="#CC1111"/>
+  <!-- "Worlds of Wonder" -->
+  <text
+    x="100" y="42"
+    font-family="'Palatino Linotype','Book Antiqua',Palatino,'Times New Roman',serif"
+    font-size="21"
+    font-weight="900"
+    font-style="italic"
+    fill="white"
+    text-anchor="middle"
+    letter-spacing="-0.3"
+    filter="url(#txtShadow)"
+  >Worlds of Wonder</text>
+  <!-- Tagline -->
+  <text
+    x="100" y="54"
+    font-family="Arial,sans-serif"
+    font-size="6"
+    font-weight="700"
+    fill="rgba(255,255,255,0.8)"
+    text-anchor="middle"
+    letter-spacing="0.8"
+  >AMUSEMENT PARK · WATER PARK · NOIDA</text>
+</svg>

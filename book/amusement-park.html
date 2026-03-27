@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Amusement Park Tickets — Worlds of Wonder, Noida</title>
+  <meta name="description" content="Book Amusement Park tickets online at Worlds of Wonder, Noida. Adult, Child, Senior Citizen, Armed Forces &amp; Specially Abled rates. Instant QR e-tickets, no booking fee." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/booking-page.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ── BOOKING HERO ─────────────────────────────────── -->
+  <div class="bk-hero bk-hero--amusement">
+    <div class="container">
+      <nav class="bk-breadcrumb">
+        <a href="../index.html">Home</a>
+        <span>›</span>
+        <a href="../amusement-park.html">Amusement Park</a>
+        <span>›</span>
+        <span>Book Tickets</span>
+      </nav>
+      <div class="bk-hero-badge">🎢 Amusement Park</div>
+      <h1>Book Amusement Park Tickets</h1>
+      <p>Roller Coasters · Live Shows · Thrills for everyone — your adventure starts here.</p>
+      <div class="bk-trust-strip">
+        <span>🔒 Secure checkout</span>
+        <span>📱 Instant QR ticket</span>
+        <span>✅ No booking fee</span>
+        <span>🎫 Valid for chosen date only</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ────────────────────────────────────────── -->
+  <div class="bk-body">
+    <div class="container">
+      <div class="bk-layout">
+
+        <!-- ── LEFT / MAIN ─────────────────────────────── -->
+        <div class="bk-main">
+
+          <!-- STEP 1 — Guest details -->
+          <section class="bk-card">
+            <div class="bk-card-step">
+              <div class="bk-step-num bk-step-num--amusement">1</div>
+              <div>
+                <div class="bk-step-title">Lead Guest Details</div>
+                <div class="bk-step-sub">We'll send the QR ticket to this mobile number</div>
+              </div>
+            </div>
+            <div class="bk-card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="label" for="full-name">Full Name *</label>
+                  <input class="input" id="full-name" type="text" placeholder="e.g. Priya Sharma" autocomplete="name" />
+                  <div class="field-err hidden" id="full-name-err"></div>
+                </div>
+                <div class="form-group">
+                  <label class="label" for="mobile">Mobile Number *</label>
+                  <div class="input-prefix-wrap">
+                    <span class="input-prefix">+91</span>
+                    <input class="input input--prefixed" id="mobile" type="tel" placeholder="10-digit number" maxlength="10" autocomplete="tel" />
+                  </div>
+                  <div class="field-err hidden" id="mobile-err"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- STEP 2 — Visit Date -->
+          <section class="bk-card">
+            <div class="bk-card-step">
+              <div class="bk-step-num bk-step-num--amusement">2</div>
+              <div>
+                <div class="bk-step-title">Choose Your Visit Date</div>
+                <div class="bk-step-sub">Tickets are valid for the selected date only. No rescheduling.</div>
+              </div>
+            </div>
+            <div class="bk-card-body">
+              <div class="form-grid form-grid--narrow">
+                <div class="form-group">
+                  <label class="label" for="visit-date">Visit Date *</label>
+                  <input class="input" id="visit-date" type="date" />
+                  <div class="field-err hidden" id="visit-date-err"></div>
+                </div>
+                <div class="bk-timing-card">
+                  <div class="bk-timing-row"><span class="bk-timing-icon">🕙</span><div><strong>Park opens:</strong> 10:00 AM</div></div>
+                  <div class="bk-timing-row"><span class="bk-timing-icon">🌅</span><div><strong>Last entry:</strong> 4:00 PM</div></div>
+                  <div class="bk-timing-row"><span class="bk-timing-icon">🎭</span><div><strong>Live shows:</strong> 12 PM · 3 PM · 5 PM</div></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- STEP 3 — Ticket categories -->
+          <section class="bk-card">
+            <div class="bk-card-step">
+              <div class="bk-step-num bk-step-num--amusement">3</div>
+              <div style="flex:1;">
+                <div class="bk-step-title">Select Tickets</div>
+                <div class="bk-step-sub">Choose the number of tickets per guest category</div>
+              </div>
+              <div class="ticket-count-badge ticket-count-badge--amusement" id="total-tickets-count">0 tickets</div>
+            </div>
+
+            <div class="bk-card-body bk-card-body--flush">
+
+              <!-- Free-entry notice -->
+              <div class="bk-notice bk-notice--purple">
+                <span>👶</span>
+                <span><strong>Children under 90 cm or 3 years</strong> enter FREE — no ticket required. Must be accompanied by a ticketed adult.</span>
+              </div>
+
+              <!-- Category rows rendered by JS -->
+              <div class="cat-rows-wrap cat-rows-wrap--amusement" id="ticket-categories"></div>
+
+              <!-- Group hint -->
+              <div class="cat-hint hidden" id="group-hint"></div>
+
+              <!-- Proof-required reminder -->
+              <div class="bk-notice bk-notice--amber" style="margin-top:12px;">
+                <span>📋</span>
+                <span>For <strong>Senior Citizen, Armed Forces</strong> and <strong>Differently Abled</strong> categories — carry valid ID proof at the gate.</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- WHAT'S INCLUDED -->
+          <section class="bk-card bk-card--tinted-purple">
+            <div class="bk-card-body">
+              <div class="bk-includes-title">✓ What's included in your Amusement Park ticket</div>
+              <div class="bk-includes-grid">
+                <div class="bk-include-item">🎢 30+ rides &amp; attractions</div>
+                <div class="bk-include-item">🎭 Live shows (3 daily)</div>
+                <div class="bk-include-item">🎡 Themed adventure zones</div>
+                <div class="bk-include-item">👶 Kids &amp; family rides</div>
+                <div class="bk-include-item">🎮 Game arcades access</div>
+                <div class="bk-include-item">🍔 Food court access</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- HOW IT WORKS -->
+          <section class="bk-card">
+            <div class="bk-card-body">
+              <div class="bk-how-steps">
+                <div class="bk-how-step"><div class="bk-how-num">1</div><div>Fill details &amp; select tickets</div></div>
+                <div class="bk-how-arrow">→</div>
+                <div class="bk-how-step"><div class="bk-how-num">2</div><div>Confirm &amp; pay securely</div></div>
+                <div class="bk-how-arrow">→</div>
+                <div class="bk-how-step"><div class="bk-how-num">3</div><div>QR ticket on your phone</div></div>
+                <div class="bk-how-arrow">→</div>
+                <div class="bk-how-step"><div class="bk-how-num">4</div><div>Show QR at park gate</div></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- MOBILE CTA -->
+          <div class="bk-cta-mobile">
+            <div class="bk-cta-mobile-total">
+              <span>Total</span>
+              <strong id="mobile-sum-total">₹ —</strong>
+            </div>
+            <button class="btn bk-cta-btn bk-cta-btn--amusement" id="checkout-btn-mobile">
+              Proceed to Pay →
+            </button>
+          </div>
+
+        </div><!-- /.bk-main -->
+
+        <!-- ── RIGHT SIDEBAR ──────────────────────────── -->
+        <aside class="bk-sidebar">
+
+          <div class="bk-summary bk-summary--amusement">
+            <div class="bk-summary-header">
+              <div class="bk-summary-icon">🎢</div>
+              <div>
+                <div class="bk-summary-title">Amusement Park Day Ticket</div>
+                <div class="bk-summary-sub">Order Summary</div>
+              </div>
+            </div>
+
+            <div class="bk-summary-body">
+              <div id="summary-lines" class="bk-sum-lines"></div>
+              <div class="bk-sum-row bk-sum-row--sub"><span>Subtotal</span><span id="sum-subtotal">₹ —</span></div>
+              <div class="bk-sum-row bk-sum-row--disc hidden" id="sum-group-disc-row">
+                <span>🎉 Group Discount</span><span id="sum-group-disc" style="color:var(--wow-green);">—</span>
+              </div>
+              <div class="bk-sum-row bk-sum-row--gst"><span>GST 18% (incl.)</span><span id="sum-gst">₹ —</span></div>
+              <div class="bk-sum-row bk-sum-row--total"><span>Total Payable</span><span id="sum-total">₹ —</span></div>
+            </div>
+
+            <div class="bk-summary-cta">
+              <button class="btn bk-cta-btn bk-cta-btn--amusement" id="checkout-btn">Pay &amp; Confirm Booking →</button>
+              <div class="bk-cta-meta">🔒 Secure payment &nbsp;·&nbsp; ✅ No booking fee</div>
+            </div>
+          </div>
+
+          <!-- What to carry -->
+          <div class="bk-info-card" style="margin-top:16px;">
+            <div class="bk-info-card-title">📋 What to carry</div>
+            <ul class="bk-info-list">
+              <li>QR ticket (phone screen is fine)</li>
+              <li>Government-issued photo ID</li>
+              <li>Comfortable closed-toe shoes</li>
+              <li>Height restrictions apply on select rides (min 110 cm)</li>
+              <li>For concession tickets: relevant ID proof</li>
+            </ul>
+          </div>
+
+          <!-- Pricing reference -->
+          <div class="bk-info-card" style="margin-top:12px;">
+            <div class="bk-info-card-title">💳 Ticket Rate Reference</div>
+            <table class="bk-rate-table">
+              <thead><tr><th>Category</th><th>Rate (incl. GST)</th></tr></thead>
+              <tbody>
+                <tr><td>🧑 Adult (12+)</td><td class="rate-price">₹1,199</td></tr>
+                <tr><td>🧒 Child (3–11)</td><td class="rate-price">₹799</td></tr>
+                <tr><td>👴 Senior Citizen (60+)</td><td class="rate-price">₹899 <span class="rate-badge">-25%</span></td></tr>
+                <tr><td>🎖 Armed Forces</td><td class="rate-price">₹839 <span class="rate-badge">-30%</span></td></tr>
+                <tr><td>♿ Differently Abled</td><td class="rate-price">₹599 <span class="rate-badge">-50%</span></td></tr>
+                <tr class="rate-group-row"><td colspan="2">🎉 Group discount: ₹50 off per adult when total tickets ≥ 10</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS MODAL ─────────────────────────────────── -->
+  <div id="success-modal" class="bk-modal-overlay hidden">
+    <div class="bk-modal">
+      <div class="bk-modal-confetti">🎉</div>
+      <h2 class="bk-modal-title">Booking Confirmed!</h2>
+      <p class="bk-modal-sub">Get ready for an epic ride day! Your tickets are confirmed. 🎢</p>
+
+      <div class="bk-modal-receipt">
+        <div class="bk-receipt-row"><span>Lead Guest</span><strong id="suc-name">—</strong></div>
+        <div class="bk-receipt-row"><span>Park</span><strong id="suc-park">—</strong></div>
+        <div class="bk-receipt-row"><span>Visit Date</span><strong id="suc-date">—</strong></div>
+        <div id="suc-breakdown" class="bk-receipt-breakdown"></div>
+        <div class="bk-receipt-row bk-receipt-total"><span>Total Paid</span><strong id="suc-total">—</strong></div>
+      </div>
+
+      <div id="suc-proof-reminder" class="bk-modal-proof hidden"></div>
+      <div class="bk-modal-qr-note">📱 In a live environment your QR ticket would be sent via SMS &amp; WhatsApp instantly.</div>
+      <button id="modal-close" class="btn bk-cta-btn bk-cta-btn--amusement" style="width:100%;">Done — Have an epic day! 🎢</button>
+    </div>
+  </div>
+
+</div>
+<script src="../js/shell.js"></script>
+<script src="../js/booking.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  WOWBooking.initBookingForm('AMUSEMENT_DAY');
+  const obs = new MutationObserver(() => {
+    const v = document.getElementById('sum-total')?.textContent;
+    const m = document.getElementById('mobile-sum-total');
+    if (m && v) m.textContent = v;
+  });
+  const sumEl = document.getElementById('sum-total');
+  if (sumEl) obs.observe(sumEl, { characterData: true, subtree: true, childList: true });
+  const mobileBtn = document.getElementById('checkout-btn-mobile');
+  if (mobileBtn) mobileBtn.addEventListener('click', () => document.getElementById('checkout-btn')?.click());
+});
+</script>
+</body>
+</html>

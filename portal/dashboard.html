@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard — Worlds of Wonder</title>
+  <meta name="description" content="Your WOW account dashboard — bookings, passport, loyalty points and offers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+  <style>
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media(max-width:900px){ .dash-grid, .dash-grid-3 { grid-template-columns:1fr; } }
+    .stat-card { background:var(--clr-bg-card,#1a2235); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; display:flex; align-items:center; gap:16px; }
+    .stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .stat-icon.blue  { background:rgba(0,85,179,.2); }
+    .stat-icon.gold  { background:rgba(245,168,0,.15); }
+    .stat-icon.green { background:rgba(16,185,129,.15); }
+    .stat-icon.red   { background:rgba(239,68,68,.15); }
+    .stat-val  { font-size:28px; font-weight:800; color:#fff; }
+    .stat-lbl  { font-size:13px; color:rgba(255,255,255,.55); margin-top:2px; }
+    .widget-card { background:var(--clr-bg-card,#1a2235); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; }
+    .widget-title { font-size:14px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.08em; margin-bottom:18px; }
+    .booking-row { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+    .booking-row:last-child { border-bottom:none; }
+    .booking-badge { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:rgba(0,85,179,.15); }
+    .booking-info { flex:1; min-width:0; }
+    .booking-name { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .booking-meta { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
+    .booking-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+    .status-confirmed { background:rgba(16,185,129,.15); color:#10b981; }
+    .status-pending   { background:rgba(245,168,0,.15);  color:#f5a800; }
+    .status-used      { background:rgba(255,255,255,.08); color:rgba(255,255,255,.4); }
+    .loyalty-bar-wrap { margin:16px 0; }
+    .loyalty-bar-label { display:flex; justify-content:space-between; font-size:12px; color:rgba(255,255,255,.55); margin-bottom:8px; }
+    .loyalty-bar { height:8px; background:rgba(255,255,255,.08); border-radius:4px; overflow:hidden; }
+    .loyalty-bar-fill { height:100%; background:linear-gradient(90deg,#F5A800,#f97316); border-radius:4px; transition:width .6s; }
+    .tier-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; }
+    .tier-gold { background:linear-gradient(135deg,#F5A800,#f97316); color:#000; }
+    .tier-silver { background:linear-gradient(135deg,#94a3b8,#cbd5e1); color:#000; }
+    .tier-platinum { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
+    .offer-chip { display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; margin-bottom:10px; }
+    .offer-chip-icon { font-size:22px; }
+    .offer-chip-info { flex:1; }
+    .offer-chip-title { font-size:13px; font-weight:600; color:#fff; }
+    .offer-chip-sub   { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
+    .offer-chip-cta   { font-size:12px; font-weight:700; color:#F5A800; white-space:nowrap; }
+    .quick-links { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    @media(max-width:600px){ .quick-links { grid-template-columns:repeat(2,1fr); } }
+    .quick-link-btn { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px 12px; text-align:center; text-decoration:none; transition:all .2s; }
+    .quick-link-btn:hover { background:rgba(0,85,179,.15); border-color:rgba(0,85,179,.3); transform:translateY(-2px); }
+    .quick-link-icon { font-size:26px; display:block; margin-bottom:8px; }
+    .quick-link-lbl  { font-size:12px; font-weight:600; color:rgba(255,255,255,.7); }
+    .passport-card   { background:linear-gradient(135deg,#0055B3 0%,#0a2a6e 100%); border-radius:16px; padding:20px 24px; position:relative; overflow:hidden; }
+    .passport-card::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:rgba(255,255,255,.05); border-radius:50%; }
+    .passport-title  { font-size:11px; font-weight:700; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.1em; }
+    .passport-name   { font-size:20px; font-weight:800; color:#fff; margin:6px 0 2px; }
+    .passport-plan   { font-size:13px; color:rgba(255,255,255,.6); }
+    .passport-valid  { font-size:12px; color:#F5A800; font-weight:600; margin-top:12px; }
+    .passport-visits { position:absolute; right:24px; top:50%; transform:translateY(-50%); text-align:right; }
+    .passport-visits-num { font-size:36px; font-weight:900; color:#F5A800; }
+    .passport-visits-lbl { font-size:10px; color:rgba(255,255,255,.45); }
+  </style>
+</head>
+<body class="portal-body">
+<div id="app">
+  <div class="portal-layout">
+
+    <!-- Sidebar -->
+    <aside class="portal-sidebar">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+        </a>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item active">
+          <span class="portal-sidenav-icon">🏠</span><span>Dashboard</span>
+        </a>
+        <a href="my-bookings.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">🎟️</span><span>My Bookings</span>
+        </a>
+        <a href="tickets.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">📱</span><span>My Tickets</span>
+        </a>
+        <a href="passport.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">🛂</span><span>My Passport</span>
+        </a>
+        <a href="loyalty.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">⭐</span><span>Loyalty Points</span>
+        </a>
+        <a href="offers.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">🎁</span><span>My Offers</span>
+        </a>
+        <a href="notifications.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">🔔</span><span>Notifications <span class="notif-badge" id="notifCount" style="background:#e53e3e;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:4px;">3</span></span>
+        </a>
+        <a href="profile.html" class="portal-sidenav-item">
+          <span class="portal-sidenav-icon">👤</span><span>Profile</span>
+        </a>
+        <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);">
+          <a href="../index.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);">
+            <span class="portal-sidenav-icon">🌐</span><span>Back to Site</span>
+          </a>
+          <a href="login.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);" id="signOutBtn">
+            <span class="portal-sidenav-icon">🚪</span><span>Sign Out</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="portal-main">
+      <div class="portal-topbar">
+        <div>
+          <h1 class="portal-page-title">Welcome back, <span id="userName" style="color:#F5A800;">Rajesh</span>! 👋</h1>
+          <p style="color:rgba(255,255,255,.5);font-size:14px;margin-top:4px;">Here's your WOW account overview</p>
+        </div>
+        <a href="../book/water-park.html" class="btn btn-primary" style="white-space:nowrap;">
+          🎟️ Book Tickets
+        </a>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="dash-grid-3" style="margin-bottom:24px;">
+        <div class="stat-card">
+          <div class="stat-icon blue">🎟️</div>
+          <div>
+            <div class="stat-val">12</div>
+            <div class="stat-lbl">Total Bookings</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">⭐</div>
+          <div>
+            <div class="stat-val">2,450</div>
+            <div class="stat-lbl">Loyalty Points</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">💰</div>
+          <div>
+            <div class="stat-val">₹340</div>
+            <div class="stat-lbl">Rewards Value</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passport Card -->
+      <div class="passport-card" style="margin-bottom:24px;">
+        <div class="passport-title">Annual Passport</div>
+        <div class="passport-name" id="passportName">Rajesh Kumar</div>
+        <div class="passport-plan">Gold Passport — Water Park + Amusement Park</div>
+        <div class="passport-valid">✓ Valid until 31 March 2027</div>
+        <div class="passport-visits">
+          <div class="passport-visits-num">24</div>
+          <div class="passport-visits-lbl">Visits This Year</div>
+        </div>
+      </div>
+
+      <div class="dash-grid" style="margin-bottom:24px;">
+        <!-- Recent Bookings -->
+        <div class="widget-card">
+          <div class="widget-title">Recent Bookings</div>
+          <div class="booking-row">
+            <div class="booking-badge">🌊</div>
+            <div class="booking-info">
+              <div class="booking-name">Water Park — 3 Adults</div>
+              <div class="booking-meta">BK-2026-08841 · 28 Mar 2026</div>
+            </div>
+            <span class="booking-status status-confirmed">Confirmed</span>
+          </div>
+          <div class="booking-row">
+            <div class="booking-badge">🎢</div>
+            <div class="booking-info">
+              <div class="booking-name">Combo Deal — 2 Adults, 1 Child</div>
+              <div class="booking-meta">BK-2026-08712 · 15 Mar 2026</div>
+            </div>
+            <span class="booking-status status-used">Used</span>
+          </div>
+          <div class="booking-row">
+            <div class="booking-badge">🎡</div>
+            <div class="booking-info">
+              <div class="booking-name">Amusement Park — 4 Adults</div>
+              <div class="booking-meta">BK-2026-08401 · 5 Mar 2026</div>
+            </div>
+            <span class="booking-status status-used">Used</span>
+          </div>
+          <div class="booking-row">
+            <div class="booking-badge">🎟️</div>
+            <div class="booking-info">
+              <div class="booking-name">Annual Passport Renewal</div>
+              <div class="booking-meta">BK-2026-07991 · 1 Apr 2026</div>
+            </div>
+            <span class="booking-status status-pending">Upcoming</span>
+          </div>
+          <div style="margin-top:16px;">
+            <a href="my-bookings.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;">View all bookings →</a>
+          </div>
+        </div>
+
+        <!-- Loyalty & Offers -->
+        <div>
+          <!-- Loyalty -->
+          <div class="widget-card" style="margin-bottom:20px;">
+            <div class="widget-title">Loyalty Status</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <span class="tier-badge tier-gold">🥇 Gold Tier</span>
+              <span style="font-size:13px;color:rgba(255,255,255,.5);">2,450 pts</span>
+            </div>
+            <div class="loyalty-bar-wrap">
+              <div class="loyalty-bar-label">
+                <span>Gold (2,000)</span><span>Platinum at 5,000</span>
+              </div>
+              <div class="loyalty-bar">
+                <div class="loyalty-bar-fill" style="width:49%;"></div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:rgba(255,255,255,.45);margin-top:10px;">Earn 2,550 more points to reach Platinum tier.</p>
+            <a href="loyalty.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;display:block;margin-top:10px;">View full history →</a>
+          </div>
+          <!-- Offers -->
+          <div class="widget-card">
+            <div class="widget-title">Active Offers for You</div>
+            <div class="offer-chip">
+              <div class="offer-chip-icon">🎯</div>
+              <div class="offer-chip-info">
+                <div class="offer-chip-title">Gold Member: 15% Off Combo</div>
+                <div class="offer-chip-sub">Valid till 31 May 2026</div>
+              </div>
+              <a href="../book/combo.html" class="offer-chip-cta">Use →</a>
+            </div>
+            <div class="offer-chip">
+              <div class="offer-chip-icon">🎂</div>
+              <div class="offer-chip-info">
+                <div class="offer-chip-title">Birthday Month: Free Entry</div>
+                <div class="offer-chip-sub">Redeem in April</div>
+              </div>
+              <a href="../book/water-park.html" class="offer-chip-cta">Redeem →</a>
+            </div>
+            <div class="offer-chip">
+              <div class="offer-chip-icon">👨‍👩‍👧</div>
+              <div class="offer-chip-info">
+                <div class="offer-chip-title">Bring a Friend: ₹200 Off</div>
+                <div class="offer-chip-sub">Min 2 tickets</div>
+              </div>
+              <a href="../book/water-park.html" class="offer-chip-cta">Apply →</a>
+            </div>
+            <a href="offers.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;display:block;margin-top:10px;">See all offers →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="widget-card" style="margin-bottom:24px;">
+        <div class="widget-title">Quick Actions</div>
+        <div class="quick-links">
+          <a href="../book/water-park.html" class="quick-link-btn">
+            <span class="quick-link-icon">🌊</span>
+            <span class="quick-link-lbl">Book Water Park</span>
+          </a>
+          <a href="../book/amusement-park.html" class="quick-link-btn">
+            <span class="quick-link-icon">🎢</span>
+            <span class="quick-link-lbl">Book Amusement</span>
+          </a>
+          <a href="../book/combo.html" class="quick-link-btn">
+            <span class="quick-link-icon">🎡</span>
+            <span class="quick-link-lbl">Combo Deal</span>
+          </a>
+          <a href="../book/passport.html" class="quick-link-btn">
+            <span class="quick-link-icon">🛂</span>
+            <span class="quick-link-lbl">Annual Passport</span>
+          </a>
+          <a href="tickets.html" class="quick-link-btn">
+            <span class="quick-link-icon">📱</span>
+            <span class="quick-link-lbl">View Tickets</span>
+          </a>
+          <a href="profile.html" class="quick-link-btn">
+            <span class="quick-link-icon">⚙️</span>
+            <span class="quick-link-lbl">Account Settings</span>
+          </a>
+          <a href="../plan-your-visit.html" class="quick-link-btn">
+            <span class="quick-link-icon">🗺️</span>
+            <span class="quick-link-lbl">Plan Your Visit</span>
+          </a>
+          <a href="../contact.html" class="quick-link-btn">
+            <span class="quick-link-icon">💬</span>
+            <span class="quick-link-lbl">Get Help</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Upcoming Visit Banner -->
+      <div style="background:linear-gradient(135deg,#0a3d62,#1a5276);border-radius:16px;padding:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <div style="font-size:48px;">🎉</div>
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:800;color:#fff;">You have an upcoming visit!</div>
+          <div style="font-size:14px;color:rgba(255,255,255,.6);margin-top:4px;">Water Park — 28 March 2026 · 3 guests · BK-2026-08841</div>
+        </div>
+        <a href="tickets.html" class="btn btn-primary">View Tickets</a>
+      </div>
+
+    </main>
+  </div>
+</div>
+<script>
+  // Load user data from localStorage
+  const user = JSON.parse(localStorage.getItem('wow_user') || '{"name":"Rajesh Kumar","email":"rajesh@example.com"}');
+  const firstName = (user.name || 'Guest').split(' ')[0];
+  document.getElementById('userName').textContent = firstName;
+  document.getElementById('passportName').textContent = user.name || 'Guest';
+  document.getElementById('signOutBtn').addEventListener('click', function(e){
+    e.preventDefault();
+    localStorage.removeItem('wow_user');
+    localStorage.removeItem('wow_auth');
+    window.location.href = 'login.html';
+  });
+</script>
+</body>
+</html>

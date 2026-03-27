@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partner Sign In — Worlds of Wonder</title>
+  <meta name="description" content="Travel agent and reseller portal login — Worlds of Wonder Partner Portal." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+  <div class="portal-page">
+
+    <!-- Left panel -->
+    <div class="portal-brand" style="background:linear-gradient(160deg,#0a1628 0%,#1a3a00 50%,#2d5a00 100%);">
+      <div class="portal-brand-inner">
+        <a href="../index.html" class="portal-brand-logo">
+          <img src="../images/logo.png" alt="Worlds of Wonder" class="portal-logo-img" style="filter:none!important;" />
+        </a>
+        <div class="partner-badge">🤝 Partner Portal</div>
+        <h1 class="portal-brand-title">Welcome,<br><span class="portal-brand-accent">Trade Partner.</span></h1>
+        <p class="portal-brand-sub">Access your travel agent or reseller dashboard to manage bookings, download tickets, view statements, and track commission.</p>
+        <div class="portal-brand-perks">
+          <div class="portal-perk"><span class="portal-perk-icon">🎟</span><span>Buy &amp; issue bulk tickets</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">💰</span><span>Track commissions &amp; statements</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">🧾</span><span>Download GST invoices</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">📊</span><span>View performance dashboard</span></div>
+        </div>
+        <div class="partner-not-yet">
+          Not a partner yet? <a href="onboarding.html">Apply here →</a>
+        </div>
+      </div>
+      <div class="portal-brand-bg"></div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="portal-form-panel">
+      <div class="portal-form-wrap">
+        <div class="portal-form-header">
+          <h2 class="portal-form-title">Partner Sign In</h2>
+          <p class="portal-form-sub">Use the email and password set during your partner onboarding.</p>
+        </div>
+
+        <form id="partner-login-form" novalidate>
+          <div class="portal-field">
+            <label class="portal-label" for="p-email">Business Email</label>
+            <input class="portal-input" id="p-email" type="email" placeholder="agent@company.com" autocomplete="email" required />
+            <div class="portal-field-err hidden" id="p-email-err"></div>
+          </div>
+          <div class="portal-field">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <label class="portal-label" for="p-password" style="margin-bottom:0;">Password</label>
+              <a href="../portal/forgot-password.html" class="portal-link" style="font-size:13px;">Forgot password?</a>
+            </div>
+            <div class="portal-input-wrap">
+              <input class="portal-input" id="p-password" type="password" placeholder="Your password" autocomplete="current-password" required />
+              <button type="button" class="portal-eye-btn" id="toggle-pw" aria-label="Show/hide password">
+                <svg id="eye-show" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg id="eye-hide" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+            <div class="portal-field-err hidden" id="p-password-err"></div>
+          </div>
+
+          <button type="submit" class="portal-submit-btn" style="background:linear-gradient(135deg,#166534,#14532d);color:white;margin-top:8px;" id="partner-login-submit">
+            Sign In to Partner Portal →
+          </button>
+          <div class="portal-error-banner hidden" id="partner-login-error"></div>
+        </form>
+
+        <div class="partner-helpline">
+          <p>Need help? Call the Partner Desk:</p>
+          <a href="tel:08069090000" style="font-size:17px;font-weight:800;color:#166534;">080-6909-0000</a>
+          <p style="font-size:12px;color:#9ca3af;margin-top:2px;">Mon–Sat, 9 AM – 6 PM</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- #app -->
+
+<style>
+.partner-badge {
+  display: inline-block;
+  background: rgba(34,197,94,.15);
+  border: 1px solid rgba(34,197,94,.3);
+  color: #86efac;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  letter-spacing: .04em;
+}
+.partner-not-yet {
+  margin-top: 28px;
+  font-size: 14px;
+  color: rgba(255,255,255,.5);
+}
+.partner-not-yet a { color: #86efac; font-weight: 700; text-decoration: none; }
+.partner-not-yet a:hover { text-decoration: underline; }
+.partner-helpline {
+  margin-top: 28px;
+  text-align: center;
+  padding: 20px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+}
+.partner-helpline p { font-size: 13px; color: #6b7280; margin: 0 0 4px; }
+</style>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+
+  const app  = initializeApp(WOW_FB_CONFIG);
+  const auth = getAuth(app);
+
+  document.getElementById('toggle-pw')?.addEventListener('click', () => {
+    const inp = document.getElementById('p-password');
+    const s = document.getElementById('eye-show'); const h = document.getElementById('eye-hide');
+    if (inp.type === 'password') { inp.type='text'; s.style.display='none'; h.style.display='block'; }
+    else { inp.type='password'; s.style.display='block'; h.style.display='none'; }
+  });
+
+  document.getElementById('partner-login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email    = document.getElementById('p-email').value.trim();
+    const password = document.getElementById('p-password').value;
+    const emailErr = document.getElementById('p-email-err');
+    const pwErr    = document.getElementById('p-password-err');
+    const banner   = document.getElementById('partner-login-error');
+    const btn      = document.getElementById('partner-login-submit');
+
+    [emailErr, pwErr, banner].forEach(el => { el.textContent=''; el.classList.add('hidden'); });
+    if (!email)    { emailErr.textContent='Enter your business email'; emailErr.classList.remove('hidden'); return; }
+    if (!password) { pwErr.textContent='Enter your password'; pwErr.classList.remove('hidden'); return; }
+
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      const msgs = {
+        'auth/user-not-found':     'No partner account found with this email.',
+        'auth/wrong-password':     'Incorrect password.',
+        'auth/invalid-credential': 'Email or password is incorrect.',
+        'auth/too-many-requests':  'Too many attempts — please wait a few minutes.',
+      };
+      banner.textContent = msgs[err.code] || 'Sign-in failed. Contact the partner desk.';
+      banner.classList.remove('hidden');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign In to Partner Portal →';
+    }
+  });
+</script>
+</body>
+</html>

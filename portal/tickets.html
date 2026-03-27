@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Tickets — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+  <style>
+    .tickets-filter{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+    .filter-btn{padding:8px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;}
+    .filter-btn.active,.filter-btn:hover{background:#0055B3;border-color:#0055B3;color:#fff;}
+    .ticket-card{background:#1a2235;border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;margin-bottom:20px;}
+    .ticket-header{background:linear-gradient(135deg,#0055B3,#0a2a6e);padding:20px 24px;display:flex;align-items:center;gap:16px;}
+    .ticket-type-icon{font-size:36px;}
+    .ticket-header-info{flex:1;}
+    .ticket-park{font-size:18px;font-weight:800;color:#fff;}
+    .ticket-date{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;}
+    .ticket-status-badge{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+    .status-valid  {background:rgba(16,185,129,.2);color:#10b981;border:1px solid rgba(16,185,129,.3);}
+    .status-used   {background:rgba(255,255,255,.1);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.15);}
+    .status-expired{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2);}
+    .ticket-body{padding:24px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;}
+    @media(max-width:600px){.ticket-body{grid-template-columns:1fr;}}
+    .ticket-detail-row{display:flex;gap:8px;align-items:baseline;margin-bottom:12px;}
+    .ticket-detail-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;min-width:80px;}
+    .ticket-detail-value{font-size:14px;font-weight:600;color:#fff;}
+    .ticket-guests{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+    .guest-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.06);border-radius:20px;font-size:12px;color:rgba(255,255,255,.7);}
+    .qr-container{text-align:center;}
+    .qr-box{background:#fff;border-radius:12px;padding:12px;display:inline-block;}
+    .qr-id{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px;letter-spacing:.05em;}
+    .ticket-actions{display:flex;gap:10px;flex-wrap:wrap;padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);}
+    .btn-download{padding:9px 18px;border-radius:10px;background:rgba(0,85,179,.2);color:#60a5fa;border:1px solid rgba(0,85,179,.3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+    .btn-share{padding:9px 18px;border-radius:10px;background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+    .btn-cancel{padding:9px 18px;border-radius:10px;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.15);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+    .empty-state{text-align:center;padding:60px 20px;color:rgba(255,255,255,.4);}
+    .empty-icon{font-size:64px;margin-bottom:16px;}
+  </style>
+</head>
+<body class="portal-body">
+<div id="app">
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+        </a>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🏠</span><span>Dashboard</span></a>
+        <a href="my-bookings.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🎟️</span><span>My Bookings</span></a>
+        <a href="tickets.html" class="portal-sidenav-item active"><span class="portal-sidenav-icon">📱</span><span>My Tickets</span></a>
+        <a href="passport.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🛂</span><span>My Passport</span></a>
+        <a href="loyalty.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">⭐</span><span>Loyalty Points</span></a>
+        <a href="offers.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🎁</span><span>My Offers</span></a>
+        <a href="notifications.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🔔</span><span>Notifications</span></a>
+        <a href="profile.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">👤</span><span>Profile</span></a>
+        <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);">
+          <a href="../index.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);"><span class="portal-sidenav-icon">🌐</span><span>Back to Site</span></a>
+        </div>
+      </nav>
+    </aside>
+    <main class="portal-main">
+      <div class="portal-topbar">
+        <div>
+          <h1 class="portal-page-title">My Tickets</h1>
+          <p style="color:rgba(255,255,255,.5);font-size:14px;margin-top:4px;">E-tickets with QR codes for park entry</p>
+        </div>
+        <a href="../book/water-park.html" class="btn btn-primary">+ Book New</a>
+      </div>
+      <div class="tickets-filter">
+        <button class="filter-btn active" onclick="filterTickets('all',this)">All Tickets</button>
+        <button class="filter-btn" onclick="filterTickets('valid',this)">Valid</button>
+        <button class="filter-btn" onclick="filterTickets('used',this)">Used</button>
+        <button class="filter-btn" onclick="filterTickets('expired',this)">Expired</button>
+      </div>
+      <div id="ticketsList"></div>
+    </main>
+  </div>
+</div>
+<script>
+const tickets=[
+  {id:'TK-2026-08841-WP',booking:'BK-2026-08841',park:'Water Park',icon:'🌊',date:'28 March 2026',status:'valid',guests:[{type:'Adult',name:'Rajesh Kumar'},{type:'Adult',name:'Priya Kumar'},{type:'Child',name:'Aryan Kumar'}],amount:2797,entryType:'Single Day',gate:'Main Gate — Water Park',barcode:'WP2026088419ABC'},
+  {id:'TK-2026-08712-CB',booking:'BK-2026-08712',park:'Combo Deal',icon:'🎡',date:'15 March 2026',status:'used',guests:[{type:'Adult',name:'Rajesh Kumar'},{type:'Adult',name:'Priya Kumar'},{type:'Child',name:'Aryan Kumar'}],amount:4797,entryType:'Combo (Both Parks)',gate:'Main Gate',barcode:'CB20260871212XY'},
+  {id:'TK-2025-12214-AP',booking:'BK-2025-12214',park:'Amusement Park',icon:'🎢',date:'20 Dec 2025',status:'expired',guests:[{type:'Adult',name:'Rajesh Kumar'},{type:'Adult',name:'Friend Guest'}],amount:1998,entryType:'Single Day',gate:'Main Gate — Amusement Park',barcode:'AP20251221400ZZ'}
+];
+let currentFilter='all';
+function filterTickets(status,btn){
+  currentFilter=status;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTickets();
+}
+function drawQR(canvas,text){
+  const size=140,cells=21,cellSize=Math.floor(size/cells);
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,size,size);
+  let hash=0;for(let i=0;i<text.length;i++){hash=((hash<<5)-hash)+text.charCodeAt(i);hash|=0;}
+  ctx.fillStyle='#000000';
+  [[0,0],[14,0],[0,14]].forEach(([cx,cy])=>{
+    for(let r=0;r<7;r++) for(let c=0;c<7;c++){
+      if(r===0||r===6||c===0||c===6||(r>=2&&r<=4&&c>=2&&c<=4)){ctx.fillRect((cx+c)*cellSize,(cy+r)*cellSize,cellSize,cellSize);}
+    }
+    ctx.fillStyle='#ffffff';ctx.fillRect((cx+1)*cellSize,(cy+1)*cellSize,5*cellSize,5*cellSize);
+    ctx.fillStyle='#000000';ctx.fillRect((cx+2)*cellSize,(cy+2)*cellSize,3*cellSize,3*cellSize);
+  });
+  for(let r=0;r<cells;r++){
+    for(let c=0;c<cells;c++){
+      if((r<9&&c<9)||(r<9&&c>12)||(r>12&&c<9)) continue;
+      const bit=((hash^(r*31+c*17))>>((r+c)%31))&1;
+      if(bit){ctx.fillRect(c*cellSize,r*cellSize,cellSize,cellSize);}
+    }
+  }
+}
+function renderTickets(){
+  const list=document.getElementById('ticketsList');
+  const filtered=currentFilter==='all'?tickets:tickets.filter(t=>t.status===currentFilter);
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">🎟️</div><p style="font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;">No tickets found</p><p>Book your next WOW adventure!</p><a href="../book/water-park.html" class="btn btn-primary" style="margin-top:16px;display:inline-block;">Book Now</a></div>`;
+    return;
+  }
+  list.innerHTML=filtered.map((t,idx)=>`
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <div class="ticket-type-icon">${t.icon}</div>
+        <div class="ticket-header-info">
+          <div class="ticket-park">${t.park}</div>
+          <div class="ticket-date">${t.date} · ${t.guests.length} Guest${t.guests.length>1?'s':''}</div>
+        </div>
+        <span class="ticket-status-badge status-${t.status}">${t.status==='valid'?'✓ Valid':t.status==='used'?'✓ Used':'✗ Expired'}</span>
+      </div>
+      <div class="ticket-body">
+        <div>
+          <div class="ticket-detail-row"><span class="ticket-detail-label">Ticket ID</span><span class="ticket-detail-value" style="font-family:monospace;font-size:12px;">${t.id}</span></div>
+          <div class="ticket-detail-row"><span class="ticket-detail-label">Booking</span><span class="ticket-detail-value" style="font-family:monospace;font-size:12px;">${t.booking}</span></div>
+          <div class="ticket-detail-row"><span class="ticket-detail-label">Entry Type</span><span class="ticket-detail-value">${t.entryType}</span></div>
+          <div class="ticket-detail-row"><span class="ticket-detail-label">Gate</span><span class="ticket-detail-value">${t.gate}</span></div>
+          <div class="ticket-detail-row"><span class="ticket-detail-label">Amount</span><span class="ticket-detail-value" style="color:#F5A800;">₹${t.amount.toLocaleString('en-IN')}</span></div>
+          <div class="ticket-detail-row" style="align-items:flex-start;"><span class="ticket-detail-label">Guests</span><div class="ticket-guests">${t.guests.map(g=>`<span class="guest-pill">👤 ${g.type}: ${g.name}</span>`).join('')}</div></div>
+        </div>
+        <div class="qr-container">
+          <div class="qr-box"><canvas id="qr-${idx}" width="140" height="140"></canvas></div>
+          <div class="qr-id">${t.barcode}</div>
+          ${t.status==='valid'?'<div style="font-size:11px;color:#10b981;margin-top:6px;font-weight:700;">Show at entry gate</div>':''}
+        </div>
+      </div>
+      <div class="ticket-actions">
+        <button class="btn-download" onclick="downloadTicket('${t.id}')">⬇ Download PDF</button>
+        <button class="btn-share" onclick="shareTicket('${t.id}')">↗ Share</button>
+        ${t.status==='valid'?`<button class="btn-cancel" onclick="cancelTicket('${t.id}')">✗ Cancel</button>`:''}
+        ${t.status==='used'?`<a href="../book/water-park.html" style="padding:9px 18px;border-radius:10px;background:rgba(245,168,0,.1);color:#F5A800;border:1px solid rgba(245,168,0,.2);font-size:13px;font-weight:600;text-decoration:none;">↺ Book Again</a>`:''}
+      </div>
+    </div>
+  `).join('');
+  filtered.forEach((t,idx)=>{const c=document.getElementById('qr-'+idx);if(c)drawQR(c,t.barcode);});
+}
+function downloadTicket(id){alert(`Downloading ticket ${id} as PDF...\nAPI: GET /api/tickets/${id}/pdf`);}
+function shareTicket(id){if(navigator.share){navigator.share({title:'My WOW Ticket',text:`Ticket: ${id}`,url:window.location.href});}else{navigator.clipboard.writeText(id).then(()=>alert('Ticket ID copied!'));}}
+function cancelTicket(id){if(confirm(`Cancel ticket ${id}?\nRefund in 5–7 business days.`))alert(`Cancellation submitted.`);}
+renderTickets();
+</script>
+</body>
+</html>

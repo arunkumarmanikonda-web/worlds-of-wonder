@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — Partner Portal | Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+  <div class="portal-dashboard">
+    <aside class="portal-sidebar" style="background:#0d1f0e;">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;">Partner Portal</div>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+        <a href="buy-tickets.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Buy Tickets</a>
+        <a href="ticket-batches.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Ticket Batches</a>
+        <a href="invoices.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+        <a href="statements.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Statement & Ledger</a>
+        <a href="support.html" class="portal-sidenav-item active" style="border-left-color:#22c55e;"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Support</a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to WOW Site</a>
+      </nav>
+    </aside>
+
+    <main class="portal-main">
+      <div class="portal-main-header">
+        <div>
+          <h1 class="portal-main-title">Partner Support</h1>
+          <p class="portal-main-sub">Raise tickets, track issues, contact your account manager</p>
+        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('new-ticket-form').scrollIntoView({behavior:'smooth'})">+ New Support Ticket</button>
+      </div>
+
+      <!-- Contact channels -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+        <div class="portal-card" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:36px;margin-bottom:10px;">📞</div>
+          <div style="font-size:14px;font-weight:800;color:#0a0f28;margin-bottom:6px;">Dedicated Account Manager</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">Mon–Sat, 9 AM – 7 PM</div>
+          <a href="tel:08069090001" style="font-size:16px;font-weight:900;color:#1a56db;text-decoration:none;">080-6909-0001</a>
+        </div>
+        <div class="portal-card" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:36px;margin-bottom:10px;">📧</div>
+          <div style="font-size:14px;font-weight:800;color:#0a0f28;margin-bottom:6px;">Partner Support Email</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">Response within 4 hours</div>
+          <a href="mailto:partners@worldsofwonder.in" style="font-size:14px;font-weight:700;color:#1a56db;text-decoration:none;">partners@worldsofwonder.in</a>
+        </div>
+        <div class="portal-card" style="text-align:center;padding:28px 20px;">
+          <div style="font-size:36px;margin-bottom:10px;">💬</div>
+          <div style="font-size:14px;font-weight:800;color:#0a0f28;margin-bottom:6px;">WhatsApp Business</div>
+          <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">Quick queries — 24/7</div>
+          <a href="https://wa.me/918069090001" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="background:#25d366;">Chat on WhatsApp</a>
+        </div>
+      </div>
+
+      <!-- Open tickets -->
+      <div class="portal-card" style="margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:800;color:#0a0f28;margin-bottom:16px;">Open Tickets</div>
+        <div id="ticket-list">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #f1f5f9;">
+            <div style="width:42px;height:42px;border-radius:10px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:18px;">⏳</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">QR code not scanning at gate — Batch WOW-B918765</div>
+              <div style="font-size:12px;color:#6b7280;">Ticket #TKT-2026-0284 · Opened 22 Mar · Priority: High</div>
+            </div>
+            <span style="background:#fffbeb;color:#b45309;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">In Progress</span>
+            <button style="padding:6px 14px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">View</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 0;">
+            <div style="width:42px;height:42px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px;">💳</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;">Credit limit increase request — from ₹2.4L to ₹5L</div>
+              <div style="font-size:12px;color:#6b7280;">Ticket #TKT-2026-0271 · Opened 18 Mar · Priority: Normal</div>
+            </div>
+            <span style="background:#eff6ff;color:#1d4ed8;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Under Review</span>
+            <button style="padding:6px 14px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">View</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- New ticket form -->
+      <div class="portal-card" id="new-ticket-form">
+        <div style="font-size:15px;font-weight:800;color:#0a0f28;margin-bottom:20px;">Raise a New Support Ticket</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Category *</label>
+            <select style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;">
+              <option>-- Select Category --</option>
+              <option>Ticket / QR Issue</option>
+              <option>Billing / Invoice</option>
+              <option>Credit / Payment</option>
+              <option>Account / Access</option>
+              <option>Booking Error</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Priority *</label>
+            <select style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;">
+              <option>Normal</option>
+              <option>High</option>
+              <option>Urgent</option>
+            </select>
+          </div>
+          <div style="grid-column:span 2;">
+            <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Related Batch / Invoice # (Optional)</label>
+            <input type="text" placeholder="e.g. WOW-B927451 or INV-2026-0342" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;" />
+          </div>
+          <div style="grid-column:span 2;">
+            <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Subject *</label>
+            <input type="text" placeholder="Brief description of the issue" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;" />
+          </div>
+          <div style="grid-column:span 2;">
+            <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Details *</label>
+            <textarea rows="5" placeholder="Describe your issue in detail…" style="width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="submitTicket()">Submit Ticket →</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<style>
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;}
+.btn-primary{background:#1a56db;color:#fff;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+</style>
+
+<script>
+function submitTicket() {
+  const ref = 'TKT-2026-' + (290 + Math.floor(Math.random()*10));
+  alert('✅ Ticket ' + ref + ' raised successfully!\n\nYour account manager will respond within 4 hours.\nYou'll receive a confirmation at your registered email.');
+}
+</script>
+</body>
+</html>

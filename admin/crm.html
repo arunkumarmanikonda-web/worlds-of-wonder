@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CRM &amp; Sales Pipeline — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.seg-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:12px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.seg-school{background:#e0f4ff;color:#007BB5;}
+.seg-corp{background:var(--purple-lt);color:var(--purple);}
+.seg-bday{background:var(--accent-lt);color:var(--accent-dk);}
+.seg-ta{background:var(--green-lt);color:var(--green);}
+.seg-gen{background:var(--bg3);color:var(--text2);}
+.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.priority-high{background:var(--red);}
+.priority-med{background:var(--amber);}
+.priority-low{background:var(--green);}
+.kanban-col-header.prospect{background:#EEF2F8;color:var(--text2);}
+.kanban-col-header.qualified{background:#EBF3FF;color:var(--primary);}
+.kanban-col-header.quote{background:#FFFBEB;color:var(--amber);}
+.kanban-col-header.negotiation{background:var(--purple-lt);color:var(--purple);}
+.kanban-col-header.won{background:var(--green-lt);color:var(--green);}
+.kanban-col-header.lost{background:var(--red-lt);color:var(--red);}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;}
+</style>
+</head>
+<body>
+<div class="adm-layout">
+
+<!-- SIDEBAR -->
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <a href="loyalty-admin.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
+    <div class="adm-nav-section">B2B &amp; Sales</div>
+    <a href="crm.html" class="adm-nav-item active"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
+    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">SE</div>
+      <div><div class="adm-user-name">Sales Exec</div><div class="adm-user-role">CRM Access</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title">🤝 CRM &amp; Sales Pipeline</div>
+      <div class="adm-topbar-sub">Leads · Opportunities · Quotes · Tasks · Reports</div>
+    </div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('import-modal')">📥 Import CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('lead-modal')">+ New Lead</button>
+      <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">📋 New Quote</a>
+    </div>
+  </div>
+
+  <div class="adm-content">
+
+    <!-- KPI row -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px;">
+      <div class="kpi-card blue"><div class="kpi-icon" style="background:var(--primary-lt);color:var(--primary);">🔍</div><div class="kpi-value">8</div><div class="kpi-label">Prospecting</div></div>
+      <div class="kpi-card blue"><div class="kpi-icon" style="background:#dbeafe;color:#1d4ed8;">🎯</div><div class="kpi-value">11</div><div class="kpi-label">Qualified</div></div>
+      <div class="kpi-card amber"><div class="kpi-icon" style="background:var(--amber-lt);color:var(--amber);">📋</div><div class="kpi-value">9</div><div class="kpi-label">Quote Sent</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon" style="background:var(--purple-lt);color:var(--purple);">🤝</div><div class="kpi-value">7</div><div class="kpi-label">Negotiation</div></div>
+      <div class="kpi-card green"><div class="kpi-icon" style="background:var(--green-lt);color:var(--green);">✅</div><div class="kpi-value">₹8.2L</div><div class="kpi-label">Won This Month</div></div>
+      <div class="kpi-card" style="border-left:3px solid var(--primary);"><div class="kpi-icon" style="background:var(--primary-lt);color:var(--primary);">💼</div><div class="kpi-value">₹28.4L</div><div class="kpi-label">Total Pipeline</div><div class="kpi-delta up">▲ 68% win rate</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('pipeline',this)">🔄 Pipeline</button>
+      <button class="tab-btn" onclick="switchTab('leads',this)">📥 Leads (42)</button>
+      <button class="tab-btn" onclick="switchTab('quotes',this)">📋 Quotes (18)</button>
+      <button class="tab-btn" onclick="switchTab('tasks',this)">✅ My Tasks (7)</button>
+      <button class="tab-btn" onclick="switchTab('reports',this)">📊 Reports</button>
+    </div>
+
+    <!-- PIPELINE TAB -->
+    <div id="tab-pipeline" class="tab-pane active">
+      <div class="filter-row">
+        <span style="font-size:12px;font-weight:700;color:var(--muted);">Filter by:</span>
+        <button class="filter-pill active" onclick="filterPipeline('all',this)">All Segments</button>
+        <button class="filter-pill" onclick="filterPipeline('SCHOOL',this)">🏫 Schools</button>
+        <button class="filter-pill" onclick="filterPipeline('CORPORATE',this)">🏢 Corporate</button>
+        <button class="filter-pill" onclick="filterPipeline('BIRTHDAY',this)">🎂 Birthday</button>
+        <button class="filter-pill" onclick="filterPipeline('B2B_TA',this)">✈️ Travel Agents</button>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <select class="form-control" style="width:160px;font-size:12px;padding:6px 10px;" onchange="filterByExec(this.value)">
+            <option value="">All Executives</option>
+            <option>Rohan Verma</option>
+            <option>Priya Kapoor</option>
+            <option>Amit Sharma</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="kanban" id="kanban-board">
+        <!-- Prospecting -->
+        <div class="kanban-col">
+          <div class="kanban-col-header prospect">🔍 Prospecting <span class="kanban-count">8</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" onclick="openLeadDetail('LD-001')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">Infosys Annual Day</div>
+              </div>
+              <div class="kanban-card-sub">Infosys Ltd · Corporate · 300 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹2,40,000</span>
+                <span class="seg-badge seg-corp">Corp</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 15 · Assigned: Rohan</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-002')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-med"></div>
+                <div class="kanban-card-title">DPS RK Puram Trip</div>
+              </div>
+              <div class="kanban-card-sub">Delhi Public School · School · 200 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹84,000</span>
+                <span class="seg-badge seg-school">School</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 22 · Assigned: Priya</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-003')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-low"></div>
+                <div class="kanban-card-title">Rainbow Tours Group</div>
+              </div>
+              <div class="kanban-card-sub">Rainbow Tours · Travel Agent</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹1,20,000</span>
+                <span class="seg-badge seg-ta">TA</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 May 5 · Assigned: Amit</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qualified -->
+        <div class="kanban-col">
+          <div class="kanban-col-header qualified">🎯 Qualified <span class="kanban-count">11</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" onclick="openLeadDetail('LD-004')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">HDFC Bank Picnic</div>
+              </div>
+              <div class="kanban-card-sub">HDFC Bank · Corporate · 600 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹4,80,000</span>
+                <span class="seg-badge seg-corp">Corp</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 10 · Assigned: Rohan</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-005')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-med"></div>
+                <div class="kanban-card-title">KV Sector 14 Trip</div>
+              </div>
+              <div class="kanban-card-sub">Kendriya Vidyalaya · School · 120 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹1,56,000</span>
+                <span class="seg-badge seg-school">School</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 18 · Assigned: Priya</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-006')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">Arjun's 10th Bday</div>
+              </div>
+              <div class="kanban-card-sub">Private · Birthday · 80 guests</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹64,000</span>
+                <span class="seg-badge seg-bday">Birthday</span>
+              </div>
+              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 20 · Assigned: Priya</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quote Sent -->
+        <div class="kanban-col">
+          <div class="kanban-col-header quote">📋 Quote Sent <span class="kanban-count">9</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" onclick="openLeadDetail('LD-007')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">Wipro Team Outing</div>
+              </div>
+              <div class="kanban-card-sub">Wipro Ltd · Corporate · 400 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹3,20,000</span>
+                <span class="seg-badge seg-corp">Corp</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--muted);">📄 QT-2026-0284 · Sent Apr 1</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-008')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-med"></div>
+                <div class="kanban-card-title">MakeMyTrip MICE</div>
+              </div>
+              <div class="kanban-card-sub">MakeMyTrip · MICE Group</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹5,60,000</span>
+                <span class="seg-badge seg-ta">TA</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--muted);">📄 QT-2026-0279 · Sent Mar 28</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Negotiation -->
+        <div class="kanban-col">
+          <div class="kanban-col-header negotiation">🤝 Negotiation <span class="kanban-count">7</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" onclick="openLeadDetail('LD-009')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">TCS Foundation Day</div>
+              </div>
+              <div class="kanban-card-sub">TCS · Corporate · 800 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹6,40,000</span>
+                <span class="seg-badge seg-corp">Corp</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--amber);">⚠️ Discount approval pending (22%)</div>
+            </div>
+            <div class="kanban-card" onclick="openLeadDetail('LD-010')">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div class="priority-dot priority-high"></div>
+                <div class="kanban-card-title">Yatra Bulk Contract</div>
+              </div>
+              <div class="kanban-card-sub">Yatra Corporate · Reseller</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value">₹4,20,000</span>
+                <span class="seg-badge seg-ta">Reseller</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--muted);">Annual contract negotiation</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Won -->
+        <div class="kanban-col">
+          <div class="kanban-col-header won">✅ Won <span class="kanban-count">7</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" style="border-left:3px solid var(--green);" onclick="openLeadDetail('LD-011')">
+              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">🎉 Axis Bank Outing</div>
+              <div class="kanban-card-sub">Axis Bank · Corporate · 250 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value" style="color:var(--green);">₹2,00,000</span>
+                <span class="badge badge-success">Confirmed</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Booking WOW-2026-09820</div>
+            </div>
+            <div class="kanban-card" style="border-left:3px solid var(--green);" onclick="openLeadDetail('LD-012')">
+              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">🎉 Amity School Group</div>
+              <div class="kanban-card-sub">Amity Noida · School · 450 pax</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value" style="color:var(--green);">₹2,08,000</span>
+                <span class="badge badge-success">Confirmed</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Booking WOW-2026-09818</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lost -->
+        <div class="kanban-col">
+          <div class="kanban-col-header lost">❌ Lost <span class="kanban-count">3</span></div>
+          <div class="kanban-body">
+            <div class="kanban-card" style="border-left:3px solid var(--red);opacity:.7;">
+              <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px;">HCL Team Event</div>
+              <div class="kanban-card-sub">HCL Technologies · Corporate</div>
+              <div class="kanban-card-meta">
+                <span class="kanban-card-value" style="color:var(--red);">₹3,60,000</span>
+                <span class="badge badge-danger">Lost</span>
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:var(--red);">Reason: Budget — went to competitor</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pipeline tab -->
+
+    <!-- LEADS TAB -->
+    <div id="tab-leads" class="tab-pane">
+      <div class="filter-row">
+        <div class="search-bar" style="flex:1;max-width:320px;position:relative;">
+          <svg class="search-bar-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="form-control" style="padding-left:36px;" placeholder="Search leads…"/>
+        </div>
+        <select class="form-control" style="width:140px;font-size:12px;padding:7px 10px;">
+          <option>All Sources</option>
+          <option>Web Form</option>
+          <option>Call Centre</option>
+          <option>Walk-in</option>
+          <option>CSV Import</option>
+        </select>
+        <select class="form-control" style="width:140px;font-size:12px;padding:7px 10px;">
+          <option>All Segments</option>
+          <option>School</option>
+          <option>Corporate</option>
+          <option>Birthday</option>
+          <option>Travel Agent</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('import-modal')">📥 Import</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('lead-modal')">+ New Lead</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Lead Ref</th><th>Contact</th><th>Organisation</th>
+              <th>Segment</th><th>Pax</th><th>Date</th><th>Status</th>
+              <th>Priority</th><th>Assigned</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody">
+            <tr>
+              <td><strong>LD-2026-0042</strong></td>
+              <td><div style="font-size:13px;font-weight:600;">Ravi Malhotra</div><div style="font-size:11px;color:var(--muted);">+91 98765 43210</div></td>
+              <td>Infosys Ltd</td>
+              <td><span class="seg-badge seg-corp">Corporate</span></td>
+              <td>300</td><td>Apr 15</td>
+              <td><span class="badge badge-primary">Qualified</span></td>
+              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-high"></div>High</div></td>
+              <td>Rohan V</td>
+              <td class="tbl-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0042')">View</button>
+                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>LD-2026-0041</strong></td>
+              <td><div style="font-size:13px;font-weight:600;">Ms. Kavitha</div><div style="font-size:11px;color:var(--muted);">+91 87654 32109</div></td>
+              <td>DPS RK Puram</td>
+              <td><span class="seg-badge seg-school">School</span></td>
+              <td>200</td><td>Apr 22</td>
+              <td><span class="badge badge-warning">Proposal Sent</span></td>
+              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-med"></div>Medium</div></td>
+              <td>Priya K</td>
+              <td class="tbl-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0041')">View</button>
+                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>LD-2026-0040</strong></td>
+              <td><div style="font-size:13px;font-weight:600;">Sunita Bhatia</div><div style="font-size:11px;color:var(--muted);">+91 76543 21098</div></td>
+              <td>—</td>
+              <td><span class="seg-badge seg-bday">Birthday</span></td>
+              <td>80</td><td>Apr 20</td>
+              <td><span class="badge badge-primary">Qualified</span></td>
+              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-high"></div>High</div></td>
+              <td>Priya K</td>
+              <td class="tbl-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0040')">View</button>
+                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>LD-2026-0039</strong></td>
+              <td><div style="font-size:13px;font-weight:600;">Manoj Tiwari</div><div style="font-size:11px;color:var(--muted);">+91 65432 10987</div></td>
+              <td>Rainbow Tours</td>
+              <td><span class="seg-badge seg-ta">Travel Agent</span></td>
+              <td>—</td><td>May 5</td>
+              <td><span class="badge badge-neutral">New</span></td>
+              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-low"></div>Low</div></td>
+              <td>Amit S</td>
+              <td class="tbl-actions">
+                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0039')">View</button>
+                <button class="btn btn-ghost btn-sm" onclick="assignLead('LD-2026-0039')">Assign</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span>Showing 4 of 42 leads</span>
+        <div class="pagination-btns">
+          <button class="page-btn">←</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUOTES TAB -->
+    <div id="tab-quotes" class="tab-pane">
+      <div class="filter-row">
+        <button class="filter-pill active">All</button>
+        <button class="filter-pill">Draft</button>
+        <button class="filter-pill">Sent</button>
+        <button class="filter-pill">Accepted</button>
+        <button class="filter-pill">Expired</button>
+        <div style="margin-left:auto;">
+          <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">+ New Quote</a>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr><th>Quote Ref</th><th>Client</th><th>Park</th><th>Visit Date</th><th>Pax</th><th>Amount</th><th>Discount</th><th>Approval</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>QT-2026-0284</strong></td><td>Wipro Ltd</td><td><span class="badge badge-teal">Combo</span></td>
+              <td>Apr 14</td><td>400</td><td>₹3,20,000</td>
+              <td><span style="color:var(--amber);font-weight:700;">15%</span></td>
+              <td><span class="badge badge-neutral">Not Required</span></td>
+              <td><span class="badge badge-warning">Sent</span></td>
+              <td class="tbl-actions">
+                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
+                <button class="btn btn-primary btn-sm" onclick="convertToBooking('QT-2026-0284')">Convert</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>QT-2026-0279</strong></td><td>MakeMyTrip</td><td><span class="badge badge-teal">Combo</span></td>
+              <td>Apr 30</td><td>700</td><td>₹5,60,000</td>
+              <td><span style="color:var(--red);font-weight:700;">22%</span></td>
+              <td><span class="badge badge-danger">Pending</span></td>
+              <td><span class="badge badge-warning">Sent</span></td>
+              <td class="tbl-actions">
+                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
+                <button class="btn btn-accent btn-sm" onclick="approveDiscount('QT-2026-0279')">Approve Disc</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>QT-2026-0271</strong></td><td>Amity Noida</td><td><span class="badge badge-primary">Water Park</span></td>
+              <td>Apr 15</td><td>450</td><td>₹2,08,000</td>
+              <td><span style="color:var(--green);font-weight:700;">10%</span></td>
+              <td><span class="badge badge-neutral">Not Required</span></td>
+              <td><span class="badge badge-success">Accepted</span></td>
+              <td class="tbl-actions">
+                <a href="bookings.html" class="btn btn-success btn-sm">View Booking</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TASKS TAB -->
+    <div id="tab-tasks" class="tab-pane">
+      <div class="flex justify-between mb-16" style="gap:12px;flex-wrap:wrap;">
+        <div class="tab-bar" style="border-bottom:none;margin-bottom:0;">
+          <button class="tab-btn active">My Tasks</button>
+          <button class="tab-btn">Team Tasks</button>
+          <button class="tab-btn">Overdue (2)</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('task-modal')">+ Add Task</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="tasks-list">
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;">Follow up with Wipro re: QT-2026-0284</div>
+                <div style="font-size:11px;color:var(--muted);">Lead: Wipro Team Outing · Assigned: Rohan V</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <span class="badge badge-danger">Overdue · Apr 3</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;">Send revised quote to TCS</div>
+                <div style="font-size:11px;color:var(--muted);">Lead: TCS Foundation Day · Due: Apr 8</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <span class="badge badge-warning">Due Today</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" checked/>
+              <div style="opacity:.5;text-decoration:line-through;">
+                <div style="font-size:13px;font-weight:700;">Call HDFC Bank contact</div>
+                <div style="font-size:11px;color:var(--muted);">Completed Apr 5</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <span class="badge badge-success">Done</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-12">
+              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
+              <div>
+                <div style="font-size:13px;font-weight:700;">Onboard Rainbow Tours as TA partner</div>
+                <div style="font-size:11px;color:var(--muted);">Lead: Rainbow Tours · Due: Apr 12</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <span class="badge badge-neutral">Upcoming</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS TAB -->
+    <div id="tab-reports" class="tab-pane">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pipeline Value by Stage</div></div>
+          <div class="chart-wrap" style="height:260px;"><canvas id="pipelineValueChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Leads by Source</div></div>
+          <div class="chart-wrap" style="height:260px;"><canvas id="leadSourceChart"></canvas></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Win Rate by Exec</div></div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="winRateChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Monthly Revenue Closed</div></div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="closedRevenueChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /adm-content -->
+</main>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- New Lead Modal -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">+ New Lead</div>
+      <button class="modal-close" onclick="closeModal('lead-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row thirds">
+        <div class="form-group"><label class="form-label">Contact Name <span class="req">*</span></label><input class="form-control" placeholder="Full name"/></div>
+        <div class="form-group"><label class="form-label">Mobile <span class="req">*</span></label><input class="form-control" placeholder="+91 XXXXX XXXXX"/></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-control" placeholder="email@company.com" type="email"/></div>
+      </div>
+      <div class="form-row thirds">
+        <div class="form-group"><label class="form-label">Organisation</label><input class="form-control" placeholder="Company / School name"/></div>
+        <div class="form-group">
+          <label class="form-label">Segment <span class="req">*</span></label>
+          <select class="form-control"><option>School</option><option>Corporate</option><option>Birthday</option><option>Travel Agent</option><option>Reseller</option><option>General</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Source <span class="req">*</span></label>
+          <select class="form-control"><option>Web Form</option><option>Call Centre</option><option>Walk-in</option><option>Referral</option><option>Event</option><option>CSV Import</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Estimated Pax</label><input class="form-control" type="number" placeholder="e.g. 200"/></div>
+        <div class="form-group"><label class="form-label">Preferred Date</label><input class="form-control" type="date"/></div>
+        <div class="form-group">
+          <label class="form-label">Park Preference</label>
+          <select class="form-control"><option>Undecided</option><option>Water Park</option><option>Amusement Park</option><option>Combo</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control"><option>Medium</option><option>High</option><option>Low</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" rows="3" placeholder="Any specific requirements, budget range, special requests…"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">Assign To</label>
+        <select class="form-control"><option>Auto-assign</option><option>Rohan Verma</option><option>Priya Kapoor</option><option>Amit Sharma</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('lead-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Create Lead &amp; Assign</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lead Detail Modal -->
+<div class="modal-overlay" id="lead-detail-modal">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="lead-detail-title">Lead: LD-2026-0042</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Infosys Annual Day · Corporate · 300 pax</div>
+      </div>
+      <div class="flex gap-8">
+        <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">📋 Create Quote</a>
+        <button class="modal-close" onclick="closeModal('lead-detail-modal')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <!-- Left: Lead Info -->
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Contact Information</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Contact</span><strong>Ravi Malhotra</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Mobile</span><strong>+91 98765 43210</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Email</span><strong>ravi.m@infosys.com</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Organisation</span><strong>Infosys Ltd</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Pax</span><strong>300</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Preferred Date</span><strong>April 15, 2026</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Park</span><strong><span class="badge badge-teal">Combo</span></strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Status</span><strong><span class="badge badge-primary">Qualified</span></strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Priority</span><strong style="color:var(--red);">🔴 High</strong></div>
+          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Assigned To</span><strong>Rohan Verma</strong></div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Update Status</div>
+        <div class="form-group">
+          <select class="form-control">
+            <option>New</option><option>Contacted</option><option selected>Qualified</option><option>Proposal Sent</option><option>Negotiation</option><option>Won</option><option>Lost</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea class="form-control" rows="2" placeholder="Add note…"></textarea>
+        </div>
+        <button class="btn btn-primary btn-sm w-full" style="justify-content:center;" onclick="updateLeadStatus()">Update Lead</button>
+      </div>
+      <!-- Right: Activity Timeline -->
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Activity Timeline</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--primary-lt);border-color:var(--primary);">📋</div>
+            <div class="tl-content">
+              <div class="tl-title">Quote QT-2026-0284 sent</div>
+              <div class="tl-sub">Wipro Team Outing — ₹3,20,000</div>
+              <div class="tl-time">Apr 1, 2026 · 2:30 PM</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--green-lt);border-color:var(--green);">📞</div>
+            <div class="tl-content">
+              <div class="tl-title">Phone call — Discovery</div>
+              <div class="tl-sub">Discussed requirements, 300 pax, April dates</div>
+              <div class="tl-time">Mar 29, 2026 · 11:00 AM</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--accent-lt);border-color:var(--accent);">📧</div>
+            <div class="tl-content">
+              <div class="tl-title">Email sent — Introduction</div>
+              <div class="tl-sub">Sent park brochure and pricing</div>
+              <div class="tl-time">Mar 27, 2026 · 9:15 AM</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">🆕</div>
+            <div class="tl-content">
+              <div class="tl-title">Lead created from Web Form</div>
+              <div class="tl-sub">Assigned to Rohan Verma</div>
+              <div class="tl-time">Mar 26, 2026 · 4:45 PM</div>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Linked Quotes</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card" style="padding:12px 14px;">
+            <div class="flex justify-between items-center">
+              <div>
+                <div style="font-size:13px;font-weight:700;">QT-2026-0284</div>
+                <div style="font-size:11px;color:var(--muted);">v1 · ₹3,20,000 · Apr 14</div>
+              </div>
+              <div class="flex gap-6">
+                <span class="badge badge-warning">Sent</span>
+                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import CSV Modal -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📥 Import Leads from CSV</div>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">Template format: Name, Mobile, Email, Organisation, Segment, Pax, Date, Notes</div>
+      <div class="upload-zone" id="csv-dropzone" onclick="document.getElementById('csv-file').click()">
+        <div class="upload-zone-icon">📄</div>
+        <div class="upload-zone-text">Drop your CSV file here, or click to browse</div>
+        <div class="upload-zone-hint">Supports .csv · Max 5MB · Up to 1,000 rows</div>
+      </div>
+      <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)"/>
+      <div id="csv-preview" style="margin-top:14px;display:none;">
+        <div class="alert alert-success">✅ 24 leads ready to import — 2 duplicates flagged</div>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label class="form-label">Assign all imported leads to:</label>
+        <select class="form-control"><option>Auto-assign by round-robin</option><option>Rohan Verma</option><option>Priya Kapoor</option><option>Amit Sharma</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancel</button>
+      <a href="#" class="btn btn-ghost btn-sm">⬇ Download Template</a>
+      <button class="btn btn-primary" onclick="importLeads()">Import Leads</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* Tab switching */
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='reports') initReportCharts();
+}
+
+/* Filter pills */
+function filterPipeline(seg,el){
+  document.querySelectorAll('.filter-row .filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  showToast('Filtered: '+el.textContent,'info');
+}
+function filterByExec(v){}
+
+/* Modal */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openLeadDetail(ref){
+  document.getElementById('lead-detail-title').textContent='Lead: '+ref;
+  openModal('lead-detail-modal');
+}
+
+/* Actions */
+function saveLead(){ closeModal('lead-modal'); showToast('Lead created & assigned successfully','success'); }
+function updateLeadStatus(){ closeModal('lead-detail-modal'); showToast('Lead status updated','success'); }
+function convertToBooking(q){ showToast('Booking created from '+q,'success'); }
+function approveDiscount(q){ showToast('Discount approval request escalated to Sales Head','info'); }
+function assignLead(l){ showToast('Lead reassigned','success'); }
+function importLeads(){ closeModal('import-modal'); showToast('24 leads imported successfully','success'); }
+function handleCSVUpload(el){ if(el.files[0]) document.getElementById('csv-preview').style.display='block'; }
+
+/* Report Charts — only init when tab is active */
+let reportChartsInited=false;
+function initReportCharts(){
+  if(reportChartsInited) return;
+  reportChartsInited=true;
+  const PRIMARY='#0055B3',TEAL='#007BB5',GOLD='#F5A800',GREEN='#0A9B5F',PURPLE='#5E35B1',RED='#DC2626';
+
+  new Chart(document.getElementById('pipelineValueChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:['Prospect','Qualified','Quote Sent','Negotiation','Won'],datasets:[{data:[3.8,9.2,12.6,10.8,8.2],backgroundColor:[PRIMARY,'#1A6FD4',GOLD,PURPLE,GREEN],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+v+'L'}}}}
+  });
+
+  new Chart(document.getElementById('leadSourceChart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:['Web Form','Call Centre','Walk-in','Referral','CSV Import','Event'],datasets:[{data:[38,24,12,14,8,4],backgroundColor:[PRIMARY,TEAL,GOLD,GREEN,PURPLE,RED],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{font:{size:11},usePointStyle:true}}}}
+  });
+
+  new Chart(document.getElementById('winRateChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:['Rohan V','Priya K','Amit S','Sneha R','Vikas M'],datasets:[{label:'Win Rate %',data:[72,68,61,75,55],backgroundColor:[PRIMARY,TEAL,GOLD,GREEN,PURPLE],borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{max:100,ticks:{callback:v=>v+'%'}}}}
+  });
+
+  new Chart(document.getElementById('closedRevenueChart').getContext('2d'),{
+    type:'line',
+    data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[{label:'Revenue Closed',data:[4.2,6.8,12.1,5.4,7.8,9.2,8.2],borderColor:GREEN,backgroundColor:'rgba(10,155,95,.1)',tension:.4,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'L'}}}}
+  });
+}
+
+/* Toast */
+function showToast(msg,type='info'){
+  const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+</script>
+</body>
+</html>

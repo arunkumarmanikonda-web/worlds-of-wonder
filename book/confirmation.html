@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Confirmed! 🎉 — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    :root{
+      --bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--border:rgba(255,255,255,.08);
+      --text:#e2e8f0;--muted:rgba(255,255,255,.45);
+      --primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;padding:0;}
+    
+    /* ── Topbar ── */
+    .topbar{background:#060b17;border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;}
+    .topbar-logo img{height:40px;filter:none!important;}
+    .topbar-steps{display:flex;align-items:center;gap:0;font-size:12px;}
+    .step{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.3);font-weight:700;}
+    .step.done{color:var(--green);}
+    .step.active{color:#fff;}
+    .step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background:rgba(255,255,255,.1);}
+    .step.done .step-num{background:var(--green);color:#fff;}
+    .step.active .step-num{background:var(--primary);color:#fff;}
+    .step-sep{width:28px;height:2px;background:rgba(255,255,255,.08);margin:0 4px;}
+    .step-sep.done{background:var(--green);}
+    @media(max-width:640px){.step-label{display:none;}}
+
+    /* ── Confetti strip ── */
+    .confetti-strip{background:linear-gradient(90deg,#0055B3 0%,#1a6dd4 50%,#0055B3 100%);padding:18px 24px;text-align:center;font-size:22px;font-weight:900;letter-spacing:.02em;position:relative;overflow:hidden;}
+    .confetti-strip::after{content:'🎉 🎊 🎉';font-size:28px;position:absolute;right:24px;top:50%;transform:translateY(-50%);opacity:.4;}
+
+    /* ── Main layout ── */
+    .page{max-width:900px;margin:0 auto;padding:36px 20px 60px;}
+    
+    /* ── Success card ── */
+    .success-card{background:var(--bg2);border:1px solid rgba(16,185,129,.25);border-radius:24px;padding:40px 36px;text-align:center;margin-bottom:32px;position:relative;}
+    .success-icon{width:80px;height:80px;background:rgba(16,185,129,.15);border:2px solid rgba(16,185,129,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;}
+    .success-title{font-size:32px;font-weight:900;color:#fff;margin-bottom:8px;}
+    .success-sub{font-size:15px;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto;}
+    .booking-ref{display:inline-block;background:rgba(0,85,179,.15);border:1px solid rgba(0,85,179,.4);border-radius:12px;padding:12px 24px;margin-top:20px;font-size:13px;color:rgba(255,255,255,.7);}
+    .booking-ref strong{font-size:20px;color:#fff;display:block;letter-spacing:.12em;font-family:'Poppins',sans-serif;margin-top:4px;}
+
+    /* ── Two-col grid ── */
+    .main-grid{display:grid;grid-template-columns:1fr 380px;gap:28px;}
+    @media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
+
+    /* ── Ticket cards ── */
+    .section-label{font-size:11px;font-weight:800;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;}
+    .e-ticket{background:var(--bg2);border-radius:20px;overflow:hidden;margin-bottom:20px;position:relative;}
+    .e-ticket-header{background:linear-gradient(135deg,#0055B3,#0a2a6e);padding:22px 24px;display:flex;align-items:flex-start;gap:16px;}
+    .e-ticket-icon{font-size:42px;line-height:1;}
+    .e-ticket-info{flex:1;}
+    .e-ticket-park{font-size:20px;font-weight:900;color:#fff;}
+    .e-ticket-date{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;}
+    .e-ticket-tear{height:2px;background:repeating-linear-gradient(90deg,transparent,transparent 8px,var(--bg) 8px,var(--bg) 16px);margin:0;}
+    .e-ticket-body{padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;}
+    .e-ticket-guests{flex:1;}
+    .e-ticket-guest-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+    .e-ticket-guest-row:last-child{border-bottom:none;}
+    .e-ticket-guest-row span:last-child{color:#fff;font-weight:700;}
+    .e-ticket-qr{flex-shrink:0;text-align:center;}
+    .e-ticket-qr canvas{border-radius:12px;display:block;}
+    .e-ticket-qr-label{font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;letter-spacing:.06em;}
+    .e-ticket-footer{background:rgba(0,0,0,.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .e-ticket-price{font-size:20px;font-weight:900;color:var(--gold);}
+    .e-ticket-actions{display:flex;gap:8px;}
+    .btn-ticket{padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+    .btn-download{background:var(--primary);color:#fff;}
+    .btn-share{background:rgba(255,255,255,.08);color:var(--text);}
+    .btn-download:hover{background:#0068d9;}
+    .btn-share:hover{background:rgba(255,255,255,.14);}
+
+    /* ── Right panel ── */
+    .right-panel{}
+    .info-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px;}
+    .info-card h3{font-size:15px;font-weight:800;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .info-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .info-row:last-child{border-bottom:none;}
+    .info-row span:last-child{color:#fff;font-weight:600;text-align:right;}
+    .info-row.total{font-size:15px;font-weight:800;}
+    .info-row.total span:last-child{color:var(--gold);font-size:18px;}
+    .divider-dashed{border:none;border-top:1px dashed rgba(255,255,255,.08);margin:12px 0;}
+    
+    /* Alert / notice box */
+    .notice-box{background:rgba(245,168,0,.07);border:1px solid rgba(245,168,0,.2);border-radius:14px;padding:16px 18px;margin-bottom:16px;font-size:13px;line-height:1.6;color:rgba(255,255,255,.75);}
+    .notice-box strong{color:var(--gold);display:block;margin-bottom:4px;}
+
+    /* Next steps */
+    .next-steps{list-style:none;margin:0;padding:0;}
+    .next-steps li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--muted);line-height:1.5;}
+    .next-steps li:last-child{border-bottom:none;}
+    .step-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(0,85,179,.15);}
+    .next-steps li strong{color:#fff;display:block;font-size:13px;margin-bottom:2px;}
+
+    /* CTA row */
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;}
+    .btn-primary{padding:13px 28px;background:var(--primary);color:#fff;border-radius:14px;font-size:14px;font-weight:800;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+    .btn-secondary{padding:13px 28px;background:rgba(255,255,255,.07);color:var(--text);border-radius:14px;font-size:14px;font-weight:700;text-decoration:none;border:1px solid var(--border);cursor:pointer;font-family:inherit;transition:all .2s;}
+    .btn-primary:hover{background:#0068d9;transform:translateY(-1px);}
+    .btn-secondary:hover{background:rgba(255,255,255,.12);}
+    .btn-full{width:100%;justify-content:center;}
+
+    /* Loyalty earn banner */
+    .loyalty-earn{background:linear-gradient(135deg,rgba(245,168,0,.12),rgba(245,168,0,.04));border:1px solid rgba(245,168,0,.2);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+    .loyalty-earn-icon{font-size:32px;}
+    .loyalty-earn-text{}
+    .loyalty-earn-text strong{color:var(--gold);font-size:16px;display:block;}
+    .loyalty-earn-text span{font-size:12px;color:rgba(255,255,255,.5);}
+
+    /* Payment status badge */
+    .payment-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--green);}
+    .payment-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+
+    @media(max-width:640px){
+      .page{padding:20px 14px 40px;}
+      .success-card{padding:28px 18px;}
+      .e-ticket-body{flex-direction:column;}
+      .confetti-strip{font-size:17px;}
+      .main-grid{gap:20px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <a href="../index.html" class="topbar-logo" aria-label="WOW Home">
+    <img src="../images/logo.png" alt="Worlds of Wonder" />
+  </a>
+  <div class="topbar-steps">
+    <div class="step done"><div class="step-num">✓</div><span class="step-label">Details</span></div>
+    <div class="step-sep done"></div>
+    <div class="step done"><div class="step-num">✓</div><span class="step-label">Payment</span></div>
+    <div class="step-sep done"></div>
+    <div class="step active"><div class="step-num">✓</div><span class="step-label">Confirmed</span></div>
+  </div>
+  <a href="../portal/my-bookings.html" style="font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;">My Bookings →</a>
+</div>
+
+<!-- Confetti strip -->
+<div class="confetti-strip">
+  🎉 &nbsp; Booking Confirmed — See You at the Park!
+</div>
+
+<div class="page">
+  <!-- Success hero card -->
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-title">You're All Set!</div>
+    <p class="success-sub">Your e-tickets have been issued and sent to your email &amp; WhatsApp. Show the QR at the gate — no print needed.</p>
+    <div class="booking-ref">
+      Booking Reference
+      <strong id="booking-ref-num">WOW-2026-...</strong>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <span class="payment-badge">Payment Successful</span>
+      <span style="font-size:12px;color:rgba(255,255,255,.3);">via Razorpay · <span id="pay-method">UPI</span></span>
+    </div>
+  </div>
+
+  <!-- Loyalty earn notice -->
+  <div class="loyalty-earn" id="loyalty-earn-banner">
+    <div class="loyalty-earn-icon">⭐</div>
+    <div class="loyalty-earn-text">
+      <strong>You've earned <span id="pts-earned">250</span> WOW Stars!</strong>
+      <span>Points added to your loyalty wallet · New balance: <span id="pts-balance">1,450</span> pts</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Left: E-tickets -->
+    <div>
+      <div class="section-label">Your E-Tickets</div>
+      <div id="tickets-container"></div>
+
+      <!-- Next steps -->
+      <div class="info-card" style="margin-top:8px;">
+        <h3>📋 What to do next</h3>
+        <ul class="next-steps">
+          <li>
+            <div class="step-icon">📧</div>
+            <div><strong>Check your email</strong>Tickets sent to the address you registered. Check spam if not received within 5 mins.</div>
+          </li>
+          <li>
+            <div class="step-icon">📱</div>
+            <div><strong>WhatsApp confirmation</strong>Your QR code has also been sent to your registered mobile via WhatsApp Business.</div>
+          </li>
+          <li>
+            <div class="step-icon">🔒</div>
+            <div><strong>Save your QR</strong>Screenshot or download each ticket QR. One QR = one guest entry. Non-transferable.</div>
+          </li>
+          <li>
+            <div class="step-icon">🕙</div>
+            <div><strong>Arrive 15 min early</strong>Gates open at 10:00 AM. Arrive with valid ID for faster check-in.</div>
+          </li>
+          <li>
+            <div class="step-icon">💳</div>
+            <div><strong>No refunds on the day</strong>Rescheduling allowed up to 24 hrs before. Contact support@worldsofwonder.in</div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="cta-row">
+        <a href="../portal/my-bookings.html" class="btn-primary"><span>🎟</span> View All Bookings</a>
+        <a href="../index.html" class="btn-secondary">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+      <!-- Order summary -->
+      <div class="info-card">
+        <h3>🧾 Order Summary</h3>
+        <div id="order-summary-rows"></div>
+        <hr class="divider-dashed" />
+        <div class="info-row">
+          <span>Subtotal</span><span id="os-subtotal">₹0</span>
+        </div>
+        <div class="info-row">
+          <span>GST (18%)</span><span id="os-gst">₹0</span>
+        </div>
+        <div class="info-row" id="os-discount-row" style="display:none;">
+          <span>Offer Discount</span><span id="os-discount" style="color:var(--green);">-₹0</span>
+        </div>
+        <hr class="divider-dashed" />
+        <div class="info-row total">
+          <span>Total Paid</span><span id="os-total">₹0</span>
+        </div>
+      </div>
+
+      <!-- Visit info -->
+      <div class="info-card">
+        <h3>📍 Visit Information</h3>
+        <div class="info-row"><span>Visit Date</span><span id="vi-date">—</span></div>
+        <div class="info-row"><span>Park(s)</span><span id="vi-park">—</span></div>
+        <div class="info-row"><span>Total Guests</span><span id="vi-guests">—</span></div>
+        <div class="info-row"><span>Booking Time</span><span id="vi-time">—</span></div>
+        <div style="margin-top:14px;background:rgba(0,0,0,.2);border-radius:10px;padding:12px;font-size:12px;color:rgba(255,255,255,.4);line-height:1.6;">
+          📍 A-2, Sector 38A, Noida — 201301, UP<br>
+          🕙 Open: 10:00 AM – 6:00 PM Daily<br>
+          📞 080-6909-0000 (helpline)
+        </div>
+      </div>
+
+      <!-- Notice box -->
+      <div class="notice-box">
+        <strong>⚠️ Entry Policy Reminder</strong>
+        Original government ID required at gate. Ticket is valid for the booked date only. Children under 90cm enter FREE.
+      </div>
+
+      <!-- Help -->
+      <div class="info-card">
+        <h3>💬 Need Help?</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="https://wa.me/918069090000" target="_blank" class="btn-primary btn-full" style="font-size:13px;">
+            <span>📱</span> WhatsApp Support
+          </a>
+          <a href="../contact.html" class="btn-secondary btn-full" style="font-size:13px;text-align:center;">📞 Call / Email Support</a>
+          <a href="../portal/my-bookings.html" class="btn-secondary btn-full" style="font-size:13px;text-align:center;">🔄 Reschedule Booking</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Parse URL params ── */
+const params = new URLSearchParams(window.location.search);
+const park    = params.get('park')    || 'Water Park';
+const date    = params.get('date')    || new Date(Date.now()+86400000).toLocaleDateString('en-IN');
+const adults  = parseInt(params.get('adults')  || '2');
+const children= parseInt(params.get('children')|| '1');
+const seniors = parseInt(params.get('seniors') || '0');
+const total   = parseInt(params.get('total')   || '3847');
+const offer   = params.get('offer')   || '';
+
+/* ── Generate booking ref ── */
+function genRef() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let r = 'WOW-';
+  for(let i=0;i<4;i++) r += chars[Math.floor(Math.random()*chars.length)];
+  r += '-';
+  for(let i=0;i<4;i++) r += chars[Math.floor(Math.random()*chars.length)];
+  return r;
+}
+
+const bookingRef = genRef();
+document.getElementById('booking-ref-num').textContent = bookingRef;
+
+/* ── Park metadata ── */
+const PARKS = {
+  'water-park':    { label:'Water Park 🌊',    icon:'🌊', adult:1299, child:999, senior:999, color:'#0055B3' },
+  'amusement-park':{ label:'Amusement Park 🎢', icon:'🎢', adult:1199, child:999, senior:999, color:'#1a3a6e' },
+  'combo':         { label:'Combo (Both Parks) 🎉', icon:'🎉', adult:1999, child:1499, senior:1499, color:'#7c3aed' },
+};
+
+const parkKey  = park.toLowerCase().replace(/\s+/g,'-').replace(/[()]/g,'');
+const parkData = PARKS[parkKey] || PARKS['water-park'];
+
+/* ── Order summary ── */
+const rows = [];
+if(adults>0)   rows.push({ label:`${parkData.label} — Adult × ${adults}`,    price: parkData.adult   * adults });
+if(children>0) rows.push({ label:`${parkData.label} — Child × ${children}`,  price: parkData.child   * children });
+if(seniors>0)  rows.push({ label:`${parkData.label} — Senior × ${seniors}`,  price: parkData.senior  * seniors });
+
+const rawSub  = rows.reduce((a,r)=>a+r.price,0) || total;
+const gst     = Math.round(rawSub * 0.18);
+const discount= offer ? Math.round(rawSub * 0.1) : 0;
+const finalTotal = rawSub + gst - discount;
+
+document.getElementById('os-subtotal').textContent = '₹' + rawSub.toLocaleString('en-IN');
+document.getElementById('os-gst').textContent      = '₹' + gst.toLocaleString('en-IN');
+document.getElementById('os-total').textContent    = '₹' + finalTotal.toLocaleString('en-IN');
+
+const summaryEl = document.getElementById('order-summary-rows');
+summaryEl.innerHTML = rows.map(r=>`
+  <div class="info-row">
+    <span>${r.label}</span>
+    <span>₹${r.price.toLocaleString('en-IN')}</span>
+  </div>`).join('');
+
+if(discount>0){
+  document.getElementById('os-discount-row').style.display='flex';
+  document.getElementById('os-discount').textContent = '-₹'+discount.toLocaleString('en-IN');
+}
+
+/* ── Visit info ── */
+document.getElementById('vi-date').textContent   = date;
+document.getElementById('vi-park').textContent   = parkData.label;
+document.getElementById('vi-guests').textContent = (adults+children+seniors) + ' guests';
+document.getElementById('vi-time').textContent   = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+/* ── Loyalty points ── */
+const pts = Math.floor(finalTotal / 10);
+document.getElementById('pts-earned').textContent  = pts.toLocaleString('en-IN');
+document.getElementById('pts-balance').textContent = (pts + 1200).toLocaleString('en-IN');
+
+/* ── Build e-tickets ── */
+async function buildTickets() {
+  const container = document.getElementById('tickets-container');
+  const totalGuests = adults + children + seniors;
+  const guestList = [];
+  for(let i=0;i<adults;i++)    guestList.push({ type:'Adult',   icon:'👤', price:parkData.adult });
+  for(let i=0;i<children;i++)  guestList.push({ type:'Child',   icon:'👦', price:parkData.child });
+  for(let i=0;i<seniors;i++)   guestList.push({ type:'Senior',  icon:'👴', price:parkData.senior });
+
+  // Group into one e-ticket per ticket category
+  const groups = {};
+  guestList.forEach(g => {
+    if(!groups[g.type]) groups[g.type] = { type:g.type, icon:g.icon, price:g.price, count:0 };
+    groups[g.type].count++;
+  });
+
+  for(const [type, grp] of Object.entries(groups)) {
+    const ticketId = `TKT-${Math.random().toString(36).substr(2,8).toUpperCase()}`;
+    const qrData   = JSON.stringify({ ref:bookingRef, tid:ticketId, park:parkKey, date, type, count:grp.count });
+
+    const ticketDiv = document.createElement('div');
+    ticketDiv.className = 'e-ticket';
+    ticketDiv.innerHTML = `
+      <div class="e-ticket-header">
+        <div class="e-ticket-icon">${parkData.icon}</div>
+        <div class="e-ticket-info">
+          <div class="e-ticket-park">${parkData.label}</div>
+          <div class="e-ticket-date">📅 ${date} &nbsp;·&nbsp; ${grp.count} × ${type}</div>
+          <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.08em;">${ticketId}</div>
+        </div>
+      </div>
+      <div class="e-ticket-tear"></div>
+      <div class="e-ticket-body">
+        <div class="e-ticket-guests">
+          <div class="e-ticket-guest-row"><span>Ticket Type</span><span>${type}</span></div>
+          <div class="e-ticket-guest-row"><span>Quantity</span><span>${grp.count}</span></div>
+          <div class="e-ticket-guest-row"><span>Valid Date</span><span>${date}</span></div>
+          <div class="e-ticket-guest-row"><span>Park</span><span>${parkData.label}</span></div>
+          <div class="e-ticket-guest-row"><span>Status</span><span style="color:var(--green);">✅ Active</span></div>
+        </div>
+        <div class="e-ticket-qr">
+          <canvas id="qr-${ticketId}" width="120" height="120"></canvas>
+          <div class="e-ticket-qr-label">SCAN AT GATE</div>
+        </div>
+      </div>
+      <div class="e-ticket-footer">
+        <div class="e-ticket-price">₹${(grp.price * grp.count).toLocaleString('en-IN')}</div>
+        <div class="e-ticket-actions">
+          <button class="btn-ticket btn-download" onclick="downloadTicket('${ticketId}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button>
+          <button class="btn-ticket btn-share" onclick="shareTicket('${ticketId}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share
+          </button>
+        </div>
+      </div>`;
+    container.appendChild(ticketDiv);
+
+    // Render QR after DOM insert
+    await new Promise(r=>setTimeout(r,50));
+    try {
+      QRCode.toCanvas(document.getElementById('qr-'+ticketId), qrData, {
+        width: 120, margin: 1,
+        color: { dark: '#ffffff', light: '#1a2235' }
+      });
+    } catch(e) {
+      document.getElementById('qr-'+ticketId).style.background='#1a2235';
+    }
+  }
+}
+
+buildTickets();
+
+/* ── Actions ── */
+function downloadTicket(id) {
+  // In production: trigger PDF download via server
+  alert('📥 Downloading ticket ' + id + ' as PDF...\n\n(In production this generates a branded PDF e-ticket via the backend)');
+}
+
+function shareTicket(id) {
+  if(navigator.share) {
+    navigator.share({
+      title: 'My WOW Ticket',
+      text: `I'm visiting Worlds of Wonder! Booking: ${bookingRef}`,
+      url: window.location.href
+    });
+  } else {
+    const url = `https://wa.me/?text=I'm visiting Worlds of Wonder! Booking ref: ${bookingRef}`;
+    window.open(url, '_blank');
+  }
+}
+
+/* ── Confetti animation ── */
+(function spawnConfetti() {
+  const colors = ['#0055B3','#F5A800','#10b981','#f97316','#a78bfa'];
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
+  document.body.appendChild(container);
+  for(let i=0;i<60;i++) {
+    const el = document.createElement('div');
+    const size = Math.random()*8+4;
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${colors[Math.floor(Math.random()*colors.length)]};top:-10px;left:${Math.random()*100}%;border-radius:${Math.random()>0.5?'50%':'2px'};opacity:1;animation:fall ${1.5+Math.random()*2}s ease-in ${Math.random()*1.5}s forwards;`;
+    container.appendChild(el);
+  }
+  const style = document.createElement('style');
+  style.textContent = '@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0;}}';
+  document.head.appendChild(style);
+  setTimeout(()=>container.remove(), 4500);
+})();
+</script>
+</body>
+</html>

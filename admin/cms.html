@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CMS — Content Management — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.cms-zone-card{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--white);transition:box-shadow var(--tr);}
+.cms-zone-card:hover{box-shadow:var(--sh);}
+.cms-zone-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.cms-zone-title{font-size:14px;font-weight:800;color:var(--ink);}
+.cms-zone-body{padding:14px 16px;}
+.cms-banner-preview{width:100%;height:100px;border-radius:var(--r-sm);object-fit:cover;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:10px;}
+.media-card{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;cursor:pointer;transition:box-shadow var(--tr-fast);}
+.media-card:hover{box-shadow:var(--sh-sm);}
+.media-thumb{width:100%;height:80px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:24px;}
+.media-name{font-size:11px;font-weight:600;color:var(--text2);padding:6px 8px;border-top:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.seo-score{display:flex;align-items:center;gap:8px;}
+.seo-score-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;}
+.seo-green{background:var(--green-lt);color:var(--green);}
+.seo-amber{background:var(--amber-lt);color:var(--amber);}
+.seo-red{background:var(--red-lt);color:var(--red);}
+</style>
+</head>
+<body>
+<div class="adm-layout">
+
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">CMS Module</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport</a>
+    <div class="adm-nav-section">B2B &amp; Sales</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item active"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">CE</div>
+      <div><div class="adm-user-name">CMS Editor</div><div class="adm-user-role">Content Access</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title">🖼 Content Management System</div>
+      <div class="adm-topbar-sub">Pages · Banners · Offers · FAQs · SEO · Media Library</div>
+    </div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="previewSite()">👁 Preview Site</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('advisory-modal')">📢 Post Advisory</button>
+      <button class="btn btn-primary btn-sm" onclick="publishAll()">🚀 Publish All Changes</button>
+    </div>
+  </div>
+
+  <div class="adm-content">
+
+    <!-- Unpublished changes alert -->
+    <div class="alert alert-warning mb-16">
+      <span>⚠️</span>
+      <span><strong>3 unpublished changes</strong> — Hero banner updated, FAQ #4 edited, Offer card added. Review before publishing.</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('zones',this)">🗺 Content Zones</button>
+      <button class="tab-btn" onclick="switchTab('pages',this)">📄 Pages</button>
+      <button class="tab-btn" onclick="switchTab('media',this)">🖼 Media Library</button>
+      <button class="tab-btn" onclick="switchTab('faq',this)">❓ FAQs</button>
+      <button class="tab-btn" onclick="switchTab('seo',this)">🔍 SEO</button>
+      <button class="tab-btn" onclick="switchTab('advisories',this)">📢 Advisories</button>
+    </div>
+
+    <!-- CONTENT ZONES -->
+    <div id="tab-zones" class="tab-pane active">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+
+        <!-- Hero Carousel -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">🎠 Hero Carousel</span>
+            <div class="flex gap-6">
+              <span class="badge badge-warning">3 unpublished</span>
+              <button class="btn btn-primary btn-sm" onclick="editZone('hero')">Edit</button>
+            </div>
+          </div>
+          <div class="cms-zone-body">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;display:flex;gap:10px;align-items:center;">
+                <div style="width:60px;height:40px;background:linear-gradient(135deg,#0055B3,#00AADD);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;">🌊</div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;">Slide 1 — Water Park</div>
+                  <div style="font-size:11px;color:var(--muted);">Active · 6s</div>
+                </div>
+                <div class="flex gap-4">
+                  <button class="btn btn-ghost btn-sm" style="padding:4px 8px;">✏️</button>
+                  <button class="btn btn-ghost btn-sm" style="padding:4px 8px;">🗑</button>
+                </div>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;display:flex;gap:10px;align-items:center;">
+                <div style="width:60px;height:40px;background:linear-gradient(135deg,#5E35B1,#7c3aed);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;">🎢</div>
+                <div style="flex:1;">
+                  <div style="font-size:12px;font-weight:700;">Slide 2 — Amusement Park</div>
+                  <div style="font-size:11px;color:var(--muted);">Active · 6s</div>
+                </div>
+                <div class="flex gap-4">
+                  <button class="btn btn-ghost btn-sm" style="padding:4px 8px;">✏️</button>
+                  <button class="btn btn-ghost btn-sm" style="padding:4px 8px;">🗑</button>
+                </div>
+              </div>
+              <div style="border:1px dashed var(--border);border-radius:var(--r-sm);padding:10px;display:flex;gap:10px;align-items:center;opacity:.6;">
+                <div style="width:60px;height:40px;background:var(--bg2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;">➕</div>
+                <div style="font-size:12px;color:var(--muted);">Add new slide…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notices Banner -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">📢 Site Notice Bar</span>
+            <button class="btn btn-primary btn-sm" onclick="editZone('notice')">Edit</button>
+          </div>
+          <div class="cms-zone-body">
+            <div style="background:var(--accent);color:var(--ink);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:10px;font-size:12px;font-weight:700;">🎉 Summer Special: 25% off Combo tickets! Use SUMMER25</div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label class="form-label" style="font-size:11px;">Notice Text</label>
+              <input class="form-control" value="🎉 Summer Special: 25% off Combo tickets! Use SUMMER25" style="font-size:12px;"/>
+            </div>
+            <div class="form-row" style="grid-template-columns:1fr 1fr;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:11px;">BG Color</label>
+                <input class="form-control" type="color" value="#F5A800" style="height:36px;padding:2px 4px;"/>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:11px;">Active</label>
+                <div class="toggle-wrap" style="margin-top:6px;">
+                  <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+                  <span class="toggle-label">Enabled</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer Cards -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">🎯 Homepage Offer Cards</span>
+            <button class="btn btn-primary btn-sm" onclick="editZone('offers')">Edit</button>
+          </div>
+          <div class="cms-zone-body">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;">Summer Splash 25% Off</div>
+                  <div style="font-size:11px;color:var(--muted);">Water Park · Ends Apr 30</div>
+                </div>
+                <span class="badge badge-success">Live</span>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-size:12px;font-weight:700;">Group Saver ₹125 Off</div>
+                  <div style="font-size:11px;color:var(--muted);">10+ tickets</div>
+                </div>
+                <span class="badge badge-success">Live</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center;" onclick="openModal('offer-card-modal')">+ Add Offer Card</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Park Modules -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">🎡 Park Modules</span>
+            <button class="btn btn-primary btn-sm" onclick="editZone('parks')">Edit</button>
+          </div>
+          <div class="cms-zone-body">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;">
+                <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Water Park Cards (13 rides)</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <span class="badge badge-teal">Wave Pool</span>
+                  <span class="badge badge-teal">Boomerango</span>
+                  <span class="badge badge-teal">Lazy River</span>
+                  <span class="badge badge-neutral">+10 more</span>
+                </div>
+              </div>
+              <div style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;">
+                <div style="font-size:12px;font-weight:700;margin-bottom:4px;">Amusement Park Cards (18 rides)</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <span class="badge badge-purple">Rockin Roller</span>
+                  <span class="badge badge-purple">Giant Wheel</span>
+                  <span class="badge badge-neutral">+16 more</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Safety & Policies -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">🛡 Safety &amp; Policies</span>
+            <button class="btn btn-primary btn-sm" onclick="editZone('safety')">Edit</button>
+          </div>
+          <div class="cms-zone-body">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div class="flex justify-between" style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span>Height restrictions</span><span class="badge badge-success">Published</span>
+              </div>
+              <div class="flex justify-between" style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span>Health advisories</span><span class="badge badge-success">Published</span>
+              </div>
+              <div class="flex justify-between" style="font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);">
+                <span>Terms &amp; Conditions</span><span class="badge badge-warning">Draft</span>
+              </div>
+              <div class="flex justify-between" style="font-size:12px;padding:6px 0;">
+                <span>Privacy Policy</span><span class="badge badge-success">Published</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="cms-zone-card">
+          <div class="cms-zone-header">
+            <span class="cms-zone-title">🔗 Footer Content</span>
+            <button class="btn btn-primary btn-sm" onclick="editZone('footer')">Edit</button>
+          </div>
+          <div class="cms-zone-body">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div class="form-group"><label class="form-label" style="font-size:11px;">Phone</label><input class="form-control" value="080-6909-0000" style="font-size:12px;"/></div>
+              <div class="form-group"><label class="form-label" style="font-size:11px;">Email</label><input class="form-control" value="support@worldsofwonder.in" style="font-size:12px;"/></div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label" style="font-size:11px;">Address</label><textarea class="form-control" rows="2" style="font-size:12px;">A-2, Sector 38A, Noida — 201301</textarea></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /grid -->
+    </div>
+
+    <!-- PAGES TAB -->
+    <div id="tab-pages" class="tab-pane">
+      <div class="filter-row">
+        <button class="filter-pill active">All Pages</button>
+        <button class="filter-pill">Public</button>
+        <button class="filter-pill">Booking</button>
+        <button class="filter-pill">Portal</button>
+        <button class="filter-pill">Admin</button>
+        <div style="margin-left:auto;">
+          <button class="btn btn-primary btn-sm" onclick="openModal('new-page-modal')">+ New Page</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Page Title</th><th>Path</th><th>Last Edited</th><th>SEO Score</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Homepage</strong></td><td><code>/index.html</code></td><td>2 hrs ago</td><td><div class="seo-score"><div class="seo-score-num seo-green">92</div><span style="font-size:11px;color:var(--green);">Excellent</span></div></td><td><span class="badge badge-success">Live</span></td><td class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="editPage('index')">Edit</button><a href="../index.html" target="_blank" class="btn btn-ghost btn-sm">↗</a></td></tr>
+            <tr><td><strong>Water Park</strong></td><td><code>/water-park.html</code></td><td>1 day ago</td><td><div class="seo-score"><div class="seo-score-num seo-green">88</div></div></td><td><span class="badge badge-success">Live</span></td><td class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="editPage('water-park')">Edit</button><a href="../water-park.html" target="_blank" class="btn btn-ghost btn-sm">↗</a></td></tr>
+            <tr><td><strong>Amusement Park</strong></td><td><code>/amusement-park.html</code></td><td>1 day ago</td><td><div class="seo-score"><div class="seo-score-num seo-green">86</div></div></td><td><span class="badge badge-success">Live</span></td><td class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="editPage('amusement-park')">Edit</button></td></tr>
+            <tr><td><strong>Offers</strong></td><td><code>/offers.html</code></td><td>3 hrs ago</td><td><div class="seo-score"><div class="seo-score-num seo-amber">74</div><span style="font-size:11px;color:var(--amber);">Improve</span></div></td><td><span class="badge badge-warning">Draft Changes</span></td><td class="tbl-actions"><button class="btn btn-primary btn-sm" onclick="publishPage('offers')">Publish</button><button class="btn btn-ghost btn-sm" onclick="editPage('offers')">Edit</button></td></tr>
+            <tr><td><strong>Annual Passport</strong></td><td><code>/passport.html</code></td><td>5 days ago</td><td><div class="seo-score"><div class="seo-score-num seo-green">91</div></div></td><td><span class="badge badge-success">Live</span></td><td class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="editPage('passport')">Edit</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MEDIA LIBRARY -->
+    <div id="tab-media" class="tab-pane">
+      <div class="filter-row">
+        <button class="filter-pill active">All</button>
+        <button class="filter-pill">Images</button>
+        <button class="filter-pill">Videos</button>
+        <button class="filter-pill">Documents</button>
+        <div style="margin-left:auto;">
+          <button class="btn btn-primary btn-sm" onclick="openModal('upload-modal')">📤 Upload Media</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;" id="media-grid">
+        <div class="media-card"><div class="media-thumb">🌊</div><div class="media-name">hero-water.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🎢</div><div class="media-name">hero-amusement.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🌀</div><div class="media-name">ride-boomerango.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🌊</div><div class="media-name">ride-wave-pool.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🎡</div><div class="media-name">ride-giant-wheel.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🎠</div><div class="media-name">ride-kids-zone.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🛝</div><div class="media-name">ride-lazy-river.jpg</div></div>
+        <div class="media-card"><div class="media-thumb">🚗</div><div class="media-name">ride-bumper-cars.jpg</div></div>
+        <div class="media-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;min-height:100px;" onclick="openModal('upload-modal')">
+          <div style="font-size:24px;color:var(--muted);">+</div>
+          <div style="font-size:11px;color:var(--muted);">Upload</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQs -->
+    <div id="tab-faq" class="tab-pane">
+      <div class="flex justify-between mb-16">
+        <div class="tab-bar" style="border-bottom:none;margin-bottom:0;">
+          <button class="tab-btn active">All FAQs</button>
+          <button class="tab-btn">Booking</button>
+          <button class="tab-btn">Safety</button>
+          <button class="tab-btn">Passport</button>
+          <button class="tab-btn">Groups</button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('faq-modal')">+ Add FAQ</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="faq-list">
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex justify-between items-center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">What are the park timings?</div>
+              <div style="font-size:11px;color:var(--muted);">Category: General · Updated: Mar 15</div>
+            </div>
+            <div class="flex gap-8">
+              <span class="badge badge-success">Published</span>
+              <button class="btn btn-ghost btn-sm" onclick="editFAQ(1)">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFAQ(1)">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 18px;">
+          <div class="flex justify-between items-center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Can I get a refund if it rains?</div>
+              <div style="font-size:11px;color:var(--muted);">Category: Booking · Updated: Apr 2</div>
+            </div>
+            <div class="flex gap-8">
+              <span class="badge badge-success">Published</span>
+              <button class="btn btn-ghost btn-sm" onclick="editFAQ(2)">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFAQ(2)">Delete</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:14px 18px;border-left:3px solid var(--amber);">
+          <div class="flex justify-between items-center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">What documents are needed for Passport KYC?</div>
+              <div style="font-size:11px;color:var(--amber);">Category: Passport · DRAFT — unpublished changes</div>
+            </div>
+            <div class="flex gap-8">
+              <span class="badge badge-warning">Draft</span>
+              <button class="btn btn-primary btn-sm" onclick="publishFAQ(3)">Publish</button>
+              <button class="btn btn-ghost btn-sm" onclick="editFAQ(3)">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div id="tab-seo" class="tab-pane">
+      <div class="card mb-16">
+        <div class="card-header"><div class="card-title">🔍 SEO Configuration</div><button class="btn btn-primary btn-sm" onclick="saveSEO()">Save SEO</button></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Site Name</label><input class="form-control" value="Worlds of Wonder — Delhi NCR's #1 Theme Park"/></div>
+          <div class="form-group"><label class="form-label">Default Meta Description</label><input class="form-control" value="Worlds of Wonder Noida — Water Park, Amusement Park, Annual Passport. 50+ rides. Book online."/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Google Site Verification</label><input class="form-control" placeholder="meta verification token"/></div>
+          <div class="form-group"><label class="form-label">Google Analytics ID</label><input class="form-control" placeholder="G-XXXXXXXXXX"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Facebook Pixel ID</label><input class="form-control" placeholder="XXXXXXXXXXXXXXX"/></div>
+          <div class="form-group"><label class="form-label">Schema Type</label><select class="form-control"><option>AmusementPark</option><option>TouristAttraction</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADVISORIES -->
+    <div id="tab-advisories" class="tab-pane">
+      <div class="flex justify-between mb-16">
+        <div style="font-size:14px;font-weight:700;color:var(--ink);">Site-wide Advisories &amp; Emergency Alerts</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('advisory-modal')">+ Post Advisory</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="border-left:4px solid var(--red);padding:16px;">
+          <div class="flex justify-between items-center">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--red);">🚨 High Priority — All Routes</div>
+              <div style="font-size:13px;margin-top:4px;">Wave Pool maintenance scheduled Apr 16 — reduced capacity expected.</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Active · Expires Apr 16 · Posted by Super Admin</div>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="removeAdvisory(1)">Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--amber);padding:16px;">
+          <div class="flex justify-between items-center">
+            <div>
+              <div style="font-size:13px;font-weight:800;color:var(--amber);">⚠️ Normal — Homepage</div>
+              <div style="font-size:13px;margin-top:4px;">New Season passes available — limited slots. Book now to secure your Passport.</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Active · No expiry · Posted by Marketing</div>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-ghost btn-sm">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="removeAdvisory(2)">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- Advisory Modal -->
+<div class="modal-overlay" id="advisory-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📢 Post Advisory</div>
+      <button class="modal-close" onclick="closeModal('advisory-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Advisory Message <span class="req">*</span></label><textarea class="form-control" rows="3" placeholder="Enter advisory text…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-control"><option>Normal</option><option>High</option><option>Emergency</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Display Routes</label>
+          <select class="form-control"><option>All Pages</option><option>Homepage Only</option><option>Booking Pages</option><option>Portal</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Start Date/Time</label><input class="form-control" type="datetime-local"/></div>
+        <div class="form-group"><label class="form-label">Expiry Date/Time</label><input class="form-control" type="datetime-local"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('advisory-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="postAdvisory()">Post Advisory</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📤 Upload Media</div>
+      <button class="modal-close" onclick="closeModal('upload-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" onclick="document.getElementById('media-file').click()">
+        <div class="upload-zone-icon">🖼</div>
+        <div class="upload-zone-text">Drop images, videos or documents here</div>
+        <div class="upload-zone-hint">JPG, PNG, SVG, MP4, PDF · Max 20MB per file</div>
+      </div>
+      <input type="file" id="media-file" multiple accept="image/*,video/*,.pdf" style="display:none;" onchange="handleUpload(this)"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('upload-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('upload-modal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function editZone(z){ showToast('Opening editor for: '+z,'info'); }
+function editPage(p){ showToast('Opening page editor for: '+p,'info'); }
+function publishPage(p){ showToast(p+' published successfully','success'); }
+function saveSEO(){ showToast('SEO settings saved','success'); }
+function publishAll(){ showToast('All 3 changes published to live site','success'); }
+function previewSite(){ window.open('../index.html','_blank'); }
+function postAdvisory(){ closeModal('advisory-modal'); showToast('Advisory posted to live site','success'); }
+function removeAdvisory(id){ showToast('Advisory removed','success'); }
+function editFAQ(id){ showToast('FAQ editor opening…','info'); }
+function deleteFAQ(id){ if(confirm('Delete this FAQ?')) showToast('FAQ deleted','success'); }
+function publishFAQ(id){ showToast('FAQ published','success'); }
+function handleUpload(el){ if(el.files.length) showToast(el.files.length+' file(s) uploading…','info'); }
+function showToast(msg,type='info'){
+  const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+</script>
+</body>
+</html>

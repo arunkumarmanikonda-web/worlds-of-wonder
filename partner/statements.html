@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Statement & Ledger — Partner Portal | Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div id="app">
+  <div class="portal-dashboard">
+    <aside class="portal-sidebar" style="background:#0d1f0e;">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;">Partner Portal</div>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+        <a href="buy-tickets.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Buy Tickets</a>
+        <a href="ticket-batches.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Ticket Batches</a>
+        <a href="invoices.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+        <a href="statements.html" class="portal-sidenav-item active" style="border-left-color:#22c55e;"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Statement & Ledger</a>
+        <a href="support.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Support</a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to WOW Site</a>
+      </nav>
+    </aside>
+
+    <main class="portal-main">
+      <div class="portal-main-header">
+        <div>
+          <h1 class="portal-main-title">Statement &amp; Ledger</h1>
+          <p class="portal-main-sub">Credit wallet, commissions earned, transactions ledger</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Statement PDF ready — downloading…')">📥 Download Statement</button>
+      </div>
+
+      <!-- Credit / Commission cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div class="portal-stat-card" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;">
+          <div class="portal-stat-num" style="color:#1d4ed8;">₹2,40,000</div>
+          <div class="portal-stat-label">Credit Limit</div>
+        </div>
+        <div class="portal-stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;">
+          <div class="portal-stat-num" style="color:#166534;">₹2,40,000</div>
+          <div class="portal-stat-label">Available Balance</div>
+        </div>
+        <div class="portal-stat-card">
+          <div class="portal-stat-num">₹0</div>
+          <div class="portal-stat-label">Outstanding Dues</div>
+        </div>
+        <div class="portal-stat-card" style="background:linear-gradient(135deg,#fdf4ff,#f3e8ff);border-color:#e9d5ff;">
+          <div class="portal-stat-num" style="color:#7c3aed;">₹38,585</div>
+          <div class="portal-stat-label">Commission Earned (MTD)</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="portal-card" style="margin-bottom:24px;">
+        <div style="font-size:15px;font-weight:800;color:#0a0f28;margin-bottom:18px;">Monthly Purchase Volume vs Commission (₹)</div>
+        <div style="position:relative;height:220px;"><canvas id="ledgerChart"></canvas></div>
+      </div>
+
+      <!-- Ledger Table -->
+      <div class="portal-card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:15px;font-weight:800;color:#0a0f28;">Transaction Ledger</div>
+          <select style="padding:7px 12px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:12px;font-weight:700;background:#fff;"><option>March 2026</option><option>February 2026</option><option>January 2026</option></select>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <thead>
+            <tr style="background:#f8fafc;">
+              <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Date</th>
+              <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Description</th>
+              <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Type</th>
+              <th style="padding:11px 16px;text-align:right;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Debit</th>
+              <th style="padding:11px 16px;text-align:right;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Credit</th>
+              <th style="padding:11px 16px;text-align:right;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Balance</th>
+            </tr>
+          </thead>
+          <tbody id="ledger-tbody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<style>
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;}
+.btn-primary{background:#1a56db;color:#fff;}
+</style>
+<script>
+// Ledger rows
+const rows = [
+  {date:'27 Mar 2026', desc:'Ticket Batch WOW-B927451 — 50 Water Park tickets', type:'Purchase', debit:57075, credit:0, bal:182925},
+  {date:'26 Mar 2026', desc:'Commission credit — Batch WOW-B924180', type:'Commission', debit:0, credit:3791, bal:240000},
+  {date:'25 Mar 2026', desc:'Ticket Batch WOW-B921034 — 20 Combo tickets', type:'Purchase', debit:35200, credit:0, bal:204800},
+  {date:'22 Mar 2026', desc:'Commission credit — Batch WOW-B921034', type:'Commission', debit:0, credit:4224, bal:240000},
+  {date:'22 Mar 2026', desc:'Ticket Batch WOW-B918765 — 40 Water Park tickets', type:'Purchase', debit:45640, credit:0, bal:194360},
+  {date:'20 Mar 2026', desc:'Credit Top-up (NEFT)', type:'Top-up', debit:0, credit:100000, bal:240000},
+  {date:'20 Mar 2026', desc:'Ticket Batch WOW-B915499 — 25 Amusement tickets', type:'Purchase', debit:26290, credit:0, bal:140000},
+  {date:'15 Mar 2026', desc:'Commission credit — WOW-B915499', type:'Commission', debit:0, credit:3155, bal:166290},
+];
+
+const typeColor = t => ({Purchase:'#ef4444', Commission:'#16a34a', 'Top-up':'#1d4ed8'})[t] || '#6b7280';
+const typeBg   = t => ({Purchase:'#fef2f2', Commission:'#f0fdf4', 'Top-up':'#eff6ff'})[t] || '#f3f4f6';
+
+document.getElementById('ledger-tbody').innerHTML = rows.map(r=>`
+  <tr>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;color:#6b7280;">${r.date}</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;">${r.desc}</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;"><span style="background:${typeBg(r.type)};color:${typeColor(r.type)};font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">${r.type}</span></td>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;text-align:right;color:#ef4444;font-weight:700;">${r.debit?'−₹'+r.debit.toLocaleString('en-IN'):''}</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;text-align:right;color:#16a34a;font-weight:700;">${r.credit?'+₹'+r.credit.toLocaleString('en-IN'):''}</td>
+    <td style="padding:12px 16px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:900;">₹${r.bal.toLocaleString('en-IN')}</td>
+  </tr>`).join('');
+
+// Chart
+new Chart(document.getElementById('ledgerChart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Purchases (₹K)',data:[68,54,82,91,78,164],backgroundColor:'rgba(26,86,219,.7)',borderRadius:6},{label:'Commission (₹K)',data:[8.2,6.5,9.8,10.9,9.4,19.7],backgroundColor:'rgba(124,58,237,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'₹'+v+'K'}},x:{grid:{display:false}}}}});
+</script>
+</body>
+</html>

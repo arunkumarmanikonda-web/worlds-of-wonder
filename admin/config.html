@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>System Config &amp; Module Toggles — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.config-group{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.config-group-header{padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.config-group-title{font-size:14px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px;}
+.config-group-body{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.config-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:var(--r-sm);background:var(--white);border:1px solid var(--border);}
+.config-row-label{font-size:13px;font-weight:600;color:var(--text);}
+.config-row-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.module-toggle-card{border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;background:var(--white);transition:box-shadow var(--tr-fast);}
+.module-toggle-card:hover{box-shadow:var(--sh-sm);}
+.module-toggle-card.enabled{border-color:rgba(10,155,95,.3);}
+.module-toggle-card.disabled{opacity:.6;}
+.rbac-role-card{border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;background:var(--white);}
+.perm-check{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="adm-layout">
+
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">System Config</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport</a>
+    <div class="adm-nav-section">B2B &amp; Sales</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance</a>
+    <div class="adm-nav-section">System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="config.html" class="adm-nav-item active"><span class="nav-icon">⚙️</span> System Config</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">SA</div>
+      <div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">All Access</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title">⚙️ System Configuration</div>
+      <div class="adm-topbar-sub">Integrations · Module Toggles · RBAC · Security · Legal Identity</div>
+    </div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportConfig()">📥 Export Config</button>
+      <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save All Settings</button>
+    </div>
+  </div>
+
+  <div class="adm-content">
+    <div class="alert alert-warning mb-16">⚠️ Changes to integration credentials and security settings require a system restart. Maker-checker approval required for Payments and KYC config changes.</div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('integrations',this)">🔌 Integrations</button>
+      <button class="tab-btn" onclick="switchTab('modules',this)">🧩 Module Toggles</button>
+      <button class="tab-btn" onclick="switchTab('rbac',this)">🔐 RBAC Matrix</button>
+      <button class="tab-btn" onclick="switchTab('legal',this)">🏢 Legal Identity</button>
+      <button class="tab-btn" onclick="switchTab('security',this)">🛡 Security</button>
+    </div>
+
+    <!-- INTEGRATIONS TAB -->
+    <div id="tab-integrations" class="tab-pane active">
+
+      <!-- Payment Gateway -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">💳 Payment Gateway <span class="badge badge-success" style="font-size:10px;">Razorpay Active</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="form-group"><label class="form-label">Gateway Provider</label><select class="form-control"><option selected>Razorpay</option><option>PayU</option></select></div>
+          <div class="form-group"><label class="form-label">API Key ID <span class="req">*</span></label><input class="form-control" value="rzp_live_••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">API Key Secret <span class="req">*</span></label><input class="form-control" value="••••••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">Webhook Secret</label><input class="form-control" value="••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">Environment</label><select class="form-control"><option>Live</option><option>Test</option></select></div>
+          <div class="form-group"><label class="form-label">Currency</label><select class="form-control"><option>INR</option></select></div>
+        </div>
+      </div>
+
+      <!-- SMS -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">📱 SMS Provider <span class="badge badge-success" style="font-size:10px;">MSG91 Active</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Provider</label><select class="form-control"><option selected>MSG91</option><option>Twilio</option></select></div>
+          <div class="form-group"><label class="form-label">Auth Key <span class="req">*</span></label><input class="form-control" value="••••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">Sender ID</label><input class="form-control" value="WOWPRK"/></div>
+          <div class="form-group"><label class="form-label">OTP Template ID</label><input class="form-control" value="6453XXX"/></div>
+        </div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">💬 WhatsApp Business API <span class="badge badge-success" style="font-size:10px;">Interakt Active</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Provider</label><select class="form-control"><option selected>Interakt</option><option>AiSensy</option><option>Meta Direct</option></select></div>
+          <div class="form-group"><label class="form-label">API Key <span class="req">*</span></label><input class="form-control" value="••••••••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">WhatsApp Business No.</label><input class="form-control" value="+91 99999 00000"/></div>
+          <div class="form-group"><label class="form-label">Templates Active</label><input class="form-control" value="booking_confirm, otp_verify, passport_ready" readonly/></div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">✉️ Email Provider <span class="badge badge-success" style="font-size:10px;">SendGrid Active</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Provider</label><select class="form-control"><option selected>SendGrid</option><option>AWS SES</option></select></div>
+          <div class="form-group"><label class="form-label">API Key <span class="req">*</span></label><input class="form-control" value="SG.••••••••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">From Email</label><input class="form-control" value="noreply@worldsofwonder.in"/></div>
+          <div class="form-group"><label class="form-label">Reply-to</label><input class="form-control" value="support@worldsofwonder.in"/></div>
+        </div>
+      </div>
+
+      <!-- KYC -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">🪪 KYC / Document Verification <span class="badge badge-warning" style="font-size:10px;">Manual Fallback</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Primary Method</label><select class="form-control"><option>DigiLocker API</option><option>Aadhaar eKYC</option><option selected>Manual Review</option></select></div>
+          <div class="form-group"><label class="form-label">DigiLocker Client ID</label><input class="form-control" placeholder="Enter client ID"/></div>
+          <div class="form-group"><label class="form-label">Max KYC SLA (hours)</label><input class="form-control" value="24" type="number"/></div>
+          <div class="form-group"><label class="form-label">Allowed Document Types</label><input class="form-control" value="Aadhaar, PAN, Driving Licence, Passport"/></div>
+        </div>
+      </div>
+
+      <!-- Weather API -->
+      <div class="config-group">
+        <div class="config-group-header" onclick="toggleGroup(this)">
+          <span class="config-group-title">🌤 Weather API <span class="badge badge-success" style="font-size:10px;">Open-Meteo Active</span></span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Provider</label><select class="form-control"><option selected>Open-Meteo (Free)</option><option>OpenWeatherMap</option><option>IMD API</option></select></div>
+          <div class="form-group"><label class="form-label">Location (Latitude)</label><input class="form-control" value="28.5355"/></div>
+          <div class="form-group"><label class="form-label">Location (Longitude)</label><input class="form-control" value="77.3910"/></div>
+          <div class="form-group"><label class="form-label">Flash Sale Trigger Temp (°C)</label><input class="form-control" value="40" type="number"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE TOGGLES TAB -->
+    <div id="tab-modules" class="tab-pane">
+      <div class="alert alert-info mb-16">ℹ️ Module toggles disable features for ALL users. Requires Super Admin + Finance Head dual approval. Changes are logged in Audit Trail.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;" id="module-grid">
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🌊 Water Park Booking</div><div style="font-size:11px;color:var(--muted);">B2C, B2B, Guest checkout</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('WP Booking',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🎢 Amusement Park Booking</div><div style="font-size:11px;color:var(--muted);">B2C, B2B, Guest checkout</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('AP Booking',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🎉 Combo Ticket Engine</div><div style="font-size:11px;color:var(--muted);">Cross-park orchestration</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Combo',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🪪 Passport Engine</div><div style="font-size:11px;color:var(--muted);">KYC, issuance, renewal</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Passport',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">⭐ Loyalty Engine</div><div style="font-size:11px;color:var(--muted);">Points, tiers, redemption</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Loyalty',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🎯 Offer Engine</div><div style="font-size:11px;color:var(--muted);">Promo codes, campaigns</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Offers',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🤝 B2B Partner Portal</div><div style="font-size:11px;color:var(--muted);">TA, Reseller onboarding</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('B2B Portal',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🔐 Gate Redemption</div><div style="font-size:11px;color:var(--muted);">QR scanner, overrides</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Gate Redemption',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">💬 WhatsApp Messaging</div><div style="font-size:11px;color:var(--muted);">Booking confirmations</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('WhatsApp',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">📱 SMS Notifications</div><div style="font-size:11px;color:var(--muted);">OTP, alerts</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('SMS',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">✉️ Email Notifications</div><div style="font-size:11px;color:var(--muted);">Transactional email</div></div><label class="toggle"><input type="checkbox" checked onchange="toggleModule('Email',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card"><div><div style="font-size:13px;font-weight:700;">🌤 Weather-triggered Offers</div><div style="font-size:11px;color:var(--muted);">Auto flash sales</div></div><label class="toggle"><input type="checkbox" onchange="toggleModule('Weather Offers',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card"><div><div style="font-size:13px;font-weight:700;">📅 Holiday Auto-campaigns</div><div style="font-size:11px;color:var(--muted);">Auto campaign triggers</div></div><label class="toggle"><input type="checkbox" onchange="toggleModule('Holiday Campaigns',this)"/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🔍 Audit Logging</div><div style="font-size:11px;color:var(--muted);">All system events</div></div><label class="toggle"><input type="checkbox" checked disabled/><span class="toggle-slider"></span></label></div>
+        <div class="module-toggle-card enabled"><div><div style="font-size:13px;font-weight:700;">🛡 RBAC Enforcement</div><div style="font-size:11px;color:var(--muted);">Cannot be disabled</div></div><label class="toggle"><input type="checkbox" checked disabled/><span class="toggle-slider"></span></label></div>
+      </div>
+    </div>
+
+    <!-- RBAC MATRIX TAB -->
+    <div id="tab-rbac" class="tab-pane">
+      <div class="flex justify-between mb-16">
+        <div style="font-size:14px;font-weight:700;">Role-Based Access Control Matrix</div>
+        <button class="btn btn-primary btn-sm" onclick="openModal('role-modal')">+ Add Role</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" style="font-size:12px;">
+          <thead>
+            <tr>
+              <th>Permission</th>
+              <th>Customer</th><th>Biz Customer</th><th>Travel Agent</th>
+              <th>Call Centre</th><th>Gate Staff</th><th>Sales Exec</th>
+              <th>Sales Mgr</th><th>Marketing</th><th>Finance</th>
+              <th>CMS Editor</th><th>Super Admin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Book Tickets (B2C)</strong></td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Book Tickets (B2B)</strong></td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>View Bookings (Own)</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>View All Bookings</strong></td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Scan QR / Gate</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Override Gate Entry</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Create Offers</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Approve Offers (&gt;20% disc)</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>View Finance/Revenue</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Generate Invoices</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Approve Refunds</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Manage CMS</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>✅</td></tr>
+            <tr><td><strong>Approve B2B Partners</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>System Config</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Audit Logs View</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+            <tr><td><strong>Module Toggles</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEGAL IDENTITY TAB -->
+    <div id="tab-legal" class="tab-pane">
+      <div class="config-group">
+        <div class="config-group-header"><span class="config-group-title">🏢 EALCPL Legal Identity</span></div>
+        <div class="config-group-body" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="form-group"><label class="form-label">Company Name</label><input class="form-control" value="Entertainment Amusement Land City Private Limited"/></div>
+          <div class="form-group"><label class="form-label">Short Name</label><input class="form-control" value="EALCPL"/></div>
+          <div class="form-group"><label class="form-label">CIN</label><input class="form-control" value="U92410DL1994PTC057935"/></div>
+          <div class="form-group"><label class="form-label">GSTIN</label><input class="form-control" value="09AABCE1234F1Z5"/></div>
+          <div class="form-group"><label class="form-label">PAN</label><input class="form-control" value="AABCE1234F"/></div>
+          <div class="form-group"><label class="form-label">State Code (Supply)</label><input class="form-control" value="09 — Uttar Pradesh"/></div>
+          <div class="form-group"><label class="form-label">Registered Address</label><input class="form-control" value="A-2, Sector 38A, Noida — 201301"/></div>
+          <div class="form-group"><label class="form-label">Support Phone</label><input class="form-control" value="080-6909-0000"/></div>
+          <div class="form-group"><label class="form-label">Support Email</label><input class="form-control" value="support@worldsofwonder.in"/></div>
+        </div>
+      </div>
+      <div class="config-group">
+        <div class="config-group-header"><span class="config-group-title">🏦 Bank Details (Payout Account)</span></div>
+        <div class="config-group-body">
+          <div class="form-group"><label class="form-label">Bank Name</label><input class="form-control" value="HDFC Bank"/></div>
+          <div class="form-group"><label class="form-label">Account Number</label><input class="form-control" value="••••••••••••" type="password"/></div>
+          <div class="form-group"><label class="form-label">IFSC Code</label><input class="form-control" value="HDFC0001234"/></div>
+          <div class="form-group"><label class="form-label">Account Type</label><select class="form-control"><option>Current</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY TAB -->
+    <div id="tab-security" class="tab-pane">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="config-group">
+          <div class="config-group-header"><span class="config-group-title">🔐 OTP Configuration</span></div>
+          <div class="config-group-body" style="grid-template-columns:1fr;">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">OTP Length</label><input class="form-control" value="6" type="number"/></div>
+              <div class="form-group"><label class="form-label">OTP Expiry (mins)</label><input class="form-control" value="10" type="number"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Max Attempts</label><input class="form-control" value="3" type="number"/></div>
+              <div class="form-group"><label class="form-label">Lockout Duration (mins)</label><input class="form-control" value="30" type="number"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">Max Resend Requests/hr</label><input class="form-control" value="5" type="number"/></div>
+          </div>
+        </div>
+        <div class="config-group">
+          <div class="config-group-header"><span class="config-group-title">🛡 Cloudflare WAF</span></div>
+          <div class="config-group-body" style="grid-template-columns:1fr;">
+            <div class="config-row"><div><div class="config-row-label">Bot Management</div><div class="config-row-sub">Cloudflare Bot Fight Mode</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+            <div class="config-row"><div><div class="config-row-label">Turnstile CAPTCHA</div><div class="config-row-sub">On booking &amp; login forms</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+            <div class="config-row"><div><div class="config-row-label">Rate Limiting</div><div class="config-row-sub">100 req/min per IP</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+            <div class="config-row"><div><div class="config-row-label">DDoS Protection</div><div class="config-row-sub">Always-on Cloudflare</div></div><label class="toggle"><input type="checkbox" checked disabled/><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+        <div class="config-group">
+          <div class="config-group-header"><span class="config-group-title">🔑 QR Token Security</span></div>
+          <div class="config-group-body" style="grid-template-columns:1fr;">
+            <div class="form-group"><label class="form-label">HMAC Algorithm</label><select class="form-control"><option>SHA-256</option><option>SHA-512</option></select></div>
+            <div class="form-group"><label class="form-label">Token Rotation (days)</label><input class="form-control" value="30" type="number"/></div>
+            <div class="config-row"><div><div class="config-row-label">Duplicate Scan Detection</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+        <div class="config-group">
+          <div class="config-group-header"><span class="config-group-title">📋 Consent &amp; Data</span></div>
+          <div class="config-group-body" style="grid-template-columns:1fr;">
+            <div class="form-group"><label class="form-label">Consent Policy Version</label><input class="form-control" value="v3.2 — Mar 2026"/></div>
+            <div class="form-group"><label class="form-label">Data Retention (months)</label><input class="form-control" value="84" type="number"/></div>
+            <div class="config-row"><div><div class="config-row-label">Maker-Checker for Finance</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+            <div class="config-row"><div><div class="config-row-label">KYC Doc Access Limits</div></div><label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function toggleGroup(header){
+  const body=header.nextElementSibling;
+  body.style.display=body.style.display==='none'?'grid':'none';
+}
+function toggleModule(name,el){
+  if(!el.checked){
+    if(!confirm('Disable '+name+' for ALL users? This requires maker-checker approval.')){el.checked=true;return;}
+  }
+  showToast(name+(el.checked?' enabled':' disabled — approval requested'),'info');
+}
+function saveAll(){ showToast('All settings saved — restart pending for credential changes','success'); }
+function exportConfig(){ showToast('Config exported as JSON (credentials redacted)','info'); }
+function showToast(msg,type='info'){
+  const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+</script>
+</body>
+</html>

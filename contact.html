@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact &amp; Support — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+
+  <section class="booking-hero">
+    <div class="container">
+      <h1>📞 We're Here to Help</h1>
+      <p>Questions, booking support, group enquiries — our team responds fast, every day.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="info-grid" style="margin-bottom:56px;">
+        <a href="tel:08069090000" class="info-card" style="cursor:pointer;text-align:center;background:linear-gradient(135deg,#f0f6ff,white);">
+          <div class="info-icon">📞</div>
+          <h3>Call Us</h3>
+          <div style="font-size:22px;font-weight:800;color:var(--wow-blue);margin:8px 0;">08069090000</div>
+          <p>Mon–Sun · 9:00 AM – 7:00 PM</p>
+        </a>
+        <a href="mailto:support@worldsofwonder.in" class="info-card" style="cursor:pointer;text-align:center;">
+          <div class="info-icon">📧</div>
+          <h3>Email Support</h3>
+          <div style="font-size:15px;font-weight:700;color:var(--wow-blue);margin:8px 0;">support@worldsofwonder.in</div>
+          <p>Response within 4 working hours</p>
+        </a>
+        <div class="info-card" style="text-align:center;">
+          <div class="info-icon">📍</div>
+          <h3>Visit Us</h3>
+          <div style="font-size:15px;font-weight:700;margin:8px 0;">A-2, Sector 38A, Noida, UP</div>
+          <p>Open daily 10:00 AM – 6:00 PM</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <!-- Contact form -->
+        <div>
+          <h2 class="section-title" style="font-size:28px;margin-bottom:24px;">Send a Message</h2>
+          <div style="display:grid;gap:16px;">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="label">Your name</label>
+                <input class="input" type="text" placeholder="Full name" />
+              </div>
+              <div class="form-group">
+                <label class="label">Mobile</label>
+                <input class="input" type="tel" placeholder="10-digit mobile" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="label">Email</label>
+              <input class="input" type="email" placeholder="email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="label">Query type</label>
+              <select class="input">
+                <option value="">Select topic</option>
+                <option>Booking &amp; tickets</option>
+                <option>Payment issues</option>
+                <option>Passport membership</option>
+                <option>Group &amp; corporate booking</option>
+                <option>Travel agent / reseller</option>
+                <option>Feedback &amp; suggestions</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="label">Message</label>
+              <textarea class="input" style="min-height:120px;resize:vertical;" placeholder="How can we help?"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%;font-size:16px;padding:16px;" onclick="alert('Message sent! We\'ll get back to you within 4 working hours.')">
+              Send Message →
+            </button>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div id="faq">
+          <h2 class="section-title" style="font-size:28px;margin-bottom:24px;">Frequently Asked Questions</h2>
+          <div class="faq-list">
+            <div class="faq-item">
+              <div class="faq-q">Can I reschedule my visit date? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">Dated tickets are currently date-specific. Contact us at least 48 hours before your visit and our team will review rescheduling on a case-by-case basis.</div></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">How do I use my QR ticket at the gate? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">Show the QR code on your phone at the park gate scanner. It reads in under 2 seconds. Bring a valid photo ID matching your booking name.</div></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">How do group discounts work? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">Book 4+ tickets in a single booking and the group discount (₹50–₹125 per ticket) is automatically applied. No promo code needed.</div></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">What happens during a weather-related closure? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">If the park closes due to weather, affected tickets are automatically rescheduled or fully refunded. You'll receive an SMS and email notification.</div></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">What documents do I need for the Passport? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">KYC requires Aadhaar number and a selfie for digital identity verification. The process is fully online — no physical documents needed.</div></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">Are there height restrictions on rides? <span class="faq-icon">+</span></div>
+              <div class="faq-a"><div class="faq-a-inner">Some thrill rides require a minimum height of 120cm. Family rides and kids' zones are open to all ages. Height charts are displayed at each ride entrance.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="js/shell.js"></script>
+</body>
+</html>

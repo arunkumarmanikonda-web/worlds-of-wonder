@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoices — Partner Portal | Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+  <div class="portal-dashboard">
+    <aside class="portal-sidebar" style="background:#0d1f0e;">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;">Partner Portal</div>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+        <a href="buy-tickets.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Buy Tickets</a>
+        <a href="ticket-batches.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Ticket Batches</a>
+        <a href="invoices.html" class="portal-sidenav-item active" style="border-left-color:#22c55e;"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
+        <a href="statements.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Statement & Ledger</a>
+        <a href="support.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Support</a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to WOW Site</a>
+      </nav>
+    </aside>
+
+    <main class="portal-main">
+      <div class="portal-main-header">
+        <div>
+          <h1 class="portal-main-title">Invoices</h1>
+          <p class="portal-main-sub">Tax-compliant GST invoices for all your purchases</p>
+        </div>
+        <button class="btn btn-primary" onclick="alert('Bulk download started — check your email.')">📥 Download All (This Month)</button>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+        <div class="portal-stat-card"><div class="portal-stat-num">18</div><div class="portal-stat-label">Invoices This Year</div></div>
+        <div class="portal-stat-card"><div class="portal-stat-num">₹3,21,545</div><div class="portal-stat-label">Total Billed (FY)</div></div>
+        <div class="portal-stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;"><div class="portal-stat-num" style="color:#166534;">₹48,768</div><div class="portal-stat-label">GST Paid (ITC Eligible)</div></div>
+      </div>
+
+      <!-- Filter -->
+      <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+        <select style="padding:8px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:600;background:#fff;"><option>All Status</option><option>Paid</option><option>Pending</option><option>Overdue</option></select>
+        <input type="month" style="padding:8px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;background:#fff;" value="2026-03" />
+        <input type="text" placeholder="🔍 Search invoice number…" style="flex:1;min-width:200px;padding:8px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;background:#fff;" />
+      </div>
+
+      <div class="portal-card" style="padding:0;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <thead>
+            <tr style="background:#f8fafc;">
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Invoice #</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Date</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Batch Ref</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Tickets</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Subtotal</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">GST (18%)</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Total</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Status</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e5e7eb;">Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:13px 16px;font-weight:700;">INV-2026-0342</td><td style="padding:13px 16px;">27 Mar 2026</td><td style="padding:13px 16px;">WOW-B927451</td><td style="padding:13px 16px;">50</td><td style="padding:13px 16px;">₹48,368</td><td style="padding:13px 16px;">₹8,707</td><td style="padding:13px 16px;font-weight:800;">₹57,075</td><td style="padding:13px 16px;"><span style="background:#f0fdf4;color:#15803d;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Paid</span></td><td style="padding:13px 16px;"><button onclick="alert('Downloading INV-2026-0342.pdf…')" style="padding:6px 12px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">📄 PDF</button></td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:13px 16px;font-weight:700;">INV-2026-0341</td><td style="padding:13px 16px;">25 Mar 2026</td><td style="padding:13px 16px;">WOW-B921034</td><td style="padding:13px 16px;">20</td><td style="padding:13px 16px;">₹29,831</td><td style="padding:13px 16px;">₹5,369</td><td style="padding:13px 16px;font-weight:800;">₹35,200</td><td style="padding:13px 16px;"><span style="background:#f0fdf4;color:#15803d;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Paid</span></td><td style="padding:13px 16px;"><button onclick="alert('Downloading INV-2026-0341.pdf…')" style="padding:6px 12px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">📄 PDF</button></td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:13px 16px;font-weight:700;">INV-2026-0338</td><td style="padding:13px 16px;">22 Mar 2026</td><td style="padding:13px 16px;">WOW-B918765</td><td style="padding:13px 16px;">40</td><td style="padding:13px 16px;">₹38,678</td><td style="padding:13px 16px;">₹6,962</td><td style="padding:13px 16px;font-weight:800;">₹45,640</td><td style="padding:13px 16px;"><span style="background:#f0fdf4;color:#15803d;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Paid</span></td><td style="padding:13px 16px;"><button onclick="alert('Downloading INV-2026-0338.pdf…')" style="padding:6px 12px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">📄 PDF</button></td></tr>
+            <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:13px 16px;font-weight:700;">INV-2026-0335</td><td style="padding:13px 16px;">20 Mar 2026</td><td style="padding:13px 16px;">WOW-B915499</td><td style="padding:13px 16px;">25</td><td style="padding:13px 16px;">₹22,280</td><td style="padding:13px 16px;">₹4,010</td><td style="padding:13px 16px;font-weight:800;">₹26,290</td><td style="padding:13px 16px;"><span style="background:#f0fdf4;color:#15803d;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Paid</span></td><td style="padding:13px 16px;"><button onclick="alert('Downloading INV-2026-0335.pdf…')" style="padding:6px 12px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">📄 PDF</button></td></tr>
+            <tr><td style="padding:13px 16px;font-weight:700;">INV-2026-0330</td><td style="padding:13px 16px;">15 Mar 2026</td><td style="padding:13px 16px;">WOW-B912011</td><td style="padding:13px 16px;">60</td><td style="padding:13px 16px;">₹58,017</td><td style="padding:13px 16px;">₹10,443</td><td style="padding:13px 16px;font-weight:800;">₹68,460</td><td style="padding:13px 16px;"><span style="background:#f0fdf4;color:#15803d;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;">Paid</span></td><td style="padding:13px 16px;"><button onclick="alert('Downloading INV-2026-0330.pdf…')" style="padding:6px 12px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;">📄 PDF</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GST Summary Box -->
+      <div class="portal-card" style="margin-top:20px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;">
+        <div style="font-size:15px;font-weight:800;color:#166534;margin-bottom:12px;">📋 GST Summary — March 2026</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+          <div><div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;">GSTIN</div><div style="font-size:13px;font-weight:700;color:#166534;">07AABCW1234F1Z5</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;">Taxable Value</div><div style="font-size:16px;font-weight:900;color:#166534;">₹1,97,174</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;">CGST (9%)</div><div style="font-size:16px;font-weight:900;color:#166534;">₹17,746</div></div>
+          <div><div style="font-size:11px;font-weight:700;color:#4ade80;text-transform:uppercase;margin-bottom:4px;">SGST (9%)</div><div style="font-size:16px;font-weight:900;color:#166534;">₹17,746</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<style>
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .2s;}
+.btn-primary{background:#1a56db;color:#fff;}
+</style>
+</body>
+</html>

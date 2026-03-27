@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gate Redemption Console — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#0a0f28;--blue:#1a56db;--green:#16a34a;--red:#dc2626;--amber:#d97706;--border:#e2e8f0;--text:#374151;--muted:#6b7280;--surface:#0d1117;}
+    body{font-family:'Poppins',sans-serif;background:var(--surface);color:#e2e8f0;min-height:100vh;}
+
+    /* Header */
+    .gate-header{
+      background:#0a0f28;border-bottom:1px solid rgba(255,255,255,.08);
+      padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:20;
+    }
+    .gate-header img{height:36px;width:auto;object-fit:contain;}
+    .gate-title{color:#fff;font-weight:800;font-size:16px;margin-left:14px;}
+    .gate-badge{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.7);}
+    .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.6)}50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+
+    /* Layout */
+    .gate-wrap{max-width:1300px;margin:0 auto;padding:22px;display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start;}
+
+    /* Scanner */
+    .scanner-card{background:#111827;border:1.5px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;position:sticky;top:80px;}
+    .scanner-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .scanner-sub{font-size:12.5px;color:rgba(255,255,255,.4);margin-bottom:20px;}
+    .scanner-input-wrap{position:relative;margin-bottom:18px;}
+    .scanner-input{
+      width:100%;padding:16px 20px;border:2px solid rgba(255,255,255,.15);
+      border-radius:12px;background:rgba(255,255,255,.05);
+      color:#fff;font-size:16px;font-weight:700;font-family:'Nunito',sans-serif;
+      outline:none;transition:border-color .15s;letter-spacing:.05em;
+    }
+    .scanner-input:focus{border-color:#1a56db;}
+    .scanner-input::placeholder{color:rgba(255,255,255,.25);}
+    .scan-btn{
+      width:100%;padding:15px;border:none;border-radius:12px;
+      background:linear-gradient(135deg,#1a56db,#3b82f6);color:#fff;
+      font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;
+      transition:transform .15s,box-shadow .15s;
+    }
+    .scan-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,130,246,.4);}
+
+    /* Result panel */
+    .scan-result{
+      display:none;margin-top:18px;border-radius:14px;padding:20px;
+      border:2px solid;
+    }
+    .scan-result.ok{border-color:#22c55e;background:rgba(34,197,94,.1);}
+    .scan-result.fail{border-color:#ef4444;background:rgba(239,68,68,.1);}
+    .scan-result.warn{border-color:#f59e0b;background:rgba(245,158,11,.1);}
+    .result-status{font-size:22px;font-weight:900;margin-bottom:8px;font-family:'Nunito',sans-serif;}
+    .result-ok .result-status{color:#22c55e;}
+    .result-fail .result-status{color:#ef4444;}
+    .result-warn .result-status{color:#f59e0b;}
+    .result-detail{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;}
+    .override-btn{
+      margin-top:14px;padding:10px 18px;background:rgba(245,158,11,.2);
+      border:1.5px solid #f59e0b;border-radius:9px;color:#fde68a;
+      font-size:13px;font-weight:700;cursor:pointer;width:100%;
+    }
+
+    /* Stats */
+    .gate-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+    .gs-card{background:#111827;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,.08);}
+    .gs-num{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:#e2e8f0;}
+    .gs-label{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:3px;}
+    .gs-delta{font-size:12px;font-weight:700;margin-top:4px;}
+    .delta-up{color:#22c55e;}
+
+    /* Scan log */
+    .scan-log{background:#111827;border-radius:16px;border:1px solid rgba(255,255,255,.08);overflow:hidden;}
+    .scan-log-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;}
+    .log-row{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeIn .3s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    .log-row:last-child{border-bottom:none;}
+    .log-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .log-icon.ok{background:rgba(34,197,94,.15);}
+    .log-icon.fail{background:rgba(239,68,68,.15);}
+    .log-icon.warn{background:rgba(245,158,11,.15);}
+    .log-ref{font-size:13px;font-weight:700;color:#e2e8f0;}
+    .log-detail{font-size:12px;color:rgba(255,255,255,.4);}
+    .log-time{font-size:11.5px;color:rgba(255,255,255,.25);margin-left:auto;}
+    .badge-ok{background:rgba(34,197,94,.2);color:#4ade80;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
+    .badge-fail{background:rgba(239,68,68,.2);color:#f87171;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
+    .badge-warn{background:rgba(245,158,11,.2);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
+
+    /* Chart */
+    .chart-card{background:#111827;border-radius:16px;border:1px solid rgba(255,255,255,.08);padding:20px;margin-bottom:20px;}
+    .chart-title{font-size:14px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:16px;}
+
+    /* Gate selector */
+    .gate-sel{display:flex;gap:8px;margin-bottom:18px;}
+    .gate-btn{padding:8px 18px;border-radius:8px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;}
+    .gate-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+    @media(max-width:900px){.gate-wrap{grid-template-columns:1fr;}.gate-stats{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body>
+
+<div class="gate-header">
+  <div style="display:flex;align-items:center;">
+    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;" /></a>
+    <div class="gate-title">Gate Redemption Console</div>
+  </div>
+  <div class="gate-badge">
+    <div class="live-dot"></div>
+    <span>Live · 27 Mar 2026 · <span id="live-time">--:--:--</span></span>
+    &nbsp;&nbsp;
+    <a href="index.html" style="color:rgba(255,255,255,.4);font-size:12px;text-decoration:none;">← Admin</a>
+  </div>
+</div>
+
+<div class="gate-wrap">
+  <!-- LEFT: Scanner -->
+  <div>
+    <div class="scanner-card">
+      <div class="scanner-title">🔍 Scan / Enter QR Code</div>
+      <div class="scanner-sub">Scan ticket QR or type the ticket token below</div>
+
+      <!-- Gate selector -->
+      <div class="gate-sel">
+        <button class="gate-btn active" id="gate-water" onclick="setGate('Water Park Main Gate',this)">🌊 Water Park</button>
+        <button class="gate-btn" id="gate-amus" onclick="setGate('Amusement Park Main Gate',this)">🎢 Amusement</button>
+        <button class="gate-btn" id="gate-exit" onclick="setGate('Exit Gate',this)">🚪 Exit</button>
+      </div>
+
+      <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:14px;">Current gate: <strong style="color:#93c5fd;" id="current-gate">Water Park Main Gate</strong></div>
+
+      <div class="scanner-input-wrap">
+        <input class="scanner-input" type="text" id="qr-input" placeholder="WOW-QR-XXXXXXXXXX" autocomplete="off" maxlength="30" onkeydown="if(event.key==='Enter')scan()" />
+      </div>
+      <button class="scan-btn" onclick="scan()">✅ Verify &amp; Allow Entry</button>
+
+      <!-- Result -->
+      <div class="scan-result" id="scan-result">
+        <div class="result-status" id="result-status"></div>
+        <div class="result-detail" id="result-detail"></div>
+        <button class="override-btn" id="override-btn" onclick="manualOverride()" style="display:none;">⚠️ Override — Supervisor Approval</button>
+      </div>
+    </div>
+
+    <!-- Daily chart -->
+    <div class="chart-card" style="margin-top:20px;">
+      <div class="chart-title">Today's Footfall — Hourly</div>
+      <div style="height:180px;"><canvas id="footChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Stats + Log -->
+  <div>
+    <div class="gate-stats">
+      <div class="gs-card"><div class="gs-num" id="total-in">0</div><div class="gs-label">Total In Today</div><div class="gs-delta delta-up">Target: 1,500</div></div>
+      <div class="gs-card"><div class="gs-num">847</div><div class="gs-label">Tickets Sold</div><div class="gs-delta delta-up">▲ 23% vs yesterday</div></div>
+      <div class="gs-card"><div class="gs-num" style="color:#22c55e;" id="valid-count">0</div><div class="gs-label">Valid Scans</div></div>
+      <div class="gs-card"><div class="gs-num" style="color:#ef4444;" id="invalid-count">0</div><div class="gs-label">Rejected / Errors</div></div>
+    </div>
+
+    <!-- Scan log -->
+    <div class="scan-log">
+      <div class="scan-log-head">
+        <div style="font-size:14px;font-weight:700;color:#e2e8f0;">Live Scan Log</div>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:12px;color:rgba(255,255,255,.3);" id="log-count">0 scans</span>
+          <button onclick="clearLog()" style="padding:4px 12px;border:1.5px solid rgba(255,255,255,.12);border-radius:6px;background:none;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;">Clear</button>
+        </div>
+      </div>
+      <div id="scan-log-body" style="max-height:420px;overflow-y:auto;">
+        <div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,.2);">
+          <div style="font-size:36px;margin-bottom:10px;">🔍</div>
+          <p>Scan log will appear here as tickets are scanned</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offline mode notice -->
+    <div style="background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);border-radius:12px;padding:14px 18px;margin-top:16px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:22px;">📶</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fbbf24;">Offline Mode Available</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.4);">If internet is unavailable, the console operates in cached mode. Scans are queued and synced when connection resumes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Simulated ticket database
+const VALID_TICKETS = {
+  'WOW-QR-7824A001': { ref:'WOW-7824', guest:'Aarav Mehta', park:'Water Park', date:'2026-03-27', type:'Adult', used:false },
+  'WOW-QR-7824A002': { ref:'WOW-7824', guest:'Aarav Mehta', park:'Water Park', date:'2026-03-27', type:'Adult', used:false },
+  'WOW-QR-7823A001': { ref:'WOW-7823', guest:'Priya Sharma', park:'Amusement Park', date:'2026-03-27', type:'Adult', used:false },
+  'WOW-QR-7820A001': { ref:'WOW-7820', guest:'Vikram Singh', park:'Amusement Park', date:'2026-03-26', type:'Adult', used:false },
+  'WOW-QR-USED0001': { ref:'WOW-7810', guest:'Test Guest', park:'Water Park', date:'2026-03-27', type:'Adult', used:true },
+};
+const usedTokens = new Set();
+let totalIn=0, validCount=0, invalidCount=0;
+let currentGate = 'Water Park Main Gate';
+const logEntries = [];
+
+function setGate(name, btn) {
+  currentGate = name;
+  document.getElementById('current-gate').textContent = name;
+  document.querySelectorAll('.gate-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function scan() {
+  const raw = document.getElementById('qr-input').value.trim().toUpperCase();
+  if (!raw) return;
+  const resultEl = document.getElementById('scan-result');
+  const statusEl = document.getElementById('result-status');
+  const detailEl = document.getElementById('result-detail');
+  const oBtn     = document.getElementById('override-btn');
+  resultEl.style.display = 'block';
+  oBtn.style.display = 'none';
+
+  const now = new Date().toLocaleTimeString('en-IN');
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  if (usedTokens.has(raw)) {
+    // Already scanned THIS session
+    resultEl.className = 'scan-result fail';
+    statusEl.textContent = '❌ DUPLICATE SCAN';
+    statusEl.style.color = '#ef4444';
+    detailEl.innerHTML = `<strong style="color:#f87171;">Ticket already used in this session!</strong><br>Token: ${raw}<br>This may indicate a duplicate or fraudulent ticket.`;
+    oBtn.style.display = 'block';
+    addLog('fail', raw, 'Duplicate scan', now);
+    invalidCount++;
+  } else {
+    const ticket = VALID_TICKETS[raw];
+    if (!ticket) {
+      resultEl.className = 'scan-result fail';
+      statusEl.textContent = '❌ INVALID TICKET';
+      statusEl.style.color = '#ef4444';
+      detailEl.innerHTML = `Token not found in system.<br><small style="color:rgba(255,255,255,.4);">Token: ${raw}</small>`;
+      addLog('fail', raw, 'Not found', now);
+      invalidCount++;
+    } else if (ticket.used) {
+      resultEl.className = 'scan-result warn';
+      statusEl.textContent = '⚠️ ALREADY USED';
+      statusEl.style.color = '#f59e0b';
+      detailEl.innerHTML = `Ticket was previously scanned.<br>Guest: <strong>${ticket.guest}</strong><br>Park: ${ticket.park}<br>Ref: ${ticket.ref}`;
+      oBtn.style.display = 'block';
+      addLog('warn', raw, 'Previously used — ' + ticket.guest, now);
+      invalidCount++;
+    } else if (ticket.date !== todayStr) {
+      resultEl.className = 'scan-result fail';
+      statusEl.textContent = '❌ WRONG DATE';
+      statusEl.style.color = '#ef4444';
+      detailEl.innerHTML = `Ticket valid for: <strong>${ticket.date}</strong><br>Today: ${todayStr}<br>Guest: ${ticket.guest}`;
+      oBtn.style.display = 'block';
+      addLog('fail', raw, 'Wrong date — ' + ticket.date, now);
+      invalidCount++;
+    } else {
+      // Valid!
+      VALID_TICKETS[raw].used = true;
+      usedTokens.add(raw);
+      resultEl.className = 'scan-result ok';
+      statusEl.textContent = '✅ ENTRY ALLOWED';
+      statusEl.style.color = '#22c55e';
+      detailEl.innerHTML = `<strong style="color:#4ade80;font-size:15px;">${ticket.guest}</strong><br>Park: ${ticket.park} &nbsp;·&nbsp; ${ticket.type} Ticket<br>Booking Ref: ${ticket.ref}<br>Gate: ${currentGate}`;
+      addLog('ok', raw, ticket.guest + ' · ' + ticket.park, now);
+      validCount++;
+      totalIn++;
+    }
+  }
+
+  document.getElementById('total-in').textContent   = totalIn;
+  document.getElementById('valid-count').textContent = validCount;
+  document.getElementById('invalid-count').textContent = invalidCount;
+  document.getElementById('qr-input').value = '';
+  document.getElementById('qr-input').focus();
+}
+
+function addLog(type, token, detail, time) {
+  const icons = {ok:'✅', fail:'❌', warn:'⚠️'};
+  logEntries.unshift({type, token, detail, time});
+  const lb = document.getElementById('scan-log-body');
+  const rowHtml = `<div class="log-row">
+    <div class="log-icon ${type}">${icons[type]}</div>
+    <div>
+      <div class="log-ref">${token}</div>
+      <div class="log-detail">${detail}</div>
+    </div>
+    <div style="margin-left:auto;text-align:right;">
+      <span class="badge-${type==='ok'?'ok':type==='warn'?'warn':'fail'}">${type==='ok'?'Valid':type==='warn'?'Warning':'Rejected'}</span>
+      <div class="log-time" style="margin-top:3px;">${time}</div>
+    </div>
+  </div>`;
+  if (lb.querySelector('.log-row') === null && lb.querySelector('div')) lb.innerHTML = '';
+  lb.insertAdjacentHTML('afterbegin', rowHtml);
+  document.getElementById('log-count').textContent = logEntries.length + ' scans';
+}
+
+function manualOverride() {
+  const pin = prompt('Enter Supervisor PIN to override:');
+  if (pin === '1234') {
+    alert('✅ Override granted by Supervisor.\nTicket manually admitted. Override logged to audit trail.');
+    document.getElementById('scan-result').className = 'scan-result ok';
+    document.getElementById('result-status').textContent = '✅ OVERRIDE — ENTRY ALLOWED';
+    document.getElementById('result-status').style.color = '#22c55e';
+    document.getElementById('override-btn').style.display = 'none';
+  } else if (pin !== null) {
+    alert('❌ Invalid PIN. Override denied.');
+  }
+}
+
+function clearLog() {
+  logEntries.length = 0;
+  document.getElementById('scan-log-body').innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.2);"><p>Log cleared</p></div>';
+  document.getElementById('log-count').textContent = '0 scans';
+}
+
+// Live clock
+setInterval(()=>{document.getElementById('live-time').textContent=new Date().toLocaleTimeString('en-IN');},1000);
+
+// Footfall chart
+const hours = ['9','10','11','12','13','14','15','16','17'];
+const foot  = [42,88,154,198,172,168,142,124,96];
+new Chart(document.getElementById('footChart'),{
+  type:'line',
+  data:{labels:hours.map(h=>h+':00'),datasets:[{label:'Entries/hr',data:foot,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.15)',fill:true,tension:.4,borderWidth:2.5,pointRadius:0}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'rgba(255,255,255,.3)'},grid:{display:false}}}}
+});
+
+// Auto-focus input
+document.getElementById('qr-input').focus();
+
+// Demo hint
+setTimeout(()=>{
+  const hint = document.createElement('div');
+  hint.style='text-align:center;padding:10px;background:rgba(26,86,219,.2);border-radius:8px;font-size:12px;color:#93c5fd;margin-top:10px;';
+  hint.innerHTML='💡 Demo: Try scanning <strong>WOW-QR-7824A001</strong> (valid) or <strong>WOW-QR-USED0001</strong> (used)';
+  document.querySelector('.scanner-card').appendChild(hint);
+},500);
+</script>
+</body>
+</html>

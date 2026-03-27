@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bookings — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- Portal layout -->
+  <div class="portal-dashboard">
+
+    <!-- Sidebar -->
+    <aside class="portal-sidebar" id="portal-sidebar">
+      <div class="portal-sidebar-logo">
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" />
+        </a>
+      </div>
+      <nav class="portal-sidenav">
+        <a href="my-bookings.html" class="portal-sidenav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          My Bookings
+        </a>
+        <a href="passport.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
+          My Passport
+        </a>
+        <a href="profile.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <a href="offers.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          My Offers
+        </a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          Back to Website
+        </a>
+        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="portal-main">
+
+      <!-- Loading state -->
+      <div id="portal-loading" class="portal-loading">
+        <div class="portal-spinner"></div>
+        <p>Loading your bookings…</p>
+      </div>
+
+      <!-- Authenticated content (hidden until auth confirmed) -->
+      <div id="portal-content" style="display:none;">
+
+        <!-- Header -->
+        <div class="portal-main-header">
+          <div>
+            <h1 class="portal-main-title" id="greeting">My Bookings</h1>
+            <p class="portal-main-sub">All your Worlds of Wonder visits in one place</p>
+          </div>
+          <a href="../book/water-park.html" class="btn btn-primary" style="white-space:nowrap;">+ Book New Visit</a>
+        </div>
+
+        <!-- Welcome banner (shown once) -->
+        <div class="portal-welcome-banner hidden" id="welcome-banner">
+          <div class="portal-welcome-inner">
+            <span class="portal-welcome-emoji">🎉</span>
+            <div>
+              <div class="portal-welcome-title">Welcome to Worlds of Wonder!</div>
+              <div class="portal-welcome-sub">Your account is all set. Start by booking your first visit below.</div>
+            </div>
+            <button class="portal-welcome-close" id="close-welcome">✕</button>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="portal-stats-row" id="stats-row">
+          <div class="portal-stat-card">
+            <div class="portal-stat-num" id="stat-total">—</div>
+            <div class="portal-stat-label">Total Visits Booked</div>
+          </div>
+          <div class="portal-stat-card">
+            <div class="portal-stat-num" id="stat-upcoming">—</div>
+            <div class="portal-stat-label">Upcoming Visits</div>
+          </div>
+          <div class="portal-stat-card">
+            <div class="portal-stat-num" id="stat-spent">—</div>
+            <div class="portal-stat-label">Total Spent</div>
+          </div>
+          <div class="portal-stat-card portal-stat-card--passport" id="passport-stat">
+            <div class="portal-stat-num">🪪</div>
+            <div class="portal-stat-label">Passport Status</div>
+            <div class="portal-stat-badge" id="passport-badge">Check →</div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="portal-filter-tabs">
+          <button class="portal-filter-tab active" data-filter="all" onclick="filterBookings('all',this)">All</button>
+          <button class="portal-filter-tab" data-filter="upcoming" onclick="filterBookings('upcoming',this)">Upcoming</button>
+          <button class="portal-filter-tab" data-filter="past" onclick="filterBookings('past',this)">Past</button>
+        </div>
+
+        <!-- Bookings list -->
+        <div id="bookings-list" class="portal-bookings-list">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Empty state -->
+        <div class="portal-empty" id="bookings-empty" style="display:none;">
+          <div class="portal-empty-icon">🎢</div>
+          <h3>No bookings yet</h3>
+          <p>Your next adventure is just one click away. Book a visit and it'll appear here instantly.</p>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+            <a href="../book/water-park.html" class="btn btn-primary">🌊 Book Water Park</a>
+            <a href="../book/amusement-park.html" class="btn btn-outline">🎢 Book Amusement Park</a>
+          </div>
+        </div>
+
+      </div><!-- /#portal-content -->
+
+    </main>
+  </div>
+
+</div><!-- #app -->
+
+<!-- Booking detail modal -->
+<div id="booking-modal" class="portal-modal-overlay hidden">
+  <div class="portal-modal">
+    <div class="portal-modal-header" id="modal-header">
+      <div class="portal-modal-icon" id="modal-icon"></div>
+      <div>
+        <div class="portal-modal-title" id="modal-title"></div>
+        <div class="portal-modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="portal-modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="portal-modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+
+  const app  = initializeApp(WOW_FB_CONFIG);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  let allBookings = [];
+
+  // Auth guard
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+      return;
+    }
+    document.getElementById('portal-loading').style.display = 'none';
+    document.getElementById('portal-content').style.display = 'block';
+
+    const name = user.displayName?.split(' ')[0] || 'there';
+    document.getElementById('greeting').textContent = `Hey ${name}, your bookings 👋`;
+
+    // Welcome banner (first visit)
+    if (new URLSearchParams(window.location.search).get('welcome')) {
+      document.getElementById('welcome-banner').classList.remove('hidden');
+    }
+
+    // Load bookings from Firestore
+    loadBookings(user.uid);
+
+    // Load passport status
+    loadPassport(user.uid);
+  });
+
+  document.getElementById('close-welcome')?.addEventListener('click', () => {
+    document.getElementById('welcome-banner').classList.add('hidden');
+  });
+
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../index.html';
+  });
+
+  function inr(n) {
+    return '₹\u202F' + Number(Math.round(n)).toLocaleString('en-IN');
+  }
+
+  function statusBadge(booking) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const visitDate = new Date(booking.visitDate);
+    if (booking.cancelled) return { cls:'cancelled', label:'Cancelled' };
+    if (visitDate < today) return { cls:'past', label:'Completed' };
+    if (visitDate.toDateString() === today.toDateString()) return { cls:'today', label:'Today!' };
+    return { cls:'upcoming', label:'Upcoming' };
+  }
+
+  function parkIcon(parkKey) {
+    if (parkKey === 'WATER_DAY') return '🌊';
+    if (parkKey === 'AMUSEMENT_DAY') return '🎢';
+    return '🎟';
+  }
+  function parkLabel(parkKey) {
+    if (parkKey === 'WATER_DAY') return 'Water Park';
+    if (parkKey === 'AMUSEMENT_DAY') return 'Amusement Park';
+    return 'Combo — Both Parks';
+  }
+  function parkColor(parkKey) {
+    if (parkKey === 'WATER_DAY') return '#0057b3';
+    if (parkKey === 'AMUSEMENT_DAY') return '#5b21b6';
+    return '#c2410c';
+  }
+
+  function renderBookingCard(b) {
+    const st = statusBadge(b);
+    const date = new Date(b.visitDate).toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+    const icon = parkIcon(b.parkKey);
+    const lbl  = parkLabel(b.parkKey);
+    const clr  = parkColor(b.parkKey);
+    const tickets = b.tickets || [];
+    const ticketSummary = tickets.map(t => `${t.qty}× ${t.label}`).join(', ') || `${b.totalTickets || '—'} ticket(s)`;
+
+    return `
+    <div class="portal-booking-card" data-booking-id="${b.id}">
+      <div class="pbc-left" style="background:${clr};">
+        <div class="pbc-icon">${icon}</div>
+        <div class="pbc-park">${lbl}</div>
+        <div class="pbc-date">${date}</div>
+      </div>
+      <div class="pbc-body">
+        <div class="pbc-top">
+          <div class="pbc-ref">Booking #${(b.id || '').slice(-8).toUpperCase()}</div>
+          <span class="pbc-status pbc-status--${st.cls}">${st.label}</span>
+        </div>
+        <div class="pbc-guest"><strong>${b.guestName || '—'}</strong> &nbsp;·&nbsp; 📞 ${b.mobile || '—'}</div>
+        <div class="pbc-tickets">${ticketSummary}</div>
+        <div class="pbc-footer">
+          <div class="pbc-total">${inr(b.totalPaid || 0)}</div>
+          <button class="pbc-view-btn" onclick="viewBooking('${b.id}')">View Details →</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  window.filterBookings = function(filter, btn) {
+    document.querySelectorAll('.portal-filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderList(filter);
+  };
+
+  function renderList(filter = 'all') {
+    const today = new Date(); today.setHours(0,0,0,0);
+    let filtered = allBookings;
+    if (filter === 'upcoming') filtered = allBookings.filter(b => new Date(b.visitDate) >= today && !b.cancelled);
+    if (filter === 'past')     filtered = allBookings.filter(b => new Date(b.visitDate) < today || b.cancelled);
+
+    const list  = document.getElementById('bookings-list');
+    const empty = document.getElementById('bookings-empty');
+    if (!list) return;
+
+    if (filtered.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      list.innerHTML = filtered.map(renderBookingCard).join('');
+    }
+  }
+
+  function updateStats() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = allBookings.filter(b => new Date(b.visitDate) >= today && !b.cancelled).length;
+    const spent    = allBookings.reduce((s, b) => s + (b.totalPaid || 0), 0);
+    const total    = allBookings.length;
+    document.getElementById('stat-total').textContent    = total;
+    document.getElementById('stat-upcoming').textContent = upcoming;
+    document.getElementById('stat-spent').textContent    = inr(spent);
+  }
+
+  function loadBookings(uid) {
+    const q = query(
+      collection(db, 'bookings'),
+      where('userId', '==', uid),
+      orderBy('visitDate', 'desc')
+    );
+    onSnapshot(q, (snap) => {
+      allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderList('all');
+      updateStats();
+    });
+  }
+
+  async function loadPassport(uid) {
+    try {
+      const snap = await getDoc(doc(db, 'passports', uid));
+      const badge = document.getElementById('passport-badge');
+      if (snap.exists()) {
+        const p = snap.data();
+        const exp = p.expiresAt?.toDate();
+        const active = exp && exp > new Date();
+        if (badge) badge.textContent = active ? '✅ Active' : '⚠️ Expired';
+        if (badge) badge.style.color = active ? '#10b981' : '#f59e0b';
+      } else {
+        if (badge) badge.textContent = 'Get Passport →';
+        document.getElementById('passport-stat')?.addEventListener('click', () => { window.location.href = 'passport.html'; });
+      }
+    } catch {}
+  }
+
+  // Booking detail modal
+  window.viewBooking = function(id) {
+    const b = allBookings.find(x => x.id === id);
+    if (!b) return;
+    const icon  = parkIcon(b.parkKey);
+    const lbl   = parkLabel(b.parkKey);
+    const clr   = parkColor(b.parkKey);
+    const date  = new Date(b.visitDate).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    const st    = statusBadge(b);
+
+    document.getElementById('modal-icon').textContent = icon;
+    document.getElementById('modal-title').textContent = lbl;
+    document.getElementById('modal-sub').textContent = `Booking #${(b.id||'').slice(-8).toUpperCase()}`;
+    document.getElementById('modal-header').style.background = clr;
+
+    const tickets = (b.tickets || []).map(t =>
+      `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f4fb;">
+         <span>${t.emoji || ''} ${t.label} × ${t.qty}</span>
+         <strong>₹${(t.unit * t.qty).toLocaleString('en-IN')}</strong>
+       </div>`).join('');
+
+    document.getElementById('modal-body').innerHTML = `
+      <div class="portal-modal-section">
+        <div class="portal-modal-row"><span>Status</span><span class="pbc-status pbc-status--${st.cls}">${st.label}</span></div>
+        <div class="portal-modal-row"><span>Visit Date</span><strong>${date}</strong></div>
+        <div class="portal-modal-row"><span>Lead Guest</span><strong>${b.guestName || '—'}</strong></div>
+        <div class="portal-modal-row"><span>Mobile</span><strong>${b.mobile || '—'}</strong></div>
+      </div>
+      <div class="portal-modal-section">
+        <div class="portal-modal-section-title">Ticket Breakdown</div>
+        ${tickets || '<p style="color:#9ca3af;font-size:13px;">No ticket details recorded.</p>'}
+        ${b.groupDisc > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#059669;font-weight:700;"><span>🎉 Group Discount</span><span>−₹${b.groupDisc.toLocaleString('en-IN')}</span></div>` : ''}
+      </div>
+      <div class="portal-modal-section">
+        <div class="portal-modal-row"><span>GST (18%, incl.)</span><span>₹${(b.gstAmt||0).toLocaleString('en-IN')}</span></div>
+        <div class="portal-modal-row portal-modal-total"><span>Total Paid</span><strong>₹${(b.totalPaid||0).toLocaleString('en-IN')}</strong></div>
+      </div>
+      <div style="text-align:center;margin-top:20px;padding:16px;background:#f4f7fb;border-radius:12px;">
+        <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">📱 Your QR ticket was sent via SMS & WhatsApp</div>
+        <div style="font-size:12px;color:#9ca3af;">Show your booking ID at the park gate</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#0a1020;margin-top:8px;letter-spacing:2px;">${(b.id||'').slice(-8).toUpperCase()}</div>
+      </div>`;
+
+    document.getElementById('booking-modal').classList.remove('hidden');
+  };
+
+  document.getElementById('modal-close')?.addEventListener('click', () => {
+    document.getElementById('booking-modal').classList.add('hidden');
+  });
+  document.getElementById('booking-modal')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
+  });
+</script>
+</body>
+</html>

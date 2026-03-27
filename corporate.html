@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Corporate &amp; Bulk Booking — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+
+  <section class="booking-hero" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);">
+    <div class="container">
+      <h1>🏢 Corporate &amp; Bulk Bookings</h1>
+      <p>From team outings to 1,000-person events — dedicated pricing, account management, and GST-ready invoicing.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 440px;gap:48px;align-items:start;">
+        <div>
+          <span class="section-tag">Corporate Experiences</span>
+          <h2 class="section-title">Your Team Deserves an Epic Day Out</h2>
+          <p style="color:var(--text2);margin-bottom:32px;font-size:16px;line-height:1.8;">From 20-person team-building days to 1,000-person company events — we handle everything so you don't have to.</p>
+          <div class="info-grid" style="grid-template-columns:1fr 1fr;margin-bottom:32px;">
+            <div class="info-card">
+              <div class="info-icon">💼</div>
+              <h3>Corporate Outings</h3>
+              <p>Team-building packages with dedicated zones, catering, and group coordination.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-icon">🎉</div>
+              <h3>Large Group Events</h3>
+              <p>Bulk tickets with custom QR codes, headcount tracking and on-day staff support.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-icon">📑</div>
+              <h3>GST Invoicing</h3>
+              <p>Fully GST-compliant invoices, B2B billing and TDS documentation handled.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-icon">📞</div>
+              <h3>Dedicated Manager</h3>
+              <p>One point of contact from booking to event day. Amendments handled swiftly.</p>
+            </div>
+          </div>
+          <div class="alert alert-info">
+            <strong>Minimum group size:</strong> 20 tickets. Get a customised quote with special pricing and full support package.
+          </div>
+        </div>
+
+        <div style="background:white;border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#0f172a,#1e3a8a);padding:24px 28px;color:white;">
+            <h3 style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;margin-bottom:4px;">Request a Quote</h3>
+            <p style="opacity:.75;font-size:13px;">We'll send a personalised proposal within 24 hours</p>
+          </div>
+          <div style="padding:28px;display:grid;gap:14px;">
+            <div class="form-group"><label class="label">Company Name</label><input class="input" type="text" placeholder="Your company" /></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="label">Contact Name</label><input class="input" type="text" placeholder="Your name" /></div>
+              <div class="form-group"><label class="label">Mobile</label><input class="input" type="tel" placeholder="10-digit" /></div>
+            </div>
+            <div class="form-group"><label class="label">Email</label><input class="input" type="email" placeholder="work@company.com" /></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="label">Group size</label><input class="input" type="number" min="20" placeholder="e.g. 100" /></div>
+              <div class="form-group"><label class="label">Preferred date</label><input class="input" type="date" /></div>
+            </div>
+            <div class="form-group">
+              <label class="label">Special requirements</label>
+              <textarea class="input" style="min-height:80px;" placeholder="Catering, transport, themed zones, AV…"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width:100%;font-size:16px;padding:16px;" onclick="alert('Quote request submitted! An account manager will contact you within 24 hours.')">
+              Request Quote →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="js/shell.js"></script>
+</body>
+</html>

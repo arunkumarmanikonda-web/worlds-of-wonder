@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "version": "4.0",
+    "description": "Worlds of Wonder — Hero Banner Configuration. Uses image/gradient slides (no YouTube - blocked on preview domains).",
+    "lastUpdated": "2026-03-27",
+    "note": "YouTube embeds cause Error 153 on preview domains. Using photo/gradient backgrounds instead."
+  },
+
+  "homepage": {
+    "autoplay": true,
+    "autoplayInterval": 6000,
+    "showDots": true,
+    "showArrows": true,
+    "slides": [
+      {
+        "id": "hp-1", "active": true, "type": "image",
+        "imageUrl": "images/hero-water.jpg",
+        "title": "Two Parks.\nOne Legendary Day.",
+        "subtitle": "Delhi NCR's #1 theme park — 50+ rides, Giant Wave Pool, Rockin Roller and non-stop excitement.",
+        "badge": "🎉 Delhi NCR's #1 Theme Park",
+        "cta": { "label": "🎟 Book Now", "url": "book/water-park.html" },
+        "ctaSecondary": { "label": "Explore Parks ↓", "url": "#explore" },
+        "fallbackGradient": "linear-gradient(155deg,#001840,#004eb5)",
+        "overlayOpacity": 0.55
+      },
+      {
+        "id": "hp-2", "active": true, "type": "image",
+        "imageUrl": "images/ride-wave-pool.jpg",
+        "title": "Wave Pool &\nBoomerango — Pure Bliss",
+        "subtitle": "20+ water rides, giant wave pool, speed slides, rain disco and lazy river.",
+        "badge": "🌊 Water Park Open",
+        "cta": { "label": "🌊 Book Water Park — ₹1,299", "url": "book/water-park.html" },
+        "ctaSecondary": { "label": "See All Water Rides →", "url": "water-park.html" },
+        "fallbackGradient": "linear-gradient(155deg,#00183c,#009fd6)",
+        "overlayOpacity": 0.5
+      },
+      {
+        "id": "hp-3", "active": true, "type": "image",
+        "imageUrl": "images/ride-rockin-roller.jpg",
+        "title": "Rockin Roller &\n30+ Adrenaline Rides",
+        "subtitle": "Heart-stopping coasters, 40m Giant Wheel, Columbus, live shows and family zones.",
+        "badge": "🎢 Amusement Park",
+        "cta": { "label": "🎢 Book Amusement Park — ₹1,199", "url": "book/amusement-park.html" },
+        "ctaSecondary": { "label": "See All Rides →", "url": "amusement-park.html" },
+        "fallbackGradient": "linear-gradient(155deg,#0d001a,#7c20e0)",
+        "overlayOpacity": 0.5
+      },
+      {
+        "id": "hp-4", "active": true, "type": "image",
+        "imageUrl": "images/hero-amusement.jpg",
+        "title": "WOW Combo —\nBoth Parks, One Price",
+        "subtitle": "Water Park + Amusement Park from ₹1,999. The ultimate WOW day.",
+        "badge": "🏆 Best Value",
+        "cta": { "label": "🎟 Book Combo — ₹1,999", "url": "book/combo.html" },
+        "ctaSecondary": { "label": "Compare Tickets →", "url": "offers.html" },
+        "fallbackGradient": "linear-gradient(155deg,#001830,#0088cc)",
+        "overlayOpacity": 0.5
+      }
+    ]
+  },
+
+  "water_park": {
+    "autoplay": false, "showDots": false, "showArrows": false,
+    "slides": [{ "id": "wp-1", "active": true, "type": "image", "imageUrl": "images/hero-water.jpg", "fallbackGradient": "linear-gradient(160deg,#001840,#0077b6)", "overlayOpacity": 0.5 }]
+  },
+
+  "amusement_park": {
+    "autoplay": false, "showDots": false, "showArrows": false,
+    "slides": [{ "id": "ap-1", "active": true, "type": "image", "imageUrl": "images/hero-amusement.jpg", "fallbackGradient": "linear-gradient(160deg,#0d001a,#5a00c8)", "overlayOpacity": 0.5 }]
+  }
+}

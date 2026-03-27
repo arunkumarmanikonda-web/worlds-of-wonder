@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annual Passport — Worlds of Wonder</title>
+  <meta name="description" content="Buy your WOW Annual Passport — unlimited visits to Water Park and Amusement Park for one year from ₹2,999." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/booking-page.css" />
+  <style>
+    .passport-plans { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:32px; }
+    @media(max-width:900px){ .passport-plans { grid-template-columns:1fr; } }
+    .plan-card { background:#1a2235; border:2px solid rgba(255,255,255,.08); border-radius:20px; padding:28px; cursor:pointer; transition:all .25s; position:relative; }
+    .plan-card:hover, .plan-card.selected { border-color:#0055B3; transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,.4); }
+    .plan-card.selected { background:rgba(0,85,179,.1); }
+    .plan-card.featured { border-color:rgba(245,168,0,.5); }
+    .plan-featured-badge { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:linear-gradient(90deg,#F5A800,#f97316); color:#000; font-size:11px; font-weight:800; padding:4px 16px; border-radius:20px; white-space:nowrap; }
+    .plan-name  { font-size:22px; font-weight:800; color:#fff; margin-bottom:4px; }
+    .plan-price { font-size:36px; font-weight:900; color:#F5A800; }
+    .plan-price small { font-size:14px; color:rgba(255,255,255,.4); font-weight:400; }
+    .plan-desc  { font-size:13px; color:rgba(255,255,255,.5); margin:10px 0; }
+    .plan-features { list-style:none; padding:0; margin:16px 0 0; }
+    .plan-features li { display:flex; gap:8px; align-items:flex-start; font-size:13px; color:rgba(255,255,255,.7); margin-bottom:8px; }
+    .plan-features li::before { content:'✓'; color:#10b981; font-weight:700; flex-shrink:0; }
+    .plan-features li.no::before { content:'✗'; color:rgba(255,255,255,.2); }
+    .plan-features li.no { color:rgba(255,255,255,.25); }
+    .plan-check { position:absolute; top:20px; right:20px; width:26px; height:26px; border-radius:50%; background:#0055B3; display:none; align-items:center; justify-content:center; color:#fff; font-size:14px; }
+    .plan-card.selected .plan-check { display:flex; }
+    .step-section { background:#1a2235; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:28px; margin-bottom:24px; }
+    .step-title { font-size:18px; font-weight:800; color:#fff; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+    .step-num { width:32px; height:32px; background:#0055B3; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#fff; flex-shrink:0; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:600px){ .form-grid { grid-template-columns:1fr; } }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-label { font-size:12px; font-weight:700; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.06em; }
+    .form-input, .form-select { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:12px 14px; font-size:14px; color:#fff; font-family:inherit; transition:border-color .2s; outline:none; }
+    .form-input:focus, .form-select:focus { border-color:#0055B3; }
+    .form-select option { background:#1a2235; }
+    .kyc-upload { border:2px dashed rgba(255,255,255,.15); border-radius:12px; padding:32px; text-align:center; cursor:pointer; transition:all .2s; }
+    .kyc-upload:hover { border-color:#0055B3; background:rgba(0,85,179,.05); }
+    .kyc-upload-icon { font-size:36px; margin-bottom:10px; }
+    .kyc-upload-text { font-size:14px; color:rgba(255,255,255,.5); }
+    .kyc-upload-text strong { color:#F5A800; }
+    .addon-item { display:flex; align-items:center; gap:14px; padding:14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:12px; margin-bottom:12px; cursor:pointer; transition:all .2s; }
+    .addon-item.selected { background:rgba(0,85,179,.1); border-color:#0055B3; }
+    .addon-checkbox { width:22px; height:22px; border-radius:6px; border:2px solid rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s; }
+    .addon-item.selected .addon-checkbox { background:#0055B3; border-color:#0055B3; }
+    .addon-info { flex:1; }
+    .addon-name  { font-size:14px; font-weight:600; color:#fff; }
+    .addon-desc  { font-size:12px; color:rgba(255,255,255,.4); margin-top:2px; }
+    .addon-price { font-size:16px; font-weight:800; color:#F5A800; white-space:nowrap; }
+    .order-summary { background:#0a1628; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:24px; position:sticky; top:100px; }
+    .order-line { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:14px; }
+    .order-line:last-of-type { border-bottom:none; }
+    .order-line-label { color:rgba(255,255,255,.6); }
+    .order-line-val   { color:#fff; font-weight:600; text-align:right; }
+    .order-total { display:flex; justify-content:space-between; padding:16px 0 0; margin-top:8px; border-top:2px solid rgba(255,255,255,.1); font-size:20px; font-weight:800; color:#fff; }
+    .order-total .total-amount { color:#F5A800; }
+    .layout-with-summary { display:grid; grid-template-columns:1fr 360px; gap:28px; align-items:start; }
+    @media(max-width:1100px){ .layout-with-summary { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body class="booking-page">
+  <!-- Booking Header -->
+  <header class="booking-header">
+    <a href="../index.html" class="booking-logo">
+      <img src="../images/logo.png" alt="Worlds of Wonder" style="height:48px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+    </a>
+    <div class="booking-steps" id="stepsBar">
+      <div class="booking-step active" data-step="1"><span class="step-dot">1</span><span class="step-lbl">Plan</span></div>
+      <div class="booking-step" data-step="2"><span class="step-dot">2</span><span class="step-lbl">Details</span></div>
+      <div class="booking-step" data-step="3"><span class="step-dot">3</span><span class="step-lbl">KYC</span></div>
+      <div class="booking-step" data-step="4"><span class="step-dot">4</span><span class="step-lbl">Pay</span></div>
+      <div class="booking-step" data-step="5"><span class="step-dot">5</span><span class="step-lbl">Done</span></div>
+    </div>
+    <a href="../passport.html" style="font-size:13px;color:rgba(255,255,255,.5);text-decoration:none;">✕ Cancel</a>
+  </header>
+
+  <div class="booking-wrapper">
+    <!-- Step 1: Plan Selection -->
+    <div class="booking-step-content" id="step1">
+      <h2 class="booking-section-title">Choose Your Passport Plan</h2>
+      <div class="passport-plans">
+        <div class="plan-card" onclick="selectPlan('silver',2999,'Silver Passport')" id="plan-silver">
+          <span class="plan-check">✓</span>
+          <div class="plan-name">Silver</div>
+          <div class="plan-price">₹2,999 <small>/ year</small></div>
+          <div class="plan-desc">Water Park access all year round</div>
+          <ul class="plan-features">
+            <li>Unlimited Water Park visits</li>
+            <li>Free entry on weekdays</li>
+            <li>10% F&amp;B discount</li>
+            <li>2 Guest passes/year</li>
+            <li class="no">Amusement Park</li>
+            <li class="no">Priority entry</li>
+          </ul>
+        </div>
+        <div class="plan-card featured selected" onclick="selectPlan('gold',4999,'Gold Passport')" id="plan-gold">
+          <span class="plan-featured-badge">⭐ Most Popular</span>
+          <span class="plan-check">✓</span>
+          <div class="plan-name">Gold</div>
+          <div class="plan-price">₹4,999 <small>/ year</small></div>
+          <div class="plan-desc">Both parks — unlimited visits</div>
+          <ul class="plan-features">
+            <li>Unlimited Water Park visits</li>
+            <li>Unlimited Amusement Park visits</li>
+            <li>20% F&amp;B discount</li>
+            <li>4 Guest passes/year</li>
+            <li>Priority entry</li>
+            <li>Loyalty 2× points multiplier</li>
+          </ul>
+        </div>
+        <div class="plan-card" onclick="selectPlan('platinum',7999,'Platinum Passport')" id="plan-platinum">
+          <span class="plan-check">✓</span>
+          <div class="plan-name">Platinum</div>
+          <div class="plan-price">₹7,999 <small>/ year</small></div>
+          <div class="plan-desc">VIP unlimited access — all perks</div>
+          <ul class="plan-features">
+            <li>Unlimited both parks</li>
+            <li>VIP lounge access</li>
+            <li>30% F&amp;B + retail discount</li>
+            <li>8 Guest passes/year</li>
+            <li>Skip-the-line entry</li>
+            <li>Free parking</li>
+            <li>3× loyalty points</li>
+            <li>Dedicated concierge</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Number of passports -->
+      <div class="step-section">
+        <div class="step-title"><span class="step-num">🧑</span> How many passports?</div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:6px;">Adults (13+)</div>
+            <div class="qty-control" style="display:flex;align-items:center;gap:12px;">
+              <button onclick="changeQty('adults',-1)" class="qty-btn">−</button>
+              <span id="adultsCount" style="font-size:20px;font-weight:800;color:#fff;min-width:30px;text-align:center;">1</span>
+              <button onclick="changeQty('adults',1)" class="qty-btn">+</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:6px;">Children (3–12)</div>
+            <div class="qty-control" style="display:flex;align-items:center;gap:12px;">
+              <button onclick="changeQty('children',-1)" class="qty-btn">−</button>
+              <span id="childrenCount" style="font-size:20px;font-weight:800;color:#fff;min-width:30px;text-align:center;">0</span>
+              <button onclick="changeQty('children',1)" class="qty-btn">+</button>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,.35);margin-top:16px;">Children under 90 cm enter free · Passports start from date of purchase</p>
+      </div>
+
+      <!-- Addons -->
+      <div class="step-section">
+        <div class="step-title"><span class="step-num">+</span> Add-ons (Optional)</div>
+        <div class="addon-item" onclick="toggleAddon(this,'locker',299)">
+          <div class="addon-checkbox">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">🔒 Locker Package</div>
+            <div class="addon-desc">Full-year locker access — no daily rental</div>
+          </div>
+          <div class="addon-price">₹299/yr</div>
+        </div>
+        <div class="addon-item" onclick="toggleAddon(this,'parking',999)">
+          <div class="addon-checkbox">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">🚗 Annual Parking</div>
+            <div class="addon-desc">Unlimited free parking for 1 vehicle</div>
+          </div>
+          <div class="addon-price">₹999/yr</div>
+        </div>
+        <div class="addon-item" onclick="toggleAddon(this,'photo',1499)">
+          <div class="addon-checkbox">✓</div>
+          <div class="addon-info">
+            <div class="addon-name">📸 Photo Package</div>
+            <div class="addon-desc">Professional ride photos — unlimited downloads</div>
+          </div>
+          <div class="addon-price">₹1,499/yr</div>
+        </div>
+      </div>
+
+      <button onclick="nextStep()" class="btn btn-primary btn-large">Continue to Holder Details →</button>
+    </div>
+
+    <!-- Step 2: Holder Details -->
+    <div class="booking-step-content hidden" id="step2">
+      <h2 class="booking-section-title">Passport Holder Details</h2>
+      <div id="holderForms"></div>
+      <button onclick="nextStep()" class="btn btn-primary btn-large">Continue to KYC →</button>
+      <button onclick="prevStep()" class="btn btn-ghost" style="margin-left:12px;">← Back</button>
+    </div>
+
+    <!-- Step 3: KYC -->
+    <div class="booking-step-content hidden" id="step3">
+      <h2 class="booking-section-title">Identity Verification (KYC)</h2>
+      <div class="step-section">
+        <div class="step-title"><span class="step-num">🪪</span> Photo ID Upload</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);margin-bottom:20px;">Required for passport issuance. Accepted: Aadhaar, PAN, Passport, Driving Licence.</p>
+        <div id="kycUploads"></div>
+      </div>
+      <div class="step-section">
+        <div class="step-title"><span class="step-num">📸</span> Passport Photo</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);margin-bottom:20px;">Upload a recent passport-size photo (white background, clear face). JPEG/PNG, max 2 MB.</p>
+        <div id="photoUploads"></div>
+      </div>
+      <div class="step-section">
+        <div class="step-title"><span class="step-num">✅</span> DigiLocker / Aadhaar eKYC</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.5);margin-bottom:16px;">Alternatively, verify instantly with DigiLocker or Aadhaar OTP.</p>
+        <button onclick="initiateDigiLocker()" style="background:rgba(0,128,255,.15);border:1px solid rgba(0,128,255,.3);color:#60a5fa;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">🔗 Verify with DigiLocker</button>
+        <button onclick="initiateAadhaar()" style="background:rgba(245,168,0,.1);border:1px solid rgba(245,168,0,.3);color:#F5A800;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:12px;">📱 Aadhaar OTP eKYC</button>
+      </div>
+      <button onclick="nextStep()" class="btn btn-primary btn-large">Continue to Payment →</button>
+      <button onclick="prevStep()" class="btn btn-ghost" style="margin-left:12px;">← Back</button>
+    </div>
+
+    <!-- Step 4: Payment -->
+    <div class="booking-step-content hidden" id="step4">
+      <div class="layout-with-summary">
+        <div>
+          <h2 class="booking-section-title">Payment</h2>
+          <div class="step-section">
+            <div class="step-title"><span class="step-num">💳</span> Payment Method</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;" id="paymentMethods">
+              <div class="payment-method-btn active" onclick="selectPayment(this,'upi')">📱<br><small>UPI</small></div>
+              <div class="payment-method-btn" onclick="selectPayment(this,'card')">💳<br><small>Card</small></div>
+              <div class="payment-method-btn" onclick="selectPayment(this,'netbanking')">🏦<br><small>Net Banking</small></div>
+              <div class="payment-method-btn" onclick="selectPayment(this,'wallet')">👛<br><small>Wallet</small></div>
+            </div>
+            <div id="upiPanel">
+              <div class="form-group">
+                <label class="form-label">UPI ID</label>
+                <input type="text" class="form-input" placeholder="yourname@upi" id="upiId" />
+              </div>
+              <p style="font-size:12px;color:rgba(255,255,255,.35);margin-top:10px;">Supports: PhonePe, Google Pay, Paytm, BHIM</p>
+            </div>
+          </div>
+          <div class="step-section">
+            <div class="step-title"><span class="step-num">🏷️</span> Promo Code</div>
+            <div style="display:flex;gap:10px;">
+              <input type="text" class="form-input" placeholder="Enter promo code" id="promoCode" style="flex:1;" />
+              <button onclick="applyPromo()" class="btn btn-primary">Apply</button>
+            </div>
+            <div id="promoMsg" style="font-size:13px;margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:20px;">Order Summary</div>
+          <div id="orderLines"></div>
+          <div class="order-total">
+            <span>Total</span>
+            <span class="total-amount" id="orderTotal">₹4,999</span>
+          </div>
+          <p style="font-size:11px;color:rgba(255,255,255,.3);margin-top:12px;">Inclusive of GST · Instant digital delivery</p>
+          <button onclick="processPayment()" class="btn btn-primary btn-large" style="width:100%;margin-top:20px;" id="payBtn">Pay ₹<span id="payBtnAmt">4,999</span></button>
+          <div style="display:flex;justify-content:center;gap:12px;margin-top:16px;opacity:.4;">
+            <img src="https://cdn.jsdelivr.net/npm/payment-icons@1.1.0/min/flat/visa.svg" alt="Visa" style="height:24px;" onerror="this.remove()" />
+            <img src="https://cdn.jsdelivr.net/npm/payment-icons@1.1.0/min/flat/mastercard.svg" alt="MC" style="height:24px;" onerror="this.remove()" />
+          </div>
+          <p style="font-size:11px;color:rgba(16,185,129,.6);margin-top:12px;text-align:center;">🔒 Secured by Razorpay · SSL 256-bit</p>
+        </div>
+      </div>
+      <button onclick="prevStep()" class="btn btn-ghost" style="margin-top:16px;">← Back</button>
+    </div>
+
+    <!-- Step 5: Success -->
+    <div class="booking-step-content hidden" id="step5">
+      <div style="text-align:center;padding:60px 20px;max-width:600px;margin:0 auto;">
+        <div style="font-size:80px;margin-bottom:20px;">🎉</div>
+        <h2 style="font-size:32px;font-weight:900;color:#fff;margin-bottom:12px;">Passport Issued!</h2>
+        <p style="font-size:16px;color:rgba(255,255,255,.6);margin-bottom:32px;">Your Annual Passport has been issued. KYC verification will be completed within 24 hours. You'll receive your physical card by post within 7–10 business days.</p>
+        <div style="background:#1a2235;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;margin-bottom:32px;text-align:left;">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;"><span style="color:rgba(255,255,255,.5);">Passport ID</span><span id="successPassportId" style="color:#F5A800;font-weight:700;">PP-2026-00124</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;"><span style="color:rgba(255,255,255,.5);">Plan</span><span id="successPlan" style="color:#fff;font-weight:600;">Gold Passport</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;"><span style="color:rgba(255,255,255,.5);">Valid From</span><span style="color:#fff;font-weight:600;">27 March 2026</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;"><span style="color:rgba(255,255,255,.5);">Valid Until</span><span style="color:#10b981;font-weight:700;">26 March 2027</span></div>
+        </div>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <a href="../portal/passport.html" class="btn btn-primary">View My Passport</a>
+          <a href="../portal/dashboard.html" class="btn btn-ghost">Go to Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let state = { plan:'gold', planName:'Gold Passport', planPrice:4999, childPrice:2999, adults:1, children:0, addons:[], promoDiscount:0, currentStep:1, totalSteps:5 };
+
+    function selectPlan(plan, price, name) {
+      state.plan = plan; state.planPrice = price; state.planName = name;
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('plan-' + plan).classList.add('selected');
+      updateSummary();
+    }
+
+    function changeQty(type, delta) {
+      if (type === 'adults') { state.adults = Math.max(1, state.adults + delta); document.getElementById('adultsCount').textContent = state.adults; }
+      else { state.children = Math.max(0, state.children + delta); document.getElementById('childrenCount').textContent = state.children; }
+      updateSummary();
+    }
+
+    function toggleAddon(el, key, price) {
+      el.classList.toggle('selected');
+      if (el.classList.contains('selected')) { if (!state.addons.find(a => a.key===key)) state.addons.push({key,price,name:el.querySelector('.addon-name').textContent}); }
+      else { state.addons = state.addons.filter(a => a.key !== key); }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const adultTotal = state.adults * state.planPrice;
+      const childTotal = state.children * state.childPrice;
+      const addonTotal = state.addons.reduce((s,a) => s + a.price, 0);
+      const subtotal = adultTotal + childTotal + addonTotal;
+      const gst = Math.round(subtotal * 0.18);
+      const total = subtotal + gst - state.promoDiscount;
+
+      const lines = document.getElementById('orderLines');
+      if (lines) {
+        lines.innerHTML = `
+          <div class="order-line"><span class="order-line-label">${state.planName} × ${state.adults} Adult</span><span class="order-line-val">₹${adultTotal.toLocaleString('en-IN')}</span></div>
+          ${state.children > 0 ? `<div class="order-line"><span class="order-line-label">${state.planName} × ${state.children} Child</span><span class="order-line-val">₹${childTotal.toLocaleString('en-IN')}</span></div>` : ''}
+          ${state.addons.map(a => `<div class="order-line"><span class="order-line-label">${a.name}</span><span class="order-line-val">₹${a.price.toLocaleString('en-IN')}</span></div>`).join('')}
+          <div class="order-line"><span class="order-line-label">GST (18%)</span><span class="order-line-val">₹${gst.toLocaleString('en-IN')}</span></div>
+          ${state.promoDiscount > 0 ? `<div class="order-line"><span class="order-line-label" style="color:#10b981;">Promo Discount</span><span class="order-line-val" style="color:#10b981;">−₹${state.promoDiscount.toLocaleString('en-IN')}</span></div>` : ''}
+        `;
+      }
+      const totalEl = document.getElementById('orderTotal');
+      if (totalEl) totalEl.textContent = '₹' + total.toLocaleString('en-IN');
+      const payAmtEl = document.getElementById('payBtnAmt');
+      if (payAmtEl) payAmtEl.textContent = total.toLocaleString('en-IN');
+    }
+
+    function buildHolderForms() {
+      const total = state.adults + state.children;
+      let html = '';
+      for (let i = 0; i < total; i++) {
+        const isChild = i >= state.adults;
+        html += `<div class="step-section">
+          <div class="step-title"><span class="step-num">${i+1}</span> ${isChild ? 'Child' : 'Adult'} Passport Holder</div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="First name" required /></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="Last name" required /></div>
+            <div class="form-group"><label class="form-label">Date of Birth</label><input class="form-input" type="date" required /></div>
+            <div class="form-group"><label class="form-label">Gender</label><select class="form-select"><option>Male</option><option>Female</option><option>Other</option></select></div>
+            <div class="form-group"><label class="form-label">Mobile Number</label><input class="form-input" type="tel" placeholder="+91 XXXXX XXXXX" /></div>
+            <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="email@example.com" /></div>
+          </div>
+        </div>`;
+      }
+      document.getElementById('holderForms').innerHTML = html;
+    }
+
+    function buildKYCForms() {
+      const total = state.adults + state.children;
+      let idHtml = '', photoHtml = '';
+      for (let i = 0; i < total; i++) {
+        const isChild = i >= state.adults;
+        idHtml += `<div class="kyc-upload" onclick="this.nextElementSibling.click()" style="margin-bottom:16px;">
+          <input type="file" accept="image/*,application/pdf" style="display:none" onchange="showFileSelected(this)" />
+          <div class="kyc-upload-icon">📄</div>
+          <div class="kyc-upload-text">${isChild ? 'Child' : 'Adult'} ${i+1} — <strong>Click to upload ID</strong></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;">Aadhaar / PAN / Passport · JPEG/PNG/PDF · Max 5 MB</div>
+        </div>`;
+        photoHtml += `<div class="kyc-upload" onclick="this.nextElementSibling.click()" style="margin-bottom:16px;">
+          <input type="file" accept="image/*" style="display:none" onchange="showFileSelected(this)" />
+          <div class="kyc-upload-icon">🤳</div>
+          <div class="kyc-upload-text">${isChild ? 'Child' : 'Adult'} ${i+1} — <strong>Click to upload photo</strong></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.3);margin-top:6px;">JPEG/PNG · White background · Max 2 MB</div>
+        </div>`;
+      }
+      document.getElementById('kycUploads').innerHTML = idHtml;
+      document.getElementById('photoUploads').innerHTML = photoHtml;
+    }
+
+    function showFileSelected(input) {
+      if (input.files[0]) {
+        const parent = input.parentElement;
+        parent.style.borderColor = '#10b981';
+        parent.querySelector('.kyc-upload-icon').textContent = '✅';
+        parent.querySelector('.kyc-upload-text').innerHTML = `<strong style="color:#10b981;">${input.files[0].name}</strong>`;
+      }
+    }
+
+    function nextStep() {
+      if (state.currentStep === 1) buildHolderForms();
+      if (state.currentStep === 2) buildKYCForms();
+      if (state.currentStep === 3) updateSummary();
+      document.getElementById('step' + state.currentStep).classList.add('hidden');
+      state.currentStep++;
+      document.getElementById('step' + state.currentStep).classList.remove('hidden');
+      document.querySelectorAll('.booking-step').forEach((s, i) => {
+        s.classList.toggle('active', i < state.currentStep);
+        s.classList.toggle('completed', i < state.currentStep - 1);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function prevStep() {
+      document.getElementById('step' + state.currentStep).classList.add('hidden');
+      state.currentStep--;
+      document.getElementById('step' + state.currentStep).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function applyPromo() {
+      const code = document.getElementById('promoCode').value.trim().toUpperCase();
+      const msg = document.getElementById('promoMsg');
+      const promos = { 'PASSPORT10': 500, 'GOLD20': 1000, 'WELCOME5': 250 };
+      if (promos[code]) {
+        state.promoDiscount = promos[code];
+        msg.innerHTML = `<span style="color:#10b981;">✓ Code applied! You save ₹${promos[code].toLocaleString('en-IN')}</span>`;
+        updateSummary();
+      } else {
+        msg.innerHTML = `<span style="color:#ef4444;">✗ Invalid promo code</span>`;
+      }
+    }
+
+    function selectPayment(el, method) {
+      document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function processPayment() {
+      document.getElementById('payBtn').textContent = 'Processing...';
+      document.getElementById('payBtn').disabled = true;
+      setTimeout(() => {
+        const passportId = 'PP-2026-' + String(Math.floor(Math.random() * 90000) + 10000);
+        document.getElementById('successPassportId').textContent = passportId;
+        document.getElementById('successPlan').textContent = state.planName;
+        document.getElementById('step4').classList.add('hidden');
+        state.currentStep = 5;
+        document.getElementById('step5').classList.remove('hidden');
+        document.querySelectorAll('.booking-step').forEach(s => s.classList.add('active'));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 2000);
+    }
+
+    function initiateDigiLocker() { alert('DigiLocker integration\nAPI: POST /api/kyc/digilocker/initiate\n\nIn production: Redirect to DigiLocker OAuth flow'); }
+    function initiateAadhaar()    { alert('Aadhaar OTP eKYC\nAPI: POST /api/kyc/aadhaar/otp\n\nIn production: Aadhaar OTP verification via UIDAI'); }
+
+    updateSummary();
+  </script>
+</body>
+</html>

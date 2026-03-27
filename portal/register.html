@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/portal.css" />
+</head>
+<body>
+<div id="app">
+
+  <div class="portal-page">
+
+    <!-- Left panel -->
+    <div class="portal-brand portal-brand--register">
+      <div class="portal-brand-inner">
+        <a href="../index.html" class="portal-brand-logo">
+          <img src="../images/logo.png" alt="Worlds of Wonder" class="portal-logo-img" style="filter:none!important;" />
+        </a>
+        <h1 class="portal-brand-title">Join the<br><span class="portal-brand-accent">WOW Family!</span></h1>
+        <p class="portal-brand-sub">Create your free account and unlock the full Worlds of Wonder experience.</p>
+        <div class="portal-brand-perks">
+          <div class="portal-perk"><span class="portal-perk-icon">🎟</span><span>Save & manage all your bookings</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">🔔</span><span>Early access to offers & new rides</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">🪪</span><span>Digital Passport management</span></div>
+          <div class="portal-perk"><span class="portal-perk-icon">🎁</span><span>Birthday surprises & member rewards</span></div>
+        </div>
+      </div>
+      <div class="portal-brand-bg"></div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="portal-form-panel">
+      <div class="portal-form-wrap">
+        <div class="portal-form-header">
+          <h2 class="portal-form-title">Create your account</h2>
+          <p class="portal-form-sub">It's free, takes 30 seconds, no spam ever.</p>
+        </div>
+
+        <button class="portal-google-btn" id="google-register-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Sign up with Google
+        </button>
+
+        <div class="portal-divider"><span>or create with email</span></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-grid">
+            <div class="portal-field">
+              <label class="portal-label" for="reg-fname">First name *</label>
+              <input class="portal-input" id="reg-fname" type="text" placeholder="Aarav" autocomplete="given-name" required />
+              <div class="portal-field-err hidden" id="reg-fname-err"></div>
+            </div>
+            <div class="portal-field">
+              <label class="portal-label" for="reg-lname">Last name *</label>
+              <input class="portal-input" id="reg-lname" type="text" placeholder="Mehta" autocomplete="family-name" required />
+              <div class="portal-field-err hidden" id="reg-lname-err"></div>
+            </div>
+          </div>
+
+          <div class="portal-field">
+            <label class="portal-label" for="reg-email">Email address *</label>
+            <input class="portal-input" id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="portal-field-err hidden" id="reg-email-err"></div>
+          </div>
+
+          <div class="portal-field">
+            <label class="portal-label" for="reg-mobile">Mobile number *</label>
+            <div class="portal-input-prefix-wrap">
+              <span class="portal-input-prefix">+91</span>
+              <input class="portal-input portal-input--prefixed" id="reg-mobile" type="tel"
+                     placeholder="10-digit number" maxlength="10" autocomplete="tel" required />
+            </div>
+            <div class="portal-field-err hidden" id="reg-mobile-err"></div>
+          </div>
+
+          <div class="portal-field">
+            <label class="portal-label" for="reg-password">Password *</label>
+            <div class="portal-input-wrap">
+              <input class="portal-input" id="reg-password" type="password"
+                     placeholder="At least 8 characters" autocomplete="new-password" required />
+              <button type="button" class="portal-eye-btn" id="toggle-reg-pw" aria-label="Show/hide password">
+                <svg id="eye-show-r" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg id="eye-hide-r" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+            <div class="portal-pw-strength" id="pw-strength">
+              <div class="portal-pw-bar" id="pw-bar"></div>
+            </div>
+            <div class="portal-pw-hint" id="pw-hint">Use 8+ characters with a number</div>
+            <div class="portal-field-err hidden" id="reg-password-err"></div>
+          </div>
+
+          <div class="portal-field" style="flex-direction:row;align-items:flex-start;gap:10px;margin-bottom:24px;">
+            <input type="checkbox" id="reg-terms" class="portal-checkbox" required />
+            <label for="reg-terms" class="portal-checkbox-label">
+              I agree to the <a href="#" class="portal-link">Terms of Service</a> and <a href="#" class="portal-link">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button type="submit" class="portal-submit-btn portal-submit-btn--blue" id="reg-submit">
+            Create Account →
+          </button>
+          <div class="portal-error-banner hidden" id="reg-error-banner"></div>
+        </form>
+
+        <p class="portal-switch">
+          Already have an account? <a href="login.html" class="portal-link">Sign in →</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+
+  const app    = initializeApp(WOW_FB_CONFIG);
+  const auth   = getAuth(app);
+  const db     = getFirestore(app);
+  const google = new GoogleAuthProvider();
+
+  function showErr(id, msg) { const e = document.getElementById(id); if(e){e.textContent=msg;e.classList.remove('hidden');} }
+  function clearErrs() {
+    ['reg-fname-err','reg-lname-err','reg-email-err','reg-mobile-err','reg-password-err','reg-error-banner']
+      .forEach(id => { const e = document.getElementById(id); if(e){e.textContent='';e.classList.add('hidden');} });
+  }
+  function setBusy(b) {
+    const btn = document.getElementById('reg-submit');
+    if(btn){ btn.disabled=b; btn.textContent = b ? 'Creating account…' : 'Create Account →'; }
+  }
+  function mapErr(code) {
+    const m = {
+      'auth/email-already-in-use': 'An account with this email already exists. Try signing in.',
+      'auth/invalid-email':        'Please enter a valid email address.',
+      'auth/weak-password':        'Password must be at least 6 characters.',
+      'auth/network-request-failed': 'Network error — check your connection.',
+    };
+    return m[code] || 'Registration failed. Please try again.';
+  }
+
+  // Password strength
+  document.getElementById('reg-password')?.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const bar  = document.getElementById('pw-bar');
+    const hint = document.getElementById('pw-hint');
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^a-zA-Z0-9]/.test(val)) strength++;
+    if (val.length >= 12) strength++;
+    const pct = (strength / 4) * 100;
+    const clr = strength <= 1 ? '#ef4444' : strength <= 2 ? '#f59e0b' : '#10b981';
+    if (bar) { bar.style.width = pct + '%'; bar.style.background = clr; }
+    if (hint) {
+      hint.textContent = strength <= 1 ? 'Weak — add numbers & symbols' :
+                         strength <= 2 ? 'Fair — getting stronger' :
+                         strength <= 3 ? 'Good password' : 'Strong password ✓';
+      hint.style.color = clr;
+    }
+  });
+
+  // Password toggle
+  document.getElementById('toggle-reg-pw')?.addEventListener('click', () => {
+    const inp = document.getElementById('reg-password');
+    const s = document.getElementById('eye-show-r');
+    const h = document.getElementById('eye-hide-r');
+    if (inp.type === 'password') { inp.type='text'; s.style.display='none'; h.style.display='block'; }
+    else { inp.type='password'; s.style.display='block'; h.style.display='none'; }
+  });
+
+  async function saveUserProfile(user, extra = {}) {
+    await setDoc(doc(db, 'users', user.uid), {
+      uid:       user.uid,
+      email:     user.email,
+      name:      user.displayName || extra.name || '',
+      mobile:    extra.mobile || '',
+      photoURL:  user.photoURL || '',
+      createdAt: serverTimestamp(),
+      bookings:  [],
+      passport:  null,
+    }, { merge: true });
+  }
+
+  // Registration
+  document.getElementById('register-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrs();
+    const fname  = document.getElementById('reg-fname').value.trim();
+    const lname  = document.getElementById('reg-lname').value.trim();
+    const email  = document.getElementById('reg-email').value.trim();
+    const mobile = document.getElementById('reg-mobile').value.replace(/\s/g,'');
+    const pw     = document.getElementById('reg-password').value;
+    const terms  = document.getElementById('reg-terms')?.checked;
+    let ok = true;
+    if (!fname)  { showErr('reg-fname-err', 'First name is required'); ok=false; }
+    if (!lname)  { showErr('reg-lname-err', 'Last name is required'); ok=false; }
+    if (!email)  { showErr('reg-email-err', 'Email is required'); ok=false; }
+    if (!/^[6-9]\d{9}$/.test(mobile)) { showErr('reg-mobile-err', 'Enter a valid 10-digit Indian mobile number'); ok=false; }
+    if (pw.length < 8) { showErr('reg-password-err', 'Password must be at least 8 characters'); ok=false; }
+    if (!terms)  { const b = document.getElementById('reg-error-banner'); if(b){b.textContent='Please accept the Terms to continue';b.classList.remove('hidden');} ok=false; }
+    if (!ok) return;
+
+    setBusy(true);
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      await updateProfile(cred.user, { displayName: `${fname} ${lname}` });
+      await saveUserProfile(cred.user, { name: `${fname} ${lname}`, mobile });
+      window.location.href = '../portal/my-bookings.html?welcome=1';
+    } catch (err) {
+      const banner = document.getElementById('reg-error-banner');
+      if (banner) { banner.textContent = mapErr(err.code); banner.classList.remove('hidden'); }
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  // Google
+  document.getElementById('google-register-btn')?.addEventListener('click', async () => {
+    try {
+      const cred = await signInWithPopup(auth, google);
+      await saveUserProfile(cred.user);
+      window.location.href = '../portal/my-bookings.html?welcome=1';
+    } catch (err) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        const b = document.getElementById('reg-error-banner');
+        if(b){ b.textContent = mapErr(err.code); b.classList.remove('hidden'); }
+      }
+    }
+  });
+</script>
+</body>
+</html>
