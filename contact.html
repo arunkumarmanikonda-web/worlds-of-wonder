@@ -3,122 +3,699 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contact &amp; Support — Worlds of Wonder</title>
+  <title>Contact Us — Worlds of Wonder, Noida | Help &amp; Support</title>
+  <meta name="description" content="Contact Worlds of Wonder Noida. Call 080-6909-0000, email support@worldsofwonder.in. Get directions, park timings, emergency numbers, and submit an enquiry." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Contact Page Styles ── */
+    .ct-hero {
+      background: linear-gradient(135deg, #023d7a 0%, #0055B3 55%, #0077cc 100%);
+      padding: 120px 0 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ct-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(0,170,221,.15) 0%, transparent 70%);
+    }
+
+    .ct-hero h1 { font-family: 'Nunito', sans-serif; font-size: clamp(32px,5vw,52px); font-weight: 900; color: #fff; margin-bottom: 14px; }
+    .ct-hero p  { font-size: 17px; color: rgba(255,255,255,.8); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+    /* ── Emergency Strip ── */
+    .ct-emergency {
+      background: linear-gradient(90deg, #7B0000, #C0392B, #7B0000);
+      padding: 14px 0;
+      text-align: center;
+    }
+
+    .ct-emergency-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .ct-emergency-inner a { color: #FFD5D5; text-decoration: none; font-weight: 800; }
+    .ct-emergency-inner a:hover { color: #fff; text-decoration: underline; }
+    .ct-emg-sep { opacity: .4; }
+
+    /* ── Layout ── */
+    .ct-body { background: #F0F4FA; padding: 56px 0 80px; }
+    .ct-layout { display: grid; grid-template-columns: 1fr 420px; gap: 28px; }
+
+    /* ── Cards ── */
+    .ct-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      border: 1px solid #DDE3EE;
+      margin-bottom: 20px;
+    }
+
+    .ct-card h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #080E1E;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Contact Methods ── */
+    .ct-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .ct-method {
+      border: 1.5px solid #DDE3EE;
+      border-radius: 12px;
+      padding: 18px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      transition: border-color .2s, box-shadow .2s;
+      text-decoration: none;
+    }
+
+    .ct-method:hover { border-color: #0055B3; box-shadow: 0 2px 12px rgba(0,85,179,.1); }
+
+    .ct-method-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .ct-method-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #6B7280; margin-bottom: 4px; }
+    .ct-method-val   { font-size: 15px; font-weight: 800; color: #0055B3; margin-bottom: 2px; }
+    .ct-method-sub   { font-size: 12px; color: #6B7280; }
+
+    /* ── Form ── */
+    .ct-form { display: flex; flex-direction: column; gap: 14px; }
+
+    .ct-field { display: flex; flex-direction: column; gap: 5px; }
+
+    .ct-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1A2235;
+    }
+
+    .ct-label .req { color: #E53E3E; }
+
+    .ct-input,
+    .ct-select,
+    .ct-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #DDE3EE;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      color: #080E1E;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    .ct-input:focus,
+    .ct-select:focus,
+    .ct-textarea:focus {
+      border-color: #0055B3;
+      box-shadow: 0 0 0 3px rgba(0,85,179,.12);
+    }
+
+    .ct-input::placeholder,
+    .ct-textarea::placeholder { color: #A0AABB; }
+
+    .ct-textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+
+    .ct-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .ct-submit {
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #003D82, #0055B3);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(0,85,179,.3);
+    }
+
+    .ct-submit:hover { transform: translateY(-2px); }
+
+    /* ── Map Embed ── */
+    .ct-map-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid #DDE3EE;
+      position: relative;
+      height: 280px;
+      background: #EBF3FF;
+    }
+
+    .ct-map-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    .ct-map-placeholder {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #EBF3FF, #D0E8FF);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .ct-map-placeholder .mp-icon { font-size: 48px; }
+    .ct-map-placeholder .mp-text { font-size: 15px; font-weight: 700; color: #0055B3; }
+    .ct-map-placeholder .mp-sub  { font-size: 13px; color: #6B7280; }
+
+    /* ── Park Timings Card ── */
+    .ct-timing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F0F4FA;
+      font-size: 14px;
+    }
+
+    .ct-timing-row:last-child { border-bottom: none; }
+    .ct-timing-row .tr-day { color: #1A2235; font-weight: 600; }
+    .ct-timing-row .tr-time { font-weight: 800; color: #0055B3; }
+    .ct-timing-row.today { background: #EBF3FF; border-radius: 8px; padding: 10px 12px; margin: 0 -12px; }
+
+    /* ── Emergency Numbers ── */
+    .ct-emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .ct-emg-item {
+      background: #FFF0F0;
+      border: 1px solid rgba(229,62,62,.15);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .ct-emg-icon { font-size: 22px; flex-shrink: 0; }
+    .ct-emg-label { font-size: 11px; color: #6B7280; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .ct-emg-num   { font-size: 15px; font-weight: 800; color: #9B1C1C; }
+    .ct-emg-num a { color: inherit; text-decoration: none; }
+    .ct-emg-num a:hover { text-decoration: underline; }
+
+    /* ── FAQ Strip ── */
+    .ct-faq-item { border-bottom: 1px solid #DDE3EE; }
+    .ct-faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 14px 0;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 700;
+      color: #080E1E;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .ct-faq-a {
+      font-size: 13px;
+      color: #6B7280;
+      line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s, padding .3s;
+    }
+
+    .ct-faq-a.open { max-height: 160px; padding-bottom: 14px; }
+
+    /* ── Success Message ── */
+    .ct-success {
+      display: none;
+      background: #E6F7F1;
+      border: 1px solid rgba(10,155,95,.25);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #065C38;
+      margin-top: 14px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1000px) {
+      .ct-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .ct-method-grid { grid-template-columns: 1fr; }
+      .ct-form-grid   { grid-template-columns: 1fr; }
+      .ct-emergency-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 500px) {
+      .ct-emergency-inner { flex-direction: column; gap: 8px; text-align: center; }
+      .ct-emg-sep { display: none; }
+    }
+  </style>
 </head>
 <body>
 <div id="app">
 
-  <section class="booking-hero">
-    <div class="container">
-      <h1>📞 We're Here to Help</h1>
-      <p>Questions, booking support, group enquiries — our team responds fast, every day.</p>
+<!-- ── HERO ──────────────────────────────────────────────── -->
+<section class="ct-hero">
+  <div class="container" style="position:relative;z-index:2;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:6px 20px;font-size:13px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;">
+      📞 24x7 Support
     </div>
-  </section>
+    <h1>We're Here to Help</h1>
+    <p>Questions, feedback, group bookings, corporate enquiries — get in touch and we'll respond within a few hours.</p>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="container">
-      <div class="info-grid" style="margin-bottom:56px;">
-        <a href="tel:08069090000" class="info-card" style="cursor:pointer;text-align:center;background:linear-gradient(135deg,#f0f6ff,white);">
-          <div class="info-icon">📞</div>
-          <h3>Call Us</h3>
-          <div style="font-size:22px;font-weight:800;color:var(--wow-blue);margin:8px 0;">08069090000</div>
-          <p>Mon–Sun · 9:00 AM – 7:00 PM</p>
-        </a>
-        <a href="mailto:support@worldsofwonder.in" class="info-card" style="cursor:pointer;text-align:center;">
-          <div class="info-icon">📧</div>
-          <h3>Email Support</h3>
-          <div style="font-size:15px;font-weight:700;color:var(--wow-blue);margin:8px 0;">support@worldsofwonder.in</div>
-          <p>Response within 4 working hours</p>
-        </a>
-        <div class="info-card" style="text-align:center;">
-          <div class="info-icon">📍</div>
-          <h3>Visit Us</h3>
-          <div style="font-size:15px;font-weight:700;margin:8px 0;">A-2, Sector 38A, Noida, UP</div>
-          <p>Open daily 10:00 AM – 6:00 PM</p>
-        </div>
-      </div>
+<!-- ── EMERGENCY STRIP ──────────────────────────────────── -->
+<div class="ct-emergency">
+  <div class="ct-emergency-inner container">
+    <span>🚨 IN-PARK EMERGENCY:</span>
+    <a href="tel:+911204567890">+91-120-456-7890 (Park Control Room)</a>
+    <span class="ct-emg-sep">|</span>
+    <span>🚑 Ambulance:</span>
+    <a href="tel:108">108</a>
+    <span class="ct-emg-sep">|</span>
+    <span>🚒 Fire:</span>
+    <a href="tel:101">101</a>
+    <span class="ct-emg-sep">|</span>
+    <span>👮 Police:</span>
+    <a href="tel:100">100</a>
+  </div>
+</div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
-        <!-- Contact form -->
+<!-- ── CONTACT METHODS ──────────────────────────────────── -->
+<div style="background:#fff;padding:40px 0;border-bottom:1px solid #DDE3EE;">
+  <div class="container">
+    <div class="ct-method-grid">
+
+      <a href="tel:08069090000" class="ct-method">
+        <div class="ct-method-icon">📞</div>
         <div>
-          <h2 class="section-title" style="font-size:28px;margin-bottom:24px;">Send a Message</h2>
-          <div style="display:grid;gap:16px;">
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="label">Your name</label>
-                <input class="input" type="text" placeholder="Full name" />
+          <div class="ct-method-label">Phone</div>
+          <div class="ct-method-val">080-6909-0000</div>
+          <div class="ct-method-sub">Mon to Sun · 9:00 AM to 7:00 PM</div>
+        </div>
+      </a>
+
+      <a href="/cdn-cgi/l/email-protection#e794929797889593a79088958b83948881908889838295c98e89" class="ct-method">
+        <div class="ct-method-icon">✉️</div>
+        <div>
+          <div class="ct-method-label">Email</div>
+          <div class="ct-method-val"><span class="__cf_email__" data-cfemail="196a6c6969766b6d596e766b757d6a767f6e76777d7c6b377077">[email&#160;protected]</span></div>
+          <div class="ct-method-sub">Response within 4 working hours</div>
+        </div>
+      </a>
+
+      <a href="https://wa.me/919999000001" target="_blank" class="ct-method">
+        <div class="ct-method-icon">💬</div>
+        <div>
+          <div class="ct-method-label">WhatsApp</div>
+          <div class="ct-method-val">+91-99990-00001</div>
+          <div class="ct-method-sub">Chat with us instantly — 9 AM to 9 PM</div>
+        </div>
+      </a>
+
+      <a href="https://maps.google.com/?q=Worlds+of+Wonder+Noida" target="_blank" class="ct-method">
+        <div class="ct-method-icon">📍</div>
+        <div>
+          <div class="ct-method-label">Park Address</div>
+          <div class="ct-method-val" style="font-size:14px;line-height:1.4;">A-2, Sector 38A, Noida<br>Uttar Pradesh 201301</div>
+          <div class="ct-method-sub">Get Directions on Google Maps</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+<div class="ct-body">
+  <div class="container">
+    <div class="ct-layout">
+
+      <!-- ── LEFT: Enquiry Form + Map ── -->
+      <div>
+
+        <!-- Enquiry Form -->
+        <div class="ct-card">
+          <h3>📝 Send Us a Message</h3>
+
+          <form class="ct-form" id="ct-enquiry-form" onsubmit="submitEnquiry(event)">
+
+            <div class="ct-form-grid">
+              <div class="ct-field">
+                <label class="ct-label">Full Name <span class="req">*</span></label>
+                <input type="text" class="ct-input" id="ct-name" placeholder="Your name" required />
               </div>
-              <div class="form-group">
-                <label class="label">Mobile</label>
-                <input class="input" type="tel" placeholder="10-digit mobile" />
+              <div class="ct-field">
+                <label class="ct-label">Mobile Number <span class="req">*</span></label>
+                <input type="tel" class="ct-input" id="ct-mobile" placeholder="10-digit mobile" maxlength="10" required />
               </div>
             </div>
-            <div class="form-group">
-              <label class="label">Email</label>
-              <input class="input" type="email" placeholder="email@example.com" />
+
+            <div class="ct-field">
+              <label class="ct-label">Email Address</label>
+              <input type="email" class="ct-input" id="ct-email" placeholder="your@email.com" />
             </div>
-            <div class="form-group">
-              <label class="label">Query type</label>
-              <select class="input">
-                <option value="">Select topic</option>
-                <option>Booking &amp; tickets</option>
-                <option>Payment issues</option>
-                <option>Passport membership</option>
-                <option>Group &amp; corporate booking</option>
-                <option>Travel agent / reseller</option>
-                <option>Feedback &amp; suggestions</option>
+
+            <div class="ct-field">
+              <label class="ct-label">Enquiry Type <span class="req">*</span></label>
+              <select class="ct-select" id="ct-type" required>
+                <option value="">Select enquiry type...</option>
+                <option>General Information</option>
+                <option>Ticket Booking Help</option>
+                <option>Group / Corporate Booking</option>
+                <option>WOW Passport</option>
+                <option>School / College Trip</option>
+                <option>Birthday Party Package</option>
+                <option>Complaint or Feedback</option>
+                <option>Lost and Found</option>
+                <option>Media / Press</option>
+                <option>Career Opportunities</option>
                 <option>Other</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="label">Message</label>
-              <textarea class="input" style="min-height:120px;resize:vertical;" placeholder="How can we help?"></textarea>
+
+            <div class="ct-form-grid">
+              <div class="ct-field">
+                <label class="ct-label">Preferred Visit Date</label>
+                <input type="date" class="ct-input" id="ct-date" />
+              </div>
+              <div class="ct-field">
+                <label class="ct-label">Number of Guests</label>
+                <input type="number" class="ct-input" id="ct-guests" min="1" placeholder="e.g. 10" />
+              </div>
             </div>
-            <button class="btn btn-primary" style="width:100%;font-size:16px;padding:16px;" onclick="alert('Message sent! We\'ll get back to you within 4 working hours.')">
-              Send Message →
+
+            <div class="ct-field">
+              <label class="ct-label">Message <span class="req">*</span></label>
+              <textarea class="ct-textarea" id="ct-message" placeholder="Tell us how we can help you..." required></textarea>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#6B7280;">
+              <input type="checkbox" id="ct-consent" required style="width:18px;height:18px;min-width:18px;accent-color:#0055B3;margin-top:1px;" />
+              <label for="ct-consent">I consent to Worlds of Wonder contacting me with a response and relevant offers via call, WhatsApp, or email.</label>
+            </div>
+
+            <button type="submit" class="ct-submit">
+              Send Message — We'll Reply Within 4 Hours
             </button>
+
+            <div class="ct-success" id="ct-success-msg">
+              ✅ Thank you! Your message has been received. Our team will respond to you within 4 working hours via your preferred contact method.
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Map -->
+        <div class="ct-card">
+          <h3>🗺 Find Us</h3>
+          <div class="ct-map-wrap" id="map-container">
+            <div class="ct-map-placeholder" onclick="loadMap()">
+              <div class="mp-icon">🗺</div>
+              <div class="mp-text">Click to Load Map</div>
+              <div class="mp-sub">Worlds of Wonder · A-2 Sector 38A, Noida</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="https://maps.google.com/?q=Worlds+of+Wonder+Noida" target="_blank"
+              style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#EBF3FF;color:#0055B3;font-size:13px;font-weight:700;text-decoration:none;">
+              🗺 Open in Google Maps
+            </a>
+            <a href="https://maps.apple.com/?q=Worlds+of+Wonder+Noida" target="_blank"
+              style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#F0F0F0;color:#1A2235;font-size:13px;font-weight:700;text-decoration:none;">
+              🍎 Apple Maps
+            </a>
+          </div>
+          <!-- Getting there -->
+          <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;">
+              <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">By Metro</div>
+              <div style="font-size:13px;color:#1A2235;line-height:1.5;">Blue Line to Noida City Centre, then 15 min by auto or cab.</div>
+            </div>
+            <div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;">
+              <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">By Road</div>
+              <div style="font-size:13px;color:#1A2235;line-height:1.5;">Via NH-24 / NH-9. Follow signs to Sector 38A. Paid parking on-site.</div>
+            </div>
+            <div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;">
+              <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">By Cab/Auto</div>
+              <div style="font-size:13px;color:#1A2235;line-height:1.5;">Drop-off and pick-up zone at the main entrance gate. Ola/Uber friendly.</div>
+            </div>
+            <div style="background:#F7F9FC;border-radius:10px;padding:12px 14px;">
+              <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">Weekend Shuttle</div>
+              <div style="font-size:13px;color:#1A2235;line-height:1.5;">Free shuttle on Saturdays and Sundays from Noida City Centre Metro station.</div>
+            </div>
           </div>
         </div>
 
-        <!-- FAQ -->
-        <div id="faq">
-          <h2 class="section-title" style="font-size:28px;margin-bottom:24px;">Frequently Asked Questions</h2>
-          <div class="faq-list">
-            <div class="faq-item">
-              <div class="faq-q">Can I reschedule my visit date? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">Dated tickets are currently date-specific. Contact us at least 48 hours before your visit and our team will review rescheduling on a case-by-case basis.</div></div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">How do I use my QR ticket at the gate? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">Show the QR code on your phone at the park gate scanner. It reads in under 2 seconds. Bring a valid photo ID matching your booking name.</div></div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">How do group discounts work? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">Book 4+ tickets in a single booking and the group discount (₹50–₹125 per ticket) is automatically applied. No promo code needed.</div></div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">What happens during a weather-related closure? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">If the park closes due to weather, affected tickets are automatically rescheduled or fully refunded. You'll receive an SMS and email notification.</div></div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">What documents do I need for the Passport? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">KYC requires Aadhaar number and a selfie for digital identity verification. The process is fully online — no physical documents needed.</div></div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">Are there height restrictions on rides? <span class="faq-icon">+</span></div>
-              <div class="faq-a"><div class="faq-a-inner">Some thrill rides require a minimum height of 120cm. Family rides and kids' zones are open to all ages. Height charts are displayed at each ride entrance.</div></div>
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
-  </section>
 
-</div>
-<script src="js/shell.js"></script>
-</body>
+      <!-- ── RIGHT: Sidebar ── -->
+      <div>
+
+        <!-- Park Timings -->
+        <div class="ct-card">
+          <h3>🕙 Park Timings</h3>
+          <div id="ct-timings">
+            <div class="ct-timing-row">
+              <span class="tr-day">Monday</span>
+              <span class="tr-time">10:00 AM – 6:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Tuesday</span>
+              <span class="tr-time">10:00 AM – 6:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Wednesday</span>
+              <span class="tr-time">10:00 AM – 6:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Thursday</span>
+              <span class="tr-time">10:00 AM – 6:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Friday</span>
+              <span class="tr-time">10:00 AM – 6:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Saturday</span>
+              <span class="tr-time" style="color:#0A9B5F;">9:00 AM – 7:00 PM</span>
+            </div>
+            <div class="ct-timing-row">
+              <span class="tr-day">Sunday</span>
+              <span class="tr-time" style="color:#0A9B5F;">9:00 AM – 7:00 PM</span>
+            </div>
+          </div>
+          <div style="margin-top:14px;background:#EBF3FF;border-radius:10px;padding:10px 14px;font-size:13px;color:#0055B3;font-weight:600;">
+            ⏰ Last entry 2 hours before closing. Extended hours during holidays.
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="ct-card">
+          <h3>🔗 Quick Links</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="book/water-park.html" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F7F9FC;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;color:#1A2235;border:1px solid #DDE3EE;">
+              <span>🌊 Book Water Park Tickets</span>
+              <span style="color:#0055B3;">₹1,299 →</span>
+            </a>
+            <a href="book/amusement-park.html" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F7F9FC;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;color:#1A2235;border:1px solid #DDE3EE;">
+              <span>🎢 Book Amusement Park</span>
+              <span style="color:#5E35B1;">₹1,199 →</span>
+            </a>
+            <a href="book/combo.html" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F7F9FC;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;color:#1A2235;border:1px solid #DDE3EE;">
+              <span>🏆 Book Combo — Both Parks</span>
+              <span style="color:#0A7A4E;">₹1,999 →</span>
+            </a>
+            <a href="book/group.html" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#F7F9FC;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;color:#1A2235;border:1px solid #DDE3EE;">
+              <span>👥 Group Booking (10+ guests)</span>
+              <span style="color:#D4380D;">Get Quote →</span>
+            </a>
+            <a href="passport.html" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#FFF8E6;border-radius:10px;text-decoration:none;font-size:14px;font-weight:700;color:#1A2235;border:1px solid rgba(184,134,11,.2);">
+              <span>⭐ WOW Annual Passport</span>
+              <span style="color:#B8860B;">₹4,999 →</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Emergency Numbers -->
+        <div class="ct-card" style="border-top:3px solid #E53E3E;">
+          <h3 style="color:#9B1C1C;">🚨 Emergency Numbers</h3>
+          <div class="ct-emergency-grid">
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">🚒</div>
+              <div>
+                <div class="ct-emg-label">Fire Service</div>
+                <div class="ct-emg-num"><a href="tel:101">101</a></div>
+              </div>
+            </div>
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">🚑</div>
+              <div>
+                <div class="ct-emg-label">Ambulance</div>
+                <div class="ct-emg-num"><a href="tel:108">108</a></div>
+              </div>
+            </div>
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">👮</div>
+              <div>
+                <div class="ct-emg-label">Police</div>
+                <div class="ct-emg-num"><a href="tel:100">100</a></div>
+              </div>
+            </div>
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">🏥</div>
+              <div>
+                <div class="ct-emg-label">Women Helpline</div>
+                <div class="ct-emg-num"><a href="tel:1091">1091</a></div>
+              </div>
+            </div>
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">🏟</div>
+              <div>
+                <div class="ct-emg-label">Park Control Room</div>
+                <div class="ct-emg-num"><a href="tel:+911204567890">0120-456-7890</a></div>
+              </div>
+            </div>
+            <div class="ct-emg-item">
+              <div class="ct-emg-icon">🩺</div>
+              <div>
+                <div class="ct-emg-label">Park First Aid</div>
+                <div class="ct-emg-num"><a href="tel:08069090000">080-6909-0000</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support FAQ -->
+        <div class="ct-card">
+          <h3>❓ Common Questions</h3>
+          <div>
+            <div class="ct-faq-item">
+              <button class="ct-faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+                Can I get a refund on tickets? <span>+</span>
+              </button>
+              <div class="ct-faq-a">
+                Day-entry tickets are non-refundable. However, if the park closes due to weather or operational reasons, a full credit will be issued valid for 60 days.
+              </div>
+            </div>
+            <div class="ct-faq-item">
+              <button class="ct-faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+                Are re-entries allowed? <span>+</span>
+              </button>
+              <div class="ct-faq-a">
+                No, re-entries are not permitted once you exit the park for day-entry tickets. Passport holders may exit and re-enter on the same day.
+              </div>
+            </div>
+            <div class="ct-faq-item">
+              <button class="ct-faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+                Is outside food allowed? <span>+</span>
+              </button>
+              <div class="ct-faq-a">
+                Outside food and beverages are not permitted. Multiple dining options including vegetarian, non-vegetarian, and snack kiosks are available inside the park.
+              </div>
+            </div>
+            <div class="ct-faq-item">
+              <button class="ct-faq-q" onclick="this.nextElementSibling.classList.toggle('open')">
+                How do I reschedule my booking? <span>+</span>
+              </button>
+              <div class="ct-faq-a">
+                Contact our helpline at 080-6909-0000 at least 24 hours before your visit date. A one-time reschedule is permitted subject to availability.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div><!-- /ct-body -->
+
+</div><!-- /app -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/shell.js"></script>
+<script>
+// Highlight today's timing
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const today = days[new Date().getDay()];
+document.querySelectorAll('.ct-timing-row .tr-day').forEach(el => {
+  if (el.textContent === today) {
+    el.closest('.ct-timing-row').classList.add('today');
+    el.textContent = today + ' (Today)';
+  }
+});
+
+// Set minimum date to tomorrow
+const dateInput = document.getElementById('ct-date');
+if (dateInput) {
+  const tmr = new Date();
+  tmr.setDate(tmr.getDate() + 1);
+  dateInput.min = tmr.toISOString().split('T')[0];
+}
+
+// Load Map
+function loadMap() {
+  const container = document.getElementById('map-container');
+  container.innerHTML = `<iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3506.0!2d77.3551!3d28.5355!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce77f92df36b5%3A0xee57ae82d15e0de1!2sWorlds%20of%20Wonder!5e0!3m2!1sen!2sin!4v1620000000000"
+    width="100%" height="280" style="border:none;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+  </iframe>`;
+}
+
+// Form submission
+function submitEnquiry(e) {
+  e.preventDefault();
+  const btn = document.querySelector('.ct-submit');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  // Simulate API call
+  setTimeout(() => {
+    document.getElementById('ct-success-msg').style.display = 'block';
+    document.getElementById('ct-enquiry-form').reset();
+    btn.textContent = '✅ Message Sent!';
+    btn.style.background = 'linear-gradient(135deg,#065C38,#0A9B5F)';
+    setTimeout(() => {
+      btn.textContent = 'Send Another Message';
+      btn.disabled = false;
+      btn.style.background = '';
+      document.getElementById('ct-success-msg').style.display = 'none';
+    }, 5000);
+  }, 1500);
+}
+</script>
+
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
