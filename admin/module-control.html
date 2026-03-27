@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module Control — WOW Super Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/wow-design-system.css" />
+  <style>
+    body { background: #0a0f1e; font-family: 'Inter', sans-serif; color: #e2e8f0; min-height: 100vh; }
+
+    .admin-layout { display: flex; min-height: 100vh; }
+
+    .admin-sidebar {
+      width: 240px;
+      background: #060b17;
+      border-right: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
+      padding: 24px 0;
+    }
+
+    .admin-sidebar-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 16px;
+    }
+
+    .admin-sidebar-logo img { height: 40px; filter: brightness(0) invert(1); opacity: .85; }
+
+    .admin-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,.5);
+      text-decoration: none;
+      border-radius: 8px;
+      margin: 2px 8px;
+      transition: all .15s;
+    }
+
+    .admin-nav-link:hover { background: rgba(255,255,255,.07); color: rgba(255,255,255,.85); }
+    .admin-nav-link.active { background: rgba(0,85,179,.25); color: #60A5FA; }
+    .admin-nav-link .nl-icon { font-size: 16px; }
+
+    .admin-main { flex: 1; overflow: auto; }
+
+    .admin-topbar {
+      background: #060b17;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .admin-topbar h1 { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
+    .admin-topbar p  { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 1px; }
+
+    .admin-content { padding: 28px; }
+
+    /* Module Cards */
+    .module-group { margin-bottom: 36px; }
+
+    .module-group-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    .module-card {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color .2s;
+    }
+
+    .module-card:hover { border-color: rgba(255,255,255,.15); }
+
+    .module-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .module-info { flex: 1; }
+    .module-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .module-desc { font-size: 12px; color: rgba(255,255,255,.45); line-height: 1.4; margin-bottom: 8px; }
+
+    .module-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .module-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .tag-core     { background: rgba(59,130,246,.15); color: #60A5FA; }
+    .tag-optional { background: rgba(245,168,0,.15);  color: #F5D679; }
+    .tag-beta     { background: rgba(139,92,246,.15);  color: #C4B5FD; }
+    .tag-new      { background: rgba(16,185,129,.15);  color: #6EE7B7; }
+
+    /* Toggle Switch */
+    .toggle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 30px;
+      background: rgba(255,255,255,.12);
+      transition: background .25s;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.45);
+      transition: transform .25s, background .25s;
+    }
+
+    .toggle input:checked + .toggle-slider { background: rgba(0,85,179,.7); border-color: #0055B3; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: #fff; }
+
+    .toggle-status { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.35); }
+    .toggle-status.on { color: #6EE7B7; }
+
+    /* Save Bar */
+    .save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 240px;
+      right: 0;
+      background: #111827;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    .save-bar p { font-size: 13px; color: rgba(255,255,255,.5); }
+
+    .btn-save {
+      padding: 10px 28px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg,#003D82,#0055B3);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(0,85,179,.3);
+    }
+
+    .btn-save:hover { transform: translateY(-1px); }
+
+    /* Change count badge */
+    .changes-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #E53E3E;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <nav class="admin-sidebar">
+    <div class="admin-sidebar-logo">
+      <img src="../images/logo.png" alt="WOW Admin" />
+    </div>
+    <a href="index.html" class="admin-nav-link"><span class="nl-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="admin-nav-link"><span class="nl-icon">🎫</span> Bookings</a>
+    <a href="crm.html" class="admin-nav-link"><span class="nl-icon">👥</span> CRM</a>
+    <a href="products.html" class="admin-nav-link"><span class="nl-icon">🏷</span> Products</a>
+    <a href="offers.html" class="admin-nav-link"><span class="nl-icon">🎁</span> Offers</a>
+    <a href="passport.html" class="admin-nav-link"><span class="nl-icon">⭐</span> Passports</a>
+    <a href="finance.html" class="admin-nav-link"><span class="nl-icon">💰</span> Finance</a>
+    <a href="reporting.html" class="admin-nav-link"><span class="nl-icon">📈</span> Reports</a>
+    <a href="partners.html" class="admin-nav-link"><span class="nl-icon">🤝</span> Partners</a>
+    <a href="gate.html" class="admin-nav-link"><span class="nl-icon">🚪</span> Gate / QR</a>
+    <a href="users.html" class="admin-nav-link"><span class="nl-icon">👤</span> Users</a>
+    <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
+    <a href="module-control.html" class="admin-nav-link active"><span class="nl-icon">⚙️</span> Module Control</a>
+    <a href="api-secrets.html" class="admin-nav-link"><span class="nl-icon">🔑</span> API Secrets</a>
+    <a href="settings.html" class="admin-nav-link"><span class="nl-icon">🛠</span> Settings</a>
+  </nav>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1>Module Control <span class="changes-badge" id="changes-count" style="display:none;">0</span></h1>
+        <p>Toggle any platform module on or off. Changes take effect immediately after saving.</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="resetAll()" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;">Reset to Default</button>
+        <button onclick="saveModules()" class="btn-save">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="admin-content" style="padding-bottom:80px;">
+
+      <!-- Core Revenue Modules -->
+      <div class="module-group">
+        <div class="module-group-title">Core Revenue Modules</div>
+        <div class="module-grid" id="mg-core"></div>
+      </div>
+
+      <!-- Customer Features -->
+      <div class="module-group">
+        <div class="module-group-title">Customer-Facing Features</div>
+        <div class="module-grid" id="mg-customer"></div>
+      </div>
+
+      <!-- Operations -->
+      <div class="module-group">
+        <div class="module-group-title">Operations and Staff</div>
+        <div class="module-grid" id="mg-ops"></div>
+      </div>
+
+      <!-- Integrations -->
+      <div class="module-group">
+        <div class="module-group-title">Integrations and API</div>
+        <div class="module-grid" id="mg-integrations"></div>
+      </div>
+
+      <!-- Marketing -->
+      <div class="module-group">
+        <div class="module-group-title">Marketing and Communications</div>
+        <div class="module-grid" id="mg-marketing"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Save Bar -->
+<div class="save-bar">
+  <p id="save-status">All changes saved. Last saved: <span id="last-saved">Just now</span></p>
+  <button class="btn-save" onclick="saveModules()">💾 Save All Changes</button>
+</div>
+
+<script>
+const MODULES = {
+  core: [
+    { id:'water_ticketing', name:'Water Park Ticketing', icon:'🌊', iconBg:'rgba(0,119,204,.2)', desc:'Online ticket sales, QR issuance, and gate scan for Water Park.', tags:['core'], default:true },
+    { id:'amusement_ticketing', name:'Amusement Park Ticketing', icon:'🎢', iconBg:'rgba(94,53,177,.2)', desc:'Online ticket sales, QR issuance, and gate scan for Amusement Park.', tags:['core'], default:true },
+    { id:'combo_ticketing', name:'Combo Ticket Engine', icon:'🏆', iconBg:'rgba(10,122,78,.2)', desc:'Combined both-park ticket with ₹499 savings. Configurable pricing.', tags:['core'], default:true },
+    { id:'payment_gateway', name:'Payment Gateway', icon:'💳', iconBg:'rgba(0,85,179,.2)', desc:'UPI, Card, Net Banking, Wallet payment processing via Razorpay.', tags:['core'], default:true },
+    { id:'gst_engine', name:'GST Auto-Compute Engine', icon:'📊', iconBg:'rgba(0,123,181,.2)', desc:'Automatic GST calculation, reverse-computation, and invoice generation.', tags:['core'], default:true },
+    { id:'booking_confirmation', name:'Booking Confirmation SMS/Email', icon:'✉️', iconBg:'rgba(10,155,95,.2)', desc:'Instant confirmation messages after successful payment.', tags:['core'], default:true },
+  ],
+  customer: [
+    { id:'passport_system', name:'WOW Passport (Annual Pass)', icon:'⭐', iconBg:'rgba(184,134,11,.2)', desc:'Annual membership with KYC, digital activation, renewal engine.', tags:['optional'], default:true },
+    { id:'loyalty_program', name:'Loyalty Points Program', icon:'🏅', iconBg:'rgba(245,168,0,.2)', desc:'Earn WOW points on every visit and purchase. Redeem for discounts.', tags:['optional','new'], default:false },
+    { id:'guest_booking', name:'Guest Booking (No Login)', icon:'👤', iconBg:'rgba(100,100,100,.2)', desc:'Allow users to book without creating an account. Mobile OTP only.', tags:['optional'], default:true },
+    { id:'social_login', name:'Social Login (Google/Instagram)', icon:'🔑', iconBg:'rgba(234,67,53,.2)', desc:'One-tap login via Google or Instagram. Collects name and mobile.', tags:['optional'], default:true },
+    { id:'reschedule_cancel', name:'Reschedule and Cancel Flow', icon:'📅', iconBg:'rgba(0,85,179,.2)', desc:'Self-service reschedule (24h notice) and credit issuance on cancellation.', tags:['optional'], default:true },
+    { id:'whatsapp_ticket', name:'WhatsApp QR Ticket Delivery', icon:'💬', iconBg:'rgba(37,211,102,.2)', desc:'Automatic ticket delivery to WhatsApp after booking confirmation.', tags:['optional'], default:true },
+    { id:'flash_offers', name:'Flash Offers and Countdown Timers', icon:'⚡', iconBg:'rgba(245,168,0,.2)', desc:'Time-limited offer banners with live countdown on the offers page.', tags:['optional'], default:true },
+    { id:'weather_widget', name:'Live Weather Widget', icon:'🌤', iconBg:'rgba(0,170,221,.2)', desc:'Real-time Noida weather on homepage and park pages.', tags:['optional'], default:true },
+  ],
+  ops: [
+    { id:'gate_scanner', name:'Gate QR Scanner', icon:'📲', iconBg:'rgba(10,155,95,.2)', desc:'Mobile-friendly QR scanner for gate staff. Works offline with sync.', tags:['core'], default:true },
+    { id:'capacity_mgmt', name:'Capacity Management', icon:'🏟', iconBg:'rgba(0,85,179,.2)', desc:'Daily slot limits, sold-out detection, auto-close when capacity reached.', tags:['core'], default:true },
+    { id:'dual_park_config', name:'Dual Park Configuration', icon:'⚙️', iconBg:'rgba(94,53,177,.2)', desc:'Individual settings for Water Park and Amusement Park (prices, timings, rules).', tags:['core'], default:true },
+    { id:'group_booking', name:'Group Booking Engine', icon:'👥', iconBg:'rgba(212,56,13,.2)', desc:'Custom quotes, bulk invoicing, chaperone coordination for 10+ guests.', tags:['optional'], default:true },
+    { id:'fnb_packages', name:'F&B Package Manager', icon:'🍔', iconBg:'rgba(139,69,19,.2)', desc:'Import F&B packages via CSV. Push combos to customer booking flow.', tags:['optional'], default:false },
+    { id:'crm_module', name:'CRM and Call Centre', icon:'📞', iconBg:'rgba(0,123,181,.2)', desc:'Full CRM with ticket management, escalation matrix, and call logging.', tags:['core'], default:true },
+    { id:'partner_portal', name:'Partner and Reseller Portal', icon:'🤝', iconBg:'rgba(10,122,78,.2)', desc:'Travel agent onboarding, KYC, commission management, and bulk tickets.', tags:['optional'], default:true },
+  ],
+  integrations: [
+    { id:'razorpay', name:'Razorpay Payment Integration', icon:'💳', iconBg:'rgba(0,85,179,.2)', desc:'Primary payment gateway. Fallback to manual if disabled.', tags:['core'], default:true },
+    { id:'twilio_whatsapp', name:'Twilio WhatsApp API', icon:'💬', iconBg:'rgba(37,211,102,.2)', desc:'WhatsApp message delivery for tickets, offers, and reminders.', tags:['optional'], default:true },
+    { id:'msg91_sms', name:'MSG91 SMS Gateway', icon:'📱', iconBg:'rgba(245,168,0,.2)', desc:'SMS OTP, booking confirmations, and passport expiry reminders.', tags:['optional'], default:true },
+    { id:'sendgrid_email', name:'SendGrid Email Service', icon:'✉️', iconBg:'rgba(0,123,181,.2)', desc:'Transactional emails for tickets, invoices, and newsletters.', tags:['optional'], default:true },
+    { id:'google_analytics', name:'Google Analytics 4', icon:'📈', iconBg:'rgba(234,67,53,.2)', desc:'Website tracking, conversion events, and revenue reporting.', tags:['optional'], default:true },
+    { id:'salesforce_sync', name:'Salesforce ERP Sync', icon:'☁️', iconBg:'rgba(0,168,255,.2)', desc:'Real-time sync of bookings, customers, and revenue to Salesforce.', tags:['optional','beta'], default:false },
+    { id:'digi_locker', name:'DigiLocker KYC', icon:'🔐', iconBg:'rgba(10,122,78,.2)', desc:'Government DigiLocker for document-free Aadhaar-based KYC.', tags:['beta'], default:false },
+  ],
+  marketing: [
+    { id:'push_notifications', name:'Web Push Notifications', icon:'🔔', iconBg:'rgba(245,168,0,.2)', desc:'Browser push alerts for flash sales and new ride announcements.', tags:['optional'], default:false },
+    { id:'email_campaigns', name:'Email Marketing Campaigns', icon:'📧', iconBg:'rgba(0,123,181,.2)', desc:'Segmented email blasts for school holidays, weekends, and events.', tags:['optional'], default:true },
+    { id:'sms_campaigns', name:'Bulk SMS Campaigns', icon:'📲', iconBg:'rgba(10,155,95,.2)', desc:'Weather-triggered and holiday SMS campaigns for past visitors.', tags:['optional'], default:true },
+    { id:'whatsapp_campaigns', name:'WhatsApp Broadcast', icon:'💬', iconBg:'rgba(37,211,102,.2)', desc:'Send personalised Hinglish offers to opted-in customers via WhatsApp.', tags:['optional','new'], default:false },
+    { id:'promo_codes', name:'Promo Code Engine', icon:'🎟', iconBg:'rgba(184,134,11,.2)', desc:'Generate, track, and limit-use promotional discount codes.', tags:['optional'], default:true },
+    { id:'referral_program', name:'Referral Program', icon:'🤝', iconBg:'rgba(94,53,177,.2)', desc:'Share-and-earn referral links. Friends get ₹100 off first booking.', tags:['beta'], default:false },
+  ]
+};
+
+let moduleState = {};
+let changeCount = 0;
+
+function renderModules() {
+  Object.entries(MODULES).forEach(([group, mods]) => {
+    const container = document.getElementById('mg-' + group);
+    if (!container) return;
+    container.innerHTML = mods.map(m => {
+      const isOn = moduleState[m.id] !== undefined ? moduleState[m.id] : m.default;
+      return `
+        <div class="module-card" id="card-${m.id}">
+          <div class="module-icon" style="background:${m.iconBg};">${m.icon}</div>
+          <div class="module-info">
+            <div class="module-name">${m.name}</div>
+            <div class="module-desc">${m.desc}</div>
+            <div class="module-meta">
+              ${m.tags.map(t => `<span class="module-tag tag-${t}">${t}</span>`).join('')}
+            </div>
+          </div>
+          <div class="toggle-wrap">
+            <label class="toggle" title="${isOn ? 'Enabled' : 'Disabled'}">
+              <input type="checkbox" ${isOn ? 'checked' : ''} onchange="toggleModule('${m.id}',this)" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-status ${isOn ? 'on' : ''}" id="status-${m.id}">${isOn ? 'ON' : 'OFF'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+function toggleModule(id, input) {
+  moduleState[id] = input.checked;
+  const status = document.getElementById('status-' + id);
+  if (status) {
+    status.textContent = input.checked ? 'ON' : 'OFF';
+    status.className = 'toggle-status ' + (input.checked ? 'on' : '');
+  }
+  updateChangeCount();
+}
+
+function updateChangeCount() {
+  changeCount = Object.keys(moduleState).length;
+  const badge = document.getElementById('changes-count');
+  const bar = document.getElementById('save-status');
+  if (changeCount > 0) {
+    badge.textContent = changeCount;
+    badge.style.display = 'inline-flex';
+    if (bar) bar.innerHTML = `<span style="color:#F5D679;font-weight:700;">${changeCount} unsaved change${changeCount>1?'s':''}.</span> Click Save to apply.`;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function saveModules() {
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = '⏳ Saving...';
+  setTimeout(() => {
+    localStorage.setItem('wow_module_state', JSON.stringify(moduleState));
+    changeCount = 0;
+    moduleState = {};
+    const badge = document.getElementById('changes-count');
+    badge.style.display = 'none';
+    btn.textContent = '✅ Saved!';
+    document.getElementById('save-status').innerHTML = 'All changes saved. Last saved: <span id="last-saved">' + new Date().toLocaleTimeString('en-IN') + '</span>';
+    setTimeout(() => { btn.textContent = '💾 Save All Changes'; }, 2000);
+  }, 800);
+}
+
+function resetAll() {
+  if (!confirm('Reset all modules to default settings?')) return;
+  moduleState = {};
+  document.querySelectorAll('.toggle input').forEach(input => {
+    const id = input.closest('.module-card').id.replace('card-', '');
+    let allMods = Object.values(MODULES).flat();
+    const mod = allMods.find(m => m.id === id);
+    if (mod) {
+      input.checked = mod.default;
+      const status = document.getElementById('status-' + id);
+      if (status) { status.textContent = mod.default ? 'ON' : 'OFF'; status.className = 'toggle-status ' + (mod.default ? 'on' : ''); }
+    }
+  });
+  updateChangeCount();
+}
+
+// Load saved state
+const saved = localStorage.getItem('wow_module_state');
+if (saved) {
+  try { moduleState = JSON.parse(saved); } catch(e) {}
+}
+
+renderModules();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
