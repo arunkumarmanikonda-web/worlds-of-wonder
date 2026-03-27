@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notification Templates — WOW Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/wow-design-system.css" />
+  <style>
+    body { background:#0a0f1e; font-family:'Inter',sans-serif; color:#e2e8f0; min-height:100vh; }
+    .admin-layout { display:flex; min-height:100vh; }
+    .admin-sidebar { width:240px; background:#060b17; border-right:1px solid rgba(255,255,255,.06); flex-shrink:0; padding:24px 0; }
+    .admin-sidebar-logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,.06); margin-bottom:16px; }
+    .admin-sidebar-logo img { height:40px; filter:brightness(0) invert(1); opacity:.85; }
+    .admin-nav-link { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; font-weight:600; color:rgba(255,255,255,.5); text-decoration:none; border-radius:8px; margin:2px 8px; transition:all .15s; }
+    .admin-nav-link:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
+    .admin-nav-link.active { background:rgba(0,85,179,.25); color:#60A5FA; }
+    .admin-main { flex:1; overflow:auto; }
+    .admin-topbar { background:#060b17; border-bottom:1px solid rgba(255,255,255,.06); padding:16px 28px; position:sticky; top:0; z-index:10; }
+    .admin-topbar h1 { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; }
+    .admin-topbar p  { font-size:12px; color:rgba(255,255,255,.4); margin-top:1px; }
+    .admin-content { padding:28px; }
+
+    /* Channel Tabs */
+    .ch-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+    .ch-tab { display:flex; align-items:center; gap:6px; padding:8px 18px; border-radius:10px; border:1.5px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); font-size:13px; font-weight:600; color:rgba(255,255,255,.5); cursor:pointer; transition:all .15s; font-family:'Inter',sans-serif; }
+    .ch-tab:hover { border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.8); }
+    .ch-tab.active { background:rgba(0,85,179,.2); border-color:#0055B3; color:#60A5FA; }
+
+    /* Template Grid */
+    .tpl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:16px; }
+
+    .tpl-card {
+      background:#111827; border:1px solid rgba(255,255,255,.07); border-radius:14px; overflow:hidden; transition:border-color .2s;
+    }
+    .tpl-card:hover { border-color:rgba(255,255,255,.15); }
+
+    .tpl-head { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:10px; }
+    .tpl-icon { font-size:18px; }
+    .tpl-name { font-size:13px; font-weight:700; color:#fff; flex:1; }
+    .tpl-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+    .tpl-status.active { background:rgba(16,185,129,.15); color:#6EE7B7; }
+    .tpl-status.draft  { background:rgba(245,168,0,.15); color:#F5D679; }
+    .tpl-status.off    { background:rgba(100,100,100,.15); color:#9CA3AF; }
+
+    .tpl-body { padding:14px 16px; }
+
+    .tpl-preview {
+      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:8px;
+      padding:12px 14px; font-size:12px; color:rgba(255,255,255,.7); line-height:1.6;
+      margin-bottom:12px; font-family:'Courier New',monospace; white-space:pre-wrap;
+      word-break:break-word; max-height:100px; overflow:auto;
+    }
+
+    .tpl-vars { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+    .tpl-var { font-size:10px; background:rgba(0,85,179,.2); color:#7DD3FC; padding:2px 8px; border-radius:20px; font-family:'Courier New',monospace; }
+
+    .tpl-actions { display:flex; gap:8px; }
+    .tpl-btn { padding:6px 14px; border-radius:7px; border:none; font-size:12px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .15s; }
+    .tpl-btn-edit { background:rgba(0,85,179,.2); color:#7DD3FC; border:1px solid rgba(0,85,179,.3); }
+    .tpl-btn-test { background:rgba(16,185,129,.15); color:#6EE7B7; border:1px solid rgba(16,185,129,.2); }
+    .tpl-btn-toggle { background:rgba(255,255,255,.07); color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.1); }
+
+    /* Edit Modal */
+    .tpl-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:200; align-items:center; justify-content:center; }
+    .tpl-modal.open { display:flex; }
+    .tpl-modal-box { background:#111827; border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:28px; max-width:600px; width:95%; max-height:90vh; overflow:auto; }
+    .tpl-modal-title { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; margin-bottom:16px; }
+    .tpl-textarea { width:100%; padding:12px 14px; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; color:#fff; font-family:'Courier New',monospace; font-size:13px; min-height:160px; outline:none; resize:vertical; }
+    .tpl-textarea:focus { border-color:#0055B3; }
+    .tpl-save-btn { padding:10px 24px; border-radius:10px; border:none; background:linear-gradient(135deg,#003D82,#0055B3); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; margin-top:14px; }
+    .tpl-close-btn { padding:10px 20px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:transparent; color:rgba(255,255,255,.5); font-size:13px; cursor:pointer; margin-top:14px; margin-right:8px; font-family:'Inter',sans-serif; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="admin-sidebar-logo"><img src="../images/logo.png" alt="WOW Admin" /></div>
+    <a href="index.html" class="admin-nav-link">📊 Dashboard</a>
+    <a href="crm.html" class="admin-nav-link">👥 CRM</a>
+    <a href="bookings.html" class="admin-nav-link">🎫 Bookings</a>
+    <a href="settings.html" class="admin-nav-link">🛠 Settings</a>
+    <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
+    <a href="module-control.html" class="admin-nav-link">⚙️ Module Control</a>
+    <a href="api-secrets.html" class="admin-nav-link">🔑 API Secrets</a>
+    <a href="notifications.html" class="admin-nav-link active">🔔 Notifications</a>
+  </nav>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1>🔔 Notification Templates</h1>
+        <p>Manage WhatsApp, SMS, and Email templates for all customer communications. Variables shown in {braces}.</p>
+      </div>
+      <button onclick="openNewTemplate()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#003D82,#0055B3);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">+ New Template</button>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- Channel Tabs -->
+      <div class="ch-tabs">
+        <button class="ch-tab active" onclick="filterChannel('all',this)">🔔 All Templates</button>
+        <button class="ch-tab" onclick="filterChannel('whatsapp',this)">💬 WhatsApp</button>
+        <button class="ch-tab" onclick="filterChannel('sms',this)">📱 SMS</button>
+        <button class="ch-tab" onclick="filterChannel('email',this)">✉️ Email</button>
+        <button class="ch-tab" onclick="filterChannel('push',this)">🔔 Push</button>
+      </div>
+
+      <div class="tpl-grid" id="tpl-grid">
+        <!-- Rendered by JS -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="tpl-modal" id="tpl-modal">
+  <div class="tpl-modal-box">
+    <div class="tpl-modal-title" id="modal-title">Edit Template</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px;">Available variables:</div>
+    <div id="modal-vars" class="tpl-vars" style="margin-bottom:14px;"></div>
+    <label style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;">Template Body</label>
+    <textarea class="tpl-textarea" id="modal-body"></textarea>
+    <div>
+      <button class="tpl-close-btn" onclick="closeModal()">Cancel</button>
+      <button class="tpl-save-btn" onclick="saveTemplate()">💾 Save Template</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEMPLATES = [
+  {
+    id:'bk-confirm-wa', channel:'whatsapp', icon:'💬', name:'Booking Confirmed (WhatsApp)',
+    status:'active', trigger:'On successful payment',
+    body:`🎉 *Booking Confirmed!*
+Hi {guest_name}, your WOW tickets are ready!
+
+📅 *Visit Date:* {visit_date}
+🎫 *Park:* {park_name}
+👥 *Guests:* {ticket_summary}
+💰 *Total Paid:* ₹{total_amount}
+🎫 *Booking ID:* {booking_id}
+
+Your QR ticket is attached. Show it at the gate!
+
+📍 A-2, Sector 38A, Noida | 🕙 10AM–6PM
+Need help? Call 080-6909-0000
+
+Have a WOW day! 🌊🎢`,
+    vars:['{guest_name}','{visit_date}','{park_name}','{ticket_summary}','{total_amount}','{booking_id}']
+  },
+  {
+    id:'bk-confirm-sms', channel:'sms', icon:'📱', name:'Booking Confirmed (SMS)',
+    status:'active', trigger:'On successful payment',
+    body:`WOW! Booking confirmed for {guest_name}. Date: {visit_date}. Tickets: {ticket_summary}. ID: {booking_id}. Show QR at gate. Helpline: 080-6909-0000`,
+    vars:['{guest_name}','{visit_date}','{ticket_summary}','{booking_id}']
+  },
+  {
+    id:'passport-activate-wa', channel:'whatsapp', icon:'💬', name:'Passport Activated (WhatsApp)',
+    status:'active', trigger:'On KYC approval',
+    body:`⭐ *Your WOW Passport is Active!*
+Congratulations {member_name}!
+
+Your annual passport is now valid until *{expiry_date}*.
+🪪 *Passport ID:* {passport_id}
+🏟 *Access:* Both Parks | Unlimited Visits
+
+Show this message + your ID at the passport lane for priority entry.
+
+Welcome to the WOW Family! 🎉`,
+    vars:['{member_name}','{expiry_date}','{passport_id}']
+  },
+  {
+    id:'passport-expiry-wa', channel:'whatsapp', icon:'💬', name:'Passport Expiry Reminder (WhatsApp)',
+    status:'active', trigger:'30 days before expiry',
+    body:`⏰ *WOW Passport Expiring Soon!*
+Hi {member_name},
+
+Your WOW Passport expires on *{expiry_date}* — just {days_left} days left!
+
+🔄 Renew now and get ₹500 off as a loyalty reward.
+
+👉 Renew at: worldsofwonder.in/passport
+Or call: 080-6909-0000
+
+Keep the WOW going! 🌊🎢`,
+    vars:['{member_name}','{expiry_date}','{days_left}']
+  },
+  {
+    id:'flash-offer-wa', channel:'whatsapp', icon:'💬', name:'Flash Offer Alert (WhatsApp)',
+    status:'active', trigger:'Manual trigger / Campaign',
+    body:`⚡ *FLASH OFFER — Expires Tonight!*
+Hi {guest_name},
+
+WOW Weekend Special 🎉
+
+💰 *{discount_percent}% OFF* on {park_name} tickets
+🎟 Use code: *{promo_code}*
+⏰ Valid till: {offer_expiry}
+
+🔗 Book now: worldsofwonder.in
+Min. {min_tickets} tickets. Hurry — limited slots!
+
+Reply STOP to opt out.`,
+    vars:['{guest_name}','{discount_percent}','{park_name}','{promo_code}','{offer_expiry}','{min_tickets}']
+  },
+  {
+    id:'weather-trigger-wa', channel:'whatsapp', icon:'💬', name:'Weather Trigger (WhatsApp)',
+    status:'active', trigger:'When temp > 35°C or sunny weekend',
+    body:`☀️ *Perfect Water Park Day in Noida!*
+Hi {guest_name},
+
+It's going to be *{temperature}°C* this {day_name}! 🌊
+
+Why not splash into WOW Water Park?
+🎟 Tickets from ₹1,299 | Open 10AM–6PM
+
+👉 Book now: worldsofwonder.in/book
+Use code *SUNNY50* for ₹50 off today!
+
+See you at the Wave Pool! 🌊`,
+    vars:['{guest_name}','{temperature}','{day_name}']
+  },
+  {
+    id:'otp-sms', channel:'sms', icon:'📱', name:'OTP Verification (SMS)',
+    status:'active', trigger:'On mobile verification',
+    body:`{otp} is your WOW verification OTP. Valid for 10 minutes. Do not share this with anyone. - Worlds of Wonder`,
+    vars:['{otp}']
+  },
+  {
+    id:'bk-confirm-email', channel:'email', icon:'✉️', name:'Booking Confirmation (Email)',
+    status:'active', trigger:'On successful payment',
+    body:`Subject: Your WOW Tickets are Confirmed! Booking #{booking_id}
+
+Dear {guest_name},
+
+Thank you for booking with Worlds of Wonder!
+
+BOOKING SUMMARY
+----------------
+Park: {park_name}
+Visit Date: {visit_date}
+Tickets: {ticket_summary}
+Total Paid: ₹{total_amount} (incl. 18% GST)
+Booking ID: {booking_id}
+
+Your QR e-ticket is attached. Please show it at the gate.
+Keep your Booking ID safe for any queries.
+
+PARK TIMINGS: 10:00 AM to 6:00 PM | Last Entry: 4:00 PM
+ADDRESS: A-2, Sector 38A, Noida, UP 201301
+
+NEED HELP? Call 080-6909-0000 or email support@worldsofwonder.in
+
+See you soon!
+Team Worlds of Wonder`,
+    vars:['{guest_name}','{booking_id}','{park_name}','{visit_date}','{ticket_summary}','{total_amount}']
+  },
+  {
+    id:'reminder-24h-wa', channel:'whatsapp', icon:'💬', name:'Visit Reminder 24h (WhatsApp)',
+    status:'active', trigger:'24 hours before visit date',
+    body:`🌊 *Reminder: Your WOW Visit is TOMORROW!*
+Hi {guest_name},
+
+Get ready for an epic day! 🎢
+
+📅 Date: *{visit_date}*
+🎫 Park: *{park_name}*
+📱 Your QR: Ready to scan at gate
+🕙 Opens at 10:00 AM — Last entry 4:00 PM
+
+🧴 Remember: Bring sunscreen, swimwear, and a valid photo ID!
+
+See you tomorrow! 🌊🎉`,
+    vars:['{guest_name}','{visit_date}','{park_name}']
+  },
+  {
+    id:'push-flash', channel:'push', icon:'🔔', name:'Flash Sale Push Notification',
+    status:'draft', trigger:'Manual trigger',
+    body:`Title: ⚡ Flash Sale — 20% Off Today Only!
+Body: WOW {park_name} tickets at 20% off! Only {slots_left} slots left. Book now!`,
+    vars:['{park_name}','{slots_left}']
+  }
+];
+
+let currentTplId = null;
+let activeChannel = 'all';
+
+function renderTemplates() {
+  const filtered = activeChannel === 'all' ? TEMPLATES : TEMPLATES.filter(t => t.channel === activeChannel);
+  document.getElementById('tpl-grid').innerHTML = filtered.map(tpl => `
+    <div class="tpl-card" id="tpl-${tpl.id}">
+      <div class="tpl-head">
+        <span class="tpl-icon">${tpl.icon}</span>
+        <span class="tpl-name">${tpl.name}</span>
+        <span class="tpl-status ${tpl.status}">${tpl.status.toUpperCase()}</span>
+      </div>
+      <div class="tpl-body">
+        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Trigger: ${tpl.trigger}</div>
+        <div class="tpl-preview">${tpl.body.substring(0,200)}${tpl.body.length > 200 ? '...' : ''}</div>
+        <div class="tpl-vars">${tpl.vars.map(v => `<span class="tpl-var">${v}</span>`).join('')}</div>
+        <div class="tpl-actions">
+          <button class="tpl-btn tpl-btn-edit" onclick="editTemplate('${tpl.id}')">✏️ Edit</button>
+          <button class="tpl-btn tpl-btn-test" onclick="testTemplate('${tpl.id}')">📤 Test Send</button>
+          <button class="tpl-btn tpl-btn-toggle" onclick="toggleTemplate('${tpl.id}')">${tpl.status === 'active' ? '⏸ Pause' : '▶ Enable'}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterChannel(ch, btn) {
+  activeChannel = ch;
+  document.querySelectorAll('.ch-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTemplates();
+}
+
+function editTemplate(id) {
+  const tpl = TEMPLATES.find(t => t.id === id);
+  if (!tpl) return;
+  currentTplId = id;
+  document.getElementById('modal-title').textContent = 'Edit: ' + tpl.name;
+  document.getElementById('modal-body').value = tpl.body;
+  document.getElementById('modal-vars').innerHTML = tpl.vars.map(v => `<span class="tpl-var">${v}</span>`).join('');
+  document.getElementById('tpl-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('tpl-modal').classList.remove('open');
+  currentTplId = null;
+}
+
+function saveTemplate() {
+  const tpl = TEMPLATES.find(t => t.id === currentTplId);
+  if (tpl) tpl.body = document.getElementById('modal-body').value;
+  renderTemplates();
+  closeModal();
+  alert('✅ Template saved successfully!');
+}
+
+function testTemplate(id) {
+  const tpl = TEMPLATES.find(t => t.id === id);
+  if (tpl) alert(`Test ${tpl.channel.toUpperCase()} sent to admin test number with sample data.`);
+}
+
+function toggleTemplate(id) {
+  const tpl = TEMPLATES.find(t => t.id === id);
+  if (tpl) {
+    tpl.status = tpl.status === 'active' ? 'off' : 'active';
+    renderTemplates();
+  }
+}
+
+function openNewTemplate() {
+  currentTplId = null;
+  document.getElementById('modal-title').textContent = 'New Template';
+  document.getElementById('modal-body').value = '';
+  document.getElementById('modal-vars').innerHTML = '';
+  document.getElementById('tpl-modal').classList.add('open');
+}
+
+document.getElementById('tpl-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('tpl-modal')) closeModal();
+});
+
+renderTemplates();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
