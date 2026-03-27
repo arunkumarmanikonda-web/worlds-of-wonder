@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GST Engine — WOW Super Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/wow-design-system.css" />
+  <style>
+    body { background:#0a0f1e; font-family:'Inter',sans-serif; color:#e2e8f0; min-height:100vh; }
+    .admin-layout { display:flex; min-height:100vh; }
+    .admin-sidebar { width:240px; background:#060b17; border-right:1px solid rgba(255,255,255,.06); flex-shrink:0; padding:24px 0; }
+    .admin-sidebar-logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,.06); margin-bottom:16px; }
+    .admin-sidebar-logo img { height:40px; filter:brightness(0) invert(1); opacity:.85; }
+    .admin-nav-link { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; font-weight:600; color:rgba(255,255,255,.5); text-decoration:none; border-radius:8px; margin:2px 8px; transition:all .15s; }
+    .admin-nav-link:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
+    .admin-nav-link.active { background:rgba(0,85,179,.25); color:#60A5FA; }
+    .admin-main { flex:1; overflow:auto; }
+    .admin-topbar { background:#060b17; border-bottom:1px solid rgba(255,255,255,.06); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    .admin-topbar h1 { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; }
+    .admin-topbar p  { font-size:12px; color:rgba(255,255,255,.4); margin-top:1px; }
+    .admin-content { padding:28px; }
+
+    .gst-card { background:#111827; border:1px solid rgba(255,255,255,.07); border-radius:16px; margin-bottom:20px; overflow:hidden; }
+    .gst-card-head { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:12px; }
+    .gst-card-icon { font-size:22px; }
+    .gst-card-title { font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:#fff; }
+    .gst-card-desc  { font-size:12px; color:rgba(255,255,255,.4); margin-top:2px; }
+    .gst-card-body  { padding:20px; }
+
+    /* Rate Table */
+    .gst-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .gst-table th { padding:10px 14px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.4); background:rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.06); }
+    .gst-table td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.05); vertical-align:middle; }
+    .gst-table tr:last-child td { border-bottom:none; }
+    .gst-table tr:hover td { background:rgba(255,255,255,.02); }
+
+    .gst-rate-input {
+      width:80px; padding:6px 10px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1);
+      border-radius:6px; color:#fff; font-size:13px; font-family:'Inter',sans-serif; outline:none; text-align:right;
+    }
+    .gst-rate-input:focus { border-color:#0055B3; }
+
+    /* Calculator */
+    .gst-calc { background:rgba(0,85,179,.1); border:1px solid rgba(0,85,179,.2); border-radius:12px; padding:20px; }
+    .gst-calc h3 { font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:#60A5FA; margin-bottom:14px; }
+
+    .gst-calc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+    .gst-calc-field label { font-size:11px; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px; }
+    .gst-calc-input {
+      width:100%; padding:10px 12px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.12);
+      border-radius:8px; color:#fff; font-size:14px; font-family:'Inter',sans-serif; outline:none;
+    }
+    .gst-calc-input:focus { border-color:#0055B3; }
+    .gst-calc-input[readonly] { color:#7DD3FC; font-weight:700; background:rgba(0,85,179,.08); }
+
+    .gst-breakdown { background:rgba(255,255,255,.04); border-radius:10px; padding:14px 16px; }
+    .gst-brow { display:flex; justify-content:space-between; font-size:13px; padding:5px 0; }
+    .gst-brow .bl { color:rgba(255,255,255,.5); }
+    .gst-brow .bv { font-weight:700; color:#fff; }
+    .gst-brow.total { border-top:1px solid rgba(255,255,255,.1); margin-top:6px; padding-top:10px; }
+    .gst-brow.total .bl { color:#fff; font-size:14px; font-weight:700; }
+    .gst-brow.total .bv { color:#60A5FA; font-size:16px; font-weight:900; }
+
+    /* Invoice format */
+    .gst-invoice-preview { background:#fff; color:#1A2235; border-radius:12px; padding:24px; font-size:12px; }
+    .gst-inv-header { display:flex; justify-content:space-between; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #DDE3EE; }
+    .gst-inv-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .gst-inv-table th { background:#F7F9FC; padding:8px 10px; text-align:left; color:#6B7280; font-size:11px; font-weight:700; text-transform:uppercase; border-bottom:1px solid #DDE3EE; }
+    .gst-inv-table td { padding:8px 10px; border-bottom:1px solid #F0F4FA; }
+    .gst-inv-totals { margin-top:16px; display:flex; justify-content:flex-end; }
+    .gst-inv-totals-inner { min-width:240px; }
+    .gst-inv-row { display:flex; justify-content:space-between; font-size:12px; padding:4px 0; }
+    .gst-inv-row.grand { border-top:2px solid #DDE3EE; margin-top:8px; padding-top:8px; font-weight:900; font-size:14px; color:#0055B3; }
+
+    /* Buttons */
+    .gst-save-btn { padding:10px 24px; border-radius:8px; border:none; background:linear-gradient(135deg,#003D82,#0055B3); color:#fff; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <nav class="admin-sidebar">
+    <div class="admin-sidebar-logo"><img src="../images/logo.png" alt="WOW Admin" /></div>
+    <a href="index.html" class="admin-nav-link">📊 Dashboard</a>
+    <a href="bookings.html" class="admin-nav-link">🎫 Bookings</a>
+    <a href="finance.html" class="admin-nav-link">💰 Finance</a>
+    <a href="reporting.html" class="admin-nav-link">📈 Reports</a>
+    <a href="settings.html" class="admin-nav-link">🛠 Settings</a>
+    <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
+    <a href="module-control.html" class="admin-nav-link">⚙️ Module Control</a>
+    <a href="api-secrets.html" class="admin-nav-link">🔑 API Secrets</a>
+    <a href="gst-engine.html" class="admin-nav-link active">📊 GST Engine</a>
+  </nav>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1>📊 GST Auto-Compute Engine</h1>
+        <p>Configure GST rates, SAC codes, reverse computation, and bulk invoice generation.</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="gst-save-btn" onclick="saveGST()">Save GST Config</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- GST Rate Configuration -->
+      <div class="gst-card">
+        <div class="gst-card-head">
+          <div class="gst-card-icon">⚡</div>
+          <div>
+            <div class="gst-card-title">GST Rate Configuration by Product Type</div>
+            <div class="gst-card-desc">SAC code and applicable GST rate for each ticketing category</div>
+          </div>
+        </div>
+        <div class="gst-card-body">
+          <table class="gst-table">
+            <thead>
+              <tr>
+                <th>Product / Service</th>
+                <th>SAC Code</th>
+                <th>GST Category</th>
+                <th>Rate (%)</th>
+                <th>CGST (%)</th>
+                <th>SGST (%)</th>
+                <th>IGST (%)</th>
+                <th>Applicable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:700;">Water Park Day Entry</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
+                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
+                <td><input class="gst-rate-input" value="18" oninput="splitRates(this)" /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="18" readonly /></td>
+                <td><label style="cursor:pointer;"><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;">Amusement Park Day Entry</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
+                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
+                <td><input class="gst-rate-input" value="18" oninput="splitRates(this)" /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="18" readonly /></td>
+                <td><label style="cursor:pointer;"><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;">Combo Ticket (Both Parks)</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
+                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
+                <td><input class="gst-rate-input" value="18" /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="18" readonly /></td>
+                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;">WOW Passport (Annual)</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
+                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
+                <td><input class="gst-rate-input" value="18" /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="18" readonly /></td>
+                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;">F&amp;B (Food and Beverages)</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">996331</code></td>
+                <td><span style="font-size:11px;background:rgba(16,185,129,.15);color:#6EE7B7;padding:2px 8px;border-radius:20px;">Restaurant</span></td>
+                <td><input class="gst-rate-input" value="5" /></td>
+                <td><input class="gst-rate-input" value="2.5" readonly /></td>
+                <td><input class="gst-rate-input" value="2.5" readonly /></td>
+                <td><input class="gst-rate-input" value="5" readonly /></td>
+                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+              <tr>
+                <td style="font-weight:700;">Locker / Facility Rental</td>
+                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">997313</code></td>
+                <td><span style="font-size:11px;background:rgba(94,53,177,.15);color:#C4B5FD;padding:2px 8px;border-radius:20px;">Rental</span></td>
+                <td><input class="gst-rate-input" value="18" /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="9" readonly /></td>
+                <td><input class="gst-rate-input" value="18" readonly /></td>
+                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live GST Calculator -->
+      <div class="gst-card">
+        <div class="gst-card-head">
+          <div class="gst-card-icon">🧮</div>
+          <div>
+            <div class="gst-card-title">Live GST Calculator</div>
+            <div class="gst-card-desc">Forward computation (ex-GST to inclusive) and reverse computation (inclusive to ex-GST)</div>
+          </div>
+        </div>
+        <div class="gst-card-body">
+          <div class="gst-calc">
+            <h3>🧮 GST Reverse Computation Tool</h3>
+            <div class="gst-calc-grid">
+              <div class="gst-calc-field">
+                <label>Inclusive Price (₹)</label>
+                <input class="gst-calc-input" id="calc-inclusive" type="number" value="1299" oninput="computeGST()" />
+              </div>
+              <div class="gst-calc-field">
+                <label>GST Rate (%)</label>
+                <input class="gst-calc-input" id="calc-rate" type="number" value="18" oninput="computeGST()" />
+              </div>
+              <div class="gst-calc-field">
+                <label>Quantity</label>
+                <input class="gst-calc-input" id="calc-qty" type="number" value="2" min="1" oninput="computeGST()" />
+              </div>
+            </div>
+
+            <div class="gst-breakdown" id="gst-breakdown">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Preview -->
+      <div class="gst-card">
+        <div class="gst-card-head">
+          <div class="gst-card-icon">🧾</div>
+          <div>
+            <div class="gst-card-title">GST Invoice Format Preview</div>
+            <div class="gst-card-desc">Standard invoice generated for every booking. Download as PDF.</div>
+          </div>
+        </div>
+        <div class="gst-card-body">
+          <div class="gst-invoice-preview">
+            <div class="gst-inv-header">
+              <div>
+                <div style="font-size:18px;font-weight:900;color:#0055B3;font-family:'Nunito',sans-serif;">Worlds of Wonder</div>
+                <div style="font-size:11px;color:#6B7280;margin-top:4px;">Entertainment &amp; Amusement Land Concepts Pvt. Ltd.</div>
+                <div style="font-size:11px;color:#6B7280;">A-2, Sector 38A, Noida, UP 201301</div>
+                <div style="font-size:11px;color:#6B7280;">GSTIN: 09AAACE0000A1Z5 | CIN: U92410UP2000PTC000001</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:16px;font-weight:800;color:#080E1E;">TAX INVOICE</div>
+                <div style="font-size:12px;color:#6B7280;margin-top:4px;">Invoice #: <strong>WOW-2024-000001</strong></div>
+                <div style="font-size:12px;color:#6B7280;">Date: <strong id="inv-date"></strong></div>
+                <div style="font-size:12px;color:#6B7280;">Booking ID: <strong>WOW-XYZ123</strong></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:12px;">
+              <div>
+                <div style="font-weight:700;margin-bottom:4px;">Bill To:</div>
+                <div>Guest Name (as booked)</div>
+                <div>+91 XXXXX XXXXX</div>
+                <div><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="42253727313602272f232b2e6c212d2f">[email&#160;protected]</a></div>
+              </div>
+              <div>
+                <div style="font-weight:700;margin-bottom:4px;">Supply Details:</div>
+                <div>Place of Supply: 09 — Uttar Pradesh</div>
+                <div>Transaction Type: B2C</div>
+                <div>SAC Code: 999691</div>
+              </div>
+            </div>
+            <table class="gst-inv-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Description</th>
+                  <th>SAC</th>
+                  <th>Qty</th>
+                  <th>Rate (Ex-GST)</th>
+                  <th>CGST 9%</th>
+                  <th>SGST 9%</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Water Park Day Entry (Adult)</td>
+                  <td>999691</td>
+                  <td>2</td>
+                  <td>₹1,101.69</td>
+                  <td>₹99.15</td>
+                  <td>₹99.15</td>
+                  <td>₹2,598.00</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Water Park Day Entry (Child)</td>
+                  <td>999691</td>
+                  <td>1</td>
+                  <td>₹847.46</td>
+                  <td>₹76.27</td>
+                  <td>₹76.27</td>
+                  <td>₹999.00</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="gst-inv-totals">
+              <div class="gst-inv-totals-inner">
+                <div class="gst-inv-row"><span>Subtotal (Ex-GST)</span><span>₹3,051.61</span></div>
+                <div class="gst-inv-row"><span>CGST @9%</span><span>₹274.64</span></div>
+                <div class="gst-inv-row"><span>SGST @9%</span><span>₹274.64</span></div>
+                <div class="gst-inv-row grand"><span>Total (Incl. GST)</span><span>₹3,597.00</span></div>
+              </div>
+            </div>
+            <div style="margin-top:16px;font-size:11px;color:#6B7280;text-align:center;">
+              This is a computer-generated invoice. Authorised signatory not required. | worldsofwonder.in
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button onclick="alert('PDF invoice download initiated...')" class="gst-save-btn" style="font-size:13px;">⬇ Download PDF</button>
+            <button onclick="alert('Email sent to guest!')" style="padding:10px 20px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;">✉️ Email Invoice</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function computeGST() {
+  const inclusive = parseFloat(document.getElementById('calc-inclusive').value) || 0;
+  const rate      = parseFloat(document.getElementById('calc-rate').value) || 18;
+  const qty       = parseInt(document.getElementById('calc-qty').value) || 1;
+
+  const exGst    = inclusive / (1 + rate/100);
+  const gstAmt   = inclusive - exGst;
+  const cgst     = gstAmt / 2;
+  const sgst     = gstAmt / 2;
+  const total    = inclusive * qty;
+  const totalGst = gstAmt * qty;
+
+  const f = n => '₹' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  document.getElementById('gst-breakdown').innerHTML = `
+    <div class="gst-brow"><span class="bl">Inclusive Price per ticket</span><span class="bv">${f(inclusive)}</span></div>
+    <div class="gst-brow"><span class="bl">Ex-GST Price per ticket</span><span class="bv">${f(exGst)}</span></div>
+    <div class="gst-brow"><span class="bl">Total GST per ticket (${rate}%)</span><span class="bv">${f(gstAmt)}</span></div>
+    <div class="gst-brow"><span class="bl">CGST (${rate/2}%) per ticket</span><span class="bv">${f(cgst)}</span></div>
+    <div class="gst-brow"><span class="bl">SGST (${rate/2}%) per ticket</span><span class="bv">${f(sgst)}</span></div>
+    <div class="gst-brow total"><span class="bl">Total Payable (${qty} ticket${qty>1?'s':''})</span><span class="bv" style="color:#60A5FA;">${f(total)}</span></div>
+    <div class="gst-brow"><span class="bl">Total GST Component</span><span class="bv" style="color:#F5D679;">${f(totalGst)}</span></div>
+  `;
+}
+
+function splitRates(input) {
+  const rate = parseFloat(input.value) || 18;
+  const row = input.closest('tr');
+  const inputs = row.querySelectorAll('.gst-rate-input');
+  if (inputs[1]) inputs[1].value = (rate / 2).toString();
+  if (inputs[2]) inputs[2].value = (rate / 2).toString();
+  if (inputs[3]) inputs[3].value = rate.toString();
+}
+
+function saveGST() {
+  const btn = event.target;
+  btn.textContent = '✅ GST Config Saved!';
+  setTimeout(() => btn.textContent = 'Save GST Config', 2000);
+}
+
+// Set invoice date
+document.getElementById('inv-date').textContent = new Date().toLocaleDateString('en-IN');
+
+// Initial compute
+computeGST();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
