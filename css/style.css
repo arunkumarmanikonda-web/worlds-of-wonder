@@ -620,10 +620,21 @@ ul { list-style: none; }
 
 /* ============================================================
    WOW LOGO ON DARK BACKGROUNDS
-   mix-blend-mode: multiply makes the white canvas invisible
-   on dark/coloured backgrounds — only the red shield shows.
-   Hard adopted — logo image untouched, no filter, no edits.
+   The logo PNG has a white background.
+   We wrap it in .logo-blend-wrap which uses mix-blend-mode:screen
+   on the WRAPPER (not the img) — this bypasses stacking context
+   issues caused by parent transforms/opacity/will-change.
+   The img itself has filter:none — untouched, hard adopted.
    ============================================================ */
+
+/* Blend wrapper — sits around the logo img on dark sections */
+.logo-blend-wrap {
+  display: inline-block;
+  mix-blend-mode: screen;
+  /* screen on dark bg: white→invisible, red shield→visible */
+  isolation: auto !important;
+  line-height: 0;
+}
 
 /* Hero carousel slides — dark overlay background */
 .hero-wow-logo {
@@ -634,13 +645,11 @@ ul { list-style: none; }
   object-fit: contain;
   filter: none !important;
   opacity: 1 !important;
-  mix-blend-mode: multiply;
-  /* On dark backgrounds multiply hides white → only shield visible */
 }
 
-/* Because hero overlay is dark, we need screen blend instead */
+/* Wrap .hero-wow-logo with .logo-blend-wrap in HTML for blend to work */
 .hc-content .hero-wow-logo {
-  mix-blend-mode: screen;
+  display: block;
 }
 
 /* YouTube BG container + injected iframe — covers full slide */
@@ -793,17 +802,17 @@ ul { list-style: none; }
   mix-blend-mode: screen; /* hides white bg on dark banner */
 }
 
-/* CTA section logo — dark navy background */
-.cta-inner img[alt="Worlds of Wonder"] {
-  mix-blend-mode: screen;
+/* CTA section logo wrapper */
+.cta-inner .logo-blend-wrap {
+  margin-bottom: 28px;
 }
 
-/* Universal dark-section logo class — hard adopted, no filter, white bg hidden via screen blend */
+/* Universal dark-section logo — img is untouched, wrap handles blend */
 .dark-section-logo {
   filter: none !important;
   opacity: 1 !important;
-  mix-blend-mode: screen;
-  /* screen blend: white areas become invisible on dark bg, coloured shield remains */
+  display: block;
+  /* blend is handled by parent .logo-blend-wrap */
 }
 
 /* Responsive video banner */
