@@ -4,109 +4,541 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Offers — Worlds of Wonder</title>
+  <meta name="description" content="Exclusive personalised deals and discounts for your WOW account." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <script src="../js/wow-modules.js"></script>
+  <style>
+    /* ── Offer cards ── */
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media(max-width:700px){ .offers-grid { grid-template-columns: 1fr; } }
+
+    .offer-card {
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255,255,255,.08);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .offer-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,.35); }
+    .offer-card.expired { opacity: .5; pointer-events: none; }
+
+    .offer-header {
+      padding: 22px 22px 18px;
+      position: relative;
+      min-height: 110px;
+    }
+    .offer-exclusive-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .offer-icon { font-size: 34px; margin-bottom: 8px; }
+    .offer-title { font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .offer-desc  { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.5; }
+
+    .offer-body {
+      background: #1a2235;
+      flex: 1;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .offer-discount {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .offer-discount-val {
+      font-family: 'Nunito', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .offer-discount-label {
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+    }
+
+    /* Countdown */
+    .offer-countdown {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .countdown-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .countdown-timer { display: flex; gap: 8px; }
+    .countdown-unit { text-align: center; }
+    .countdown-num { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; color: #fff; line-height: 1; }
+    .countdown-unit-lbl { font-size: 9px; color: rgba(255,255,255,.35); text-transform: uppercase; margin-top: 2px; }
+    .countdown-sep { font-size: 18px; font-weight: 900; color: rgba(255,255,255,.3); align-self: flex-start; padding-top: 2px; }
+
+    /* Promo code */
+    .promo-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .promo-code-display {
+      flex: 1;
+      background: rgba(255,255,255,.06);
+      border: 1px dashed rgba(255,255,255,.2);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: #F5A800;
+      letter-spacing: .1em;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .promo-code-display:hover { background: rgba(255,255,255,.1); }
+    .promo-copy-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(245,168,0,.15);
+      color: #F5A800;
+      border: 1px solid rgba(245,168,0,.3);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      white-space: nowrap;
+    }
+    .promo-copy-btn:hover { background: rgba(245,168,0,.25); }
+
+    .offer-cta {
+      display: block;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      text-decoration: none;
+      transition: all .2s;
+      margin-top: auto;
+    }
+    .offer-cta:hover { transform: translateY(-1px); }
+
+    .offer-validity {
+      font-size: 11px;
+      color: rgba(255,255,255,.35);
+    }
+
+    /* ── Tabs ── */
+    .offer-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .offer-tab {
+      padding: 8px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: transparent;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+    }
+    .offer-tab.active, .offer-tab:hover {
+      background: #0055B3;
+      border-color: #0055B3;
+      color: #fff;
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.4);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      margin-bottom: 18px;
+    }
+
+    /* ── Promo input section ── */
+    .promo-input-section {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .promo-input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .promo-input-field {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      text-transform: uppercase;
+    }
+    .promo-input-field:focus { border-color: #0055B3; }
+    .promo-input-field::placeholder { color: rgba(255,255,255,.25); text-transform: none; }
+    .promo-apply-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #F5A800, #f97316);
+      color: #000;
+      font-size: 14px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+    .promo-apply-btn:hover { opacity: .9; }
+    .promo-result { margin-top: 10px; font-size: 13px; font-weight: 600; }
+    .promo-success { color: #10b981; }
+    .promo-error   { color: #ef4444; }
+
+    /* ── Referral section ── */
+    .referral-card {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .referral-card::before {
+      content: '';
+      position: absolute;
+      right: -30px;
+      top: -30px;
+      width: 180px;
+      height: 180px;
+      background: rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+    .referral-card h3 { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 6px; position: relative; }
+    .referral-card p  { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 18px; line-height: 1.6; position: relative; }
+    .referral-code-row { display: flex; gap: 10px; align-items: center; position: relative; }
+    .referral-code-box {
+      background: rgba(255,255,255,.15);
+      border: 1px dashed rgba(255,255,255,.3);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .15em;
+      flex: 1;
+    }
+    .referral-share-btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.3);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+    .referral-share-btn:hover { background: rgba(255,255,255,.3); }
+
+    /* Toast */
+    #copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0a9b5f;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      display: none;
+      z-index: 9999;
+    }
+  </style>
 </head>
-<body>
+<body class="portal-body">
 <div id="app">
-  <div class="portal-dashboard">
-    <!-- Sidebar -->
+  <div class="portal-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
     <aside class="portal-sidebar" id="portal-sidebar">
       <div class="portal-sidebar-logo">
-        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+        </a>
       </div>
       <nav class="portal-sidenav">
-        <a href="my-bookings.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Bookings</a>
-        <a href="passport.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>My Passport</a>
-        <a href="profile.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-        <a href="offers.html" class="portal-sidenav-item active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>My Offers</a>
+        <a href="dashboard.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="my-bookings.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>My Bookings</span>
+        </a>
+        <a href="tickets.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
+          <span>My Tickets</span>
+        </a>
+        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
+          <span>My Passport</span>
+        </a>
+        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Loyalty Points</span>
+        </a>
+        <a href="offers.html" class="portal-sidenav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>My Offers</span>
+        </a>
+        <a href="notifications.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span>Notifications</span>
+        </a>
+        <a href="profile.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
         <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to Website</a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+        <a href="../index.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span>Back to Website</span>
+        </a>
+        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
       </nav>
     </aside>
 
+    <!-- ═══ MAIN ═══ -->
     <main class="portal-main">
-      <div id="portal-loading" class="portal-loading"><div class="portal-spinner"></div><p>Loading your offers…</p></div>
-      <div id="portal-content" style="display:none;">
+      <div id="portal-loading" class="portal-loading">
+        <div class="portal-spinner"></div>
+        <p>Loading your exclusive offers…</p>
+      </div>
 
+      <div id="portal-content" style="display:none;">
         <div class="portal-main-header">
           <div>
             <h1 class="portal-main-title">My Offers</h1>
             <p class="portal-main-sub">Exclusive deals and personalised discounts for your next visit</p>
           </div>
-          <a href="../offers.html" class="btn btn-outline">View All Public Offers</a>
+          <a href="../offers.html" class="btn btn-outline" style="white-space:nowrap;">View All Offers</a>
         </div>
 
-        <!-- Current offers -->
-        <div class="portal-card-title" style="margin-bottom:16px;">Active Offers for You</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;" id="offers-grid">
+        <!-- ── Tabs ── -->
+        <div class="offer-tabs">
+          <button class="offer-tab active" onclick="filterOffers('all', this)">All Offers</button>
+          <button class="offer-tab" onclick="filterOffers('active', this)">Active</button>
+          <button class="offer-tab" onclick="filterOffers('flash', this)" data-module="flash_offers">Flash Deals</button>
+          <button class="offer-tab" onclick="filterOffers('member', this)">Member Exclusive</button>
+        </div>
 
-          <!-- Offer card — Group discount -->
-          <div class="offer-portal-card">
-            <div class="opc-header" style="background:linear-gradient(135deg,#006EE6,#0044a0);">
-              <span class="opc-tag">Group Deal</span>
-              <span class="opc-expiry">Valid until 31 Dec 2025</span>
+        <!-- ── Active Offers Grid ── -->
+        <div class="section-title">Active Offers For You</div>
+        <div class="offers-grid" id="offers-grid">
+
+          <!-- Flash Sale -->
+          <div class="offer-card" data-category="flash active">
+            <div class="offer-header" style="background:linear-gradient(135deg,#e11d48,#be123c);" data-module="flash_offers">
+              <span class="offer-exclusive-badge">⚡ Flash Deal</span>
+              <div class="offer-icon">🌊</div>
+              <div class="offer-title">Weekend Water Park Flash</div>
+              <div class="offer-desc">This weekend only — grab a Water Park ticket at a special member rate before it's gone!</div>
             </div>
-            <div class="opc-body">
-              <div class="opc-value">Save ₹75–₹125</div>
-              <div class="opc-title">Group Discount — 4+ Tickets</div>
-              <p>Book 4 or more tickets in one order and save ₹75 per adult on Water Park, ₹50 on Amusement Park, or ₹125 per adult on Combo tickets.</p>
-              <a href="../book/water-park.html" class="btn btn-primary" style="font-size:13.5px;padding:9px 18px;">Book Now →</a>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val">₹999</div>
+                <div class="offer-discount-label">was <s>₹1,299</s> · Save ₹300</div>
+              </div>
+              <div class="offer-countdown" data-module="flash_offers">
+                <div class="countdown-label">⏰ Offer Expires In</div>
+                <div class="countdown-timer" id="ct-flash-water"></div>
+              </div>
+              <div class="promo-row">
+                <div class="promo-code-display" onclick="copyCode('FLASH300', this)">FLASH300</div>
+                <button class="promo-copy-btn" onclick="copyCode('FLASH300', this)">📋 Copy</button>
+              </div>
+              <div class="offer-validity">Valid Sat–Sun only · Single-use per account</div>
+              <a href="../book/water-park.html?promo=FLASH300" class="offer-cta" style="background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;">
+                Book Now →
+              </a>
             </div>
           </div>
 
-          <!-- Offer card — Combo save -->
-          <div class="offer-portal-card">
-            <div class="opc-header" style="background:linear-gradient(135deg,#FF6B00,#c05200);">
-              <span class="opc-tag">Combo Deal</span>
-              <span class="opc-expiry">Always-on offer</span>
+          <!-- Birthday offer -->
+          <div class="offer-card" data-category="member active">
+            <div class="offer-header" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">
+              <span class="offer-exclusive-badge">🎂 Birthday</span>
+              <div class="offer-icon">🎉</div>
+              <div class="offer-title">Birthday Month Special</div>
+              <div class="offer-desc">Celebrate your birthday at WOW! Get a free entry on your birthday and a companion at 50% off.</div>
             </div>
-            <div class="opc-body">
-              <div class="opc-value">Save ₹499</div>
-              <div class="opc-title">Combo Ticket — Both Parks</div>
-              <p>Buy Water + Amusement Park together for ₹1,999 instead of buying separately (₹2,498). One QR code, both parks, full day.</p>
-              <a href="../book/combo.html" class="btn" style="background:linear-gradient(135deg,#FF6B00,#c05200);color:white;font-size:13.5px;padding:9px 18px;">Get Combo →</a>
-            </div>
-          </div>
-
-          <!-- Offer card — Annual passport -->
-          <div class="offer-portal-card">
-            <div class="opc-header" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);">
-              <span class="opc-tag">Membership</span>
-              <span class="opc-expiry">365-day validity</span>
-            </div>
-            <div class="opc-body">
-              <div class="opc-value">From ₹4,999</div>
-              <div class="opc-title">WOW Annual Passport</div>
-              <p>Pay once, visit all year. The Combo Passport pays for itself in just 3 visits. Passport holders also get exclusive member-only pricing on F&amp;B and merchandise.</p>
-              <a href="passport.html" class="btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);color:white;font-size:13.5px;padding:9px 18px;">Get Passport →</a>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val">Free!</div>
+                <div class="offer-discount-label">entry on your birthday + 50% companion</div>
+              </div>
+              <div class="promo-row">
+                <div class="promo-code-display" onclick="copyCode('BDAY2026', this)">BDAY2026</div>
+                <button class="promo-copy-btn" onclick="copyCode('BDAY2026', this)">📋 Copy</button>
+              </div>
+              <div class="offer-validity">Valid only on your birthday month · ID required at gate</div>
+              <a href="../book/water-park.html?promo=BDAY2026" class="offer-cta" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;">
+                Redeem Birthday Offer →
+              </a>
             </div>
           </div>
 
-          <!-- Offer card — Birthday month -->
-          <div class="offer-portal-card" id="birthday-offer">
-            <div class="opc-header" style="background:linear-gradient(135deg,#db2777,#9d174d);">
-              <span class="opc-tag">Birthday Special</span>
-              <span class="opc-expiry" id="bday-offer-expiry">Your birth month</span>
+          <!-- Combo upgrade -->
+          <div class="offer-card" data-category="member active">
+            <div class="offer-header" style="background:linear-gradient(135deg,#0055B3,#0a2a6e);">
+              <span class="offer-exclusive-badge">⭐ Member</span>
+              <div class="offer-icon">🎟</div>
+              <div class="offer-title">Combo Upgrade Deal</div>
+              <div class="offer-desc">Already booked Water Park? Upgrade to Combo (both parks) and save ₹200 instantly.</div>
             </div>
-            <div class="opc-body">
-              <div class="opc-value">10% Off</div>
-              <div class="opc-title">Birthday Month Discount</div>
-              <p>Celebrate your birthday month with 10% off your ticket. Valid on the month of your registered birthday. Keep your profile updated to unlock this.</p>
-              <a href="profile.html" class="btn" style="background:linear-gradient(135deg,#db2777,#9d174d);color:white;font-size:13.5px;padding:9px 18px;">Update Profile →</a>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val">₹200</div>
+                <div class="offer-discount-label">off Combo upgrade · was ₹700 extra</div>
+              </div>
+              <div class="promo-row">
+                <div class="promo-code-display" onclick="copyCode('UPGRADE200', this)">UPGRADE200</div>
+                <button class="promo-copy-btn" onclick="copyCode('UPGRADE200', this)">📋 Copy</button>
+              </div>
+              <div class="offer-validity">Valid for 30 days · Use at checkout</div>
+              <a href="../book/combo.html?promo=UPGRADE200" class="offer-cta" style="background:linear-gradient(135deg,#0055B3,#0a2a6e);color:#fff;">
+                Upgrade to Combo →
+              </a>
+            </div>
+          </div>
+
+          <!-- Group discount -->
+          <div class="offer-card" data-category="active" data-module="group_booking">
+            <div class="offer-header" style="background:linear-gradient(135deg,#0a9b5f,#047857);">
+              <span class="offer-exclusive-badge">👥 Groups</span>
+              <div class="offer-icon">👨‍👩‍👧‍👦</div>
+              <div class="offer-title">Bring-a-Group Reward</div>
+              <div class="offer-desc">Book for 10+ guests and get ₹75 off per adult ticket plus a complimentary locker for the organizer.</div>
+            </div>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val">₹75</div>
+                <div class="offer-discount-label">per adult · minimum 10 tickets</div>
+              </div>
+              <div class="offer-countdown">
+                <div class="countdown-label">⏰ Offer Ends</div>
+                <div class="countdown-timer" id="ct-group"></div>
+              </div>
+              <div class="offer-validity">Auto-applied for group bookings ≥ 10 guests</div>
+              <a href="../book/water-park.html" class="offer-cta" style="background:linear-gradient(135deg,#0a9b5f,#047857);color:#fff;">
+                Book Group Visit →
+              </a>
+            </div>
+          </div>
+
+          <!-- Passport renewal -->
+          <div class="offer-card" data-category="member" data-module="passport_system">
+            <div class="offer-header" style="background:linear-gradient(135deg,#F5A800,#f97316);">
+              <span class="offer-exclusive-badge">🪪 Passport</span>
+              <div class="offer-icon">🔄</div>
+              <div class="offer-title">Early Renewal Bonus</div>
+              <div class="offer-desc">Renew your Annual Passport before it expires and get 30 extra days of validity added FREE!</div>
+            </div>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val">+30 Days</div>
+                <div class="offer-discount-label">FREE on early renewal</div>
+              </div>
+              <div class="promo-row">
+                <div class="promo-code-display" onclick="copyCode('RENEW30', this)">RENEW30</div>
+                <button class="promo-copy-btn" onclick="copyCode('RENEW30', this)">📋 Copy</button>
+              </div>
+              <div class="offer-validity">Must renew ≥30 days before expiry · One-time use</div>
+              <a href="../book/passport.html?promo=RENEW30" class="offer-cta" style="background:linear-gradient(135deg,#F5A800,#f97316);color:#000;font-weight:800;">
+                Renew Passport →
+              </a>
+            </div>
+          </div>
+
+          <!-- Loyalty redeem -->
+          <div class="offer-card" data-category="member" data-module="loyalty_program">
+            <div class="offer-header" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">
+              <span class="offer-exclusive-badge">⭐ Loyalty</span>
+              <div class="offer-icon">🌟</div>
+              <div class="offer-title">Redeem Loyalty Points</div>
+              <div class="offer-desc">Convert your accumulated WOW Points into instant discounts on your next ticket booking.</div>
+            </div>
+            <div class="offer-body">
+              <div class="offer-discount">
+                <div class="offer-discount-val" id="loyalty-pts-val">—</div>
+                <div class="offer-discount-label">points available = <span id="loyalty-pts-inr">₹—</span> off</div>
+              </div>
+              <div class="offer-validity">100 points = ₹10 off · Min. 500 points to redeem</div>
+              <a href="loyalty.html" class="offer-cta" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;">
+                Go to Loyalty Dashboard →
+              </a>
             </div>
           </div>
 
         </div>
 
-        <!-- All public offers link -->
-        <div style="text-align:center;margin-top:28px;padding:24px;background:#f8faff;border-radius:14px;border:1px solid #e5edf8;">
-          <p style="font-size:15px;color:#5a6a80;margin-bottom:14px;">More offers available on our public deals page.</p>
-          <a href="../offers.html" class="btn btn-outline">🎁 See All Current Offers</a>
+        <!-- ── Promo Code Redemption ── -->
+        <div class="promo-input-section" data-module="promo_codes">
+          <div class="section-title">Have a Promo Code?</div>
+          <p style="font-size:14px;color:rgba(255,255,255,.55);margin-bottom:4px;">Enter your promo code below to unlock a special offer. Codes are case-insensitive.</p>
+          <div class="promo-input-row">
+            <input class="promo-input-field" id="promo-input" type="text" placeholder="e.g. SUMMER25" maxlength="20" />
+            <button class="promo-apply-btn" onclick="applyPromo()">Apply Code</button>
+          </div>
+          <div id="promo-result" class="promo-result"></div>
+        </div>
+
+        <!-- ── Referral Program ── -->
+        <div data-module="referral_program">
+          <div class="section-title">Refer a Friend</div>
+          <div class="referral-card">
+            <h3>🎁 Give ₹200, Get ₹200</h3>
+            <p>Share your unique referral code with friends. When they make their first booking, you both get ₹200 off your next visit. No limit on referrals!</p>
+            <div class="referral-code-row">
+              <div class="referral-code-box" id="referral-code">WOW-REF-——</div>
+              <button class="referral-share-btn" onclick="shareReferral()">📤 Share</button>
+              <button class="referral-share-btn" onclick="copyReferral()">📋 Copy</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -114,30 +546,150 @@
   </div>
 </div>
 
-<style>
-.offer-portal-card { background:white; border:1px solid #e5edf8; border-radius:16px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06); }
-.opc-header { padding:16px 20px; display:flex; justify-content:space-between; align-items:center; }
-.opc-tag { font-size:12px; font-weight:800; color:white; text-transform:uppercase; letter-spacing:.06em; background:rgba(255,255,255,.2); padding:3px 10px; border-radius:6px; }
-.opc-expiry { font-size:12px; color:rgba(255,255,255,.7); }
-.opc-body { padding:20px; }
-.opc-value { font-family:'Nunito',sans-serif; font-size:26px; font-weight:900; color:#0a1628; margin-bottom:4px; }
-.opc-title { font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; color:#0a1628; margin-bottom:8px; }
-.opc-body p { font-size:13.5px; color:#5a6a80; line-height:1.65; margin-bottom:14px; }
-@media(max-width:768px){ #offers-grid { grid-template-columns:1fr; } }
-</style>
+<div id="copy-toast">✅ Copied to clipboard!</div>
+
+<script>
+  /* ── Promo codes database (demo) ── */
+  const VALID_PROMOS = {
+    'FLASH300':   { desc: '₹300 off Water Park ticket this weekend!', type: 'discount', value: 300 },
+    'BDAY2026':   { desc: 'Free birthday entry + 50% companion!', type: 'free' },
+    'UPGRADE200': { desc: '₹200 off Combo upgrade!', type: 'discount', value: 200 },
+    'RENEW30':    { desc: '+30 days FREE on passport renewal!', type: 'bonus' },
+    'SUMMER25':   { desc: '25% off any ticket this summer!', type: 'percent', value: 25 },
+    'WELCOME10':  { desc: '10% off your first booking!', type: 'percent', value: 10 },
+    'WOW50':      { desc: '₹50 off any ticket!', type: 'discount', value: 50 },
+  };
+
+  window.copyCode = function(code, btn) {
+    navigator.clipboard.writeText(code).catch(() => {});
+    showToast('✅ Code "' + code + '" copied!');
+    if (btn && btn.classList.contains('promo-copy-btn')) {
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 2000);
+    }
+  };
+
+  window.applyPromo = function() {
+    const code = (document.getElementById('promo-input').value || '').trim().toUpperCase();
+    const result = document.getElementById('promo-result');
+    if (!code) { result.textContent = ''; return; }
+    if (VALID_PROMOS[code]) {
+      result.innerHTML = `<span class="promo-success">✅ Valid! ${VALID_PROMOS[code].desc} — use at checkout.</span>`;
+      showToast('✅ Promo code valid!');
+    } else {
+      result.innerHTML = `<span class="promo-error">❌ Invalid or expired promo code. Please check and try again.</span>`;
+    }
+  };
+
+  document.getElementById('promo-input')?.addEventListener('keypress', e => {
+    if (e.key === 'Enter') applyPromo();
+  });
+
+  window.shareReferral = function() {
+    const code = document.getElementById('referral-code').textContent;
+    const msg = `🎢 Visit Worlds of Wonder, Noida with me! Use my referral code ${code} and we both get ₹200 off. Book at: https://worldsofwonder.in`;
+    if (navigator.share) {
+      navigator.share({ text: msg }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(msg).catch(() => {});
+      showToast('✅ Referral message copied!');
+    }
+  };
+
+  window.copyReferral = function() {
+    const code = document.getElementById('referral-code').textContent;
+    navigator.clipboard.writeText(code).catch(() => {});
+    showToast('✅ Referral code copied!');
+  };
+
+  window.filterOffers = function(cat, btn) {
+    document.querySelectorAll('.offer-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.offer-card').forEach(card => {
+      if (cat === 'all') {
+        card.style.display = '';
+      } else {
+        const cats = (card.dataset.category || '').split(' ');
+        card.style.display = cats.includes(cat) ? '' : 'none';
+      }
+    });
+  };
+
+  function showToast(msg) {
+    const t = document.getElementById('copy-toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 2500);
+  }
+
+  /* ── Countdown timers ── */
+  function formatCountdown(ms, el) {
+    if (!el) return;
+    if (ms <= 0) { el.innerHTML = '<span style="color:#ef4444;font-size:13px;">Expired</span>'; return; }
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    const d = Math.floor(h / 24);
+    el.innerHTML = d > 0
+      ? `<div class="countdown-unit"><div class="countdown-num">${d}</div><div class="countdown-unit-lbl">days</div></div>
+         <div class="countdown-sep">:</div>
+         <div class="countdown-unit"><div class="countdown-num">${String(h%24).padStart(2,'0')}</div><div class="countdown-unit-lbl">hrs</div></div>
+         <div class="countdown-sep">:</div>
+         <div class="countdown-unit"><div class="countdown-num">${String(m).padStart(2,'0')}</div><div class="countdown-unit-lbl">min</div></div>`
+      : `<div class="countdown-unit"><div class="countdown-num">${String(h).padStart(2,'0')}</div><div class="countdown-unit-lbl">hrs</div></div>
+         <div class="countdown-sep">:</div>
+         <div class="countdown-unit"><div class="countdown-num">${String(m).padStart(2,'0')}</div><div class="countdown-unit-lbl">min</div></div>
+         <div class="countdown-sep">:</div>
+         <div class="countdown-unit"><div class="countdown-num">${String(s).padStart(2,'0')}</div><div class="countdown-unit-lbl">sec</div></div>`;
+  }
+
+  // Set flash sale end = next Sunday midnight
+  const now = new Date();
+  const nextSun = new Date(now);
+  nextSun.setDate(now.getDate() + (7 - now.getDay()));
+  nextSun.setHours(23, 59, 59, 0);
+  const flashEnd = nextSun.getTime();
+
+  // Group offer end = end of month
+  const groupEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
+
+  function tickCountdowns() {
+    const remaining = flashEnd - Date.now();
+    const groupRem  = groupEnd - Date.now();
+    formatCountdown(remaining, document.getElementById('ct-flash-water'));
+    formatCountdown(groupRem,  document.getElementById('ct-group'));
+  }
+  tickCountdowns();
+  setInterval(tickCountdowns, 1000);
+</script>
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
   import { WOW_FB_CONFIG } from '../js/firebase-config.js';
 
   const app  = initializeApp(WOW_FB_CONFIG);
   const auth = getAuth(app);
+  const db   = getFirestore(app);
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = 'login.html'; return; }
     document.getElementById('portal-loading').style.display = 'none';
     document.getElementById('portal-content').style.display = 'block';
+
+    // Set referral code
+    const refCode = 'WOW-REF-' + user.uid.substring(0,6).toUpperCase();
+    document.getElementById('referral-code').textContent = refCode;
+
+    // Load loyalty points (demo)
+    let pts = 750;
+    try {
+      const snap = await getDoc(doc(db, 'loyalty_points', user.uid));
+      if (snap.exists()) pts = snap.data().points || pts;
+    } catch {}
+    document.getElementById('loyalty-pts-val').textContent = pts.toLocaleString('en-IN') + ' pts';
+    document.getElementById('loyalty-pts-inr').textContent = '₹' + Math.floor(pts / 10);
   });
 
   document.getElementById('signout-btn')?.addEventListener('click', async () => {
@@ -145,5 +697,5 @@
     window.location.href = '../index.html';
   });
 </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
