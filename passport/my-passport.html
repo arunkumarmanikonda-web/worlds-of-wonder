@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My WOW Passport</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+
+/* Header */
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px 28px;display:flex;justify-content:space-between;align-items:center}
+.header-logo{display:flex;align-items:center;gap:12px}
+.header-logo .wow{font-size:22px;font-weight:800;color:#FFD700;letter-spacing:2px}
+.header-logo .divider{width:1px;height:28px;background:rgba(255,255,255,0.3)}
+.header-logo .park{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.3}
+.header-nav{display:flex;align-items:center;gap:20px}
+.header-nav a{color:rgba(255,255,255,0.6);text-decoration:none;font-size:13px;font-weight:500}
+.header-nav a:hover{color:#FFD700}
+.header-nav .btn-logout{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:7px 16px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.header-nav .btn-logout:hover{background:rgba(255,255,255,0.2)}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 52px)}
+
+/* Left panel */
+.left-panel{background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);padding:28px;overflow-y:auto}
+
+/* Passport card */
+.passport-card{border-radius:20px;padding:24px;position:relative;overflow:hidden;margin-bottom:24px;min-height:200px}
+.passport-card.explore{background:linear-gradient(135deg,#1a6fc4 0%,#2980b9 60%,#1a6fc4 100%)}
+.passport-card.together{background:linear-gradient(135deg,#4a5568 0%,#6c757d 60%,#4a5568 100%)}
+.passport-card.legacy{background:linear-gradient(135deg,#8b0000 0%,#c0392b 60%,#e74c3c 100%)}
+.passport-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.07)}
+.passport-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;position:relative;z-index:1}
+.card-brand{font-size:11px;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px}
+.card-tier{font-size:11px;font-weight:700;background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:20px;color:#fff}
+.card-holder{position:relative;z-index:1;margin-bottom:16px}
+.card-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:0.5px;text-transform:uppercase}
+.card-plan{font-size:13px;color:rgba(255,255,255,0.8);margin-top:3px}
+.card-id{font-size:11px;font-family:monospace;color:rgba(255,255,255,0.6);margin-top:4px;letter-spacing:1px}
+.card-footer{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1}
+.card-info{font-size:10px;color:rgba(255,255,255,0.6);line-height:1.6}
+.card-info strong{font-size:12px;color:rgba(255,255,255,0.9);font-weight:700;display:block}
+.card-qr{background:#fff;padding:6px;border-radius:8px;width:68px;height:68px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-qr canvas{width:56px!important;height:56px!important}
+
+/* Visit progress */
+.visit-progress{background:rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:20px}
+.progress-label{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:8px;display:flex;justify-content:space-between}
+.progress-label span{font-weight:700;color:#FFD700}
+.progress-track{height:8px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;background:linear-gradient(90deg,#FFD700,#f0c800)}
+.visit-dots{display:flex;gap:6px;margin-top:10px}
+.visit-dot{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,0.15)}
+.visit-dot.done{background:#FFD700}
+.visit-dot.current{background:#FFD700;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* Validity strip */
+.validity-strip{background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.validity-label{font-size:11px;color:rgba(255,255,255,0.5)}
+.validity-value{font-size:13px;font-weight:700;color:#FFD700}
+.days-badge{background:rgba(255,215,0,0.15);color:#FFD700;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700}
+
+/* Quick actions */
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s;color:#fff;text-decoration:none;font-size:11px;font-weight:600}
+.quick-btn:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px)}
+.quick-btn i{display:block;font-size:18px;margin-bottom:4px;color:#FFD700}
+
+/* Right panel */
+.right-panel{overflow-y:auto;padding:24px}
+
+/* Tabs */
+.tabs{display:flex;background:#fff;border-radius:12px;padding:6px;margin-bottom:20px;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.tab{flex:1;text-align:center;padding:10px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:#888;transition:all 0.2s}
+.tab.active{background:#1a1a2e;color:#FFD700}
+
+/* Tab content */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Voucher grid */
+.voucher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.voucher-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);position:relative;cursor:pointer;transition:all 0.2s}
+.voucher-card:hover:not(.redeemed){transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.10)}
+.voucher-card.redeemed{opacity:0.5;cursor:default}
+.voucher-top{padding:16px;background:linear-gradient(135deg,#1a6fc4,#2980b9);color:#fff;text-align:center;position:relative}
+.voucher-top.together{background:linear-gradient(135deg,#6c757d,#495057)}
+.voucher-top.legacy{background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.voucher-top.fnb{background:linear-gradient(135deg,#f59e0b,#d97706)}
+.voucher-top.locker{background:linear-gradient(135deg,#10b981,#059669)}
+.voucher-top.costume{background:linear-gradient(135deg,#8b5cf6,#7c3aed)}
+.voucher-top.guest{background:linear-gradient(135deg,#ec4899,#db2777)}
+.voucher-top.bday{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.voucher-icon-big{font-size:32px;margin-bottom:4px}
+.voucher-name{font-size:13px;font-weight:700}
+.voucher-val{font-size:11px;opacity:0.8;margin-top:2px}
+.voucher-bottom{padding:12px 14px}
+.voucher-id{font-size:10px;font-family:monospace;color:#aaa;margin-bottom:8px;word-break:break-all}
+.voucher-qr{width:80px;height:80px;margin:0 auto 8px}
+.voucher-qr canvas{width:80px!important;height:80px!important}
+.voucher-status{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.voucher-expiry{color:#888}
+.status-badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.status-badge.active{background:#dcfce7;color:#16a34a}
+.status-badge.redeemed{background:#fee2e2;color:#dc2626}
+.status-badge.expired{background:#f1f5f9;color:#64748b}
+.redeemed-stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-20deg);font-size:26px;font-weight:900;color:rgba(255,255,255,0.7);border:4px solid rgba(255,255,255,0.7);padding:4px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:2px;pointer-events:none}
+
+/* Visit history */
+.visit-timeline{position:relative;padding-left:24px}
+.visit-timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:#e8ecf0}
+.visit-item{position:relative;margin-bottom:20px}
+.visit-item::before{content:'';position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid #1a6fc4;background:#fff}
+.visit-item.current::before{background:#1a6fc4}
+.visit-date{font-size:11px;color:#888;font-weight:500;margin-bottom:4px}
+.visit-card-item{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.visit-title{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.visit-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.visit-tag{background:#f0f2f5;border-radius:20px;padding:3px 10px;font-size:10px;color:#555;font-weight:500}
+
+/* Upsell banner */
+.upsell-banner{border-radius:14px;padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden}
+.upsell-banner.to-together{background:linear-gradient(135deg,#f0f7ff,#dbeafe);border:1px solid #bfdbfe}
+.upsell-banner.to-legacy{background:linear-gradient(135deg,#fff5f5,#fee2e2);border:1px solid #fca5a5}
+.upsell-icon{font-size:40px;flex-shrink:0}
+.upsell-title{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
+.upsell-desc{font-size:12px;color:#666;line-height:1.5}
+.upsell-cta{background:#1a1a2e;color:#FFD700;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;text-decoration:none;display:inline-block;margin-top:8px}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 6px rgba(0,0,0,0.05);text-align:center}
+.stat-num{font-size:26px;font-weight:800}
+.stat-lbl{font-size:11px;color:#888;margin-top:2px}
+
+/* Section heading */
+.section-heading{font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* Profile info */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.profile-field{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.profile-label{font-size:11px;color:#888;font-weight:500;margin-bottom:4px}
+.profile-value{font-size:14px;font-weight:600;color:#1a1a2e}
+
+/* Notifications */
+.notif-list{display:flex;flex-direction:column;gap:10px}
+.notif-item{background:#fff;border-radius:10px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.04);display:flex;gap:12px}
+.notif-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-title{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:2px}
+.notif-sub{font-size:11px;color:#888;line-height:1.4}
+.notif-time{font-size:10px;color:#aaa;margin-top:4px}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:#1a6fc4;flex-shrink:0;margin-top:4px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.modal-body{padding:28px;text-align:center}
+.modal-body .big-qr{width:200px;height:200px;margin:0 auto 16px}
+.modal-body .big-qr canvas{width:200px!important;height:200px!important}
+.modal-vname{font-size:16px;font-weight:700;margin-bottom:4px}
+.modal-vid{font-size:11px;font-family:monospace;color:#aaa;word-break:break-all;margin-bottom:16px}
+.modal-close-btn{background:#1a1a2e;color:#FFD700;border:none;padding:12px 32px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;width:100%}
+
+/* Responsive */
+@media(max-width:900px){.layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}.left-panel{min-height:auto}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    <div class="wow">WOW</div>
+    <div class="divider"></div>
+    <div class="park">Worlds of Wonder<br>My Passport</div>
+  </div>
+  <div class="header-nav">
+    <a href="../index.html"><i class="fas fa-home"></i> WOW Home</a>
+    <a href="../portal/dashboard.html"><i class="fas fa-user"></i> My Account</a>
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Left Panel: Passport Card -->
+  <div class="left-panel">
+    <!-- Physical-style passport card -->
+    <div class="passport-card" id="passportCard">
+      <div class="card-header">
+        <div>
+          <div class="card-brand">⚡ WOW Passport</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px">Worlds of Wonder · Noida</div>
+        </div>
+        <div class="card-tier" id="cardTier">EXPLORE</div>
+      </div>
+      <div class="card-holder">
+        <div class="card-name" id="cardName">RAJESH SHARMA</div>
+        <div class="card-plan" id="cardPlan">WOW Explore Pass</div>
+        <div class="card-id" id="cardId">WOW-EXP-2025-00142</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-info">
+          <div><span style="font-size:9px;color:rgba(255,255,255,0.4)">VALID UNTIL</span><br><strong id="cardExpiry">31 Mar 2026</strong></div>
+          <div style="margin-top:6px"><span style="font-size:9px;color:rgba(255,255,255,0.4)">VISITS</span><br><strong id="cardVisits">2 / 4</strong></div>
+        </div>
+        <div class="card-qr" id="cardQrContainer"></div>
+      </div>
+    </div>
+
+    <!-- Visit Progress -->
+    <div class="visit-progress">
+      <div class="progress-label">Visit Progress <span id="progressLabel">2 of 4 used</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:50%"></div></div>
+      <div class="visit-dots" id="visitDots"></div>
+    </div>
+
+    <!-- Validity -->
+    <div class="validity-strip">
+      <div>
+        <div class="validity-label">Passport Validity</div>
+        <div class="validity-value" id="validityDate">Valid until 31 Mar 2026</div>
+      </div>
+      <div class="days-badge" id="daysLeft">182 days left</div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="quick-actions">
+      <a href="#" class="quick-btn" onclick="showGateQR()">
+        <i class="fas fa-qrcode"></i>Gate QR Code
+      </a>
+      <a href="#" class="quick-btn" onclick="switchTab('vouchers')">
+        <i class="fas fa-ticket-alt"></i>My Vouchers
+      </a>
+      <a href="#" class="quick-btn" onclick="switchTab('history')">
+        <i class="fas fa-history"></i>Visit History
+      </a>
+      <a href="register.html" class="quick-btn">
+        <i class="fas fa-arrow-up"></i>Upgrade Plan
+      </a>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('overview')"><i class="fas fa-th-large"></i> Overview</div>
+      <div class="tab" onclick="switchTab('vouchers')"><i class="fas fa-ticket-alt"></i> Vouchers</div>
+      <div class="tab" onclick="switchTab('history')"><i class="fas fa-history"></i> History</div>
+      <div class="tab" onclick="switchTab('notifications')"><i class="fas fa-bell"></i> Updates</div>
+      <div class="tab" onclick="switchTab('profile')"><i class="fas fa-user"></i> Profile</div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content active" id="tab-overview">
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" style="color:#1a6fc4" id="visitsUsedStat">2</div>
+          <div class="stat-lbl">Visits Used</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#22c55e" id="visitsLeftStat">2</div>
+          <div class="stat-lbl">Visits Left</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#f59e0b" id="vouchersLeftStat">3</div>
+          <div class="stat-lbl">Vouchers Left</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:#c0392b" id="daysLeftStat">182</div>
+          <div class="stat-lbl">Days Left</div>
+        </div>
+      </div>
+
+      <!-- Upsell Banner -->
+      <div class="upsell-banner to-together" id="upsellBanner">
+        <div class="upsell-icon">⚪</div>
+        <div>
+          <div class="upsell-title">Bring your +1 — Upgrade to Together Pass</div>
+          <div class="upsell-desc">You've already used 2 visits. Upgrade to Together Pass and bring a child along for 4 visits with locker access, 15% discount, and a birthday benefit.</div>
+          <a href="register.html?plan=together" class="upsell-cta">Upgrade for ₹2,800 →</a>
+        </div>
+      </div>
+
+      <!-- Next visit reminder -->
+      <div class="section-heading"><i class="fas fa-calendar-alt" style="color:#1a6fc4"></i> Plan Your Next Visit</div>
+      <div style="background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:11px;color:#888;margin-bottom:6px">Preferred Date</div>
+            <input type="date" style="width:100%;padding:9px 12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none">
+          </div>
+          <div>
+            <div style="font-size:11px;color:#888;margin-bottom:6px">Time Slot</div>
+            <select style="width:100%;padding:9px 12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none">
+              <option>Morning (9 AM – 1 PM)</option>
+              <option>Afternoon (1 PM – 5 PM)</option>
+              <option>Full Day (9 AM – 6 PM)</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button style="width:100%;padding:10px;background:#1a6fc4;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">Plan Visit</button>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:#f0f9ff;border-radius:8px;font-size:12px;color:#1e40af">
+          <i class="fas fa-info-circle" style="margin-right:6px"></i>Weekdays offer priority entry and shorter queues. Your Explore Pass includes weekday priority lane access.
+        </div>
+      </div>
+
+      <!-- Active vouchers preview -->
+      <div class="section-heading"><i class="fas fa-ticket-alt" style="color:#f59e0b"></i> Active Vouchers <span style="font-size:12px;font-weight:400;color:#888;margin-left:auto"><a href="#" onclick="switchTab('vouchers')" style="color:#1a6fc4;text-decoration:none">View all →</a></span></div>
+      <div class="voucher-grid" id="overviewVouchers"></div>
+    </div>
+
+    <!-- Vouchers Tab -->
+    <div class="tab-content" id="tab-vouchers">
+      <div class="section-heading"><i class="fas fa-ticket-alt" style="color:#f59e0b"></i> My Vouchers <span style="font-size:12px;font-weight:400;color:#888;margin-left:4px">Tap any active voucher to enlarge QR code</span></div>
+      <div class="voucher-grid" id="allVouchers"></div>
+
+      <div style="background:#f8fafc;border-radius:12px;padding:16px;font-size:12px;color:#666;margin-top:4px">
+        <i class="fas fa-info-circle" style="color:#1a6fc4;margin-right:6px"></i>
+        Each voucher has a unique QR code. Show it to the WOW staff at the respective counter. Once scanned, it is permanently redeemed and cannot be reused. Vouchers expire with your passport validity.
+      </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content" id="tab-history">
+      <div class="section-heading"><i class="fas fa-history" style="color:#1a6fc4"></i> Visit History</div>
+      <div class="visit-timeline" id="visitTimeline"></div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div class="tab-content" id="tab-notifications">
+      <div class="section-heading"><i class="fas fa-bell" style="color:#f59e0b"></i> Updates & Alerts</div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-content" id="tab-profile">
+      <div class="section-heading"><i class="fas fa-user" style="color:#1a6fc4"></i> Passport Holder Profile</div>
+      <div class="profile-grid" id="profileGrid"></div>
+      <div style="margin-top:16px;display:flex;gap:10px">
+        <button style="padding:10px 20px;background:#f0f2f5;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#555;font-family:'Inter',sans-serif">
+          <i class="fas fa-key"></i> Change PIN
+        </button>
+        <button style="padding:10px 20px;background:#f0f2f5;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:#555;font-family:'Inter',sans-serif">
+          <i class="fas fa-edit"></i> Update Details
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Gate QR Modal -->
+<div class="modal-overlay" id="gateQrModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div style="font-size:12px;color:#888;margin-bottom:8px">Show this at the WOW main gate</div>
+      <div class="big-qr" id="gateQrBig"></div>
+      <div class="modal-vname" id="gateQrName">WOW-EXP-2025-00142</div>
+      <div style="font-size:11px;color:#888;margin-bottom:6px" id="gateQrHolder">Rajesh Sharma</div>
+      <div style="font-size:11px;color:#888;margin-bottom:20px" id="gateQrPlan">WOW Explore Pass · Visit 2 of 4</div>
+      <button class="modal-close-btn" onclick="closeGateQR()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Voucher QR Modal -->
+<div class="modal-overlay" id="voucherQrModal">
+  <div class="modal">
+    <div class="modal-body">
+      <div style="font-size:12px;color:#888;margin-bottom:8px">Show this to WOW staff for redemption</div>
+      <div class="big-qr" id="bigVoucherQr"></div>
+      <div class="modal-vname" id="bigVoucherName">Photo Coupon</div>
+      <div class="modal-vid" id="bigVoucherId">WOW-PHO-2025-00142-001</div>
+      <div style="background:#dcfce7;border-radius:8px;padding:10px;font-size:12px;color:#166534;margin-bottom:16px">
+        <i class="fas fa-info-circle" style="margin-right:6px"></i>Single use only · Cannot be reused after scan
+      </div>
+      <button class="modal-close-btn" onclick="closeVoucherQR()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Demo Data ────────────────────────────────────────────────
+const holderData = {
+  passportId: 'WOW-EXP-2025-00142',
+  name: 'Rajesh Sharma',
+  plan: 'WOW Explore Pass',
+  tier: 'explore',
+  tierLabel: 'EXPLORE',
+  entriesUsed: 2,
+  entriesAllowed: 4,
+  expiryDate: '2026-03-31',
+  mobile: '9876543210',
+  email: 'rajesh@email.com',
+  dob: '1990-04-15',
+  address: 'A-24, Sector 18, Noida, UP 201301',
+  issueDate: '2025-09-28'
+};
+
+const vouchersData = [
+  {id:'WOW-PHO-EXP-00142-001', type:'photo', topClass:'', label:'Photo Coupon', icon:'📸', value:'1 Free Professional Photo', redeemed:true, redeemedAt:'2025-10-12'},
+  {id:'WOW-PHO-EXP-00142-002', type:'photo', topClass:'', label:'Photo Coupon', icon:'📸', value:'1 Free Professional Photo', redeemed:false, redeemedAt:null},
+  {id:'WOW-FNB-EXP-00142-001', type:'fnb', topClass:'fnb', label:'F&B Discount', icon:'🍟', value:'10% Off at All Outlets', redeemed:false, redeemedAt:null},
+  {id:'WOW-ENT-EXP-00142-001', type:'entry', topClass:'', label:'Priority Entry', icon:'🚪', value:'Weekday Priority Lane', redeemed:true, redeemedAt:'2025-10-05'},
+];
+
+const visitHistory = [
+  {date:'12 Oct 2025',title:'Visit #2 — Water Park Day',tags:['Weekday priority entry','1x Photo redeemed','F&B: ₹340 saved'],icon:'🌊'},
+  {date:'05 Oct 2025',title:'Visit #1 — Full Park Opening',tags:['Weekday priority entry','All rides','₹0 extra spend'],icon:'🎡'},
+];
+
+const notifications = [
+  {icon:'⬆️',color:'#dbeafe',title:'Upgrade Offer: Together Pass',sub:'Use 2 more visits and save ₹500 on upgrade to Together Pass. Offer valid till 31 Mar 2026.',time:'Today'},
+  {icon:'🎉',color:'#fef9c3',title:'Diwali Special: 2X Photo Coupons',sub:'Visit between 20–30 Oct 2025 to get double photo coupons redeemed. Legacy holders get priority booth access.',time:'3 days ago'},
+  {icon:'🔔',color:'#dcfce7',title:'Passport Validity Reminder',sub:'Your Explore Pass is valid until 31 Mar 2026. You have 2 visits remaining. Plan your next visit!',time:'1 week ago'},
+  {icon:'🛡️',color:'#f3e8ff',title:'Security Alert: Last Login',sub:'Last login from 10.0.0.1 · Mobile OTP · 28 Mar 2026 09:14 AM. If this wasn\'t you, reset your PIN.',time:'2 weeks ago'},
+];
+
+// ─── Initialization ────────────────────────────────────────────
+function init() {
+  // Set card data
+  document.getElementById('passportCard').className = 'passport-card '+holderData.tier;
+  document.getElementById('cardTier').textContent = holderData.tierLabel;
+  document.getElementById('cardName').textContent = holderData.name.toUpperCase();
+  document.getElementById('cardPlan').textContent = holderData.plan;
+  document.getElementById('cardId').textContent = holderData.passportId;
+
+  // Expiry
+  const expiry = new Date(holderData.expiryDate);
+  const expStr = expiry.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('cardExpiry').textContent = expStr;
+  document.getElementById('validityDate').textContent = 'Valid until '+expStr;
+  document.getElementById('cardVisits').textContent = holderData.entriesUsed+' / '+holderData.entriesAllowed;
+
+  // Days left
+  const today = new Date();
+  const daysLeft = Math.max(0, Math.round((expiry - today) / (1000*60*60*24)));
+  document.getElementById('daysLeft').textContent = daysLeft+' days left';
+  document.getElementById('daysLeftStat').textContent = daysLeft;
+
+  // Progress
+  const pct = (holderData.entriesUsed / holderData.entriesAllowed)*100;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = holderData.entriesUsed+' of '+holderData.entriesAllowed+' used';
+
+  // Visit dots
+  let dots='';
+  for(let i=0;i<holderData.entriesAllowed;i++){
+    if(i<holderData.entriesUsed) dots+='<div class="visit-dot done"></div>';
+    else dots+='<div class="visit-dot"></div>';
+  }
+  document.getElementById('visitDots').innerHTML=dots;
+
+  // Stats
+  document.getElementById('visitsUsedStat').textContent = holderData.entriesUsed;
+  document.getElementById('visitsLeftStat').textContent = holderData.entriesAllowed - holderData.entriesUsed;
+  const activeVouchers = vouchersData.filter(v=>!v.redeemed).length;
+  document.getElementById('vouchersLeftStat').textContent = activeVouchers;
+
+  // Gate QR on card
+  QRCode.toCanvas(document.createElement('canvas'), holderData.passportId, {width:56, margin:0}, (err,canvas)=>{
+    if(!err) document.getElementById('cardQrContainer').appendChild(canvas);
+  });
+
+  // Upsell banner
+  if(holderData.tier==='explore'){
+    document.getElementById('upsellBanner').className='upsell-banner to-together';
+    document.getElementById('upsellBanner').style.display='flex';
+  } else if(holderData.tier==='together'){
+    document.getElementById('upsellBanner').innerHTML=`<div class="upsell-icon">🔴</div><div>
+      <div class="upsell-title">Upgrade to Legacy — Go VIP</div>
+      <div class="upsell-desc">Your Together Pass expires in ${daysLeft} days. Upgrade to Legacy for 8 family visits, VIP fast-track entry, free lockers & costumes, 20% discount and guest passes.</div>
+      <a href="register.html?plan=legacy" class="upsell-cta">Upgrade for ₹5,500 →</a></div>`;
+    document.getElementById('upsellBanner').className='upsell-banner to-legacy';
+  } else {
+    document.getElementById('upsellBanner').style.display='none';
+  }
+
+  renderVouchers();
+  renderHistory();
+  renderNotifications();
+  renderProfile();
+}
+
+// ─── Voucher Rendering ─────────────────────────────────────────
+function renderVouchers(containerId, limit) {
+  const containers = containerId ? [containerId] : ['overviewVouchers','allVouchers'];
+  const data = limit ? vouchersData.slice(0,limit) : vouchersData;
+
+  containers.forEach(cid => {
+    const c = document.getElementById(cid);
+    if(!c) return;
+    c.innerHTML = '';
+    data.forEach(v => {
+      const div = document.createElement('div');
+      div.className = 'voucher-card'+(v.redeemed?' redeemed':'');
+      div.onclick = v.redeemed ? null : ()=>showVoucherQR(v);
+      div.innerHTML = `
+        <div class="voucher-top ${v.topClass}">
+          ${v.redeemed?'<div class="redeemed-stamp">USED</div>':''}
+          <div class="voucher-icon-big">${v.icon}</div>
+          <div class="voucher-name">${v.label}</div>
+          <div class="voucher-val">${v.value}</div>
+        </div>
+        <div class="voucher-bottom">
+          <div class="voucher-id">${v.id}</div>
+          <div class="voucher-qr" id="vqr-${v.id.replace(/[^a-zA-Z0-9]/g,'')}" style="text-align:center"></div>
+          <div class="voucher-status">
+            <span class="voucher-expiry">Exp: ${holderData.expiryDate}</span>
+            <span class="status-badge ${v.redeemed?'redeemed':'active'}">${v.redeemed?'USED':'ACTIVE'}</span>
+          </div>
+        </div>`;
+      c.appendChild(div);
+      // Generate mini QR
+      const qrContainer = div.querySelector('.voucher-qr');
+      QRCode.toCanvas(document.createElement('canvas'), v.id, {width:80,margin:0}, (err,canvas)=>{
+        if(!err && qrContainer) qrContainer.appendChild(canvas);
+      });
+    });
+  });
+}
+
+// ─── History ───────────────────────────────────────────────────
+function renderHistory(){
+  const t = document.getElementById('visitTimeline');
+  t.innerHTML = visitHistory.map((v,i)=>`
+    <div class="visit-item ${i===0?'current':''}">
+      <div class="visit-date">${v.date}</div>
+      <div class="visit-card-item">
+        <div class="visit-title">${v.icon} ${v.title}</div>
+        <div class="visit-tags">${v.tags.map(tag=>`<span class="visit-tag">${tag}</span>`).join('')}</div>
+      </div>
+    </div>`).join('')+`
+  <div style="text-align:center;padding:20px;color:#aaa;font-size:13px">
+    <i class="fas fa-calendar-plus" style="font-size:24px;margin-bottom:8px;display:block"></i>
+    Your next visit will appear here after check-in
+  </div>`;
+}
+
+// ─── Notifications ─────────────────────────────────────────────
+function renderNotifications(){
+  document.getElementById('notifList').innerHTML = notifications.map(n=>`
+    <div class="notif-item">
+      <div class="notif-icon" style="background:${n.color}">${n.icon}</div>
+      <div style="flex:1">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.sub}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+      <div class="notif-dot"></div>
+    </div>`).join('');
+}
+
+// ─── Profile ───────────────────────────────────────────────────
+function renderProfile(){
+  const fields=[
+    ['Full Name', holderData.name],
+    ['Passport ID', holderData.passportId],
+    ['Mobile', holderData.mobile],
+    ['Email', holderData.email || 'Not provided'],
+    ['Date of Birth', holderData.dob],
+    ['Issue Date', holderData.issueDate],
+    ['Valid Until', holderData.expiryDate],
+    ['Address', holderData.address]
+  ];
+  document.getElementById('profileGrid').innerHTML = fields.map(([l,v])=>`
+    <div class="profile-field">
+      <div class="profile-label">${l}</div>
+      <div class="profile-value">${v}</div>
+    </div>`).join('');
+}
+
+// ─── QR Modals ─────────────────────────────────────────────────
+function showGateQR(){
+  const modal = document.getElementById('gateQrModal');
+  const qrDiv = document.getElementById('gateQrBig');
+  qrDiv.innerHTML='';
+  QRCode.toCanvas(document.createElement('canvas'), holderData.passportId, {width:200,margin:1}, (err,canvas)=>{
+    if(!err) qrDiv.appendChild(canvas);
+  });
+  document.getElementById('gateQrName').textContent = holderData.passportId;
+  document.getElementById('gateQrHolder').textContent = holderData.name;
+  document.getElementById('gateQrPlan').textContent = holderData.plan+' · Visit '+(holderData.entriesUsed+1)+' of '+holderData.entriesAllowed;
+  modal.classList.add('open');
+}
+function closeGateQR(){ document.getElementById('gateQrModal').classList.remove('open'); }
+
+function showVoucherQR(v){
+  const modal = document.getElementById('voucherQrModal');
+  const qrDiv = document.getElementById('bigVoucherQr');
+  qrDiv.innerHTML='';
+  QRCode.toCanvas(document.createElement('canvas'), v.id, {width:200,margin:1}, (err,canvas)=>{
+    if(!err) qrDiv.appendChild(canvas);
+  });
+  document.getElementById('bigVoucherName').textContent = v.label;
+  document.getElementById('bigVoucherId').textContent = v.id;
+  modal.classList.add('open');
+}
+function closeVoucherQR(){ document.getElementById('voucherQrModal').classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(mo=>{
+  mo.addEventListener('click', e=>{ if(e.target===mo){ mo.classList.remove('open'); } });
+});
+
+// ─── Tab Switching ─────────────────────────────────────────────
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const names=['overview','vouchers','history','notifications','profile'];
+    t.classList.toggle('active', names[i]===tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+function logout(){
+  sessionStorage.clear();
+  window.location.href='login.html';
+}
+
+// ─── Boot ──────────────────────────────────────────────────────
+// Try to load from session storage first
+const storedHolder = sessionStorage.getItem('passport_holder');
+if(storedHolder){
+  try{
+    const h = JSON.parse(storedHolder);
+    holderData.passportId = h.passportId || holderData.passportId;
+    holderData.name = h.holderName || holderData.name;
+    holderData.plan = h.planName || holderData.plan;
+    holderData.tier = (h.planCode||'EXP')==='LEG'?'legacy':(h.planCode==='TOG'?'together':'explore');
+    holderData.entriesUsed = h.entriesUsed||0;
+    holderData.entriesAllowed = h.entriesAllowed||4;
+    holderData.expiryDate = h.expiryDate || holderData.expiryDate;
+  }catch(e){}
+}
+
+init();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
