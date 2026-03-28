@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/booking-page.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <script src="../js/wow-modules.js"></script>
   <!-- QR Code Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
@@ -454,12 +456,12 @@
             <div class="cell-val" id="meta-date">--</div>
           </div>
           <div class="conf-meta-cell">
-            <div class="cell-label">Adults</div>
+            <div class="cell-label">Guests</div>
             <div class="cell-val" id="meta-adults">--</div>
           </div>
           <div class="conf-meta-cell">
-            <div class="cell-label">Children</div>
-            <div class="cell-val" id="meta-children">--</div>
+            <div class="cell-label">Lead Guest</div>
+            <div class="cell-val" id="meta-guest-name" style="font-size:12px;">--</div>
           </div>
           <div class="conf-meta-cell">
             <div class="cell-label">Gate Opens</div>
@@ -473,6 +475,11 @@
             <div class="cell-label">Park Closes</div>
             <div class="cell-val">6:00 PM</div>
           </div>
+        </div>
+
+        <!-- ID proof alert -->
+        <div id="id-proof-alert" style="display:none;background:rgba(245,168,0,.12);border:1px solid rgba(245,168,0,.3);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#F5A800;line-height:1.5;">
+          ⚠️ <strong>ID Proof Required:</strong> <span id="id-proof-msg">Please carry a valid photo ID for concession verification at the gate.</span>
         </div>
 
         <div class="conf-ticket-id">
@@ -559,7 +566,7 @@
         <div class="conf-step-num">5</div>
         <div class="conf-step-text">
           <h4>Need Help? Call Us</h4>
-          <p>Helpline: <a href="tel:08069090000" style="color:#0055B3;font-weight:700;">080-6909-0000</a> | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1a696f6a6a75686e5a6d7568767e69757c6d75747e7f68347374">[email&#160;protected]</a> | 9 AM to 7 PM daily.</p>
+          <p>Helpline: <a href="tel:08069090000" style="color:#0055B3;font-weight:700;">080-6909-0000</a> | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbc8cecbcbd4c9cffbccd4c9d7dfc8d4ddccd4d5dfdec995d2d5">[email&#160;protected]</a> | 9 AM to 7 PM daily.</p>
         </div>
       </div>
     </div>
@@ -681,8 +688,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Ticket counts
-  document.getElementById('meta-adults').textContent   = (bk.adults   || 2) + ' pax';
-  document.getElementById('meta-children').textContent = (bk.children || 1) + ' pax';
+  const adults   = bk.adults   || 2;
+  const children = bk.children || 0;
+  const seniors  = bk.seniors  || 0;
+  const armed    = bk.armed    || 0;
+  const disabled = bk.disabled || 0;
+  const totalGuests = adults + children + seniors + armed + disabled;
+  const guestStr = [
+    adults   > 0 ? adults   + ' Adult' + (adults > 1 ? 's' : '')   : '',
+    children > 0 ? children + ' Child' + (children > 1 ? 'ren' : '') : '',
+    seniors  > 0 ? seniors  + ' Senior' + (seniors > 1 ? 's' : '')  : '',
+    armed    > 0 ? armed    + ' Armed Forces'                        : '',
+    disabled > 0 ? disabled + ' Diff. Abled'                        : '',
+  ].filter(Boolean).join(', ');
+  document.getElementById('meta-adults').textContent = guestStr || (totalGuests + ' Guest' + (totalGuests > 1 ? 's' : ''));
+
+  // Guest name
+  if (bk.name) document.getElementById('meta-guest-name').textContent = bk.name;
+
+  // ID proof alert
+  const idProofCategories = [];
+  if (seniors  > 0) idProofCategories.push('Senior Citizens (age 60+)');
+  if (armed    > 0) idProofCategories.push('Armed Forces (Defence ID)');
+  if (disabled > 0) idProofCategories.push('Differently Abled (disability certificate)');
+  if (idProofCategories.length > 0) {
+    document.getElementById('id-proof-alert').style.display = 'block';
+    document.getElementById('id-proof-msg').textContent = 'Please carry valid ID for: ' + idProofCategories.join(', ');
+  }
 
   // Financials
   const total    = bk.total    || 3597;
@@ -707,15 +739,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Build QR Code data
   const qrData = JSON.stringify({
-    id:      bookingId,
-    park:    parkType,
-    guest:   bk.name   || 'Guest',
-    mobile:  bk.mobile || '',
-    date:    bk.date   || '',
-    adults:  bk.adults || 2,
-    children: bk.children || 1,
-    total:   total,
-    issued:  new Date().toISOString()
+    id:       bookingId,
+    park:     bk.parkKey || parkType,
+    guest:    bk.name   || 'Guest',
+    mobile:   bk.mobile || '',
+    date:     bk.date   || '',
+    adults:   adults,
+    children: children,
+    seniors:  seniors,
+    armed:    armed,
+    disabled: disabled,
+    total:    total,
+    issued:   new Date().toISOString()
   });
 
   // Generate QR Code
@@ -735,9 +770,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Breakdown items
+  const PRICES = {
+    WATER_DAY:    { adult: 1299, child: 899, senior: 975, armed: 909, disabled: 649 },
+    AMUSEMENT_DAY:{ adult: 1299, child: 899, senior: 975, armed: 909, disabled: 649 },
+    COMBO:        { adult: 1999, child: 1399, senior: 1499, armed: 1399, disabled: 999 },
+  };
+  const px = PRICES[bk.parkKey] || PRICES.WATER_DAY;
   const items = bk.items || [
-    { name: 'Adult Ticket', qty: bk.adults || 2,   price: bk.adultPrice   || 1299 },
-    { name: 'Child Ticket', qty: bk.children || 1,  price: bk.childPrice   || 999  }
+    ...(adults   > 0 ? [{ name: 'Adult Ticket',           qty: adults,   price: bk.adultPrice   || px.adult   }] : []),
+    ...(children > 0 ? [{ name: 'Child Ticket',           qty: children, price: bk.childPrice   || px.child   }] : []),
+    ...(seniors  > 0 ? [{ name: 'Senior Citizen Ticket',  qty: seniors,  price: bk.seniorPrice  || px.senior  }] : []),
+    ...(armed    > 0 ? [{ name: 'Armed Forces Ticket',    qty: armed,    price: bk.armedPrice   || px.armed   }] : []),
+    ...(disabled > 0 ? [{ name: 'Diff. Abled Ticket',     qty: disabled, price: bk.disabledPrice|| px.disabled}] : []),
   ];
 
   const container = document.getElementById('breakdown-items');
