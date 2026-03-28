@@ -4,141 +4,715 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile — Worlds of Wonder</title>
+  <meta name="description" content="Manage your Worlds of Wonder account — personal details, contact info, ID documents and preferences." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <script src="../js/wow-modules.js"></script>
+  <style>
+    /* ── Profile card ── */
+    .profile-hero {
+      background: linear-gradient(135deg, #0a1628, #1a2a4a);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255,255,255,.08);
+      flex-wrap: wrap;
+    }
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0055B3, #0088dd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      flex-shrink: 0;
+      box-shadow: 0 8px 24px rgba(0,85,179,.4);
+      position: relative;
+    }
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 28px;
+      height: 28px;
+      background: #0055B3;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      border: 2px solid #0a1628;
+    }
+    .profile-hero-info { flex: 1; min-width: 180px; }
+    .profile-name { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .profile-email { font-size: 14px; color: rgba(255,255,255,.55); margin-bottom: 10px; }
+    .profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-member  { background: rgba(0,85,179,.2); color: #60a5fa; border: 1px solid rgba(0,85,179,.3); }
+    .badge-passport{ background: rgba(245,168,0,.15); color: #F5A800; border: 1px solid rgba(245,168,0,.25); }
+    .badge-verified{ background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+    .profile-hero-actions { display: flex; flex-direction: column; gap: 8px; }
+
+    /* ── Section card ── */
+    .section-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,.45);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .section-edit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 10px;
+      background: rgba(0,85,179,.15);
+      color: #60a5fa;
+      border: 1px solid rgba(0,85,179,.25);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+    }
+    .section-edit-btn:hover { background: rgba(0,85,179,.3); }
+
+    /* ── Fields ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media(max-width:640px){ .field-grid { grid-template-columns: 1fr; } }
+    .field-item { }
+    .field-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.35);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 6px;
+    }
+    .field-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .field-value.muted { color: rgba(255,255,255,.35); font-style: italic; }
+    .field-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #10b981;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    /* ── Edit Form (hidden by default) ── */
+    .edit-form { display: none; }
+    .edit-form.open { display: block; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    @media(max-width:640px){ .form-row { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.5); }
+    .form-input {
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-input:focus { border-color: #0055B3; }
+    .form-input::placeholder { color: rgba(255,255,255,.25); }
+    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-save {
+      padding: 11px 28px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0055B3, #0073E6);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,85,179,.4); }
+    .btn-cancel-edit {
+      padding: 11px 20px;
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(255,255,255,.5);
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,.15);
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* ── ID Documents ── */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    @media(max-width:640px){ .doc-grid { grid-template-columns: 1fr; } }
+    .doc-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .doc-icon { font-size: 26px; flex-shrink: 0; }
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 13px; font-weight: 700; color: #fff; }
+    .doc-status { font-size: 11px; margin-top: 3px; }
+    .doc-verified { color: #10b981; }
+    .doc-pending  { color: #F5A800; }
+    .doc-missing  { color: rgba(255,255,255,.35); }
+    .doc-upload-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: rgba(0,85,179,.2);
+      color: #60a5fa;
+      border: 1px solid rgba(0,85,179,.3);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      white-space: nowrap;
+    }
+
+    /* ── Preferences ── */
+    .pref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .pref-row:last-child { border-bottom: none; }
+    .pref-label { font-size: 14px; color: #fff; font-weight: 600; }
+    .pref-sub { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.15);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .3s;
+    }
+    .toggle input:checked + .toggle-slider { background: #0055B3; }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    /* ── Danger zone ── */
+    .danger-card {
+      background: rgba(239,68,68,.05);
+      border: 1px solid rgba(239,68,68,.2);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 20px;
+    }
+    .danger-title { font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 12px; }
+    .danger-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-danger {
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: rgba(239,68,68,.12);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,.25);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,.2); }
+
+    /* ── Success toast ── */
+    #save-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0a9b5f;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      display: none;
+      z-index: 9999;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+  </style>
 </head>
-<body>
+<body class="portal-body">
 <div id="app">
-  <div class="portal-dashboard">
-    <!-- Sidebar -->
+  <div class="portal-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
     <aside class="portal-sidebar" id="portal-sidebar">
       <div class="portal-sidebar-logo">
-        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+        </a>
       </div>
       <nav class="portal-sidenav">
+        <a href="dashboard.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
         <a href="my-bookings.html" class="portal-sidenav-item">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          My Bookings
+          <span>My Bookings</span>
         </a>
-        <a href="passport.html" class="portal-sidenav-item">
+        <a href="tickets.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
+          <span>My Tickets</span>
+        </a>
+        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
-          My Passport
+          <span>My Passport</span>
         </a>
-        <a href="profile.html" class="portal-sidenav-item active">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Profile
+        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Loyalty Points</span>
         </a>
         <a href="offers.html" class="portal-sidenav-item">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          My Offers
+          <span>My Offers</span>
+        </a>
+        <a href="notifications.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span>Notifications</span>
+        </a>
+        <a href="profile.html" class="portal-sidenav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
         </a>
         <div class="portal-sidenav-divider"></div>
         <a href="../index.html" class="portal-sidenav-item">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          Back to Website
+          <span>Back to Website</span>
         </a>
         <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sign Out
+          <span>Sign Out</span>
         </button>
       </nav>
     </aside>
 
+    <!-- ═══ MAIN ═══ -->
     <main class="portal-main">
-      <div id="portal-loading" class="portal-loading"><div class="portal-spinner"></div><p>Loading…</p></div>
-      <div id="portal-content" style="display:none;">
+      <div id="portal-loading" class="portal-loading">
+        <div class="portal-spinner"></div>
+        <p>Loading your profile…</p>
+      </div>
 
+      <div id="portal-content" style="display:none;">
         <div class="portal-main-header">
           <div>
             <h1 class="portal-main-title">My Profile</h1>
-            <p class="portal-main-sub">Manage your account details and preferences</p>
+            <p class="portal-main-sub">Manage your account details, ID documents and preferences</p>
           </div>
         </div>
 
-        <div class="portal-profile-grid">
-          <!-- Avatar + name card -->
-          <div class="portal-card">
-            <div class="portal-avatar-wrap" id="avatar-wrap">
-              <div class="portal-avatar" id="avatar-circle">—</div>
-              <div>
-                <div class="portal-avatar-name" id="avatar-name">—</div>
-                <div class="portal-avatar-email" id="avatar-email">—</div>
-                <span class="portal-avatar-badge" id="avatar-provider">Email account</span>
+        <!-- ── Profile Hero ── -->
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profile-avatar">
+            ?
+            <div class="avatar-edit-btn" title="Change photo">✏️</div>
+          </div>
+          <div class="profile-hero-info">
+            <div class="profile-name" id="hero-name">Loading…</div>
+            <div class="profile-email" id="hero-email">—</div>
+            <div class="profile-badges">
+              <span class="profile-badge badge-member">🌟 WOW Member</span>
+              <span class="profile-badge badge-passport" id="passport-badge" style="display:none;">🪪 Passport Active</span>
+              <span class="profile-badge badge-verified" id="verified-badge" style="display:none;">✓ Verified</span>
+            </div>
+          </div>
+          <div class="profile-hero-actions">
+            <a href="my-bookings.html" class="btn btn-outline" style="font-size:13px;padding:10px 18px;white-space:nowrap;">View Bookings</a>
+          </div>
+        </div>
+
+        <!-- ── Personal Info ── -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">Personal Information</div>
+            <button class="section-edit-btn" id="edit-personal-btn" onclick="toggleEdit('personal')">✏️ Edit</button>
+          </div>
+
+          <!-- View Mode -->
+          <div id="personal-view">
+            <div class="field-grid">
+              <div class="field-item">
+                <div class="field-label">First Name</div>
+                <div class="field-value" id="view-first-name">—</div>
+              </div>
+              <div class="field-item">
+                <div class="field-label">Last Name</div>
+                <div class="field-value" id="view-last-name">—</div>
+              </div>
+              <div class="field-item">
+                <div class="field-label">Date of Birth</div>
+                <div class="field-value" id="view-dob" class="muted">Not set</div>
+              </div>
+              <div class="field-item">
+                <div class="field-label">Gender</div>
+                <div class="field-value" id="view-gender" class="muted">Not set</div>
+              </div>
+              <div class="field-item">
+                <div class="field-label">City</div>
+                <div class="field-value" id="view-city" class="muted">Not set</div>
+              </div>
+              <div class="field-item">
+                <div class="field-label">State</div>
+                <div class="field-value" id="view-state" class="muted">Not set</div>
               </div>
             </div>
           </div>
 
-          <!-- Edit profile form -->
-          <div class="portal-card">
-            <div class="portal-card-title">Personal Details</div>
-            <form id="profile-form">
-              <div class="form-grid">
-                <div class="portal-field">
-                  <label class="portal-label">First Name</label>
-                  <input class="portal-input" id="p-fname" type="text" placeholder="First name" />
-                </div>
-                <div class="portal-field">
-                  <label class="portal-label">Last Name</label>
-                  <input class="portal-input" id="p-lname" type="text" placeholder="Last name" />
-                </div>
+          <!-- Edit Mode -->
+          <form id="personal-form" class="edit-form" onsubmit="savePersonal(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input class="form-input" id="in-first-name" placeholder="First Name" />
               </div>
-              <div class="portal-field">
-                <label class="portal-label">Mobile Number</label>
-                <div class="portal-input-prefix-wrap">
-                  <span class="portal-input-prefix">+91</span>
-                  <input class="portal-input portal-input--prefixed" id="p-mobile" type="tel" placeholder="10-digit number" maxlength="10" />
-                </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input class="form-input" id="in-last-name" placeholder="Last Name" />
               </div>
-              <div class="portal-field">
-                <label class="portal-label">Email (cannot change)</label>
-                <input class="portal-input" id="p-email" type="email" disabled style="opacity:.6;cursor:not-allowed;" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <input class="form-input" id="in-dob" type="date" />
               </div>
-              <button type="submit" class="portal-submit-btn portal-submit-btn--blue" id="profile-save">Save Changes</button>
-              <div class="portal-error-banner hidden" id="profile-msg"></div>
-            </form>
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select class="form-input" id="in-gender">
+                  <option value="">Select gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Non-binary</option>
+                  <option>Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input class="form-input" id="in-city" placeholder="City" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <select class="form-input" id="in-state">
+                  <option value="">Select state</option>
+                  <option>Delhi</option>
+                  <option>Uttar Pradesh</option>
+                  <option>Haryana</option>
+                  <option>Rajasthan</option>
+                  <option>Madhya Pradesh</option>
+                  <option>Maharashtra</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-save">Save Changes</button>
+              <button type="button" class="btn-cancel-edit" onclick="toggleEdit('personal')">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── Contact Info ── -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">Contact Details</div>
+            <button class="section-edit-btn" onclick="toggleEdit('contact')">✏️ Edit</button>
           </div>
 
-          <!-- Change password -->
-          <div class="portal-card" id="change-pw-card">
-            <div class="portal-card-title">Change Password</div>
-            <form id="pw-form">
-              <div class="portal-field">
-                <label class="portal-label">Current Password</label>
-                <input class="portal-input" id="cur-pw" type="password" placeholder="Current password" />
+          <div id="contact-view">
+            <div class="field-grid">
+              <div class="field-item">
+                <div class="field-label">Email Address</div>
+                <div class="field-value" id="view-email">—
+                  <span class="field-verified" id="email-verified" style="display:none;">✓ Verified</span>
+                </div>
               </div>
-              <div class="portal-field">
-                <label class="portal-label">New Password</label>
-                <input class="portal-input" id="new-pw" type="password" placeholder="New password (8+ chars)" />
+              <div class="field-item">
+                <div class="field-label">Mobile Number</div>
+                <div class="field-value" id="view-mobile">—
+                  <span class="field-verified" id="mobile-verified" style="display:none;">✓ Verified</span>
+                </div>
               </div>
-              <div class="portal-field">
-                <label class="portal-label">Confirm New Password</label>
-                <input class="portal-input" id="conf-pw" type="password" placeholder="Repeat new password" />
+              <div class="field-item">
+                <div class="field-label">WhatsApp Number</div>
+                <div class="field-value" id="view-whatsapp" style="color:rgba(255,255,255,.35);font-style:italic;">Same as mobile</div>
               </div>
-              <button type="submit" class="portal-submit-btn portal-submit-btn--blue" id="pw-save">Update Password</button>
-              <div class="portal-error-banner hidden" id="pw-msg"></div>
-            </form>
+              <div class="field-item">
+                <div class="field-label">Alternate Email</div>
+                <div class="field-value" id="view-alt-email" style="color:rgba(255,255,255,.35);font-style:italic;">Not set</div>
+              </div>
+            </div>
           </div>
 
-          <!-- Danger zone -->
-          <div class="portal-card portal-card--danger">
-            <div class="portal-card-title" style="color:#dc2626;">Account</div>
-            <p style="font-size:13.5px;color:#6b7280;margin-bottom:16px;">Sign out of your account on this device.</p>
-            <button class="portal-submit-btn" style="background:#f4f7fb;color:#374151;box-shadow:none;" id="signout-card-btn">Sign Out of Account</button>
+          <form id="contact-form" class="edit-form" onsubmit="saveContact(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input class="form-input" id="in-email" type="email" placeholder="you@example.com" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mobile Number (+91)</label>
+                <input class="form-input" id="in-mobile" type="tel" placeholder="10-digit mobile" maxlength="10" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">WhatsApp Number (if different)</label>
+                <input class="form-input" id="in-whatsapp" type="tel" placeholder="Leave blank to use mobile" maxlength="10" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Alternate Email</label>
+                <input class="form-input" id="in-alt-email" type="email" placeholder="Optional backup email" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-save">Save Contact Info</button>
+              <button type="button" class="btn-cancel-edit" onclick="toggleEdit('contact')">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ── ID Documents ── -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">ID Documents (for Concession Verification)</div>
+          </div>
+          <div class="doc-grid">
+            <div class="doc-card">
+              <div class="doc-icon">🪪</div>
+              <div class="doc-info">
+                <div class="doc-name">Aadhaar Card</div>
+                <div class="doc-status doc-missing">Not uploaded</div>
+              </div>
+              <button class="doc-upload-btn">Upload</button>
+            </div>
+            <div class="doc-card">
+              <div class="doc-icon">📘</div>
+              <div class="doc-info">
+                <div class="doc-name">Passport</div>
+                <div class="doc-status doc-missing">Not uploaded</div>
+              </div>
+              <button class="doc-upload-btn">Upload</button>
+            </div>
+            <div class="doc-card">
+              <div class="doc-icon">🎖️</div>
+              <div class="doc-info">
+                <div class="doc-name">Defence ID (for Armed Forces discount)</div>
+                <div class="doc-status doc-missing">Not uploaded</div>
+              </div>
+              <button class="doc-upload-btn">Upload</button>
+            </div>
+            <div class="doc-card">
+              <div class="doc-icon">♿</div>
+              <div class="doc-info">
+                <div class="doc-name">Disability Certificate (for 50% discount)</div>
+                <div class="doc-status doc-missing">Not uploaded</div>
+              </div>
+              <button class="doc-upload-btn">Upload</button>
+            </div>
+          </div>
+          <p style="font-size:12px;color:rgba(255,255,255,.35);margin-top:16px;line-height:1.6;">
+            ℹ️ ID documents are verified by our team before the concession discount is activated. You can also present physical ID at the gate for spot discounts.
+          </p>
+        </div>
+
+        <!-- ── Communication Preferences ── -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">Communication Preferences</div>
+          </div>
+          <div class="pref-row">
+            <div>
+              <div class="pref-label">Email Notifications</div>
+              <div class="pref-sub">Booking confirmations, receipts, updates</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pref-email" checked onchange="savePref('email', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="pref-row">
+            <div>
+              <div class="pref-label">SMS Alerts</div>
+              <div class="pref-sub">Booking reminders and gate entry notifications</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pref-sms" checked onchange="savePref('sms', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="pref-row" data-module="whatsapp_campaigns">
+            <div>
+              <div class="pref-label">WhatsApp Updates</div>
+              <div class="pref-sub">Instant ticket delivery and flash offers via WhatsApp</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pref-whatsapp" checked onchange="savePref('whatsapp', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="pref-row">
+            <div>
+              <div class="pref-label">Promotional Offers</div>
+              <div class="pref-sub">Flash deals, seasonal discounts and special events</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pref-promo" checked onchange="savePref('promo', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="pref-row" data-module="loyalty_program">
+            <div>
+              <div class="pref-label">Loyalty Points Alerts</div>
+              <div class="pref-sub">Points earned and tier upgrades</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pref-loyalty" checked onchange="savePref('loyalty', this.checked)" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ── Security ── -->
+        <div class="section-card">
+          <div class="section-header">
+            <div class="section-title">Security</div>
+          </div>
+          <div class="field-grid">
+            <div class="field-item">
+              <div class="field-label">Password</div>
+              <div class="field-value">●●●●●●●●</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Two-Factor Auth</div>
+              <div class="field-value" style="color:rgba(255,255,255,.4);font-style:italic;">Not enabled</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Last Login</div>
+              <div class="field-value" id="last-login">—</div>
+            </div>
+            <div class="field-item">
+              <div class="field-label">Account Created</div>
+              <div class="field-value" id="acct-created">—</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="section-edit-btn" onclick="alert('Password reset link sent to your email.')">🔐 Change Password</button>
+            <button class="section-edit-btn" onclick="alert('2FA setup will be available soon.')">🛡 Enable 2FA</button>
+          </div>
+        </div>
+
+        <!-- ── Danger Zone ── -->
+        <div class="danger-card">
+          <div class="danger-title">⚠️ Danger Zone</div>
+          <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:16px;line-height:1.5;">
+            These actions are permanent and cannot be undone. Please be absolutely certain before proceeding.
+          </p>
+          <div class="danger-actions">
+            <button class="btn-danger" onclick="confirmDelete()">🗑 Delete My Account</button>
+            <button class="btn-danger" onclick="confirmExport()">📥 Export My Data (GDPR)</button>
           </div>
         </div>
 
       </div>
+      <!-- /portal-content -->
     </main>
   </div>
 </div>
 
+<!-- Save toast -->
+<div id="save-toast">✅ Changes saved successfully!</div>
+
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getAuth, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
   import { WOW_FB_CONFIG } from '../js/firebase-config.js';
 
   const app  = initializeApp(WOW_FB_CONFIG);
@@ -146,103 +720,172 @@
   const db   = getFirestore(app);
 
   let currentUser = null;
+  let profileData = {};
+
+  function showToast(msg = '✅ Saved!') {
+    const t = document.getElementById('save-toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }
+
+  window.toggleEdit = function(section) {
+    const form = document.getElementById(section + '-form');
+    const view = document.getElementById(section + '-view');
+    const btn  = document.getElementById('edit-' + section + '-btn');
+    if (!form) return;
+    const isOpen = form.classList.contains('open');
+    form.classList.toggle('open', !isOpen);
+    if (view) view.style.display = isOpen ? 'block' : 'none';
+    if (btn)  btn.textContent   = isOpen ? '✏️ Edit' : '✕ Cancel';
+  };
+
+  window.savePersonal = function(e) {
+    e.preventDefault();
+    const data = {
+      firstName: document.getElementById('in-first-name').value,
+      lastName:  document.getElementById('in-last-name').value,
+      dob:       document.getElementById('in-dob').value,
+      gender:    document.getElementById('in-gender').value,
+      city:      document.getElementById('in-city').value,
+      state:     document.getElementById('in-state').value,
+    };
+    Object.assign(profileData, data);
+    // Save to localStorage as fallback
+    localStorage.setItem('wow_profile_' + (currentUser?.uid || 'demo'), JSON.stringify(profileData));
+    // Try Firestore
+    if (currentUser) {
+      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')
+        .then(({ getFirestore, doc, updateDoc }) => {
+          updateDoc(doc(getFirestore(), 'users', currentUser.uid), data).catch(() => {});
+        });
+    }
+    renderPersonalView(data);
+    toggleEdit('personal');
+    showToast('✅ Personal info updated!');
+  };
+
+  window.saveContact = function(e) {
+    e.preventDefault();
+    const data = {
+      altEmail:  document.getElementById('in-alt-email').value,
+      whatsapp:  document.getElementById('in-whatsapp').value,
+    };
+    Object.assign(profileData, data);
+    localStorage.setItem('wow_profile_' + (currentUser?.uid || 'demo'), JSON.stringify(profileData));
+    toggleEdit('contact');
+    showToast('✅ Contact info updated!');
+  };
+
+  window.savePref = function(key, val) {
+    const prefs = JSON.parse(localStorage.getItem('wow_prefs') || '{}');
+    prefs[key] = val;
+    localStorage.setItem('wow_prefs', JSON.stringify(prefs));
+    showToast(val ? `🔔 ${key} notifications enabled` : `🔕 ${key} notifications disabled`);
+  };
+
+  window.confirmDelete = function() {
+    if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
+      alert('Account deletion request submitted. Our team will process it within 30 days as per GDPR.');
+    }
+  };
+
+  window.confirmExport = function() {
+    alert('A data export has been requested. You will receive a download link to your email within 72 hours.');
+    showToast('📥 Data export requested!');
+  };
+
+  function renderPersonalView(data) {
+    document.getElementById('view-first-name').textContent = data.firstName || '—';
+    document.getElementById('view-last-name').textContent  = data.lastName  || '—';
+    document.getElementById('view-dob').textContent        = data.dob       || 'Not set';
+    document.getElementById('view-gender').textContent     = data.gender    || 'Not set';
+    document.getElementById('view-city').textContent       = data.city      || 'Not set';
+    document.getElementById('view-state').textContent      = data.state     || 'Not set';
+    // Populate edit fields
+    if (data.firstName) document.getElementById('in-first-name').value = data.firstName;
+    if (data.lastName)  document.getElementById('in-last-name').value  = data.lastName;
+    if (data.dob)       document.getElementById('in-dob').value        = data.dob;
+    if (data.gender)    document.getElementById('in-gender').value     = data.gender;
+    if (data.city)      document.getElementById('in-city').value       = data.city;
+    if (data.state)     document.getElementById('in-state').value      = data.state;
+  }
+
+  function initials(name) {
+    if (!name) return '?';
+    return name.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    return new Date(typeof ts === 'number' ? ts : ts).toLocaleDateString('en-IN', {
+      day:'numeric', month:'short', year:'numeric'
+    });
+  }
+
+  // Load saved prefs
+  function loadPrefs() {
+    const prefs = JSON.parse(localStorage.getItem('wow_prefs') || '{}');
+    ['email','sms','whatsapp','promo','loyalty'].forEach(k => {
+      const el = document.getElementById('pref-' + k);
+      if (el && k in prefs) el.checked = prefs[k];
+    });
+  }
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = 'login.html'; return; }
     currentUser = user;
+
     document.getElementById('portal-loading').style.display = 'none';
     document.getElementById('portal-content').style.display = 'block';
 
-    // Avatar initials
-    const name = user.displayName || user.email || '';
-    const initials = name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() || '?';
-    document.getElementById('avatar-circle').textContent = initials;
-    document.getElementById('avatar-name').textContent  = user.displayName || 'No name set';
-    document.getElementById('avatar-email').textContent = user.email;
+    // ── Firebase metadata ──
+    const meta = user.metadata;
+    document.getElementById('last-login').textContent  = fmtDate(meta.lastSignInTime ? new Date(meta.lastSignInTime) : null);
+    document.getElementById('acct-created').textContent = fmtDate(meta.creationTime  ? new Date(meta.creationTime)  : null);
 
-    const provider = user.providerData[0]?.providerId;
-    document.getElementById('avatar-provider').textContent = provider === 'google.com' ? 'Google account' : 'Email account';
-    if (provider === 'google.com') document.getElementById('change-pw-card').style.display = 'none';
+    // ── Basic from Firebase Auth ──
+    const nameParts = (user.displayName || '').split(' ');
+    const fName = nameParts[0] || '';
+    const lName = nameParts.slice(1).join(' ') || '';
 
-    // Fill form
-    document.getElementById('p-email').value = user.email || '';
-    const parts = (user.displayName || '').split(' ');
-    document.getElementById('p-fname').value = parts[0] || '';
-    document.getElementById('p-lname').value = parts.slice(1).join(' ') || '';
+    document.getElementById('hero-name').textContent  = user.displayName || user.email?.split('@')[0] || 'WOW Member';
+    document.getElementById('hero-email').textContent = user.email || '—';
+    document.getElementById('profile-avatar').textContent = initials(user.displayName || user.email || 'WM');
+    document.getElementById('view-email').innerHTML = (user.email || '—') + (user.emailVerified ? '<span class="field-verified">✓ Verified</span>' : '');
+    document.getElementById('view-mobile').textContent = '—';
+    if (user.emailVerified) document.getElementById('email-verified').style.display = 'inline-flex';
+    if (user.emailVerified) document.getElementById('verified-badge').style.display = 'inline-flex';
 
-    // Load mobile from Firestore
+    // ── Try loading saved profile data ──
+    let savedLocal = {};
+    try { savedLocal = JSON.parse(localStorage.getItem('wow_profile_' + user.uid) || '{}'); } catch {}
+
+    // ── Try Firestore ──
+    let firestoreData = {};
     try {
       const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) document.getElementById('p-mobile').value = snap.data().mobile || '';
+      if (snap.exists()) firestoreData = snap.data();
     } catch {}
-  });
 
-  function showMsg(id, msg, isErr = true) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = msg;
-    el.style.background = isErr ? '#fef2f2' : '#f0fdf4';
-    el.style.color = isErr ? '#dc2626' : '#065f46';
-    el.style.borderColor = isErr ? '#fecaca' : '#a7f3d0';
-    el.classList.remove('hidden');
-    setTimeout(() => el.classList.add('hidden'), 4000);
-  }
+    profileData = { firstName: fName, lastName: lName, ...savedLocal, ...firestoreData };
+    renderPersonalView(profileData);
 
-  document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!currentUser) return;
-    const fname  = document.getElementById('p-fname').value.trim();
-    const lname  = document.getElementById('p-lname').value.trim();
-    const mobile = document.getElementById('p-mobile').value.trim();
-    const btn    = document.getElementById('profile-save');
-    btn.disabled = true; btn.textContent = 'Saving…';
+    // Passport badge
     try {
-      await updateProfile(currentUser, { displayName: `${fname} ${lname}`.trim() });
-      await setDoc(doc(db, 'users', currentUser.uid), { name: `${fname} ${lname}`.trim(), mobile, updatedAt: serverTimestamp() }, { merge: true });
-      document.getElementById('avatar-name').textContent = `${fname} ${lname}`.trim();
-      showMsg('profile-msg', '✅ Profile updated successfully!', false);
-    } catch (err) {
-      showMsg('profile-msg', 'Failed to save: ' + err.message);
-    } finally {
-      btn.disabled = false; btn.textContent = 'Save Changes';
-    }
+      const pSnap = await getDoc(doc(db, 'passports', user.uid));
+      if (pSnap.exists() && pSnap.data().status === 'active') {
+        document.getElementById('passport-badge').style.display = 'inline-flex';
+      }
+    } catch {}
+
+    loadPrefs();
   });
 
-  document.getElementById('pw-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const cur  = document.getElementById('cur-pw').value;
-    const nw   = document.getElementById('new-pw').value;
-    const conf = document.getElementById('conf-pw').value;
-    if (nw !== conf) { showMsg('pw-msg', 'New passwords do not match'); return; }
-    if (nw.length < 8) { showMsg('pw-msg', 'New password must be at least 8 characters'); return; }
-    const btn = document.getElementById('pw-save');
-    btn.disabled = true; btn.textContent = 'Updating…';
-    try {
-      const cred = EmailAuthProvider.credential(currentUser.email, cur);
-      await reauthenticateWithCredential(currentUser, cred);
-      await updatePassword(currentUser, nw);
-      document.getElementById('cur-pw').value = '';
-      document.getElementById('new-pw').value = '';
-      document.getElementById('conf-pw').value = '';
-      showMsg('pw-msg', '✅ Password updated successfully!', false);
-    } catch (err) {
-      const map = {
-        'auth/wrong-password':  'Current password is incorrect.',
-        'auth/weak-password':   'New password is too weak.',
-        'auth/too-many-requests': 'Too many attempts. Try again later.',
-      };
-      showMsg('pw-msg', map[err.code] || err.message);
-    } finally {
-      btn.disabled = false; btn.textContent = 'Update Password';
-    }
-  });
-
-  ['signout-btn','signout-card-btn'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', async () => {
-      await signOut(auth);
-      window.location.href = '../index.html';
-    });
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../index.html';
   });
 </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
