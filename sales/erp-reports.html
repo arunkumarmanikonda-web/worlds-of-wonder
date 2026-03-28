@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports & Analytics — WOW Sales ERP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--bg:#0a0a14;--sidebar:#0e0e22;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--orange:#f97316}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+    .sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+    .sb-brand{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .sb-brand .ico{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.9rem}
+    .sb-brand .bt{font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:700;color:var(--gold)}
+    .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
+    .sb-sec{padding:8px 14px 4px;font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .sb-link{display:flex;align-items:center;gap:9px;padding:9px 16px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:600;position:relative;transition:all .2s}
+    .sb-link:hover,.sb-link.active{color:#fff;background:rgba(201,168,76,.08)}
+    .sb-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+    .sb-link.active i{color:var(--gold)}
+    .sb-link i{width:15px;text-align:center;font-size:.82rem}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar h1{font-size:1.05rem;font-weight:800}
+    .tb-right{display:flex;gap:10px;align-items:center}
+    .btn{padding:7px 14px;border-radius:9px;font-size:.78rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;border:none}
+    .btn.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14}
+    .btn.gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
+    .btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+    .btn.outline:hover{border-color:var(--gold);color:var(--gold)}
+    .content{padding:20px 24px;flex:1;overflow-y:auto}
+    /* FILTER BAR */
+    .filter-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .filter-bar label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+    .filter-bar select,.filter-bar input{background:#0d0d22;border:1.5px solid var(--border);border-radius:8px;padding:7px 11px;color:#fff;font-size:.8rem;font-family:'Nunito',sans-serif;outline:none}
+    .filter-bar select:focus,.filter-bar input:focus{border-color:var(--gold)}
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+    .kpi-val{font-size:1.6rem;font-weight:900;font-family:'Poppins',sans-serif;line-height:1}
+    .kpi-lbl{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:3px}
+    .kpi-chg{font-size:.7rem;margin-top:6px;font-weight:700;display:flex;align-items:center;gap:3px}
+    .kpi-chg.up{color:var(--green)}
+    .kpi-chg.down{color:var(--red)}
+    /* CHARTS */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .g3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+    .cw{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .cw-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+    .cw-head i{color:var(--gold);margin-right:7px}
+    .cw-head button{font-size:.72rem;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+    .chart-area{height:260px;padding:10px}
+    /* TABLE */
+    .dt{width:100%;border-collapse:collapse}
+    .dt th{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:700}
+    .dt td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;vertical-align:middle}
+    .dt tr:last-child td{border-bottom:none}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:.66rem;font-weight:700}
+    .badge.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .badge.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    .badge.purple{background:rgba(168,85,247,.15);color:var(--purple)}
+    @media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:900px){.main{margin-left:0}.sidebar{display:none}.g2,.g3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="ico"><i class="fas fa-chart-line"></i></div>
+    <div><div class="bt">WOW Sales ERP</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="erp-dashboard.html" class="sb-link"><i class="fas fa-tachometer-alt"></i>ERP Dashboard</a>
+    <a href="erp-crm.html" class="sb-link"><i class="fas fa-users"></i>CRM & Leads</a>
+    <a href="erp-agents.html" class="sb-link"><i class="fas fa-user-tie"></i>Agents</a>
+    <a href="erp-reports.html" class="sb-link active"><i class="fas fa-chart-bar"></i>Reports</a>
+    <a href="erp-products.html" class="sb-link"><i class="fas fa-box"></i>Products</a>
+    <div class="sb-sec">Sales</div>
+    <a href="passport-kyc.html" class="sb-link"><i class="fas fa-user-plus"></i>New Sale</a>
+    <a href="passport-dashboard.html" class="sb-link"><i class="fas fa-passport"></i>Sales Portal</a>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Reports & <span style="color:var(--gold)">Analytics</span></h1>
+      <p style="font-size:.72rem;color:var(--muted)">Passport sales performance, revenue and conversion analytics</p>
+    </div>
+    <div class="tb-right">
+      <button class="btn outline" onclick="exportReport()"><i class="fas fa-download"></i> Export PDF</button>
+      <button class="btn gold" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Filters -->
+    <div class="filter-bar">
+      <label>Period:</label>
+      <select id="fPeriod" onchange="refreshCharts()"><option value="month">This Month</option><option value="quarter">This Quarter</option><option value="year">This Year</option><option value="custom">Custom</option></select>
+      <label>Agent:</label>
+      <select id="fAgent" onchange="refreshCharts()"><option value="">All Agents</option><option>Raj Sharma</option><option>Priya Singh</option><option>Karan Verma</option><option>Amit Kumar</option></select>
+      <label>Plan:</label>
+      <select id="fPlan" onchange="refreshCharts()"><option value="">All Plans</option><option>Combo Passport</option><option>Water Park Passport</option><option>Amusement Passport</option></select>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div style="font-size:.9rem;color:var(--gold);margin-bottom:8px"><i class="fas fa-rupee-sign"></i></div>
+        <div class="kpi-val">₹18.4L</div>
+        <div class="kpi-lbl">Total Revenue</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +22% vs prev</div>
+      </div>
+      <div class="kpi">
+        <div style="font-size:.9rem;color:var(--green);margin-bottom:8px"><i class="fas fa-passport"></i></div>
+        <div class="kpi-val" style="color:var(--green)">368</div>
+        <div class="kpi-lbl">Passports Sold</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +31 above target</div>
+      </div>
+      <div class="kpi">
+        <div style="font-size:.9rem;color:var(--blue);margin-bottom:8px"><i class="fas fa-percentage"></i></div>
+        <div class="kpi-val" style="color:var(--blue)">78%</div>
+        <div class="kpi-lbl">Conversion Rate</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +5% improved</div>
+      </div>
+      <div class="kpi">
+        <div style="font-size:.9rem;color:var(--purple);margin-bottom:8px"><i class="fas fa-coins"></i></div>
+        <div class="kpi-val" style="color:var(--purple)">₹1.8L</div>
+        <div class="kpi-lbl">Agent Incentives</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +18% payout</div>
+      </div>
+    </div>
+
+    <!-- Revenue + Mode -->
+    <div class="g3">
+      <div class="cw">
+        <div class="cw-head"><div><i class="fas fa-chart-area"></i>Revenue Trend</div><button onclick="toggleChartType()">Toggle</button></div>
+        <div class="chart-area" id="revChart"></div>
+      </div>
+      <div class="cw">
+        <div class="cw-head"><div><i class="fas fa-credit-card"></i>Payment Modes</div></div>
+        <div class="chart-area" id="modeChart"></div>
+      </div>
+    </div>
+
+    <!-- Plan Breakdown + Agent Comparison -->
+    <div class="g2">
+      <div class="cw">
+        <div class="cw-head"><div><i class="fas fa-chart-bar"></i>Sales by Plan — Weekly</div></div>
+        <div class="chart-area" id="planChart"></div>
+      </div>
+      <div class="cw">
+        <div class="cw-head"><div><i class="fas fa-users"></i>Agent Sales Share</div></div>
+        <div class="chart-area" id="agentShare"></div>
+      </div>
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="cw" style="margin-bottom:0">
+      <div class="cw-head"><div><i class="fas fa-table"></i>Detailed Sales Report</div><button onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button></div>
+      <div style="overflow-x:auto">
+        <table class="dt">
+          <thead><tr><th>#</th><th>Date</th><th>Customer</th><th>Plan</th><th>Agent</th><th>Zone</th><th>Amount</th><th>Mode</th><th>GST</th><th>Net</th></tr></thead>
+          <tbody id="reportTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLE_DATA=[
+  {date:'27 Mar',cust:'Rahul Sharma',plan:'Combo Passport',agent:'Raj Sharma',zone:'N. Delhi',amt:4999,mode:'UPI'},
+  {date:'27 Mar',cust:'Priya Mehta',plan:'Water Park Passport',agent:'Priya Singh',zone:'Rohini',amt:2999,mode:'Cash'},
+  {date:'26 Mar',cust:'Amit Verma',plan:'Amusement Passport',agent:'Karan Verma',zone:'Dwarka',amt:2499,mode:'Card'},
+  {date:'26 Mar',cust:'Sunita Rao',plan:'Combo Passport',agent:'Priya Singh',zone:'Rohini',amt:4999,mode:'UPI'},
+  {date:'25 Mar',cust:'Karan Singh',plan:'Water Park Passport',agent:'Raj Sharma',zone:'N. Delhi',amt:2999,mode:'Cash'},
+  {date:'25 Mar',cust:'Vikram Tiwari',plan:'Combo Passport',agent:'Raj Sharma',zone:'N. Delhi',amt:4999,mode:'UPI'},
+  {date:'24 Mar',cust:'Pooja Dixit',plan:'Combo Passport',agent:'Karan Verma',zone:'Dwarka',amt:4999,mode:'Card'},
+  {date:'23 Mar',cust:'Kavita Rajan',plan:'Amusement Passport',agent:'Priya Singh',zone:'Rohini',amt:2499,mode:'UPI'},
+];
+
+function initCharts(){
+  const rev=echarts.init(document.getElementById('revChart'));
+  rev.setOption({tooltip:{trigger:'axis',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},grid:{top:20,bottom:30,left:50,right:20},xAxis:{type:'category',data:['W1','W2','W3','W4'],axisLine:{lineStyle:{color:'#2a2a4a'}},axisLabel:{color:'#8888aa'}},yAxis:{type:'value',splitLine:{lineStyle:{color:'#1a1a3e'}},axisLabel:{color:'#8888aa',formatter:v=>'₹'+v/1000+'K'}},series:[{type:'line',data:[320000,480000,610000,430000],smooth:true,lineStyle:{color:'#C9A84C',width:3},areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(201,168,76,.3)'},{offset:1,color:'rgba(201,168,76,.02)'}]}},itemStyle:{color:'#C9A84C'},symbol:'circle',symbolSize:7}]});
+
+  const mode=echarts.init(document.getElementById('modeChart'));
+  mode.setOption({tooltip:{trigger:'item',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},legend:{bottom:0,textStyle:{color:'#8888aa'}},series:[{type:'pie',radius:['42%','68%'],center:['50%','44%'],data:[{value:168,name:'UPI',itemStyle:{color:'#3b82f6'}},{value:124,name:'Cash',itemStyle:{color:'#22c55e'}},{value:76,name:'Card',itemStyle:{color:'#a855f7'}}],label:{color:'#f0f0f0',fontSize:11},emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.5)'}}}]});
+
+  const plan=echarts.init(document.getElementById('planChart'));
+  plan.setOption({tooltip:{trigger:'axis',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},legend:{data:['Combo','Water Park','Amusement'],textStyle:{color:'#8888aa'},bottom:0},grid:{top:20,bottom:40,left:40,right:20},xAxis:{type:'category',data:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],axisLine:{lineStyle:{color:'#2a2a4a'}},axisLabel:{color:'#8888aa',fontSize:10}},yAxis:{type:'value',splitLine:{lineStyle:{color:'#1a1a3e'}},axisLabel:{color:'#8888aa',fontSize:10}},series:[{name:'Combo',type:'bar',stack:'a',data:[6,8,5,9,7,12,9],itemStyle:{color:'rgba(201,168,76,.85)'},barMaxWidth:32},{name:'Water Park',type:'bar',stack:'a',data:[4,5,3,6,4,8,5],itemStyle:{color:'rgba(59,130,246,.85)'}},{name:'Amusement',type:'bar',stack:'a',data:[2,3,2,4,3,5,3],itemStyle:{color:'rgba(168,85,247,.85)'}}]});
+
+  const ags=echarts.init(document.getElementById('agentShare'));
+  ags.setOption({tooltip:{trigger:'item',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},legend:{bottom:0,textStyle:{color:'#8888aa'}},series:[{type:'pie',radius:['35%','65%'],center:['50%','44%'],data:[{value:41,name:'Priya S.',itemStyle:{color:'#C9A84C'}},{value:35,name:'Amit K.',itemStyle:{color:'#3b82f6'}},{value:23,name:'Raj S.',itemStyle:{color:'#22c55e'}},{value:18,name:'Karan V.',itemStyle:{color:'#a855f7'}}],label:{color:'#f0f0f0',fontSize:10},emphasis:{itemStyle:{shadowBlur:8,shadowColor:'rgba(0,0,0,.4)'}}}]});
+
+  window.allCharts=[rev,mode,plan,ags];
+  window.addEventListener('resize',()=>window.allCharts.forEach(c=>c.resize()));
+}
+
+function renderTable(){
+  const gst=0.18;
+  document.getElementById('reportTable').innerHTML=SAMPLE_DATA.map((r,i)=>{
+    const net=Math.round(r.amt/1.18);
+    const gstAmt=r.amt-net;
+    return `<tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td style="color:var(--muted)">${r.date}</td>
+      <td style="font-weight:700">${r.cust}</td>
+      <td><span class="badge ${r.plan==='Combo Passport'?'gold':r.plan==='Water Park Passport'?'blue':'purple'}">${r.plan.replace(' Passport','')}</span></td>
+      <td style="color:var(--muted)">${r.agent}</td>
+      <td style="color:var(--muted);font-size:.72rem">${r.zone}</td>
+      <td style="font-weight:800;color:var(--gold)">₹${r.amt.toLocaleString('en-IN')}</td>
+      <td><span class="badge ${r.mode==='Cash'?'green':r.mode==='UPI'?'blue':'purple'}">${r.mode}</span></td>
+      <td style="color:var(--muted)">₹${gstAmt.toLocaleString('en-IN')}</td>
+      <td style="font-weight:700">₹${net.toLocaleString('en-IN')}</td>
+    </tr>`;
+  }).join('');
+}
+
+let chartType='line';
+function toggleChartType(){ chartType=chartType==='line'?'bar':'line'; initCharts(); }
+function refreshCharts(){ initCharts(); renderTable(); }
+function exportCSV(){ alert('CSV export — connect to backend for real-time data export.'); }
+function exportReport(){ alert('PDF report generation — requires server-side rendering.'); }
+
+initCharts();
+renderTable();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
