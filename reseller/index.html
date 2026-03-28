@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Reseller ERP — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --purple:#7c3aed;--purple2:#a855f7;--purple3:#c084fc;
+  --gold:#C9A84C;--gold2:#F0D080;
+  --bg:#06040e;--sidebar:#09060f;--card:#100d1a;--card2:#15111f;--border:rgba(255,255,255,.07);
+  --text:#f0f0f0;--muted:rgba(255,255,255,.42);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;--teal:#14b8a6;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sb-logo img{height:32px;filter:none!important;width:auto;}
+.sb-label{font-size:9px;font-weight:800;color:var(--purple3);letter-spacing:2px;font-family:'Courier Prime',monospace;}
+.sb-nav{padding:10px 8px;}
+.sb-sec{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 10px 5px;font-family:'Courier Prime',monospace;}
+.sb-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;margin:2px 0;cursor:pointer;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:none;transition:all .2s;}
+.sb-link:hover,.sb-link.active{background:rgba(168,85,247,.12);color:var(--purple3);}
+.sb-link i{width:15px;text-align:center;}
+.sb-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:8px;}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{padding:12px 22px;background:rgba(6,4,14,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.page-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;}
+.page-sub{font-size:11px;color:var(--muted);}
+.user-pill{display:flex;align-items:center;gap:8px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:20px;padding:5px 12px;}
+.user-pill .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.user-pill .nm{font-size:11px;font-weight:700;color:var(--purple3);}
+
+/* CONTENT */
+.content{padding:20px;flex:1;}
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab-btn{padding:9px 18px;font-size:12.5px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;}
+.tab-btn.active{color:var(--purple3);border-bottom-color:var(--purple2);}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.stat-val{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:#fff;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat .ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px;}
+
+/* CARDS / TABLE */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.card-title{font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:700;}
+.btns{display:flex;gap:8px;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none;}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;}
+.btn-primary:hover{box-shadow:0 4px 14px rgba(168,85,247,.3);}
+.btn-outline{border:1px solid var(--border);background:none;color:var(--muted);}
+.btn-outline:hover{border-color:var(--purple3);color:var(--purple3);}
+.btn-green{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--green);}
+.search{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:12px;outline:none;width:160px;font-family:'Nunito',sans-serif;}
+.search:focus{border-color:var(--purple3);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+th{padding:9px 14px;text-align:left;font-family:'Courier Prime',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
+td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;font-size:9.5px;font-weight:700;font-family:'Courier Prime',monospace;}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;}
+.ib{display:flex;gap:5px;}
+.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;}
+.icon-btn:hover{border-color:var(--purple3);color:var(--purple3);}
+.icon-btn.red:hover{border-color:var(--red);color:var(--red);}
+
+/* INVENTORY BARS */
+.inv-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px;}
+.inv-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));}
+.inv-fill.mid{background:linear-gradient(90deg,var(--orange),#facc15);}
+.inv-fill.low{background:linear-gradient(90deg,var(--red),#f97316);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:#0e0a18;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.modal h3{font-family:'Poppins',sans-serif;font-size:16px;font-weight:800;margin-bottom:3px;}
+.modal p{font-size:11.5px;color:var(--muted);margin-bottom:18px;}
+.fg{margin-bottom:13px;}
+.fl{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:block;font-family:'Courier Prime',monospace;}
+.fi{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:13px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;}
+.fi:focus{border-color:var(--purple2);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-submit{width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-top:4px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <img src="../images/logo.png" alt="WOW"/>
+    <div class="sb-label">RESELLER ERP</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Main</div>
+    <a class="sb-link active" href="javascript:void(0)" onclick="showTab('dashboard')"><i class="fa fa-th-large"></i> Dashboard</a>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('inventory')"><i class="fa fa-boxes"></i> Ticket Inventory <span class="sb-badge">87</span></a>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('bulk')"><i class="fa fa-layer-group"></i> Bulk Tickets</a>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('team')"><i class="fa fa-users"></i> My Team</a>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('sales')"><i class="fa fa-chart-bar"></i> Sales History</a>
+    <div class="sb-sec">Finance</div>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('invoices')"><i class="fa fa-file-invoice"></i> GST Invoices</a>
+    <a class="sb-link" href="javascript:void(0)" onclick="showTab('commissions')"><i class="fa fa-rupee-sign"></i> Commissions</a>
+    <div class="sb-sec">Support</div>
+    <a class="sb-link" href="javascript:void(0)"><i class="fa fa-headset"></i> Support</a>
+    <a class="sb-link" href="../internal/index.html" style="margin-top:16px;color:var(--red);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="pageTitle">Reseller Dashboard</div>
+      <div class="page-sub">Sharma Tours &amp; Travels · Reseller Partner</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="user-pill"><div class="av">ST</div><div class="nm">Sharma Tours</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="tab-dashboard">
+      <div class="stats">
+        <div class="stat"><div class="ico" style="background:rgba(168,85,247,.15);color:var(--purple2);"><i class="fa fa-ticket-alt"></i></div><div class="stat-val">1,240</div><div class="stat-lbl">Tickets in Stock</div></div>
+        <div class="stat"><div class="ico" style="background:rgba(34,197,94,.15);color:var(--green);"><i class="fa fa-check-circle"></i></div><div class="stat-val">3,847</div><div class="stat-lbl">Tickets Sold (MTD)</div></div>
+        <div class="stat"><div class="ico" style="background:rgba(201,168,76,.15);color:var(--gold);"><i class="fa fa-rupee-sign"></i></div><div class="stat-val">&#8377;38,470</div><div class="stat-lbl">Commission Earned</div></div>
+        <div class="stat"><div class="ico" style="background:rgba(249,115,22,.15);color:var(--orange);"><i class="fa fa-users"></i></div><div class="stat-val">7</div><div class="stat-lbl">Active Agents</div></div>
+        <div class="stat"><div class="ico" style="background:rgba(59,130,246,.15);color:var(--blue);"><i class="fa fa-file-invoice"></i></div><div class="stat-val">23</div><div class="stat-lbl">Invoices (MTD)</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">&#9888; Inventory Alerts</div></div>
+        <table>
+          <thead><tr><th>TICKET TYPE</th><th>IN STOCK</th><th>USED TODAY</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody>
+            <tr><td>Water Park Adult</td><td>87</td><td>12</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Good</span></td><td><button class="btn btn-outline" onclick="openRestock('Water Park Adult')">Request More</button></td></tr>
+            <tr><td>Amusement Park Adult</td><td>24</td><td>8</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Low</span></td><td><button class="btn btn-primary" onclick="openRestock('Amusement Park Adult')">Request Urgently</button></td></tr>
+            <tr><td>Combo Ticket</td><td>0</td><td>0</td><td><span class="badge" style="background:rgba(239,68,68,.15);color:var(--red);">Out of Stock</span></td><td><button class="btn btn-primary" onclick="openRestock('Combo Ticket')">Request Now</button></td></tr>
+            <tr><td>Child Water Park</td><td>145</td><td>5</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Good</span></td><td><button class="btn btn-outline" onclick="openRestock('Child Water Park')">Request More</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── INVENTORY ── -->
+    <div id="tab-inventory" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Ticket Inventory</div>
+          <div class="btns">
+            <input class="search" placeholder="Search..."/>
+            <button class="btn btn-primary" onclick="openRestock('')"><i class="fa fa-plus"></i> Request Allocation</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>TICKET TYPE</th><th>PARK</th><th>ALLOCATED</th><th>SOLD</th><th>REMAINING</th><th>INVENTORY</th><th>EXPIRY</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Water Park — Adult</strong></td><td>Water Park</td><td>500</td><td>413</td><td>87</td><td><div>87/500 (17%)</div><div class="inv-bar"><div class="inv-fill low" style="width:17%;"></div></div></td><td>31 Mar 2025</td></tr>
+            <tr><td><strong>Amusement Park — Adult</strong></td><td>Amusement</td><td>300</td><td>276</td><td>24</td><td><div>24/300 (8%)</div><div class="inv-bar"><div class="inv-fill low" style="width:8%;"></div></div></td><td>31 Mar 2025</td></tr>
+            <tr><td><strong>Combo Ticket</strong></td><td>Both</td><td>200</td><td>200</td><td>0</td><td><div>0/200 (0%)</div><div class="inv-bar"><div class="inv-fill low" style="width:1%;"></div></div></td><td>31 Mar 2025</td></tr>
+            <tr><td><strong>Child Water Park</strong></td><td>Water Park</td><td>300</td><td>155</td><td>145</td><td><div>145/300 (48%)</div><div class="inv-bar"><div class="inv-fill mid" style="width:48%;"></div></div></td><td>31 Mar 2025</td></tr>
+            <tr><td><strong>Senior Citizen (60+)</strong></td><td>Both</td><td>100</td><td>42</td><td>58</td><td><div>58/100 (58%)</div><div class="inv-bar"><div class="inv-fill" style="width:58%;"></div></div></td><td>31 Mar 2025</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── BULK TICKETS ── -->
+    <div id="tab-bulk" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Bulk Ticket Generation</div>
+          <button class="btn btn-primary" onclick="openBulkCreate()"><i class="fa fa-layer-group"></i> Create Bulk Batch</button>
+        </div>
+        <table>
+          <thead><tr><th>BATCH ID</th><th>TYPE</th><th>QUANTITY</th><th>ISSUED</th><th>VALID TILL</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0142</td>
+              <td>Water Park Adult</td><td>100</td><td>15 Mar 2025</td><td>31 Mar 2025</td>
+              <td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Active</span></td>
+              <td><div class="ib"><div class="icon-btn" title="Download QR Batch"><i class="fa fa-download"></i></div><div class="icon-btn" title="View Tickets"><i class="fa fa-eye"></i></div></div></td>
+            </tr>
+            <tr>
+              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0138</td>
+              <td>Combo Ticket</td><td>50</td><td>10 Mar 2025</td><td>31 Mar 2025</td>
+              <td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Exhausted</span></td>
+              <td><div class="ib"><div class="icon-btn" title="Download"><i class="fa fa-download"></i></div></div></td>
+            </tr>
+            <tr>
+              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0121</td>
+              <td>Amusement Adult</td><td>200</td><td>01 Mar 2025</td><td>31 Mar 2025</td>
+              <td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Active</span></td>
+              <td><div class="ib"><div class="icon-btn"><i class="fa fa-download"></i></div><div class="icon-btn"><i class="fa fa-eye"></i></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TEAM ── -->
+    <div id="tab-team" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">My Sales Team</div>
+          <div class="btns">
+            <input class="search" placeholder="Search agents..."/>
+            <button class="btn btn-primary" onclick="openAddAgent()"><i class="fa fa-user-plus"></i> Add Agent</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>AGENT NAME</th><th>MOBILE</th><th>ROLE</th><th>TICKETS SOLD</th><th>COMMISSION</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody id="agentsBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SALES ── -->
+    <div id="tab-sales" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Sales History</div>
+          <div class="btns">
+            <select class="search"><option>This Month</option><option>Last Month</option><option>This Year</option></select>
+            <button class="btn btn-outline"><i class="fa fa-download"></i> Export CSV</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>DATE</th><th>TICKET TYPE</th><th>QTY</th><th>AGENT</th><th>AMOUNT</th><th>COMMISSION</th><th>STATUS</th></tr></thead>
+          <tbody>
+            <tr><td style="font-size:11px;color:var(--muted);">28 Mar 2025</td><td>Water Park Adult</td><td>4</td><td>Raju Singh</td><td>&#8377;5,196</td><td>&#8377;520</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
+            <tr><td style="font-size:11px;color:var(--muted);">28 Mar 2025</td><td>Combo Ticket</td><td>2</td><td>Priya Patel</td><td>&#8377;3,998</td><td>&#8377;400</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
+            <tr><td style="font-size:11px;color:var(--muted);">27 Mar 2025</td><td>Amusement Adult</td><td>6</td><td>Raju Singh</td><td>&#8377;7,194</td><td>&#8377;719</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Pending</span></td></tr>
+            <tr><td style="font-size:11px;color:var(--muted);">26 Mar 2025</td><td>Child Water Park</td><td>8</td><td>Direct</td><td>&#8377;5,992</td><td>&#8377;599</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── INVOICES ── -->
+    <div id="tab-invoices" style="display:none;">
+      <div class="card">
+        <div class="card-head"><div class="card-title">GST Invoices</div><button class="btn btn-outline"><i class="fa fa-download"></i> Download All</button></div>
+        <table>
+          <thead><tr><th>INVOICE NO.</th><th>DATE</th><th>AMOUNT</th><th>GST</th><th>TOTAL</th><th>STATUS</th><th>PDF</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">INV-2025-0089</td><td>28 Mar 2025</td><td>&#8377;38,470</td><td>&#8377;6,925</td><td>&#8377;45,395</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">INV-2025-0074</td><td>28 Feb 2025</td><td>&#8377;42,300</td><td>&#8377;7,614</td><td>&#8377;49,914</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── COMMISSIONS ── -->
+    <div id="tab-commissions" style="display:none;">
+      <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+        <div class="stat"><div class="stat-val" style="color:var(--gold);">&#8377;38,470</div><div class="stat-lbl">Earned this month</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--green);">&#8377;38,470</div><div class="stat-lbl">Settled (credited)</div></div>
+        <div class="stat"><div class="stat-val" style="color:var(--orange);">&#8377;0</div><div class="stat-lbl">Pending payout</div></div>
+        <div class="stat"><div class="stat-val">10%</div><div class="stat-lbl">Your commission slab</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Commission Statement</div><button class="btn btn-outline"><i class="fa fa-download"></i> Export</button></div>
+        <table>
+          <thead><tr><th>PERIOD</th><th>TICKETS SOLD</th><th>GROSS SALES</th><th>COMMISSION RATE</th><th>EARNED</th><th>PAYOUT DATE</th><th>STATUS</th></tr></thead>
+          <tbody>
+            <tr><td>March 2025</td><td>3,847</td><td>&#8377;3,84,700</td><td>10%</td><td>&#8377;38,470</td><td>05 Apr 2025</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Scheduled</span></td></tr>
+            <tr><td>February 2025</td><td>4,230</td><td>&#8377;4,23,000</td><td>10%</td><td>&#8377;42,300</td><td>05 Mar 2025</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="overlay" id="restockModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('restockModal').classList.remove('open')"><i class="fa fa-times"></i></button>
+    <h3>Request Ticket Allocation</h3>
+    <p>Request additional inventory from WOW admin. Approval usually takes 4–6 hours on working days.</p>
+    <div class="fg"><label class="fl">Ticket Type</label><input class="fi" id="restockType" placeholder="e.g. Water Park Adult"/></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Quantity Required</label><input class="fi" type="number" placeholder="e.g. 200"/></div>
+      <div class="fg"><label class="fl">Required By</label><input class="fi" type="date"/></div>
+    </div>
+    <div class="fg"><label class="fl">Reason / Notes</label><input class="fi" placeholder="e.g. Weekend rush — stock running low"/></div>
+    <button class="btn-submit" onclick="submitRestock()">Submit Allocation Request</button>
+  </div>
+</div>
+
+<div class="overlay" id="bulkModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('bulkModal').classList.remove('open')"><i class="fa fa-times"></i></button>
+    <h3>Create Bulk Ticket Batch</h3>
+    <p>Generate a batch of pre-signed QR tickets from your inventory allocation.</p>
+    <div class="fg"><label class="fl">Ticket Type</label>
+      <select class="fi"><option>Water Park Adult</option><option>Amusement Adult</option><option>Combo Ticket</option><option>Child Water Park</option></select>
+    </div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Quantity</label><input class="fi" type="number" placeholder="e.g. 100"/></div>
+      <div class="fg"><label class="fl">Valid Till</label><input class="fi" type="date"/></div>
+    </div>
+    <div class="fg"><label class="fl">Batch Name / Reference</label><input class="fi" placeholder="e.g. March Weekend Batch"/></div>
+    <button class="btn-submit" onclick="createBatch()">Generate Batch &amp; QR Codes</button>
+  </div>
+</div>
+
+<div class="overlay" id="agentModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('agentModal').classList.remove('open')"><i class="fa fa-times"></i></button>
+    <h3>Add Sales Agent</h3>
+    <p>Add a team member to your reseller account. They can sell from your allocated inventory.</p>
+    <div class="fr">
+      <div class="fg"><label class="fl">First Name</label><input class="fi" placeholder="First name"/></div>
+      <div class="fg"><label class="fl">Last Name</label><input class="fi" placeholder="Last name"/></div>
+    </div>
+    <div class="fg"><label class="fl">Mobile Number</label><input class="fi" type="tel" placeholder="+91 98765 43210"/></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="agent@example.com"/></div>
+    <div class="fg"><label class="fl">Daily Ticket Limit</label><input class="fi" type="number" placeholder="e.g. 50 tickets per day"/></div>
+    <div class="fg"><label class="fl">Can Access Reports?</label>
+      <select class="fi"><option>No — Sales only</option><option>Yes — View own sales report</option></select>
+    </div>
+    <button class="btn-submit" onclick="addAgent()">Create Agent Account</button>
+  </div>
+</div>
+
+<script>
+const AGENTS = [
+  {name:'Raju Singh',mobile:'+91 98110 44321',role:'Senior Agent',sold:1240,comm:'₹12,400',status:'active'},
+  {name:'Priya Patel',mobile:'+91 98765 00123',role:'Agent',sold:890,comm:'₹8,900',status:'active'},
+  {name:'Amit Verma',mobile:'+91 99990 11234',role:'Agent',sold:720,comm:'₹7,200',status:'active'},
+  {name:'Sunita Devi',mobile:'+91 98000 55432',role:'Agent',sold:540,comm:'₹5,400',status:'active'},
+  {name:'Vikram Yadav',mobile:'+91 98765 99876',role:'Junior Agent',sold:280,comm:'₹2,800',status:'active'},
+  {name:'Mohan Lal',mobile:'+91 99876 54321',role:'Agent',sold:120,comm:'₹1,200',status:'inactive'},
+  {name:'Kavita Sharma',mobile:'+91 98000 12345',role:'Junior Agent',sold:57,comm:'₹570',status:'active'},
+];
+
+function showTab(t) {
+  ['dashboard','inventory','bulk','team','sales','invoices','commissions'].forEach(id => {
+    const el = document.getElementById('tab-'+id);
+    if (el) el.style.display = (id===t)?'':'none';
+  });
+  const titles = {dashboard:'Reseller Dashboard',inventory:'Ticket Inventory',bulk:'Bulk Tickets',team:'My Team',sales:'Sales History',invoices:'GST Invoices',commissions:'Commissions'};
+  document.getElementById('pageTitle').textContent = titles[t]||t;
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+  if (t==='team') renderAgents();
+}
+
+function renderAgents() {
+  const tbody = document.getElementById('agentsBody');
+  tbody.innerHTML = '';
+  AGENTS.forEach((a,i) => {
+    const sc = a.status==='active'?'var(--green)':'var(--red)';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong style="color:#fff;">${a.name}</strong></td><td style="font-family:'Courier Prime',monospace;font-size:11px;">${a.mobile}</td><td><span class="badge" style="background:rgba(168,85,247,.15);color:var(--purple3);">${a.role}</span></td><td>${a.sold}</td><td style="color:var(--gold);">${a.comm}</td><td><span style="color:${sc};"><span class="dot" style="background:${sc};"></span>${a.status}</span></td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn" title="Set daily limit"><i class="fa fa-sliders-h"></i></div><div class="icon-btn red" onclick="toggleAgent(${i})"><i class="fa ${a.status==='active'?'fa-ban':'fa-check'}"></i></div></div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleAgent(i) { AGENTS[i].status = AGENTS[i].status==='active'?'inactive':'active'; renderAgents(); }
+
+function openRestock(type) {
+  document.getElementById('restockType').value = type;
+  document.getElementById('restockModal').classList.add('open');
+}
+function submitRestock() {
+  alert('Allocation request submitted to WOW Admin. Expected approval: 4–6 hours.');
+  document.getElementById('restockModal').classList.remove('open');
+}
+function openBulkCreate() { document.getElementById('bulkModal').classList.add('open'); }
+function createBatch() {
+  alert('Bulk batch created! QR codes are being generated. You will receive a download link within 5 minutes via WhatsApp and email.');
+  document.getElementById('bulkModal').classList.remove('open');
+}
+function openAddAgent() { document.getElementById('agentModal').classList.add('open'); }
+function addAgent() {
+  alert('Agent account created! They will receive a login OTP on their mobile number.');
+  document.getElementById('agentModal').classList.remove('open');
+}
+
+showTab('dashboard');
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
