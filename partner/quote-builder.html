@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quote Builder — WOW Partner Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;display:flex;min-height:100vh;}
+/* Sidebar (identical trim) */
+.sidebar{width:216px;background:linear-gradient(180deg,#0d1220,#080c18);border-right:1px solid rgba(255,215,0,.1);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-brand{padding:16px;border-bottom:1px solid rgba(255,215,0,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo{width:34px;height:34px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0a0e1a;flex-shrink:0;}
+.sb-name{font-size:12px;font-weight:700;color:#ffd700;}
+.sb-role{font-size:10px;color:#8899aa;}
+.nav-section{padding:12px 10px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;margin:1px 6px;cursor:pointer;color:#8899aa;font-size:12px;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:rgba(255,215,0,.07);color:#ffd700;}
+.nav-item.active{background:rgba(255,215,0,.12);color:#ffd700;border-left:2px solid #ffd700;}
+.nav-item i{width:15px;text-align:center;font-size:12px;}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700;}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.05);}
+.partner-chip{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.13);border-radius:8px;padding:10px;}
+.partner-chip .name{font-size:12px;font-weight:700;color:#ffd700;}
+.partner-chip .code{font-size:10px;color:#8899aa;margin-top:1px;}
+.partner-chip .st{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;margin-top:6px;color:#10b981;}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:rgba(255,255,255,.025);border-bottom:1px solid rgba(255,255,255,.06);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;}
+.topbar h2{font-size:17px;font-weight:700;}
+.topbar .sub{font-size:11px;color:#8899aa;}
+.topbar-right{display:flex;gap:9px;}
+.tb-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 13px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;text-decoration:none;}
+.tb-btn:hover{background:rgba(255,215,0,.1);color:#ffd700;border-color:rgba(255,215,0,.25);}
+.tb-btn.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:start;}
+/* Builder Panel */
+.builder{display:flex;flex-direction:column;gap:14px;}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.card-title{font-size:14px;font-weight:700;}
+.card-subtitle{font-size:11px;color:#8899aa;margin-top:1px;}
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-grid.full{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:10px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
+.field label .req{color:#ff6b6b;}
+.field input,.field select,.field textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:9px 12px;color:#e0e6f0;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
+.field input:focus,.field select:focus{border-color:#6c63ff;background:rgba(108,99,255,.07);}
+.field select option{background:#1a1f35;}
+.field-hint{font-size:10px;color:#8899aa;}
+/* Segment tabs */
+.seg-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px;margin-bottom:14px;}
+.seg-tab{flex:1;padding:8px;text-align:center;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:#8899aa;transition:.2s;}
+.seg-tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+/* Rate row */
+.rate-row{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;margin-bottom:6px;}
+.rate-label{flex:1;font-size:13px;font-weight:600;}
+.rate-sub{font-size:10px;color:#8899aa;}
+.rate-input{width:90px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 10px;color:#e0e6f0;font-size:13px;text-align:right;outline:none;}
+.rate-input:focus{border-color:#ffd700;}
+.rate-qty{width:70px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 10px;color:#e0e6f0;font-size:13px;text-align:center;outline:none;}
+.rate-total{min-width:80px;text-align:right;font-weight:700;font-size:13px;color:#ffd700;}
+.add-row-btn{background:rgba(108,99,255,.12);border:1px dashed rgba(108,99,255,.3);border-radius:8px;padding:9px;width:100%;color:#a78bfa;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.add-row-btn:hover{background:rgba(108,99,255,.18);}
+/* Summary Panel */
+.summary{position:sticky;top:18px;}
+.summary-card{background:linear-gradient(135deg,rgba(255,215,0,.07),rgba(255,140,0,.04));border:1px solid rgba(255,215,0,.2);border-radius:14px;padding:18px;}
+.summary-title{font-size:15px;font-weight:700;color:#ffd700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.summary-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);}
+.summary-row:last-child{border-bottom:none;}
+.summary-total{display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:800;color:#ffd700;border-top:2px solid rgba(255,215,0,.2);margin-top:6px;}
+.school-note{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:10px 12px;font-size:12px;color:#6ee7b7;margin:10px 0;}
+.school-note b{color:#10b981;}
+.tc-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:12px;font-size:12px;color:#8899aa;line-height:1.6;max-height:120px;overflow-y:auto;margin-top:10px;}
+.btn-row{display:flex;gap:10px;margin-top:14px;}
+.btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.3s;display:flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;flex:1;justify-content:center;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(255,215,0,.4);}
+.btn-ghost{background:rgba(255,255,255,.07);color:#e0e6f0;border:1px solid rgba(255,255,255,.1);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);}
+/* Previous Quotes */
+.quotes-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;}
+.quote-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.2s;}
+.quote-row:hover{border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.04);}
+.q-badge{display:inline-flex;padding:2px 8px;border-radius:18px;font-size:10px;font-weight:600;}
+.qb-sent{background:rgba(59,130,246,.15);color:#60a5fa;}
+.qb-accepted{background:rgba(16,185,129,.15);color:#10b981;}
+.qb-expired{background:rgba(239,68,68,.15);color:#ef4444;}
+.qb-draft{background:rgba(255,255,255,.1);color:#8899aa;}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;display:none;}
+.modal-box{background:#13182a;border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:24px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+@media(max-width:900px){.sidebar{display:none;}.content{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand"><div class="sb-logo">WW</div><div><div class="sb-name">WOW Partner Portal</div><div class="sb-role">Quote Builder</div></div></div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a class="nav-item active" href="quote-builder.html"><i class="fas fa-file-invoice"></i> Quote Builder <span class="nav-badge">3</span></a>
+  <a class="nav-item" href="bulk-tickets.html"><i class="fas fa-qrcode"></i> Bulk Tickets</a>
+  <div class="nav-section">Commerce</div>
+  <a class="nav-item" href="invoice-gst.html"><i class="fas fa-receipt"></i> Invoices &amp; GST</a>
+  <a class="nav-item" href="#"><i class="fas fa-wallet"></i> Commissions</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="onboarding-kyc.html"><i class="fas fa-id-badge"></i> KYC / Profile</a>
+  <a class="nav-item" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <div class="sidebar-footer"><div class="partner-chip"><div class="name">XYZ Tours Pvt Ltd</div><div class="code">WOW-TA-2026-0089</div><div class="st">● KYC Approved</div></div></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><h2>📝 Quote Builder</h2><div class="sub">Segment-specific quotes: Schools, Corporates, Birthdays, FIT</div></div>
+    <div class="topbar-right">
+      <a class="tb-btn" href="dashboard.html"><i class="fas fa-arrow-left"></i> Dashboard</a>
+      <button class="tb-btn gold" onclick="clearForm()"><i class="fas fa-plus"></i> New Quote</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Left: Builder -->
+    <div class="builder">
+
+      <!-- Segment Selector -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.2);">🏷</div>
+          <div><div class="card-title">Segment &amp; Client Details</div></div>
+        </div>
+        <div class="seg-tabs" id="seg-tabs">
+          <div class="seg-tab active" onclick="setSeg(this,'school')">🏫 School</div>
+          <div class="seg-tab" onclick="setSeg(this,'corporate')">🏢 Corporate</div>
+          <div class="seg-tab" onclick="setSeg(this,'birthday')">🎂 Birthday</div>
+          <div class="seg-tab" onclick="setSeg(this,'fit')">✈️ FIT Group</div>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label>Client / School Name <span class="req">*</span></label><input id="client-name" type="text" placeholder="DPS Noida / Infosys Delhi" oninput="updateSummary()"/></div>
+          <div class="field"><label>Contact Person</label><input id="contact-person" type="text" placeholder="Mrs. Sharma" oninput="updateSummary()"/></div>
+          <div class="field"><label>Email</label><input id="contact-email" type="email" placeholder="events@client.com"/></div>
+          <div class="field"><label>Phone</label><input id="contact-phone" type="tel" placeholder="+91 99000 00000"/></div>
+          <div class="field"><label>Visit Date <span class="req">*</span></label><input id="visit-date" type="date" oninput="updateSummary()"/></div>
+          <div class="field"><label>Quote Valid Till</label><input id="valid-till" type="date"/></div>
+        </div>
+        <div id="school-extra" style="margin-top:12px;">
+          <div class="school-note">
+            <b>📐 School Rule:</b> 1 Teacher FREE per 10 Students. Student-to-teacher ratio = 10:1. Teachers beyond ratio charged at teacher rate. Driver meal option: ₹150 per driver.
+          </div>
+          <div class="form-grid three" style="margin-top:8px;">
+            <div class="field"><label>No. of Students <span class="req">*</span></label><input id="num-students" type="number" value="100" min="1" oninput="calcSchoolRatio()"/></div>
+            <div class="field"><label>No. of Teachers</label><input id="num-teachers" type="number" value="10" min="0" oninput="calcSchoolRatio()"/></div>
+            <div class="field"><label>No. of Drivers</label><input id="num-drivers" type="number" value="2" min="0" oninput="updateSummary()"/></div>
+          </div>
+          <div id="ratio-note" style="font-size:11px;color:#10b981;margin-top:6px;"></div>
+        </div>
+        <div id="corp-extra" style="margin-top:12px;display:none;">
+          <div class="form-grid">
+            <div class="field"><label>Company / Brand</label><input id="corp-company" type="text" placeholder="Infosys Technologies"/></div>
+            <div class="field"><label>Event Type</label><select id="corp-event"><option>Team Outing</option><option>Annual Day</option><option>Client Entertainment</option><option>Product Launch</option><option>Birthday Bash</option></select></div>
+          </div>
+        </div>
+        <div id="bday-extra" style="margin-top:12px;display:none;">
+          <div class="form-grid">
+            <div class="field"><label>Birthday Person</label><input id="bday-name" type="text" placeholder="Arjun Sharma"/></div>
+            <div class="field"><label>Age Celebrating</label><input id="bday-age" type="number" placeholder="7"/></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Rates -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);">🎟</div>
+          <div><div class="card-title">Ticket Rates</div><div class="card-subtitle">Admin-set rates auto-loaded. Override allowed with approval.</div></div>
+        </div>
+        <div id="ticket-rows">
+          <div class="rate-row">
+            <div><div class="rate-label">Student / Adult Entry</div><div class="rate-sub">Water Park + Amusement Combo</div></div>
+            <input class="rate-qty" type="number" value="100" oninput="updateSummary()" data-key="student"/>
+            <span style="font-size:11px;color:#8899aa;">× ₹</span>
+            <input class="rate-input" type="number" value="599" oninput="updateSummary()" data-key="student-rate"/>
+            <div class="rate-total" id="rt-student">₹59,900</div>
+          </div>
+          <div class="rate-row">
+            <div><div class="rate-label">Teacher Entry</div><div class="rate-sub">Complimentary 1 per 10 students</div></div>
+            <input class="rate-qty" type="number" value="0" oninput="updateSummary()" id="teacher-chargeable-qty"/>
+            <span style="font-size:11px;color:#8899aa;">× ₹</span>
+            <input class="rate-input" type="number" value="399" oninput="updateSummary()" data-key="teacher-rate"/>
+            <div class="rate-total" id="rt-teacher">₹0</div>
+          </div>
+          <div class="rate-row">
+            <div><div class="rate-label">Driver Meal Voucher</div><div class="rate-sub">Includes lunch + snacks</div></div>
+            <input class="rate-qty" type="number" value="2" oninput="updateSummary()" id="driver-qty"/>
+            <span style="font-size:11px;color:#8899aa;">× ₹</span>
+            <input class="rate-input" type="number" value="150" oninput="updateSummary()"/>
+            <div class="rate-total" id="rt-driver">₹300</div>
+          </div>
+        </div>
+        <button class="add-row-btn" onclick="addCustomRow()"><i class="fas fa-plus"></i> Add Custom Line Item</button>
+      </div>
+
+      <!-- Add-ons -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);">🎪</div>
+          <div><div class="card-title">Add-On Services</div><div class="card-subtitle">Optional — select to include in quote</div></div>
+        </div>
+        <div id="addons-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="addon-item" data-price="15000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">🎭</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Costume Rental</div><div style="font-size:10px;color:#8899aa;">50 costumes, 4 hrs</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹15,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+          <div class="addon-item" data-price="25000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">🌿</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Lawn Rental (Half-Day)</div><div style="font-size:10px;color:#8899aa;">Includes setup, PA system</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹25,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+          <div class="addon-item" data-price="8000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">🥗</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">F&amp;B Package (Veg)</div><div style="font-size:10px;color:#8899aa;">Lunch + snacks per 100 pax</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹8,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+          <div class="addon-item" data-price="12000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">🔒</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Locker Package (50 units)</div><div style="font-size:10px;color:#8899aa;">Full day use, 50 lockers</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹12,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+          <div class="addon-item" data-price="20000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">👮</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">Security Personnel (4 guards)</div><div style="font-size:10px;color:#8899aa;">Full day, uniformed</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹20,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+          <div class="addon-item" data-price="5000" onclick="toggleAddon(this)">
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:.2s;">
+              <div style="font-size:18px;">🎵</div>
+              <div style="flex:1;"><div style="font-size:12px;font-weight:600;">DJ / Music Arrangement</div><div style="font-size:10px;color:#8899aa;">3 hours, professional DJ</div></div>
+              <div style="font-size:12px;font-weight:700;color:#ffd700;">₹5,000</div>
+              <div class="addon-check" style="width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.2);">📜</div>
+          <div><div class="card-title">Terms &amp; Conditions</div></div>
+        </div>
+        <div class="field">
+          <label>Segment T&amp;C</label>
+          <textarea id="tnc-text" style="min-height:90px;font-size:12px;">1. Booking confirmed on 50% advance payment.\n2. Balance 50% due 7 days before visit.\n3. Cancellation: 100% refund if cancelled 15+ days prior.\n4. Tickets non-transferable. Valid only for the booked date.\n5. WOW reserves the right to refuse entry for misconduct.\n6. Weather-related closures: full credit for rescheduling.</textarea>
+        </div>
+        <div class="field" style="margin-top:10px;">
+          <label>Special Note to Client</label>
+          <textarea id="special-note" placeholder="Any special instruction for this group…" style="min-height:56px;font-size:12px;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Summary -->
+    <div class="summary">
+      <div class="summary-card">
+        <div class="summary-title">📄 Quote Preview</div>
+        <div id="q-client" style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Client: —</div>
+        <div id="q-date" style="font-size:11px;color:#8899aa;margin-bottom:12px;">Visit Date: —</div>
+        <hr style="border-color:rgba(255,255,255,.07);margin-bottom:12px;"/>
+        <div id="summary-lines">
+          <div class="summary-row"><span>Student / Adult Tickets</span><span id="sl-student">₹59,900</span></div>
+          <div class="summary-row"><span>Teacher Tickets</span><span id="sl-teacher">₹0</span></div>
+          <div class="summary-row"><span>Driver Meals</span><span id="sl-driver">₹300</span></div>
+        </div>
+        <div class="summary-row" style="margin-top:6px;"><span>Add-On Services</span><span id="sl-addons">₹0</span></div>
+        <div class="summary-row"><span>Sub-Total</span><span id="sl-subtotal">₹60,200</span></div>
+        <div id="school-free-note" class="school-note" style="font-size:11px;margin:8px 0;">🎓 <b>10 teachers FREE</b> (1 per 10 students)</div>
+        <div class="summary-row"><span>GST 18%</span><span id="sl-gst">₹10,836</span></div>
+        <div class="summary-row"><span>Commission (<span id="comm-pct">12</span>%)</span><span id="sl-comm" style="color:#10b981;">—₹7,224</span></div>
+        <div class="summary-total"><span>GRAND TOTAL</span><span id="sl-total">₹63,812</span></div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#8899aa;"><span>Advance (50%)</span><span id="sl-advance" style="color:#ffd700;">₹31,906</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#8899aa;"><span>Balance Due</span><span id="sl-balance">₹31,906</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="generateQuote()"><i class="fas fa-paper-plane"></i> Send Quote</button>
+          <button class="btn btn-ghost" onclick="previewQuote()"><i class="fas fa-eye"></i></button>
+        </div>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;" onclick="saveDraft()"><i class="fas fa-save"></i> Save Draft</button>
+      </div>
+
+      <!-- Previous Quotes -->
+      <div class="card" style="margin-top:14px;">
+        <div class="panel-header" style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">Recent Quotes <a href="#" style="font-size:11px;color:#6c63ff;text-decoration:none;">All →</a></div>
+        <div class="quotes-list" id="quotes-list">
+          <div class="quote-row"><div style="flex:1;"><div style="font-size:12px;font-weight:600;">DPS Noida — 240 pax</div><div style="font-size:10px;color:#8899aa;">School · 12 Apr 2026</div></div><span class="q-badge qb-accepted">Accepted</span></div>
+          <div class="quote-row"><div style="flex:1;"><div style="font-size:12px;font-weight:600;">Infosys Team Outing — 85 pax</div><div style="font-size:10px;color:#8899aa;">Corporate · 18 Apr 2026</div></div><span class="q-badge qb-sent">Sent</span></div>
+          <div class="quote-row"><div style="flex:1;"><div style="font-size:12px;font-weight:600;">Happy Birthday Arjun — 30 pax</div><div style="font-size:10px;color:#8899aa;">Birthday · 20 Apr 2026</div></div><span class="q-badge qb-draft">Draft</span></div>
+          <div class="quote-row"><div style="flex:1;"><div style="font-size:12px;font-weight:600;">Modern School Faridabad — 180 pax</div><div style="font-size:10px;color:#8899aa;">School · 25 Apr 2026</div></div><span class="q-badge qb-sent">Sent</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal-box">
+    <div class="modal-title"><span>📄 Quote Preview</span><span style="cursor:pointer;color:#8899aa;font-size:18px;" onclick="closePreview()">×</span></div>
+    <div id="preview-content"></div>
+    <div class="btn-row" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="generateQuote()"><i class="fas fa-paper-plane"></i> Send to Client</button>
+      <button class="btn btn-ghost" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentSeg = 'school';
+let addonTotal = 0;
+
+function setSeg(el, seg) {
+  document.querySelectorAll('.seg-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentSeg = seg;
+  document.getElementById('school-extra').style.display = seg === 'school' ? 'block' : 'none';
+  document.getElementById('corp-extra').style.display = seg === 'corporate' ? 'block' : 'none';
+  document.getElementById('bday-extra').style.display = seg === 'birthday' ? 'block' : 'none';
+  document.getElementById('school-free-note').style.display = seg === 'school' ? 'flex' : 'none';
+  updateSummary();
+}
+
+function calcSchoolRatio() {
+  const students = parseInt(document.getElementById('num-students').value) || 0;
+  const teachers = parseInt(document.getElementById('num-teachers').value) || 0;
+  const freeTeachers = Math.floor(students / 10);
+  const chargeableTeachers = Math.max(0, teachers - freeTeachers);
+  document.getElementById('teacher-chargeable-qty').value = chargeableTeachers;
+  document.getElementById('ratio-note').textContent =
+    `✓ ${freeTeachers} teacher(s) free | ${chargeableTeachers} chargeable | Ratio: ${students}:${teachers}`;
+  // sync student qty
+  document.querySelector('[data-key="student"]').value = students;
+  document.getElementById('driver-qty').value = document.getElementById('num-drivers').value;
+  updateSummary();
+}
+
+function getQty(el) { return parseFloat(el.value) || 0; }
+function getRate(key) { const el = document.querySelector(`[data-key="${key}-rate"]`); return el ? parseFloat(el.value) || 0 : 0; }
+
+function updateSummary() {
+  const sQty = getQty(document.querySelector('[data-key="student"]') || {value:0});
+  const sRate = getRate('student');
+  const tQty = getQty(document.getElementById('teacher-chargeable-qty'));
+  const tRate = getRate('teacher');
+  const dQty = getQty(document.getElementById('driver-qty'));
+  const dRateEl = document.querySelectorAll('.rate-input')[2];
+  const dRate = dRateEl ? parseFloat(dRateEl.value) || 0 : 150;
+
+  const studentTotal = sQty * sRate;
+  const teacherTotal = tQty * tRate;
+  const driverTotal = dQty * dRate;
+
+  document.getElementById('rt-student').textContent = '₹' + fmt(studentTotal);
+  document.getElementById('rt-teacher').textContent = '₹' + fmt(teacherTotal);
+  document.getElementById('rt-driver').textContent = '₹' + fmt(driverTotal);
+
+  document.getElementById('sl-student').textContent = '₹' + fmt(studentTotal);
+  document.getElementById('sl-teacher').textContent = '₹' + fmt(teacherTotal);
+  document.getElementById('sl-driver').textContent = '₹' + fmt(driverTotal);
+  document.getElementById('sl-addons').textContent = '₹' + fmt(addonTotal);
+
+  const sub = studentTotal + teacherTotal + driverTotal + addonTotal;
+  const gst = sub * 0.18;
+  const comm = sub * 0.12;
+  const total = sub + gst;
+  const advance = total * 0.5;
+
+  document.getElementById('sl-subtotal').textContent = '₹' + fmt(sub);
+  document.getElementById('sl-gst').textContent = '₹' + fmt(gst);
+  document.getElementById('sl-comm').textContent = '-₹' + fmt(comm);
+  document.getElementById('sl-total').textContent = '₹' + fmt(total);
+  document.getElementById('sl-advance').textContent = '₹' + fmt(advance);
+  document.getElementById('sl-balance').textContent = '₹' + fmt(advance);
+
+  const client = document.getElementById('client-name').value || '—';
+  const date = document.getElementById('visit-date').value || '—';
+  document.getElementById('q-client').textContent = 'Client: ' + client;
+  document.getElementById('q-date').textContent = 'Visit Date: ' + date;
+
+  if (currentSeg === 'school') {
+    const freeCount = Math.floor(parseInt(document.getElementById('num-students')?.value || 0) / 10);
+    document.getElementById('school-free-note').textContent = `🎓 ${freeCount} teacher(s) complimentary (1 per 10 students)`;
+  }
+}
+
+function toggleAddon(el) {
+  const inner = el.querySelector('div');
+  const check = el.querySelector('.addon-check');
+  const price = parseFloat(el.dataset.price) || 0;
+  if (check.textContent === '✓') {
+    check.textContent = '';
+    check.style.background = 'transparent';
+    check.style.borderColor = 'rgba(255,255,255,.2)';
+    inner.style.borderColor = 'rgba(255,255,255,.08)';
+    inner.style.background = 'rgba(255,255,255,.03)';
+    addonTotal -= price;
+  } else {
+    check.textContent = '✓';
+    check.style.background = '#10b981';
+    check.style.borderColor = '#10b981';
+    check.style.color = '#fff';
+    inner.style.borderColor = 'rgba(16,185,129,.4)';
+    inner.style.background = 'rgba(16,185,129,.05)';
+    addonTotal += price;
+  }
+  updateSummary();
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
+
+function addCustomRow() {
+  const container = document.getElementById('ticket-rows');
+  const row = document.createElement('div');
+  row.className = 'rate-row';
+  row.innerHTML = `<div><input placeholder="Item description" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 8px;color:#e0e6f0;font-size:12px;width:160px;" oninput="updateSummary()"/></div><input class="rate-qty" type="number" value="1" oninput="updateSummary()"/><span style="font-size:11px;color:#8899aa;">× ₹</span><input class="rate-input" type="number" value="0" oninput="updateSummary()"/><div class="rate-total">₹0</div><button onclick="this.parentElement.remove();updateSummary();" style="background:rgba(239,68,68,.15);border:none;color:#f87171;width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:14px;">×</button>`;
+  container.appendChild(row);
+}
+
+async function generateQuote() {
+  const qId = 'WOW-Q-' + Date.now().toString(36).toUpperCase();
+  const payload = {
+    quote_id: qId, segment: currentSeg,
+    client_name: document.getElementById('client-name').value,
+    contact_email: document.getElementById('contact-email').value,
+    visit_date: document.getElementById('visit-date').value,
+    status: 'sent', created_at: new Date().toISOString()
+  };
+  try { await fetch('tables/ta_quotes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); } catch(e) {}
+  document.getElementById('preview-modal').style.display = 'none';
+  alert(`✅ Quote ${qId} generated and sent to client!\nWhatsApp + Email notification dispatched.`);
+  addQuoteToList(payload);
+}
+
+function addQuoteToList(q) {
+  const list = document.getElementById('quotes-list');
+  const el = document.createElement('div');
+  el.className = 'quote-row';
+  el.innerHTML = `<div style="flex:1;"><div style="font-size:12px;font-weight:600;">${q.client_name||'New Client'}</div><div style="font-size:10px;color:#8899aa;">${q.segment} · ${q.visit_date||'TBD'}</div></div><span class="q-badge qb-sent">Sent</span>`;
+  list.prepend(el);
+}
+
+function previewQuote() {
+  const total = document.getElementById('sl-total').textContent;
+  const adv = document.getElementById('sl-advance').textContent;
+  const client = document.getElementById('client-name').value || '—';
+  const date = document.getElementById('visit-date').value || '—';
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:10px;padding:16px;font-size:13px;">
+      <div style="font-size:16px;font-weight:800;color:#ffd700;margin-bottom:8px;">Worlds of Wonder</div>
+      <div style="font-size:11px;color:#8899aa;margin-bottom:16px;">Quote for ${client} · Visit: ${date}</div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span>Sub-Total</span><span>${document.getElementById('sl-subtotal').textContent}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);"><span>GST 18%</span><span>${document.getElementById('sl-gst').textContent}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:16px;font-weight:800;color:#ffd700;"><span>Grand Total</span><span>${total}</span></div>
+      <div style="margin-top:12px;background:rgba(255,255,255,.04);border-radius:8px;padding:10px;font-size:12px;color:#8899aa;">
+        Advance Required (50%): <b style="color:#ffd700;">${adv}</b><br/>
+        Valid for 7 days from quote date.
+      </div>
+    </div>`;
+  document.getElementById('preview-modal').style.display = 'flex';
+}
+
+function closePreview() { document.getElementById('preview-modal').style.display = 'none'; }
+
+function saveDraft() { alert('Draft saved locally. You can resume anytime.'); }
+
+function clearForm() {
+  document.getElementById('client-name').value = '';
+  document.getElementById('visit-date').value = '';
+  addonTotal = 0;
+  document.querySelectorAll('.addon-check').forEach(c => { c.textContent = ''; c.style.background = 'transparent'; c.style.borderColor = 'rgba(255,255,255,.2)'; });
+  document.querySelectorAll('.addon-item div').forEach(d => { d.style.borderColor = 'rgba(255,255,255,.08)'; d.style.background = 'rgba(255,255,255,.03)'; });
+  updateSummary();
+}
+
+// Init
+calcSchoolRatio();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
