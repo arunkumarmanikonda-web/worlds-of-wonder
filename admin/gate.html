@@ -1,347 +1,705 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gate Redemption Console — Worlds of Wonder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--ink:#0a0f28;--blue:#1a56db;--green:#16a34a;--red:#dc2626;--amber:#d97706;--border:#e2e8f0;--text:#374151;--muted:#6b7280;--surface:#0d1117;}
-    body{font-family:'Poppins',sans-serif;background:var(--surface);color:#e2e8f0;min-height:100vh;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gate Operations — WOW Live Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#030712;color:#e2e8f0;min-height:100vh}
 
-    /* Header */
-    .gate-header{
-      background:#0a0f28;border-bottom:1px solid rgba(255,255,255,.08);
-      padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
-      position:sticky;top:0;z-index:20;
-    }
-    .gate-header img{height:36px;width:auto;object-fit:contain;}
-    .gate-title{color:#fff;font-weight:800;font-size:16px;margin-left:14px;}
-    .gate-badge{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,.7);}
-    .live-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite;}
-    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,.6)}50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+/* Header */
+.gate-header{background:linear-gradient(90deg,#0f172a,#1e293b);border-bottom:2px solid #f59e0b;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.gate-header img{height:42px;filter:none!important}
+.gate-title{font-size:1.1rem;font-weight:800;color:#f1f5f9;display:flex;align-items:center;gap:10px}
+.gate-title .live-badge{background:#dc2626;color:#fff;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:10px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.header-right{display:flex;align-items:center;gap:10px}
+.clock-display{font-family:'Courier Prime',monospace;font-size:1.1rem;font-weight:700;color:#f59e0b;background:#0f172a;padding:6px 14px;border-radius:8px;border:1px solid #334155}
+.btn-sm{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.btn-red{background:#dc2626;color:#fff}
+.btn-green{background:#16a34a;color:#fff}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-gold{background:#f59e0b;color:#000}
+.btn-outline{background:transparent;border:1px solid #475569;color:#cbd5e1}
 
-    /* Layout */
-    .gate-wrap{max-width:1300px;margin:0 auto;padding:22px;display:grid;grid-template-columns:400px 1fr;gap:20px;align-items:start;}
+/* Grid */
+.gate-grid{display:grid;grid-template-columns:320px 1fr 280px;gap:0;height:calc(100vh - 68px)}
 
-    /* Scanner */
-    .scanner-card{background:#111827;border:1.5px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;position:sticky;top:80px;}
-    .scanner-title{font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;}
-    .scanner-sub{font-size:12.5px;color:rgba(255,255,255,.4);margin-bottom:20px;}
-    .scanner-input-wrap{position:relative;margin-bottom:18px;}
-    .scanner-input{
-      width:100%;padding:16px 20px;border:2px solid rgba(255,255,255,.15);
-      border-radius:12px;background:rgba(255,255,255,.05);
-      color:#fff;font-size:16px;font-weight:700;font-family:'Nunito',sans-serif;
-      outline:none;transition:border-color .15s;letter-spacing:.05em;
-    }
-    .scanner-input:focus{border-color:#1a56db;}
-    .scanner-input::placeholder{color:rgba(255,255,255,.25);}
-    .scan-btn{
-      width:100%;padding:15px;border:none;border-radius:12px;
-      background:linear-gradient(135deg,#1a56db,#3b82f6);color:#fff;
-      font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;
-      transition:transform .15s,box-shadow .15s;
-    }
-    .scan-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(59,130,246,.4);}
+/* Left: Scanner */
+.scanner-panel{background:#0f172a;border-right:1px solid #1e293b;display:flex;flex-direction:column;padding:16px;gap:14px;overflow-y:auto}
+.panel-title{font-size:.85rem;font-weight:700;color:#f1f5f9;margin-bottom:2px;display:flex;align-items:center;gap:8px}
 
-    /* Result panel */
-    .scan-result{
-      display:none;margin-top:18px;border-radius:14px;padding:20px;
-      border:2px solid;
-    }
-    .scan-result.ok{border-color:#22c55e;background:rgba(34,197,94,.1);}
-    .scan-result.fail{border-color:#ef4444;background:rgba(239,68,68,.1);}
-    .scan-result.warn{border-color:#f59e0b;background:rgba(245,158,11,.1);}
-    .result-status{font-size:22px;font-weight:900;margin-bottom:8px;font-family:'Nunito',sans-serif;}
-    .result-ok .result-status{color:#22c55e;}
-    .result-fail .result-status{color:#ef4444;}
-    .result-warn .result-status{color:#f59e0b;}
-    .result-detail{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;}
-    .override-btn{
-      margin-top:14px;padding:10px 18px;background:rgba(245,158,11,.2);
-      border:1.5px solid #f59e0b;border-radius:9px;color:#fde68a;
-      font-size:13px;font-weight:700;cursor:pointer;width:100%;
-    }
+.qr-viewport{background:#000;border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:2px solid #334155;overflow:hidden}
+.qr-viewport .scan-line{position:absolute;width:80%;height:2px;background:linear-gradient(90deg,transparent,#f59e0b,transparent);animation:scan 2s linear infinite;top:20%}
+@keyframes scan{0%{top:15%}50%{top:75%}100%{top:15%}}
+.qr-corners{position:absolute;inset:12px;pointer-events:none}
+.qr-corners::before,.qr-corners::after{content:'';position:absolute;border:3px solid #f59e0b}
+.qr-corners::before{top:0;left:0;width:28px;height:28px;border-right:none;border-bottom:none}
+.qr-corners::after{bottom:0;right:0;width:28px;height:28px;border-left:none;border-top:none}
+.qr-placeholder{color:#475569;font-size:2.5rem;text-align:center}
+.qr-placeholder p{font-size:.78rem;color:#64748b;margin-top:8px}
+.scan-input{background:#1e293b;border:2px solid #334155;border-radius:10px;padding:12px;color:#e2e8f0;font-family:'Courier Prime',monospace;font-size:1rem;text-align:center;width:100%;outline:none;transition:border-color .2s}
+.scan-input:focus{border-color:#f59e0b}
+.scan-result{border-radius:10px;padding:14px;display:none}
+.scan-result.valid{background:#0d2b1a;border:2px solid #16a34a;display:block}
+.scan-result.invalid{background:#2d0a0a;border:2px solid #dc2626;display:block}
+.scan-result.used{background:#2d1f00;border:2px solid #f59e0b;display:block}
+.scan-result-icon{font-size:2rem;text-align:center;margin-bottom:8px}
+.scan-result h4{font-size:.95rem;font-weight:700;text-align:center;margin-bottom:10px}
+.scan-detail{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:5px}
+.scan-detail .sk{color:#94a3b8}
+.scan-detail .sv{color:#f1f5f9;font-weight:600;text-align:right}
+.gate-select{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.gate-btn{padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:.78rem;font-weight:700;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px}
+.gate-btn i{font-size:1.2rem}
+.gate-btn.wp{background:#1d4ed8;color:#fff}
+.gate-btn.ap{background:#7c3aed;color:#fff}
+.gate-btn.main{background:#16a34a;color:#fff}
+.gate-btn.exit{background:#dc2626;color:#fff}
+.gate-btn.active-gate{box-shadow:0 0 0 3px #f59e0b}
+.recent-scans{flex:1;display:flex;flex-direction:column;gap:6px}
+.scan-item{background:#1e293b;border-radius:8px;padding:10px;display:flex;align-items:center;gap:10px;font-size:.78rem}
+.scan-item .si-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.si-valid{background:#0d2b1a;color:#4ade80}
+.si-invalid{background:#2d0a0a;color:#f87171}
+.si-used{background:#2d1f00;color:#fbbf24}
+.scan-item .si-info{flex:1}
+.scan-item .si-id{color:#60a5fa;font-weight:600;font-family:'Courier Prime',monospace}
+.scan-item .si-name{color:#94a3b8}
+.scan-item .si-time{color:#64748b;font-size:.7rem}
 
-    /* Stats */
-    .gate-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-    .gs-card{background:#111827;border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,.08);}
-    .gs-num{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:#e2e8f0;}
-    .gs-label{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:3px;}
-    .gs-delta{font-size:12px;font-weight:700;margin-top:4px;}
-    .delta-up{color:#22c55e;}
+/* Centre: Live Dashboard */
+.centre-panel{display:flex;flex-direction:column;overflow-y:auto;background:#030712}
 
-    /* Scan log */
-    .scan-log{background:#111827;border-radius:16px;border:1px solid rgba(255,255,255,.08);overflow:hidden;}
-    .scan-log-head{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;}
-    .log-row{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeIn .3s ease;}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-    .log-row:last-child{border-bottom:none;}
-    .log-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-    .log-icon.ok{background:rgba(34,197,94,.15);}
-    .log-icon.fail{background:rgba(239,68,68,.15);}
-    .log-icon.warn{background:rgba(245,158,11,.15);}
-    .log-ref{font-size:13px;font-weight:700;color:#e2e8f0;}
-    .log-detail{font-size:12px;color:rgba(255,255,255,.4);}
-    .log-time{font-size:11.5px;color:rgba(255,255,255,.25);margin-left:auto;}
-    .badge-ok{background:rgba(34,197,94,.2);color:#4ade80;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
-    .badge-fail{background:rgba(239,68,68,.2);color:#f87171;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
-    .badge-warn{background:rgba(245,158,11,.2);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;}
+/* Weather & Emergency bar */
+.info-bar{background:linear-gradient(90deg,#1e3a5f,#0f172a);border-bottom:1px solid #1e293b;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.info-chip{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#e2e8f0;background:#0f172a;padding:6px 12px;border-radius:20px;border:1px solid #334155}
+.info-chip.weather{border-color:#fbbf24;color:#fbbf24}
+.info-chip.traffic{border-color:#f87171;color:#f87171}
+.info-chip.emergency{border-color:#ef4444;color:#ef4444;cursor:pointer}
+.info-chip.capacity-ok{border-color:#4ade80;color:#4ade80}
+.info-chip.capacity-warn{border-color:#f59e0b;color:#f59e0b}
+.info-chip.capacity-full{border-color:#ef4444;color:#ef4444;animation:pulse 1.5s infinite}
 
-    /* Chart */
-    .chart-card{background:#111827;border-radius:16px;border:1px solid rgba(255,255,255,.08);padding:20px;margin-bottom:20px;}
-    .chart-title{font-size:14px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:16px;}
+/* Capacity meters */
+.capacity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px}
+.cap-card{background:#0f172a;border:1px solid #1e293b;border-radius:14px;padding:16px;text-align:center}
+.cap-card h4{font-size:.8rem;font-weight:700;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+.cap-ring-container{position:relative;width:120px;height:120px;margin:0 auto 12px}
+.cap-ring-svg{width:120px;height:120px;transform:rotate(-90deg)}
+.cap-ring-bg{fill:none;stroke:#1e293b;stroke-width:10}
+.cap-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dasharray 1s ease}
+.cap-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cap-pct{font-size:1.5rem;font-weight:800;color:#f1f5f9}
+.cap-sub{font-size:.68rem;color:#64748b}
+.cap-counts{display:flex;justify-content:space-around;font-size:.75rem}
+.cap-count-item{text-align:center}
+.cap-count-item .val{font-weight:700;color:#f1f5f9}
+.cap-count-item .lbl{color:#64748b}
 
-    /* Gate selector */
-    .gate-sel{display:flex;gap:8px;margin-bottom:18px;}
-    .gate-btn{padding:8px 18px;border-radius:8px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .15s;}
-    .gate-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+/* Live entry chart */
+.chart-section{padding:0 20px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:16px}
+.chart-card h4{font-size:.85rem;font-weight:700;color:#f1f5f9;margin-bottom:12px}
+.chart-container{height:160px;position:relative}
 
-    @media(max-width:900px){.gate-wrap{grid-template-columns:1fr;}.gate-stats{grid-template-columns:1fr 1fr;}}
-  </style>
+/* Gate status grid */
+.gates-section{padding:0 20px 20px}
+.gates-section h3{font-size:.88rem;font-weight:700;color:#f1f5f9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.gates-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.gate-card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.gate-card:hover{border-color:#334155}
+.gate-card.operational{border-color:#16a34a}
+.gate-card.busy{border-color:#f59e0b}
+.gate-card.closed{border-color:#dc2626;opacity:.6}
+.gate-card.vip{border-color:#7c3aed}
+.gate-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 8px;display:block}
+.gate-card.operational .gate-dot{background:#4ade80;box-shadow:0 0 8px #4ade80}
+.gate-card.busy .gate-dot{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
+.gate-card.closed .gate-dot{background:#ef4444}
+.gate-card.vip .gate-dot{background:#a78bfa;box-shadow:0 0 8px #a78bfa}
+.gate-name{font-size:.8rem;font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.gate-count{font-size:1.1rem;font-weight:800;color:#f59e0b}
+.gate-rate{font-size:.7rem;color:#64748b}
+.gate-toggle{position:absolute;top:6px;right:6px;background:transparent;border:none;color:#64748b;cursor:pointer;font-size:.7rem}
+
+/* Alert feed */
+.alerts-section{padding:0 20px 20px}
+.alerts-section h3{font-size:.88rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.alert-feed{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
+.alert-item{display:flex;align-items:flex-start;gap:10px;background:#0f172a;border-radius:8px;padding:10px;font-size:.78rem;border-left:3px solid}
+.alert-item.critical{border-color:#ef4444}
+.alert-item.warning{border-color:#f59e0b}
+.alert-item.info{border-color:#3b82f6}
+.alert-item.success{border-color:#22c55e}
+.alert-icon{font-size:.9rem;margin-top:1px}
+.alert-text{flex:1}
+.alert-text .at{color:#e2e8f0;margin-bottom:2px}
+.alert-text .atime{color:#64748b}
+
+/* Right panel */
+.right-panel{background:#0f172a;border-left:1px solid #1e293b;display:flex;flex-direction:column;overflow-y:auto}
+.rp-sect{padding:14px 16px;border-bottom:1px solid #1e293b}
+.rp-sect h4{font-size:.82rem;font-weight:700;color:#f1f5f9;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.8rem;border-bottom:1px solid #0a1628}
+.stat-row .sr-label{color:#94a3b8}
+.stat-row .sr-val{color:#f1f5f9;font-weight:700}
+.emergency-list{display:flex;flex-direction:column;gap:8px}
+.emer-item{background:#0a1628;border-radius:8px;padding:10px;display:flex;align-items:center;gap:10px}
+.emer-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.emer-item.police .emer-icon{background:#1e3a5f;color:#60a5fa}
+.emer-item.fire .emer-icon{background:#4a1d1d;color:#f87171}
+.emer-item.medical .emer-icon{background:#14532d;color:#4ade80}
+.emer-item.control .emer-icon{background:#3b2f00;color:#fbbf24}
+.emer-info .en{font-size:.8rem;font-weight:700;color:#f1f5f9}
+.emer-info .ep{font-size:.82rem;font-weight:700;color:#f59e0b;font-family:'Courier Prime',monospace;cursor:pointer}
+.ops-actions{display:flex;flex-direction:column;gap:6px}
+.ops-btn{width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:700;text-align:left;display:flex;align-items:center;gap:8px;transition:all .2s}
+.ops-btn.danger{background:#4a1d1d;color:#f87171}
+.ops-btn.warning{background:#3b2f00;color:#fbbf24}
+.ops-btn.info-btn{background:#172554;color:#60a5fa}
+.ops-btn.success-btn{background:#0d2b1a;color:#4ade80}
+.ops-btn:hover{filter:brightness(1.2)}
+
+/* Staff on duty */
+.staff-list{display:flex;flex-direction:column;gap:6px}
+.staff-item{display:flex;align-items:center;gap:8px;font-size:.78rem;background:#0a1628;border-radius:6px;padding:8px}
+.staff-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.staff-item .si-name{flex:1;color:#e2e8f0;font-weight:600}
+.staff-item .si-gate{color:#64748b}
+.staff-item .si-radio{color:#4ade80;font-size:.7rem}
+
+/* Weather section */
+.weather-display{background:#0a1628;border-radius:10px;padding:12px;margin-bottom:0}
+.weather-main{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.weather-icon{font-size:2.5rem}
+.weather-temp{font-size:1.8rem;font-weight:800;color:#fbbf24}
+.weather-desc{color:#94a3b8;font-size:.8rem}
+.weather-details{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wd-item{font-size:.75rem;display:flex;justify-content:space-between}
+.wd-item .wl{color:#64748b}.wd-item .wv{color:#e2e8f0;font-weight:600}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid #f59e0b;border-radius:10px;padding:12px 18px;color:#fbbf24;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateY(0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#030712}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+</style>
 </head>
 <body>
 
-<div class="gate-header">
-  <div style="display:flex;align-items:center;">
-    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;" /></a>
-    <div class="gate-title">Gate Redemption Console</div>
+<header class="gate-header">
+  <div style="display:flex;align-items:center;gap:14px">
+    <img src="../images/logo.png" alt="WOW">
+    <div class="gate-title">
+      Gate Operations Control
+      <span class="live-badge">● LIVE</span>
+    </div>
   </div>
-  <div class="gate-badge">
-    <div class="live-dot"></div>
-    <span>Live · 27 Mar 2026 · <span id="live-time">--:--:--</span></span>
-    &nbsp;&nbsp;
-    <a href="index.html" style="color:rgba(255,255,255,.4);font-size:12px;text-decoration:none;">← Admin</a>
+  <div class="header-right">
+    <div class="clock-display" id="clockDisplay">10:45:22</div>
+    <button class="btn-sm btn-red" onclick="triggerEmergency()"><i class="fas fa-exclamation-triangle"></i> EMERGENCY</button>
+    <button class="btn-sm btn-outline" onclick="window.location='index.html'"><i class="fas fa-th"></i> Admin</button>
   </div>
-</div>
+</header>
 
-<div class="gate-wrap">
-  <!-- LEFT: Scanner -->
-  <div>
-    <div class="scanner-card">
-      <div class="scanner-title">🔍 Scan / Enter QR Code</div>
-      <div class="scanner-sub">Scan ticket QR or type the ticket token below</div>
+<div class="gate-grid">
 
-      <!-- Gate selector -->
-      <div class="gate-sel">
-        <button class="gate-btn active" id="gate-water" onclick="setGate('Water Park Main Gate',this)">🌊 Water Park</button>
-        <button class="gate-btn" id="gate-amus" onclick="setGate('Amusement Park Main Gate',this)">🎢 Amusement</button>
-        <button class="gate-btn" id="gate-exit" onclick="setGate('Exit Gate',this)">🚪 Exit</button>
-      </div>
+  <!-- LEFT: QR Scanner -->
+  <aside class="scanner-panel">
+    <div class="panel-title"><i class="fas fa-qrcode" style="color:#f59e0b"></i> QR Ticket Scanner</div>
 
-      <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:14px;">Current gate: <strong style="color:#93c5fd;" id="current-gate">Water Park Main Gate</strong></div>
-
-      <div class="scanner-input-wrap">
-        <input class="scanner-input" type="text" id="qr-input" placeholder="WOW-QR-XXXXXXXXXX" autocomplete="off" maxlength="30" onkeydown="if(event.key==='Enter')scan()" />
-      </div>
-      <button class="scan-btn" onclick="scan()">✅ Verify &amp; Allow Entry</button>
-
-      <!-- Result -->
-      <div class="scan-result" id="scan-result">
-        <div class="result-status" id="result-status"></div>
-        <div class="result-detail" id="result-detail"></div>
-        <button class="override-btn" id="override-btn" onclick="manualOverride()" style="display:none;">⚠️ Override — Supervisor Approval</button>
+    <!-- Gate selector -->
+    <div>
+      <div style="font-size:.72rem;color:#64748b;margin-bottom:6px;font-weight:600">SELECT ACTIVE GATE</div>
+      <div class="gate-select">
+        <button class="gate-btn wp active-gate" id="gateWP" onclick="selectGate('wp',this)"><i class="fas fa-water"></i> Water Park</button>
+        <button class="gate-btn ap" id="gateAP" onclick="selectGate('ap',this)"><i class="fas fa-star"></i> Amusement</button>
+        <button class="gate-btn main" id="gateMain" onclick="selectGate('main',this)"><i class="fas fa-door-open"></i> Main Entry</button>
+        <button class="gate-btn exit" id="gateExit" onclick="selectGate('exit',this)"><i class="fas fa-sign-out-alt"></i> Exit Gate</button>
       </div>
     </div>
 
-    <!-- Daily chart -->
-    <div class="chart-card" style="margin-top:20px;">
-      <div class="chart-title">Today's Footfall — Hourly</div>
-      <div style="height:180px;"><canvas id="footChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- RIGHT: Stats + Log -->
-  <div>
-    <div class="gate-stats">
-      <div class="gs-card"><div class="gs-num" id="total-in">0</div><div class="gs-label">Total In Today</div><div class="gs-delta delta-up">Target: 1,500</div></div>
-      <div class="gs-card"><div class="gs-num">847</div><div class="gs-label">Tickets Sold</div><div class="gs-delta delta-up">▲ 23% vs yesterday</div></div>
-      <div class="gs-card"><div class="gs-num" style="color:#22c55e;" id="valid-count">0</div><div class="gs-label">Valid Scans</div></div>
-      <div class="gs-card"><div class="gs-num" style="color:#ef4444;" id="invalid-count">0</div><div class="gs-label">Rejected / Errors</div></div>
+    <!-- QR Viewport -->
+    <div class="qr-viewport" id="qrViewport">
+      <div class="scan-line"></div>
+      <div class="qr-corners"></div>
+      <div class="qr-placeholder">
+        <i class="fas fa-qrcode"></i>
+        <p>Camera QR scan active<br>or type code below</p>
+      </div>
     </div>
 
-    <!-- Scan log -->
-    <div class="scan-log">
-      <div class="scan-log-head">
-        <div style="font-size:14px;font-weight:700;color:#e2e8f0;">Live Scan Log</div>
-        <div style="display:flex;gap:8px;">
-          <span style="font-size:12px;color:rgba(255,255,255,.3);" id="log-count">0 scans</span>
-          <button onclick="clearLog()" style="padding:4px 12px;border:1.5px solid rgba(255,255,255,.12);border-radius:6px;background:none;color:rgba(255,255,255,.4);font-size:12px;cursor:pointer;">Clear</button>
+    <!-- Manual input -->
+    <input class="scan-input" type="text" id="scanInput" placeholder="Scan QR or type ticket code…" oninput="handleScan(this.value)" autofocus>
+
+    <!-- Scan result -->
+    <div class="scan-result" id="scanResult"></div>
+
+    <!-- Quick scan actions -->
+    <div style="display:flex;gap:6px">
+      <button class="btn-sm btn-green" style="flex:1" onclick="simulateScan('valid')"><i class="fas fa-check"></i> Test Valid</button>
+      <button class="btn-sm btn-red" style="flex:1" onclick="simulateScan('invalid')"><i class="fas fa-times"></i> Test Invalid</button>
+      <button class="btn-sm btn-gold" style="flex:1" onclick="simulateScan('used')"><i class="fas fa-ban"></i> Test Used</button>
+    </div>
+
+    <!-- Recent scans -->
+    <div>
+      <div class="panel-title" style="margin-bottom:8px"><i class="fas fa-history" style="color:#60a5fa"></i> Recent Scans</div>
+      <div class="recent-scans" id="recentScans"></div>
+    </div>
+  </aside>
+
+  <!-- CENTRE: Dashboard -->
+  <main class="centre-panel">
+    <!-- Info Bar: weather, traffic, capacity -->
+    <div class="info-bar">
+      <div class="info-chip weather" id="weatherChip"><i class="fas fa-sun"></i> 34°C · Sunny</div>
+      <div class="info-chip traffic" id="trafficChip"><i class="fas fa-car"></i> NH-58: Moderate — 12 min</div>
+      <div class="info-chip capacity-ok" id="mainCapChip"><i class="fas fa-users"></i> Park: 68% capacity</div>
+      <div class="info-chip" style="border-color:#a78bfa;color:#a78bfa"><i class="fas fa-umbrella-beach"></i> AQI: 82 — Good</div>
+      <div class="info-chip emergency" onclick="showEmergencyPanel()"><i class="fas fa-phone-alt"></i> Emergency Numbers</div>
+    </div>
+
+    <!-- Capacity rings -->
+    <div class="capacity-grid">
+      <div class="cap-card">
+        <h4><i class="fas fa-water" style="color:#3b82f6"></i> Water Park</h4>
+        <div class="cap-ring-container">
+          <svg class="cap-ring-svg" viewBox="0 0 120 120">
+            <circle class="cap-ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="cap-ring-fill" id="ring-wp" cx="60" cy="60" r="50" stroke="#3b82f6" stroke-dasharray="219 314"/>
+          </svg>
+          <div class="cap-center"><div class="cap-pct" id="pct-wp">70%</div><div class="cap-sub">of 2,500</div></div>
+        </div>
+        <div class="cap-counts">
+          <div class="cap-count-item"><div class="val" id="inside-wp">1,748</div><div class="lbl">Inside</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#4ade80">42</div><div class="lbl">Entry/hr</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#f87171">18</div><div class="lbl">Exit/hr</div></div>
         </div>
       </div>
-      <div id="scan-log-body" style="max-height:420px;overflow-y:auto;">
-        <div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,.2);">
-          <div style="font-size:36px;margin-bottom:10px;">🔍</div>
-          <p>Scan log will appear here as tickets are scanned</p>
+      <div class="cap-card">
+        <h4><i class="fas fa-star" style="color:#7c3aed"></i> Amusement Park</h4>
+        <div class="cap-ring-container">
+          <svg class="cap-ring-svg" viewBox="0 0 120 120">
+            <circle class="cap-ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="cap-ring-fill" id="ring-ap" cx="60" cy="60" r="50" stroke="#7c3aed" stroke-dasharray="157 314"/>
+          </svg>
+          <div class="cap-center"><div class="cap-pct" id="pct-ap">50%</div><div class="cap-sub">of 3,000</div></div>
+        </div>
+        <div class="cap-counts">
+          <div class="cap-count-item"><div class="val" id="inside-ap">1,501</div><div class="lbl">Inside</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#4ade80">61</div><div class="lbl">Entry/hr</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#f87171">29</div><div class="lbl">Exit/hr</div></div>
+        </div>
+      </div>
+      <div class="cap-card">
+        <h4><i class="fas fa-ticket-alt" style="color:#f59e0b"></i> Total Park</h4>
+        <div class="cap-ring-container">
+          <svg class="cap-ring-svg" viewBox="0 0 120 120">
+            <circle class="cap-ring-bg" cx="60" cy="60" r="50"/>
+            <circle class="cap-ring-fill" id="ring-total" cx="60" cy="60" r="50" stroke="#f59e0b" stroke-dasharray="201 314"/>
+          </svg>
+          <div class="cap-center"><div class="cap-pct" id="pct-total">64%</div><div class="cap-sub">of 5,500</div></div>
+        </div>
+        <div class="cap-counts">
+          <div class="cap-count-item"><div class="val" id="inside-total">3,249</div><div class="lbl">Inside</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#4ade80" id="today-entry">4,182</div><div class="lbl">Today's Entry</div></div>
+          <div class="cap-count-item"><div class="val" style="color:#f87171" id="today-exit">933</div><div class="lbl">Exited</div></div>
         </div>
       </div>
     </div>
 
-    <!-- Offline mode notice -->
-    <div style="background:rgba(245,158,11,.1);border:1.5px solid rgba(245,158,11,.3);border-radius:12px;padding:14px 18px;margin-top:16px;display:flex;align-items:center;gap:12px;">
-      <div style="font-size:22px;">📶</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:#fbbf24;">Offline Mode Available</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.4);">If internet is unavailable, the console operates in cached mode. Scans are queued and synced when connection resumes.</div>
+    <!-- Live Charts -->
+    <div class="chart-section">
+      <div class="chart-card">
+        <h4><i class="fas fa-chart-line" style="color:#4ade80"></i> Hourly Entry Rate</h4>
+        <div class="chart-container"><canvas id="entryChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h4><i class="fas fa-chart-pie" style="color:#a78bfa"></i> Ticket Type Breakdown</h4>
+        <div class="chart-container"><canvas id="ticketTypeChart"></canvas></div>
       </div>
     </div>
-  </div>
+
+    <!-- Gate Status -->
+    <div class="gates-section">
+      <h3><i class="fas fa-door-open" style="color:#f59e0b"></i> Active Gates — Live Status</h3>
+      <div class="gates-grid" id="gatesGrid"></div>
+    </div>
+
+    <!-- Alert Feed -->
+    <div class="alerts-section">
+      <h3><i class="fas fa-bell" style="color:#f87171"></i> Live Alerts <span id="alertCount" style="background:#dc2626;color:#fff;border-radius:10px;padding:1px 7px;font-size:.7rem;font-weight:700;margin-left:4px">3</span></h3>
+      <div class="alert-feed" id="alertFeed"></div>
+    </div>
+  </main>
+
+  <!-- RIGHT Panel -->
+  <aside class="right-panel">
+    <!-- Live weather -->
+    <div class="rp-sect">
+      <h4><i class="fas fa-cloud-sun" style="color:#fbbf24"></i> Live Weather — Noida</h4>
+      <div class="weather-display">
+        <div class="weather-main">
+          <span class="weather-icon">☀️</span>
+          <div>
+            <div class="weather-temp" id="liveTemp">34°C</div>
+            <div class="weather-desc" id="liveDesc">Clear sky · Feels like 38°C</div>
+          </div>
+        </div>
+        <div class="weather-details">
+          <div class="wd-item"><span class="wl">Humidity</span><span class="wv" id="liveHumidity">52%</span></div>
+          <div class="wd-item"><span class="wl">Wind</span><span class="wv" id="liveWind">12 km/h NW</span></div>
+          <div class="wd-item"><span class="wl">UV Index</span><span class="wv" id="liveUV">8 — Very High</span></div>
+          <div class="wd-item"><span class="wl">Visibility</span><span class="wv">10 km</span></div>
+        </div>
+        <div style="margin-top:8px;background:#0f172a;border-radius:6px;padding:8px;font-size:.75rem;color:#fbbf24;border-left:3px solid #fbbf24">
+          ⚠️ UV very high — sunscreen & hydration stations active at all gates
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's key stats -->
+    <div class="rp-sect">
+      <h4><i class="fas fa-chart-bar" style="color:#f59e0b"></i> Today's Stats</h4>
+      <div class="stat-row"><span class="sr-label">Total Entries</span><span class="sr-val" style="color:#4ade80" id="s-entries">4,182</span></div>
+      <div class="stat-row"><span class="sr-label">Passport Holders</span><span class="sr-val" style="color:#f59e0b" id="s-passport">614</span></div>
+      <div class="stat-row"><span class="sr-label">Combo Tickets</span><span class="sr-val" id="s-combo">1,247</span></div>
+      <div class="stat-row"><span class="sr-label">Water Park Only</span><span class="sr-val" id="s-wp">1,841</span></div>
+      <div class="stat-row"><span class="sr-label">Amusement Only</span><span class="sr-val" id="s-ap">480</span></div>
+      <div class="stat-row"><span class="sr-label">Invalid/Refused</span><span class="sr-val" style="color:#f87171" id="s-invalid">23</span></div>
+      <div class="stat-row"><span class="sr-label">Peak Hour</span><span class="sr-val">11:30–12:30 PM</span></div>
+      <div class="stat-row"><span class="sr-label">Avg. Wait Time</span><span class="sr-val" style="color:#fbbf24" id="s-wait">4.2 min</span></div>
+    </div>
+
+    <!-- Emergency contacts -->
+    <div class="rp-sect">
+      <h4><i class="fas fa-phone-alt" style="color:#ef4444"></i> Emergency Numbers</h4>
+      <div class="emergency-list">
+        <div class="emer-item police">
+          <div class="emer-icon"><i class="fas fa-shield-alt"></i></div>
+          <div class="emer-info"><div class="en">Police — Sector 38</div><div class="ep" onclick="showToast('Calling Police: 100')">100 / 0120-255-1100</div></div>
+        </div>
+        <div class="emer-item fire">
+          <div class="emer-icon"><i class="fas fa-fire-extinguisher"></i></div>
+          <div class="emer-info"><div class="en">Fire Brigade</div><div class="ep" onclick="showToast('Calling Fire: 101')">101 / 0120-254-0101</div></div>
+        </div>
+        <div class="emer-item medical">
+          <div class="emer-icon"><i class="fas fa-ambulance"></i></div>
+          <div class="emer-info"><div class="en">Ambulance / Medical</div><div class="ep" onclick="showToast('Calling Ambulance: 108')">108 / 0120-454-0200</div></div>
+        </div>
+        <div class="emer-item control">
+          <div class="emer-icon"><i class="fas fa-headset"></i></div>
+          <div class="emer-info"><div class="en">WOW Control Room</div><div class="ep" onclick="showToast('Calling Control: 1800-WOW')">1800-WOW (24/7)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operations controls -->
+    <div class="rp-sect">
+      <h4><i class="fas fa-cog" style="color:#a78bfa"></i> Operations Controls</h4>
+      <div class="ops-actions">
+        <button class="ops-btn danger" onclick="showToast('🚨 PARK LOCKDOWN initiated — all gates closing!')"><i class="fas fa-lock"></i> Park Lockdown</button>
+        <button class="ops-btn warning" onclick="showToast('⚠️ Capacity Alert sent to all gates')"><i class="fas fa-exclamation-triangle"></i> Capacity Alert</button>
+        <button class="ops-btn info-btn" onclick="showToast('Wave Pool temporarily closed — all signage updated')"><i class="fas fa-ban"></i> Close Wave Pool</button>
+        <button class="ops-btn success-btn" onclick="showToast('VIP lane opened at Gate A2 & WP-01')"><i class="fas fa-star"></i> Open VIP Lane</button>
+        <button class="ops-btn info-btn" onclick="showToast('Queue management system alerted — shuffle active')"><i class="fas fa-exchange-alt"></i> Balance Queues</button>
+      </div>
+    </div>
+
+    <!-- Staff on duty -->
+    <div class="rp-sect" style="flex:1">
+      <h4><i class="fas fa-user-shield" style="color:#4ade80"></i> Staff on Duty</h4>
+      <div class="staff-list" id="staffList"></div>
+    </div>
+  </aside>
 </div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fas fa-bolt"></i><span id="toastMsg">Alert</span></div>
 
 <script>
-// Simulated ticket database
-const VALID_TICKETS = {
-  'WOW-QR-7824A001': { ref:'WOW-7824', guest:'Aarav Mehta', park:'Water Park', date:'2026-03-27', type:'Adult', used:false },
-  'WOW-QR-7824A002': { ref:'WOW-7824', guest:'Aarav Mehta', park:'Water Park', date:'2026-03-27', type:'Adult', used:false },
-  'WOW-QR-7823A001': { ref:'WOW-7823', guest:'Priya Sharma', park:'Amusement Park', date:'2026-03-27', type:'Adult', used:false },
-  'WOW-QR-7820A001': { ref:'WOW-7820', guest:'Vikram Singh', park:'Amusement Park', date:'2026-03-26', type:'Adult', used:false },
-  'WOW-QR-USED0001': { ref:'WOW-7810', guest:'Test Guest', park:'Water Park', date:'2026-03-27', type:'Adult', used:true },
+// ── Clock ──
+function updateClock(){
+  document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString('en-IN',{hour12:false});
+}
+updateClock();setInterval(updateClock,1000);
+
+// ── Gate data ──
+const GATES = [
+  {id:'A1',name:'Main Entry A1',status:'operational',count:1842,rate:48,type:'main'},
+  {id:'A2',name:'Main Entry A2',status:'operational',count:1254,rate:32,type:'main'},
+  {id:'WP-01',name:'Water Park WP-01',status:'busy',count:2108,rate:71,type:'wp'},
+  {id:'WP-02',name:'Water Park WP-02',status:'operational',count:1633,rate:44,type:'wp'},
+  {id:'WP-03',name:'Water Park WP-03',status:'operational',count:987,rate:28,type:'wp'},
+  {id:'AP-01',name:'Amusement AP-01',status:'operational',count:1501,rate:61,type:'ap'},
+  {id:'AP-02',name:'Amusement AP-02',status:'operational',count:1122,rate:38,type:'ap'},
+  {id:'VIP',name:'VIP / Passport Lane',status:'vip',count:614,rate:18,type:'vip'},
+  {id:'EX-01',name:'Exit Gate EX-01',status:'operational',count:933,rate:24,type:'exit'},
+  {id:'EX-02',name:'Exit Gate EX-02',status:'closed',count:0,rate:0,type:'exit'},
+  {id:'GR-01',name:'Group Entry GR-01',status:'operational',count:312,rate:12,type:'group'},
+  {id:'SCH',name:'School / B2B Entry',status:'operational',count:188,rate:6,type:'group'},
+];
+
+function renderGates(){
+  document.getElementById('gatesGrid').innerHTML = GATES.map(g=>`
+    <div class="gate-card ${g.status}" onclick="selectGateCard('${g.id}')">
+      <button class="gate-toggle" onclick="event.stopPropagation();toggleGate('${g.id}',this)">${g.status==='closed'?'▶':'■'}</button>
+      <span class="gate-dot"></span>
+      <div class="gate-name">${g.id}</div>
+      <div class="gate-count">${g.count.toLocaleString()}</div>
+      <div class="gate-rate">${g.rate}/hr</div>
+    </div>
+  `).join('');
+}
+
+function selectGateCard(id){showToast(`Gate ${id} selected — scanner active`);}
+function toggleGate(id,btn){
+  const g = GATES.find(x=>x.id===id);
+  if(g){
+    g.status = g.status==='closed'?'operational':'closed';
+    btn.textContent = g.status==='closed'?'▶':'■';
+    showToast(`Gate ${id} ${g.status==='closed'?'closed':'opened'}`);
+    renderGates();
+  }
+}
+
+// ── Recent scans data ──
+const recentScans = [
+  {type:'valid',id:'WOW-TK-2025-004817',name:'Rahul Sharma',gate:'WP-01',time:'10:44:51'},
+  {type:'valid',id:'WOW-PP-EXPLORE-2025',name:'Anjali Gupta',gate:'VIP',time:'10:44:39'},
+  {type:'invalid',id:'WOW-TK-2024-003211',name:'Unknown',gate:'A1',time:'10:44:22'},
+  {type:'valid',id:'WOW-CB-2025-007844',name:'Vijay Family',gate:'A2',time:'10:44:10'},
+  {type:'used',id:'WOW-TK-2025-001122',name:'Meena Krishnan',gate:'WP-02',time:'10:43:58'},
+  {type:'valid',id:'WOW-PP-TOGETHER-2025',name:'Sharma Family',gate:'VIP',time:'10:43:45'},
+];
+
+function renderScans(){
+  document.getElementById('recentScans').innerHTML = recentScans.slice(0,6).map(s=>`
+    <div class="scan-item">
+      <div class="si-icon si-${s.type}"><i class="fas fa-${s.type==='valid'?'check':s.type==='used'?'ban':'times'}"></i></div>
+      <div class="si-info">
+        <div class="si-id">${s.id.substring(0,18)}…</div>
+        <div class="si-name">${s.name} · ${s.gate}</div>
+      </div>
+      <div class="si-time">${s.time}</div>
+    </div>
+  `).join('');
+}
+
+// ── Scan handler ──
+const VALID_CODES = {
+  'WOW-TK-2025-004817':{name:'Rahul Kumar Sharma',type:'Explore Passport',gate:'Water Park',valid:true,visits:'3/UNL',expires:'31 Mar 2026'},
+  'WOW-CB-2025-007844':{name:'Vijay & Seema Malhotra +2',type:'Combo Ticket',gate:'Both Parks',valid:true,visits:'1/1',expires:'Today'},
+  'WOW-TK-2025-001122':{name:'Meena Krishnan',type:'Water Park Ticket',gate:'Water Park',valid:false,used:true,visits:'1/1',expires:'28 Mar 2025'},
 };
-const usedTokens = new Set();
-let totalIn=0, validCount=0, invalidCount=0;
-let currentGate = 'Water Park Main Gate';
-const logEntries = [];
 
-function setGate(name, btn) {
-  currentGate = name;
-  document.getElementById('current-gate').textContent = name;
-  document.querySelectorAll('.gate-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+let scanTimer = null;
+function handleScan(val){
+  clearTimeout(scanTimer);
+  if(val.length < 8) return;
+  scanTimer = setTimeout(()=>processScan(val),500);
 }
 
-function scan() {
-  const raw = document.getElementById('qr-input').value.trim().toUpperCase();
-  if (!raw) return;
-  const resultEl = document.getElementById('scan-result');
-  const statusEl = document.getElementById('result-status');
-  const detailEl = document.getElementById('result-detail');
-  const oBtn     = document.getElementById('override-btn');
-  resultEl.style.display = 'block';
-  oBtn.style.display = 'none';
-
-  const now = new Date().toLocaleTimeString('en-IN');
-  const todayStr = new Date().toISOString().split('T')[0];
-
-  if (usedTokens.has(raw)) {
-    // Already scanned THIS session
-    resultEl.className = 'scan-result fail';
-    statusEl.textContent = '❌ DUPLICATE SCAN';
-    statusEl.style.color = '#ef4444';
-    detailEl.innerHTML = `<strong style="color:#f87171;">Ticket already used in this session!</strong><br>Token: ${raw}<br>This may indicate a duplicate or fraudulent ticket.`;
-    oBtn.style.display = 'block';
-    addLog('fail', raw, 'Duplicate scan', now);
-    invalidCount++;
+function processScan(code){
+  const result = document.getElementById('scanResult');
+  const data = VALID_CODES[code];
+  if(!data){
+    result.className = 'scan-result invalid';
+    result.innerHTML = `
+      <div class="scan-result-icon">❌</div>
+      <h4 style="color:#f87171">INVALID TICKET</h4>
+      <div class="scan-detail"><span class="sk">Code</span><span class="sv" style="color:#f87171">${code}</span></div>
+      <div class="scan-detail"><span class="sk">Status</span><span class="sv" style="color:#f87171">Not found in system</span></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn-sm btn-red" onclick="reportFraud()"><i class="fas fa-flag"></i> Flag Suspicious</button></div>`;
+    addScan({type:'invalid',id:code,name:'Unknown',gate:'Active Gate',time:new Date().toLocaleTimeString('en-IN',{hour12:false})});
+  } else if(data.used){
+    result.className = 'scan-result used';
+    result.innerHTML = `
+      <div class="scan-result-icon">⚠️</div>
+      <h4 style="color:#fbbf24">ALREADY USED</h4>
+      <div class="scan-detail"><span class="sk">Holder</span><span class="sv">${data.name}</span></div>
+      <div class="scan-detail"><span class="sk">Ticket Type</span><span class="sv">${data.type}</span></div>
+      <div class="scan-detail"><span class="sk">Visits Used</span><span class="sv" style="color:#fbbf24">${data.visits}</span></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn-sm btn-gold" onclick="callSupport()"><i class="fas fa-headset"></i> Call Support</button></div>`;
+    addScan({type:'used',id:code,name:data.name,gate:'Active Gate',time:new Date().toLocaleTimeString('en-IN',{hour12:false})});
   } else {
-    const ticket = VALID_TICKETS[raw];
-    if (!ticket) {
-      resultEl.className = 'scan-result fail';
-      statusEl.textContent = '❌ INVALID TICKET';
-      statusEl.style.color = '#ef4444';
-      detailEl.innerHTML = `Token not found in system.<br><small style="color:rgba(255,255,255,.4);">Token: ${raw}</small>`;
-      addLog('fail', raw, 'Not found', now);
-      invalidCount++;
-    } else if (ticket.used) {
-      resultEl.className = 'scan-result warn';
-      statusEl.textContent = '⚠️ ALREADY USED';
-      statusEl.style.color = '#f59e0b';
-      detailEl.innerHTML = `Ticket was previously scanned.<br>Guest: <strong>${ticket.guest}</strong><br>Park: ${ticket.park}<br>Ref: ${ticket.ref}`;
-      oBtn.style.display = 'block';
-      addLog('warn', raw, 'Previously used — ' + ticket.guest, now);
-      invalidCount++;
-    } else if (ticket.date !== todayStr) {
-      resultEl.className = 'scan-result fail';
-      statusEl.textContent = '❌ WRONG DATE';
-      statusEl.style.color = '#ef4444';
-      detailEl.innerHTML = `Ticket valid for: <strong>${ticket.date}</strong><br>Today: ${todayStr}<br>Guest: ${ticket.guest}`;
-      oBtn.style.display = 'block';
-      addLog('fail', raw, 'Wrong date — ' + ticket.date, now);
-      invalidCount++;
-    } else {
-      // Valid!
-      VALID_TICKETS[raw].used = true;
-      usedTokens.add(raw);
-      resultEl.className = 'scan-result ok';
-      statusEl.textContent = '✅ ENTRY ALLOWED';
-      statusEl.style.color = '#22c55e';
-      detailEl.innerHTML = `<strong style="color:#4ade80;font-size:15px;">${ticket.guest}</strong><br>Park: ${ticket.park} &nbsp;·&nbsp; ${ticket.type} Ticket<br>Booking Ref: ${ticket.ref}<br>Gate: ${currentGate}`;
-      addLog('ok', raw, ticket.guest + ' · ' + ticket.park, now);
-      validCount++;
-      totalIn++;
-    }
-  }
-
-  document.getElementById('total-in').textContent   = totalIn;
-  document.getElementById('valid-count').textContent = validCount;
-  document.getElementById('invalid-count').textContent = invalidCount;
-  document.getElementById('qr-input').value = '';
-  document.getElementById('qr-input').focus();
-}
-
-function addLog(type, token, detail, time) {
-  const icons = {ok:'✅', fail:'❌', warn:'⚠️'};
-  logEntries.unshift({type, token, detail, time});
-  const lb = document.getElementById('scan-log-body');
-  const rowHtml = `<div class="log-row">
-    <div class="log-icon ${type}">${icons[type]}</div>
-    <div>
-      <div class="log-ref">${token}</div>
-      <div class="log-detail">${detail}</div>
-    </div>
-    <div style="margin-left:auto;text-align:right;">
-      <span class="badge-${type==='ok'?'ok':type==='warn'?'warn':'fail'}">${type==='ok'?'Valid':type==='warn'?'Warning':'Rejected'}</span>
-      <div class="log-time" style="margin-top:3px;">${time}</div>
-    </div>
-  </div>`;
-  if (lb.querySelector('.log-row') === null && lb.querySelector('div')) lb.innerHTML = '';
-  lb.insertAdjacentHTML('afterbegin', rowHtml);
-  document.getElementById('log-count').textContent = logEntries.length + ' scans';
-}
-
-function manualOverride() {
-  const pin = prompt('Enter Supervisor PIN to override:');
-  if (pin === '1234') {
-    alert('✅ Override granted by Supervisor.\nTicket manually admitted. Override logged to audit trail.');
-    document.getElementById('scan-result').className = 'scan-result ok';
-    document.getElementById('result-status').textContent = '✅ OVERRIDE — ENTRY ALLOWED';
-    document.getElementById('result-status').style.color = '#22c55e';
-    document.getElementById('override-btn').style.display = 'none';
-  } else if (pin !== null) {
-    alert('❌ Invalid PIN. Override denied.');
+    result.className = 'scan-result valid';
+    result.innerHTML = `
+      <div class="scan-result-icon">✅</div>
+      <h4 style="color:#4ade80">VALID — ALLOW ENTRY</h4>
+      <div class="scan-detail"><span class="sk">Name</span><span class="sv">${data.name}</span></div>
+      <div class="scan-detail"><span class="sk">Ticket Type</span><span class="sv" style="color:#f59e0b">${data.type}</span></div>
+      <div class="scan-detail"><span class="sk">Valid For</span><span class="sv">${data.gate}</span></div>
+      <div class="scan-detail"><span class="sk">Visits</span><span class="sv">${data.visits}</span></div>
+      <div class="scan-detail"><span class="sk">Expires</span><span class="sv">${data.expires}</span></div>`;
+    addScan({type:'valid',id:code,name:data.name,gate:'Active Gate',time:new Date().toLocaleTimeString('en-IN',{hour12:false})});
+    showToast(`✅ Entry granted — ${data.name}`,'success');
+    // Increment count
+    const t = parseInt(document.getElementById('today-entry').textContent.replace(',',''));
+    document.getElementById('today-entry').textContent = (t+1).toLocaleString();
   }
 }
 
-function clearLog() {
-  logEntries.length = 0;
-  document.getElementById('scan-log-body').innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.2);"><p>Log cleared</p></div>';
-  document.getElementById('log-count').textContent = '0 scans';
+function simulateScan(type){
+  const codes = {valid:'WOW-TK-2025-004817',invalid:'WOW-TK-INVALID-9999',used:'WOW-TK-2025-001122'};
+  document.getElementById('scanInput').value = codes[type];
+  processScan(codes[type]);
 }
 
-// Live clock
-setInterval(()=>{document.getElementById('live-time').textContent=new Date().toLocaleTimeString('en-IN');},1000);
+function addScan(s){
+  recentScans.unshift(s);
+  if(recentScans.length>6)recentScans.pop();
+  renderScans();
+}
 
-// Footfall chart
-const hours = ['9','10','11','12','13','14','15','16','17'];
-const foot  = [42,88,154,198,172,168,142,124,96];
-new Chart(document.getElementById('footChart'),{
-  type:'line',
-  data:{labels:hours.map(h=>h+':00'),datasets:[{label:'Entries/hr',data:foot,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.15)',fill:true,tension:.4,borderWidth:2.5,pointRadius:0}]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'rgba(255,255,255,.3)'},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'rgba(255,255,255,.3)'},grid:{display:false}}}}
-});
+function selectGate(type,el){
+  document.querySelectorAll('.gate-btn').forEach(b=>b.classList.remove('active-gate'));
+  el.classList.add('active-gate');
+  showToast(`Active gate set to: ${el.textContent.trim()}`);
+}
 
-// Auto-focus input
-document.getElementById('qr-input').focus();
+// ── Alerts ──
+const ALERTS = [
+  {type:'warning',icon:'fas fa-users',text:'Water Park WP-01 at 85% capacity — consider diverting to WP-02',time:'10:42 AM'},
+  {type:'critical',icon:'fas fa-times-circle',text:'Invalid QR attempt at Gate A1 — suspicious document flagged (3rd in 10 min)',time:'10:38 AM'},
+  {type:'info',icon:'fas fa-cloud-sun',text:'Weather update: UV index rising to 8 — hydration reminders broadcasting',time:'10:30 AM'},
+  {type:'success',icon:'fas fa-check-circle',text:'VIP lane opened successfully — Passport holders priority processing active',time:'10:15 AM'},
+  {type:'warning',icon:'fas fa-car',text:'Parking lot B-2 reaching capacity (82%) — directing to C-1',time:'10:05 AM'},
+];
 
-// Demo hint
-setTimeout(()=>{
-  const hint = document.createElement('div');
-  hint.style='text-align:center;padding:10px;background:rgba(26,86,219,.2);border-radius:8px;font-size:12px;color:#93c5fd;margin-top:10px;';
-  hint.innerHTML='💡 Demo: Try scanning <strong>WOW-QR-7824A001</strong> (valid) or <strong>WOW-QR-USED0001</strong> (used)';
-  document.querySelector('.scanner-card').appendChild(hint);
-},500);
+function renderAlerts(){
+  document.getElementById('alertFeed').innerHTML = ALERTS.map(a=>`
+    <div class="alert-item ${a.type}">
+      <i class="${a.icon} alert-icon" style="color:${a.type==='critical'?'#f87171':a.type==='warning'?'#fbbf24':a.type==='success'?'#4ade80':'#60a5fa'}"></i>
+      <div class="alert-text"><div class="at">${a.text}</div><div class="atime">${a.time}</div></div>
+    </div>
+  `).join('');
+}
+
+// ── Staff ──
+const STAFF = [
+  {name:'Ramesh Kumar',role:'Gate Supervisor',gate:'A1',radio:'CH-1'},
+  {name:'Sunita Devi',role:'Ticket Agent',gate:'WP-01',radio:'CH-2'},
+  {name:'Anil Yadav',role:'Security',gate:'A2',radio:'CH-3'},
+  {name:'Pooja Kumari',role:'Ticket Agent',gate:'AP-01',radio:'CH-4'},
+  {name:'Vikram Singh',role:'Security Lead',gate:'VIP',radio:'CH-1'},
+  {name:'Deepa Sharma',role:'Ticket Agent',gate:'WP-02',radio:'CH-5'},
+];
+
+function renderStaff(){
+  document.getElementById('staffList').innerHTML = STAFF.map(s=>`
+    <div class="staff-item">
+      <span class="staff-dot" style="background:#4ade80"></span>
+      <span class="si-name">${s.name}</span>
+      <span class="si-gate">${s.gate}</span>
+      <span class="si-radio"><i class="fas fa-walkie-talkie"></i> ${s.radio}</span>
+    </div>
+  `).join('');
+}
+
+// ── Charts ──
+function initCharts(){
+  const entryCtx = document.getElementById('entryChart').getContext('2d');
+  new Chart(entryCtx,{
+    type:'line',
+    data:{
+      labels:['8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM'],
+      datasets:[
+        {label:'Water Park',data:[120,380,620,890,750,680,590,420],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',tension:.4,fill:true},
+        {label:'Amusement',data:[80,240,410,610,520,480,390,310],borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,.08)',tension:.4,fill:true},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b'}}}}
+  });
+
+  const pieCtx = document.getElementById('ticketTypeChart').getContext('2d');
+  new Chart(pieCtx,{
+    type:'doughnut',
+    data:{
+      labels:['Annual Passport','Combo','Water Park','Amusement','Group'],
+      datasets:[{data:[614,1247,1841,480,312],backgroundColor:['#f59e0b','#3b82f6','#06b6d4','#7c3aed','#22c55e'],borderWidth:0}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9}},position:'right'}}}
+  });
+}
+
+// ── Live weather fetch (Open-Meteo API — no key required) ──
+async function fetchWeather(){
+  try{
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=28.5355&longitude=77.3910&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia/Kolkata');
+    const d = await r.json();
+    const c = d.current;
+    document.getElementById('liveTemp').textContent = Math.round(c.temperature_2m)+'°C';
+    document.getElementById('liveHumidity').textContent = c.relative_humidity_2m+'%';
+    document.getElementById('liveWind').textContent = Math.round(c.wind_speed_10m)+' km/h';
+    document.getElementById('weatherChip').innerHTML = `<i class="fas fa-thermometer-half"></i> ${Math.round(c.temperature_2m)}°C · Live`;
+  }catch(e){/* keep default values */}
+}
+fetchWeather();setInterval(fetchWeather,300000);
+
+// ── Simulate live capacity updates ──
+let wpCount = 1748, apCount = 1501;
+function simulateLive(){
+  wpCount += Math.floor(Math.random()*3-1);
+  apCount += Math.floor(Math.random()*4-1);
+  wpCount = Math.max(0,Math.min(2500,wpCount));
+  apCount = Math.max(0,Math.min(3000,apCount));
+  const wpPct = Math.round(wpCount/2500*100);
+  const apPct = Math.round(apCount/3000*100);
+  const totalPct = Math.round((wpCount+apCount)/5500*100);
+  document.getElementById('pct-wp').textContent = wpPct+'%';
+  document.getElementById('pct-ap').textContent = apPct+'%';
+  document.getElementById('pct-total').textContent = totalPct+'%';
+  document.getElementById('inside-wp').textContent = wpCount.toLocaleString();
+  document.getElementById('inside-ap').textContent = apCount.toLocaleString();
+  document.getElementById('inside-total').textContent = (wpCount+apCount).toLocaleString();
+  // Ring update
+  const wpDash = Math.round(wpPct/100*314);
+  const apDash = Math.round(apPct/100*314);
+  const totalDash = Math.round(totalPct/100*314);
+  document.getElementById('ring-wp').setAttribute('stroke-dasharray',`${wpDash} 314`);
+  document.getElementById('ring-ap').setAttribute('stroke-dasharray',`${apDash} 314`);
+  document.getElementById('ring-total').setAttribute('stroke-dasharray',`${totalDash} 314`);
+  // Color warning
+  document.getElementById('ring-wp').style.stroke = wpPct>85?'#ef4444':wpPct>70?'#f59e0b':'#3b82f6';
+}
+setInterval(simulateLive,3000);
+
+function triggerEmergency(){
+  document.querySelector('.btn-red').style.animation = 'pulse .5s infinite';
+  showToast('🚨 EMERGENCY PROTOCOL ACTIVATED — Control Room Alerted!','danger');
+  ALERTS.unshift({type:'critical',icon:'fas fa-exclamation-triangle',text:'EMERGENCY ACTIVATED by Gate Ops — All Response Teams notified',time:'Now'});
+  renderAlerts();
+  document.getElementById('alertCount').textContent = ALERTS.length;
+}
+
+function showEmergencyPanel(){
+  document.querySelector('.right-panel').scrollTo({top:999,behavior:'smooth'});
+}
+
+function reportFraud(){showToast('🚩 Suspicious ticket flagged — Security alerted','danger');}
+function callSupport(){showToast('📞 Connecting to call centre support…');}
+
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.innerHTML = `<i class="fas fa-bolt"></i><span>${msg}</span>`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Init
+renderGates();
+renderScans();
+renderAlerts();
+renderStaff();
+initCharts();
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
