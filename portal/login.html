@@ -4,316 +4,728 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Sign In — Worlds of Wonder</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --blue:#003D82;--blue2:#0055B3;--gold:#C9A84C;--gold2:#F0D080;
-  --bg:#f4f6fa;--card:#fff;--border:#DDE3EE;--muted:#6B7280;
-  --text:#080E1E;--green:#16a34a;--red:#dc2626;
+  --bg:#f0f2f8;--card:#ffffff;
+  --blue:#0033cc;--blue2:#0044ff;--blue-dark:#001f7a;
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#8B6914;
+  --text:#1a1a2e;--muted:#6b7a99;--border:#e2e8f0;
+  --red:#ef4444;--green:#22c55e;
 }
-html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);}
+html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);}
 
-/* HEADER */
-.topnav{background:var(--blue);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
-.topnav img{height:40px;filter:none!important;width:auto;object-fit:contain;}
-.topnav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:13px;font-weight:600;}
-.topnav a:hover{color:#fff;}
+/* ── LAYOUT ── */
+.page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
 
-/* LAYOUT */
-.page{display:flex;min-height:calc(100vh - 66px);}
-.left-panel{flex:1;background:linear-gradient(145deg,#001c44 0%,#003D82 55%,#004A99 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;position:relative;overflow:hidden;}
-.left-panel::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 22px,rgba(255,255,255,.02) 22px,rgba(255,255,255,.02) 23px),repeating-linear-gradient(90deg,transparent,transparent 22px,rgba(255,255,255,.02) 22px,rgba(255,255,255,.02) 23px);pointer-events:none;}
-.lp-logo img{height:64px;filter:none!important;margin-bottom:28px;display:block;}
-.lp-title{font-family:'Poppins',sans-serif;font-size:28px;font-weight:800;color:#fff;text-align:center;margin-bottom:10px;line-height:1.2;}
-.lp-sub{font-size:14px;color:rgba(255,255,255,.55);text-align:center;max-width:300px;line-height:1.7;margin-bottom:32px;}
-.lp-perks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;}
-.lp-perk{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px;}
-.lp-perk .icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.lp-perk .text{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.4;}
-.lp-perk .text strong{display:block;color:#fff;font-size:13px;}
+/* ── LEFT HERO PANEL ── */
+.hero-panel{
+  background:linear-gradient(145deg,var(--blue-dark) 0%,var(--blue) 50%,#001166 100%);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 40px;
+  color:#fff;
+}
+.hero-panel::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 41px),
+    repeating-linear-gradient(90deg, transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 41px);
+}
+.hero-panel::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 20%,rgba(255,255,255,.06) 0%,transparent 70%);
+}
+.hero-logo{z-index:2;margin-bottom:24px;text-align:center;}
+.hero-logo img{
+  height:80px;width:auto;
+  filter:none!important;opacity:1!important;
+  object-fit:contain;visibility:visible!important;
+}
+.hero-heading{font-family:'Cinzel',serif;font-size:clamp(20px,3vw,28px);font-weight:700;text-align:center;z-index:2;margin-bottom:10px;line-height:1.25;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.65);text-align:center;z-index:2;max-width:300px;line-height:1.6;margin-bottom:28px;}
+.hero-features{display:flex;flex-direction:column;gap:10px;z-index:2;width:100%;max-width:320px;}
+.hero-feature{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px 14px;}
+.hero-feature-icon{font-size:18px;flex-shrink:0;}
+.hero-feature-text{font-size:12px;color:rgba(255,255,255,.8);line-height:1.4;}
+.hero-feature-text strong{display:block;font-size:12.5px;margin-bottom:1px;color:#fff;}
 
-/* FORM PANEL */
-.right-panel{width:460px;display:flex;align-items:center;justify-content:center;padding:40px 28px;background:#fff;}
-.form-wrap{width:100%;max-width:380px;}
-.form-title{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
-.form-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+/* ── RIGHT FORM PANEL ── */
+.form-panel{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 32px;background:var(--bg);overflow-y:auto;
+}
+.form-card{
+  background:var(--card);border-radius:18px;
+  box-shadow:0 8px 40px rgba(0,0,0,.1);
+  padding:36px;width:100%;max-width:420px;
+}
 
-/* TYPE TABS */
-.type-tabs{display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
-.type-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;transition:all .2s;font-family:'Nunito',sans-serif;}
-.type-tab.active{background:var(--blue);color:#fff;}
+/* ── TABS ── */
+.tab-row{display:flex;background:#f0f2f8;border-radius:10px;padding:4px;margin-bottom:24px;}
+.tab{
+  flex:1;padding:9px 12px;border:none;background:none;
+  border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.tab.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.08);}
 
-/* METHOD TABS */
-.method-tabs{display:flex;gap:6px;margin-bottom:18px;}
-.method-tab{flex:1;padding:9px 6px;text-align:center;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;font-size:12px;font-weight:700;color:var(--muted);background:none;transition:all .2s;font-family:'Nunito',sans-serif;}
-.method-tab.active{border-color:var(--blue2);color:var(--blue2);background:rgba(0,85,179,.05);}
+/* ── LOGIN METHODS ── */
+.method-row{display:flex;gap:8px;margin-bottom:20px;}
+.method-btn{
+  flex:1;padding:8px;border:2px solid var(--border);border-radius:9px;background:#fff;
+  font-size:11.5px;font-weight:700;color:var(--muted);cursor:pointer;
+  transition:all .2s;text-align:center;
+}
+.method-btn.active{border-color:var(--blue);color:var(--blue);background:rgba(0,51,204,.04);}
+.method-btn:hover{border-color:#aab4cc;}
 
-/* FORM */
-.flabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:block;}
-.finput{width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;margin-bottom:14px;}
-.finput:focus{border-color:var(--blue2);}
-.finput-row{display:flex;gap:10px;}
-.finput-row .finput{margin-bottom:0;}
-.otp-group{display:flex;gap:8px;margin-bottom:14px;}
-.otp-digit{width:44px;height:48px;border:1.5px solid var(--border);border-radius:8px;text-align:center;font-size:20px;font-weight:800;color:var(--text);outline:none;background:#fff;transition:border-color .2s;}
-.otp-digit:focus{border-color:var(--blue2);}
-.btn-primary{width:100%;padding:13px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Poppins',sans-serif;margin-bottom:14px;transition:all .2s;}
-.btn-primary:hover{box-shadow:0 6px 20px rgba(0,61,130,.3);transform:translateY(-1px);}
-.btn-google{width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Nunito',sans-serif;margin-bottom:14px;transition:all .2s;}
-.btn-google:hover{border-color:#4285F4;background:rgba(66,133,244,.04);}
-.btn-google img{width:18px;height:18px;}
-.divider{display:flex;align-items:center;gap:10px;margin:4px 0 14px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.divider span{font-size:11px;color:var(--muted);font-weight:600;}
-.form-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
-.form-note a{color:var(--blue2);text-decoration:none;font-weight:700;}
-.err{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--red);margin-bottom:12px;display:none;}
-.success{background:rgba(22,163,74,.07);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--green);margin-bottom:12px;display:none;}
-.send-otp-btn{background:none;border:none;color:var(--blue2);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px;display:block;}
-.countdown{font-size:11px;color:var(--muted);margin-bottom:14px;display:none;}
-.pass-toggle{position:relative;}
-.pass-toggle .finput{padding-right:42px;margin-bottom:0;}
-.pass-toggle-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;}
-.section-hidden{display:none;}
+/* ── FORM ELEMENTS ── */
+.form-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:5px;}
+.form-sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-group label{font-size:11.5px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;}
+.input-wrap{position:relative;}
+.input-wrap input{
+  width:100%;background:#f8faff;border:1.5px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:9px;font-size:13.5px;
+  font-family:'Inter',sans-serif;transition:all .2s;
+}
+.input-wrap input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(0,51,204,.08);}
+.input-wrap input.has-icon{padding-left:42px;}
+.input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;}
+.input-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:700;color:var(--blue);cursor:pointer;background:none;border:none;padding:4px 8px;}
+.input-suffix:hover{text-decoration:underline;}
+.field-note{font-size:11px;color:var(--muted);}
 
-/* RESPONSIVE */
+/* OTP row */
+.otp-row{display:flex;gap:8px;}
+.otp-input{
+  flex:1;text-align:center;font-size:20px;font-weight:800;
+  background:#f8faff;border:1.5px solid var(--border);
+  color:var(--text);padding:12px 4px;border-radius:9px;
+  font-family:'Courier New',monospace;transition:all .2s;
+}
+.otp-input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(0,51,204,.08);}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
+.divider-line{flex:1;height:1px;background:var(--border);}
+.divider-text{font-size:11.5px;color:var(--muted);font-weight:600;}
+
+/* Social login */
+.social-row{display:flex;gap:10px;margin-bottom:16px;}
+.btn-social{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px;border:1.5px solid var(--border);border-radius:9px;
+  background:#fff;color:var(--text);font-size:12.5px;font-weight:700;
+  cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.btn-social:hover{border-color:#aab4cc;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.btn-social img{width:18px;height:18px;}
+
+/* Primary button */
+.btn-main{
+  width:100%;padding:14px;background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+  color:#fff;font-size:14px;font-weight:800;border:none;border-radius:10px;
+  cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+  letter-spacing:0.3px;margin-bottom:12px;
+}
+.btn-main:hover{box-shadow:0 6px 20px rgba(0,51,204,.3);transform:translateY(-1px);}
+.btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* Error / success messages */
+.msg{padding:10px 14px;border-radius:8px;font-size:12.5px;margin-bottom:14px;display:none;}
+.msg.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#dc2626;}
+.msg.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#16a34a;}
+
+/* Links */
+.form-links{text-align:center;font-size:12.5px;color:var(--muted);}
+.form-links a{color:var(--blue);font-weight:700;text-decoration:none;}
+.form-links a:hover{text-decoration:underline;}
+
+/* Timer */
+.otp-timer{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:12px;}
+.otp-resend{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:none;background:none;border:none;font-size:11.5px;}
+.otp-resend:disabled{color:var(--muted);cursor:not-allowed;}
+
+/* KYC step */
+.kyc-step{display:none;}
+.kyc-step.active{display:block;}
+.kyc-heading{font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.kyc-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.kyc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.upload-box{
+  border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;
+  cursor:pointer;transition:all .2s;background:#f8faff;
+}
+.upload-box:hover{border-color:var(--blue);background:rgba(0,51,204,.03);}
+.upload-box i{font-size:22px;color:var(--muted);margin-bottom:6px;}
+.upload-box p{font-size:11px;color:var(--muted);margin:0;}
+.upload-box strong{display:block;font-size:12px;color:var(--text);margin-bottom:4px;}
+
+/* Progress steps */
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:24px;}
+.step{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;
+  background:var(--border);color:var(--muted);
+  position:relative;z-index:1;transition:all .25s;flex-shrink:0;
+}
+.step.active{background:var(--blue);color:#fff;}
+.step.done{background:var(--green);color:#fff;}
+.step-line{flex:1;height:2px;background:var(--border);max-width:40px;transition:all .25s;}
+.step-line.done{background:var(--green);}
+
+/* Business badge */
+.biz-badge{
+  background:rgba(0,51,204,.06);border:1px solid rgba(0,51,204,.15);
+  border-radius:8px;padding:10px 14px;font-size:11.5px;color:var(--blue);
+  display:flex;align-items:center;gap:8px;margin-bottom:16px;
+}
+
+/* Responsive */
 @media(max-width:768px){
-  .page{flex-direction:column;}
-  .left-panel{padding:32px 24px;min-height:240px;}
-  .right-panel{width:100%;padding:28px 20px;}
+  .page{grid-template-columns:1fr;}
+  .hero-panel{display:none;}
+  .form-panel{padding:20px 16px;justify-content:flex-start;padding-top:28px;}
+  .form-card{padding:24px 20px;max-width:100%;}
+  .kyc-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
-<nav class="topnav">
-  <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder"/></a>
-  <a href="../index.html"><i class="fa fa-arrow-left"></i> Back to site</a>
-</nav>
-
 <div class="page">
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-    <div class="lp-logo"><img src="../images/logo.png" alt="Worlds of Wonder"/></div>
-    <div class="lp-title">Welcome Back to WOW</div>
-    <div class="lp-sub">Sign in to access your tickets, passport, loyalty points and exclusive member offers.</div>
-    <div class="lp-perks">
-      <div class="lp-perk"><div class="icon">🎟</div><div class="text"><strong>Your Tickets</strong>All bookings in one place</div></div>
-      <div class="lp-perk"><div class="icon">🪪</div><div class="text"><strong>WOW Passport</strong>View and redeem your passport</div></div>
-      <div class="lp-perk"><div class="icon">⭐</div><div class="text"><strong>Loyalty Points</strong>Earn and redeem WOW points</div></div>
-      <div class="lp-perk"><div class="icon">🎁</div><div class="text"><strong>Exclusive Offers</strong>Member-only deals and early access</div></div>
+
+  <!-- LEFT HERO -->
+  <div class="hero-panel">
+    <div class="hero-logo">
+      <img src="../images/logo.png" alt="Worlds of Wonder"
+           style="height:80px;width:auto;filter:none!important;opacity:1!important;object-fit:contain;visibility:visible!important;"/>
+    </div>
+    <h1 class="hero-heading">Welcome Back to WOW!</h1>
+    <p class="hero-sub">Sign in to access your tickets, passport, loyalty points, and exclusive deals.</p>
+    <div class="hero-features">
+      <div class="hero-feature">
+        <span class="hero-feature-icon">🎟</span>
+        <div class="hero-feature-text">
+          <strong>Instant Ticket Access</strong>
+          View, download, and share your QR tickets anytime.
+        </div>
+      </div>
+      <div class="hero-feature">
+        <span class="hero-feature-icon">🪪</span>
+        <div class="hero-feature-text">
+          <strong>Your WOW Passport</strong>
+          Unlimited visits with your digital passport book.
+        </div>
+      </div>
+      <div class="hero-feature">
+        <span class="hero-feature-icon">⭐</span>
+        <div class="hero-feature-text">
+          <strong>Loyalty Rewards</strong>
+          Earn WOW points on every visit and redeem for perks.
+        </div>
+      </div>
+      <div class="hero-feature">
+        <span class="hero-feature-icon">💰</span>
+        <div class="hero-feature-text">
+          <strong>Exclusive Member Deals</strong>
+          Early-bird offers and surprise discounts just for you.
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
-    <div class="form-wrap">
+  <!-- RIGHT FORM -->
+  <div class="form-panel">
+    <div class="form-card">
 
-      <!-- TYPE SWITCH -->
-      <div class="type-tabs" id="typeTabs">
-        <button class="type-tab active" onclick="switchType('individual')">&#128100; Individual</button>
-        <button class="type-tab" onclick="switchType('business')">&#127970; Business</button>
-      </div>
-
-      <!-- ══ INDIVIDUAL LOGIN ══ -->
-      <div id="sect-individual">
-        <div class="form-title">Sign In</div>
-        <div class="form-sub">Use your mobile number, email, or Google account.</div>
-
-        <div class="method-tabs">
-          <button class="method-tab active" onclick="switchMethod('mobile')">&#128241; Mobile OTP</button>
-          <button class="method-tab" onclick="switchMethod('email')">&#9993; Email</button>
-        </div>
-
-        <div id="mErr" class="err"></div>
-        <div id="mSuccess" class="success"></div>
-
-        <!-- Mobile OTP flow -->
-        <div id="method-mobile">
-          <div id="step-mobile">
-            <label class="flabel">Mobile Number</label>
-            <div class="finput-row" style="margin-bottom:14px;">
-              <input class="finput" style="width:70px;flex-shrink:0;" value="+91" readonly/>
-              <input class="finput" id="mobile-num" type="tel" placeholder="98765 43210" maxlength="10"/>
-            </div>
-            <button class="btn-primary" onclick="sendOTP()"><i class="fa fa-paper-plane"></i> Send OTP</button>
-          </div>
-          <div id="step-otp" class="section-hidden">
-            <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">OTP sent to <strong id="otp-mobile-display"></strong></div>
-            <label class="flabel">Enter 4-Digit OTP</label>
-            <div class="otp-group">
-              <input class="otp-digit" maxlength="1" oninput="otpNext(this,0)" id="o0"/>
-              <input class="otp-digit" maxlength="1" oninput="otpNext(this,1)" id="o1"/>
-              <input class="otp-digit" maxlength="1" oninput="otpNext(this,2)" id="o2"/>
-              <input class="otp-digit" maxlength="1" oninput="otpNext(this,3)" id="o3"/>
-            </div>
-            <button class="btn-primary" onclick="verifyOTP()"><i class="fa fa-check"></i> Verify &amp; Sign In</button>
-            <button class="send-otp-btn" onclick="resendOTP()">Resend OTP</button>
-            <div class="countdown" id="otp-countdown"></div>
-          </div>
-        </div>
-
-        <!-- Email flow -->
-        <div id="method-email" class="section-hidden">
-          <label class="flabel">Email Address</label>
-          <input class="finput" id="email-addr" type="email" placeholder="your@email.com"/>
-          <label class="flabel">Password</label>
-          <div class="pass-toggle">
-            <input class="finput" id="email-pass" type="password" placeholder="Your password"/>
-            <button class="pass-toggle-btn" onclick="togglePass('email-pass',this)" type="button"><i class="fa fa-eye"></i></button>
-          </div>
-          <div style="height:14px;"></div>
-          <button class="btn-primary" onclick="emailLogin()"><i class="fa fa-sign-in-alt"></i> Sign In</button>
-          <div style="text-align:right;margin:-8px 0 14px;"><a href="forgot-password.html" style="font-size:12px;color:var(--blue2);text-decoration:none;font-weight:700;">Forgot password?</a></div>
-        </div>
-
-        <div class="divider"><span>or</span></div>
-
-        <!-- Google -->
-        <button class="btn-google" onclick="googleLogin()">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Continue with Google
+      <!-- TABS: Individual vs Business -->
+      <div class="tab-row">
+        <button class="tab active" id="tab-individual" onclick="setTab('individual')">
+          <i class="fas fa-user"></i> Individual
         </button>
+        <button class="tab" id="tab-business" onclick="setTab('business')">
+          <i class="fas fa-building"></i> Business
+        </button>
+      </div>
 
-        <div class="form-note">
-          New to WOW? <a href="register.html">Create a free account</a><br>
-          <span style="margin-top:6px;display:block;">Are you a business? <a href="javascript:void(0)" onclick="switchType('business')">Sign in as Business</a></span>
+      <!-- ── INDIVIDUAL LOGIN ── -->
+      <div id="section-individual">
+
+        <!-- Login method picker -->
+        <div class="method-row">
+          <button class="method-btn active" id="method-mobile" onclick="setMethod('mobile')">
+            <i class="fas fa-mobile-alt"></i> Mobile OTP
+          </button>
+          <button class="method-btn" id="method-email" onclick="setMethod('email')">
+            <i class="fas fa-envelope"></i> Email
+          </button>
+          <button class="method-btn" id="method-social" onclick="setMethod('social')">
+            <i class="fab fa-google"></i> Social
+          </button>
+        </div>
+
+        <!-- Error / success message -->
+        <div class="msg error" id="ind-msg"></div>
+
+        <!-- MOBILE OTP FLOW -->
+        <div id="flow-mobile">
+          <!-- Step 1: Enter mobile -->
+          <div id="step-mobile-1">
+            <div class="form-title">Sign In with OTP</div>
+            <div class="form-sub">Enter your registered mobile number. We will send a 4-digit OTP via SMS and WhatsApp.</div>
+            <div class="form-group">
+              <label>Mobile Number</label>
+              <div class="input-wrap">
+                <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
+                <input type="tel" id="mobile-input" class="has-icon" placeholder="+91 98765 43210" maxlength="13"/>
+              </div>
+            </div>
+            <button class="btn-main" onclick="sendOTP()">
+              <i class="fas fa-paper-plane"></i> Send OTP
+            </button>
+          </div>
+          <!-- Step 2: Enter OTP -->
+          <div id="step-mobile-2" style="display:none;">
+            <div class="form-title">Enter OTP</div>
+            <div class="form-sub" id="otp-sub">OTP sent to your mobile. Valid for 10 minutes.</div>
+            <div class="form-group">
+              <label>4-Digit OTP</label>
+              <div class="otp-row">
+                <input type="text" class="otp-input" id="otp1" maxlength="1" oninput="otpNext(this,'otp2')"/>
+                <input type="text" class="otp-input" id="otp2" maxlength="1" oninput="otpNext(this,'otp3')"/>
+                <input type="text" class="otp-input" id="otp3" maxlength="1" oninput="otpNext(this,'otp4')"/>
+                <input type="text" class="otp-input" id="otp4" maxlength="1" oninput="otpNext(this,null)"/>
+              </div>
+            </div>
+            <div class="otp-timer" id="otp-timer">Resend OTP in <strong id="otp-countdown">30</strong>s</div>
+            <button class="btn-main" onclick="verifyOTP()">
+              <i class="fas fa-check-circle"></i> Verify and Sign In
+            </button>
+            <div class="form-links">
+              <a onclick="document.getElementById('step-mobile-1').style.display='block';document.getElementById('step-mobile-2').style.display='none';" style="cursor:pointer;">Change Number</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- EMAIL/PASSWORD FLOW -->
+        <div id="flow-email" style="display:none;">
+          <div class="form-title">Sign In with Email</div>
+          <div class="form-sub">Use your email address and password to sign in.</div>
+          <form onsubmit="emailLogin(event)">
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-wrap">
+              <span class="input-icon"><i class="fas fa-envelope"></i></span>
+              <input type="email" id="email-input" class="has-icon" placeholder="you@example.com" autocomplete="username"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" id="pass-input" class="has-icon" placeholder="Enter your password" autocomplete="current-password"/>
+              <button type="button" class="input-suffix" onclick="togglePass('pass-input')">Show</button>
+            </div>
+          </div>
+          <div style="text-align:right;margin-bottom:14px;">
+            <a href="forgot-password.html" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:600;">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-main">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </button>
+          </form>
+        </div>
+
+        <!-- SOCIAL LOGIN FLOW -->
+        <div id="flow-social" style="display:none;">
+          <div class="form-title">Sign In with Social</div>
+          <div class="form-sub">Use your Google or other social account for quick and secure sign-in.</div>
+          <div class="social-row" style="flex-direction:column;gap:10px;">
+            <a href="#" class="btn-social" onclick="socialLogin('google'); return false;">
+              <img src="https://www.google.com/favicon.ico" alt="Google"/> Sign in with Google
+            </a>
+            <a href="#" class="btn-social" onclick="socialLogin('facebook'); return false;">
+              <i class="fab fa-facebook" style="color:#1877f2;font-size:18px;"></i> Sign in with Facebook
+            </a>
+            <a href="#" class="btn-social" onclick="socialLogin('apple'); return false;">
+              <i class="fab fa-apple" style="font-size:18px;"></i> Sign in with Apple
+            </a>
+          </div>
+          <div class="field-note" style="text-align:center;margin-top:8px;">Your account is created automatically on first social login.</div>
+        </div>
+
+        <div class="divider"><div class="divider-line"></div><div class="divider-text">New to WOW?</div><div class="divider-line"></div></div>
+        <div class="form-links">
+          <a href="register.html">Create your account</a> &nbsp;|&nbsp; <a href="../index.html">Back to Home</a>
         </div>
       </div>
 
-      <!-- ══ BUSINESS LOGIN ══ -->
-      <div id="sect-business" class="section-hidden">
-        <div class="form-title">Business Sign In</div>
-        <div class="form-sub">For corporate clients, resellers, and travel agents. Accounts must be pre-approved by WOW admin.</div>
+      <!-- ── BUSINESS LOGIN ── -->
+      <div id="section-business" style="display:none;">
 
-        <div id="bErr" class="err"></div>
-        <label class="flabel">Business Email</label>
-        <input class="finput" id="biz-email" type="email" placeholder="company@business.com"/>
-        <label class="flabel">Password</label>
-        <div class="pass-toggle">
-          <input class="finput" id="biz-pass" type="password" placeholder="Your password"/>
-          <button class="pass-toggle-btn" onclick="togglePass('biz-pass',this)" type="button"><i class="fa fa-eye"></i></button>
+        <div class="biz-badge">
+          <i class="fas fa-building"></i>
+          Business account? Complete KYC once at signup, then sign in with email.
         </div>
-        <div style="height:14px;"></div>
-        <button class="btn-primary" onclick="bizLogin()"><i class="fa fa-building"></i> Sign In as Business</button>
 
-        <div class="form-note" style="margin-top:14px;">
-          New business? <a href="../partner/onboarding-kyc.html">Complete KYC &amp; apply for access</a><br>
-          <span style="display:block;margin-top:6px;">Staff / reseller / TA portals: <a href="../internal/index.html">Internal Gateway</a></span>
+        <!-- Step indicator for business -->
+        <div id="biz-login-section">
+          <div class="form-title">Business Sign In</div>
+          <div class="form-sub">Registered business accounts sign in using their company email address.</div>
+          <div class="msg error" id="biz-msg"></div>
+          <div class="form-group">
+            <label>Company Email</label>
+            <div class="input-wrap">
+              <span class="input-icon"><i class="fas fa-envelope"></i></span>
+              <input type="email" id="biz-email" class="has-icon" placeholder="accounts@company.in"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="input-icon"><i class="fas fa-lock"></i></span>
+              <input type="password" id="biz-pass" class="has-icon" placeholder="Enter your password"/>
+              <button class="input-suffix" onclick="togglePass('biz-pass')">Show</button>
+            </div>
+          </div>
+          <div style="text-align:right;margin-bottom:14px;">
+            <a href="forgot-password.html" style="font-size:12px;color:var(--blue);text-decoration:none;font-weight:600;">Forgot password?</a>
+          </div>
+          <button class="btn-main" onclick="bizLogin()">
+            <i class="fas fa-sign-in-alt"></i> Sign In to Business Portal
+          </button>
+          <div class="form-links" style="margin-top:14px;">
+            Not yet registered? <a href="#" onclick="showBizKYC()">Register Business Account</a>
+          </div>
         </div>
-      </div>
 
+        <!-- Business KYC Signup -->
+        <div id="biz-kyc-section" style="display:none;">
+          <div class="step-indicator">
+            <div class="step active" id="s1">1</div>
+            <div class="step-line" id="sl1"></div>
+            <div class="step" id="s2">2</div>
+            <div class="step-line" id="sl2"></div>
+            <div class="step" id="s3">3</div>
+            <div class="step-line" id="sl3"></div>
+            <div class="step" id="s4">4</div>
+          </div>
+
+          <!-- KYC Step 1: Company Details -->
+          <div class="kyc-step active" id="kstep1">
+            <div class="kyc-heading">Company Information</div>
+            <div class="kyc-sub">Tell us about your business. All details are verified before activation.</div>
+            <div class="form-group">
+              <label>Company / Organisation Name</label>
+              <div class="input-wrap"><input type="text" placeholder="Acme Pvt Ltd" id="k-company"/></div>
+            </div>
+            <div class="form-group">
+              <label>GST Identification Number (GSTIN)</label>
+              <div class="input-wrap"><input type="text" placeholder="29ABCDE1234F1Z5" id="k-gst" maxlength="15"/></div>
+            </div>
+            <div class="form-group">
+              <label>PAN Number</label>
+              <div class="input-wrap"><input type="text" placeholder="ABCDE1234F" id="k-pan" maxlength="10"/></div>
+            </div>
+            <div class="kyc-grid">
+              <div class="form-group" style="margin:0;">
+                <label>Company Email</label>
+                <div class="input-wrap"><input type="email" placeholder="accounts@company.in" id="k-email"/></div>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label>Contact Number</label>
+                <div class="input-wrap"><input type="tel" placeholder="+91 98765 43210" id="k-phone"/></div>
+              </div>
+            </div>
+            <button class="btn-main" style="margin-top:14px;" onclick="kycNext(1)">Next: Upload Documents</button>
+          </div>
+
+          <!-- KYC Step 2: Document Upload -->
+          <div class="kyc-step" id="kstep2">
+            <div class="kyc-heading">Upload KYC Documents</div>
+            <div class="kyc-sub">Upload clear scans or photos of your documents. Accepted: PDF, JPG, PNG (max 5 MB each).</div>
+            <div class="kyc-grid" style="margin-bottom:14px;">
+              <div class="upload-box" onclick="fakeUpload(this,'gst-cert')">
+                <i class="fas fa-file-upload"></i>
+                <strong>GST Certificate</strong>
+                <p>Click to upload</p>
+              </div>
+              <div class="upload-box" onclick="fakeUpload(this,'pan-card')">
+                <i class="fas fa-id-card"></i>
+                <strong>Company PAN Card</strong>
+                <p>Click to upload</p>
+              </div>
+              <div class="upload-box" onclick="fakeUpload(this,'coi')">
+                <i class="fas fa-building"></i>
+                <strong>Certificate of Incorporation</strong>
+                <p>Click to upload</p>
+              </div>
+              <div class="upload-box" onclick="fakeUpload(this,'cancelled-cheque')">
+                <i class="fas fa-money-check"></i>
+                <strong>Cancelled Cheque / Bank Letter</strong>
+                <p>Click to upload</p>
+              </div>
+            </div>
+            <button class="btn-main" onclick="kycNext(2)">Next: Authorised Signatory</button>
+            <div class="form-links"><a onclick="kycBack(1)">Back</a></div>
+          </div>
+
+          <!-- KYC Step 3: Signatory Details -->
+          <div class="kyc-step" id="kstep3">
+            <div class="kyc-heading">Authorised Signatory</div>
+            <div class="kyc-sub">Details of the person who will manage this account on behalf of the company.</div>
+            <div class="kyc-grid">
+              <div class="form-group" style="margin:0;">
+                <label>Full Name</label>
+                <div class="input-wrap"><input type="text" placeholder="Ramesh Gupta" id="k-sig-name"/></div>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label>Designation</label>
+                <div class="input-wrap"><input type="text" placeholder="Managing Director"/></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Aadhaar / PAN (Signatory)</label>
+              <div class="input-wrap"><input type="text" placeholder="Aadhaar or PAN number"/></div>
+            </div>
+            <div class="kyc-grid" style="margin-bottom:14px;">
+              <div class="upload-box" onclick="fakeUpload(this,'sig-id')">
+                <i class="fas fa-user-circle"></i>
+                <strong>Signatory ID Proof</strong>
+                <p>Aadhaar / Passport / DL</p>
+              </div>
+              <div class="upload-box" onclick="fakeUpload(this,'sig-auth')">
+                <i class="fas fa-stamp"></i>
+                <strong>Board Resolution / Authority Letter</strong>
+                <p>Click to upload</p>
+              </div>
+            </div>
+            <button class="btn-main" onclick="kycNext(3)">Next: Set Password</button>
+            <div class="form-links"><a onclick="kycBack(2)">Back</a></div>
+          </div>
+
+          <!-- KYC Step 4: Password + Submit -->
+          <div class="kyc-step" id="kstep4">
+            <div class="kyc-heading">Set Your Password</div>
+            <div class="kyc-sub">Create a strong password for your business account. You can sign in with your company email once your KYC is verified (usually within 24 hours).</div>
+            <div class="form-group">
+              <label>Password</label>
+              <div class="input-wrap">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input type="password" class="has-icon" placeholder="Minimum 8 characters" id="k-pass"/>
+                <button class="input-suffix" onclick="togglePass('k-pass')">Show</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <div class="input-wrap">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input type="password" class="has-icon" placeholder="Repeat password" id="k-pass2"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:flex-start;gap:8px;flex-direction:row;font-size:11.5px;font-weight:400;text-transform:none;letter-spacing:0;">
+                <input type="checkbox" style="margin-top:2px;accent-color:var(--blue);" required/>
+                I agree to the WOW Terms of Service, Privacy Policy, and Authorise WOW to verify my KYC details.
+              </label>
+            </div>
+            <button class="btn-main" onclick="submitKYC()">
+              <i class="fas fa-check-circle"></i> Submit KYC Application
+            </button>
+            <div class="form-links"><a onclick="kycBack(3)">Back</a></div>
+          </div>
+
+        </div><!-- /biz-kyc-section -->
+      </div><!-- /section-business -->
+
+    </div><!-- /form-card -->
+
+    <!-- Back link -->
+    <div style="margin-top:16px;text-align:center;font-size:12px;color:var(--muted);">
+      <a href="../index.html" style="color:var(--muted);text-decoration:none;">
+        <i class="fas fa-arrow-left"></i> Back to Worlds of Wonder
+      </a>
     </div>
-  </div>
-</div>
+  </div><!-- /form-panel -->
+</div><!-- /page -->
 
 <script>
-let currentType = 'individual';
-let currentMethod = 'mobile';
-let otpTimer = null;
-
-function switchType(t) {
-  currentType = t;
-  document.getElementById('sect-individual').style.display = t === 'individual' ? '' : 'none';
-  document.getElementById('sect-business').style.display = t === 'business' ? '' : 'none';
-  document.querySelectorAll('.type-tab').forEach((b,i) => {
-    b.classList.toggle('active', (i===0 && t==='individual') || (i===1 && t==='business'));
-  });
-  // If URL says business
-  if (t === 'business') document.querySelector('.form-title').textContent = 'Business Sign In';
+// ── TAB CONTROL ──────────────────────────────────────────────────────
+function setTab(t) {
+  document.getElementById('section-individual').style.display = t==='individual'?'block':'none';
+  document.getElementById('section-business').style.display  = t==='business'?'block':'none';
+  document.getElementById('tab-individual').classList.toggle('active', t==='individual');
+  document.getElementById('tab-business').classList.toggle('active', t==='business');
 }
 
-function switchMethod(m) {
-  currentMethod = m;
-  document.getElementById('method-mobile').style.display = m === 'mobile' ? '' : 'none';
-  document.getElementById('method-email').style.display = m === 'email' ? '' : 'none';
-  document.querySelectorAll('.method-tab').forEach((b,i) => {
-    b.classList.toggle('active', (i===0 && m==='mobile') || (i===1 && m==='email'));
+// ── LOGIN METHOD ─────────────────────────────────────────────────────
+function setMethod(m) {
+  ['mobile','email','social'].forEach(x => {
+    document.getElementById('method-'+x).classList.toggle('active', x===m);
+    document.getElementById('flow-'+x).style.display = x===m ? 'block' : 'none';
   });
 }
 
+// ── OTP FLOW ─────────────────────────────────────────────────────────
+let otpTimerInterval = null;
 function sendOTP() {
-  const num = document.getElementById('mobile-num').value.replace(/\s/g,'');
-  if (num.length !== 10 || isNaN(num)) { showErr('mErr','Please enter a valid 10-digit mobile number.'); return; }
-  document.getElementById('otp-mobile-display').textContent = '+91 ' + num;
-  document.getElementById('step-mobile').style.display = 'none';
-  document.getElementById('step-otp').classList.remove('section-hidden');
-  startCountdown();
-  showSuccess('mSuccess','OTP sent! Use 1234 for this demo.');
+  const mobile = document.getElementById('mobile-input').value.trim();
+  if (mobile.length < 10) {
+    showMsg('ind-msg','error','Please enter a valid 10-digit mobile number.');
+    return;
+  }
+  document.getElementById('step-mobile-1').style.display = 'none';
+  document.getElementById('step-mobile-2').style.display = 'block';
+  document.getElementById('otp-sub').textContent = 'OTP sent to ' + mobile + ' via SMS and WhatsApp.';
+  document.getElementById('otp1').focus();
+  startOTPTimer(30);
+  showMsg('ind-msg','success','OTP sent! (Demo OTP: 1234)');
 }
 
-function otpNext(el, idx) {
-  if (el.value.length === 1 && idx < 3) document.getElementById('o'+(idx+1)).focus();
-}
-
-function verifyOTP() {
-  const otp = ['o0','o1','o2','o3'].map(id => document.getElementById(id).value).join('');
-  if (otp.length !== 4) { showErr('mErr','Please enter the 4-digit OTP.'); return; }
-  // Demo: any 4-digit OTP passes
-  window.location.href = 'dashboard.html';
-}
-
-function resendOTP() {
-  showSuccess('mSuccess','OTP resent!'); startCountdown();
-}
-
-function startCountdown() {
-  let secs = 30;
-  const el = document.getElementById('otp-countdown');
-  el.style.display = 'block';
-  el.textContent = 'Resend in '+secs+'s';
-  if (otpTimer) clearInterval(otpTimer);
-  otpTimer = setInterval(() => {
-    secs--;
-    if (secs <= 0) { clearInterval(otpTimer); el.style.display = 'none'; }
-    else el.textContent = 'Resend in '+secs+'s';
+function startOTPTimer(sec) {
+  clearInterval(otpTimerInterval);
+  let remaining = sec;
+  document.getElementById('otp-countdown').textContent = remaining;
+  otpTimerInterval = setInterval(() => {
+    remaining--;
+    document.getElementById('otp-countdown').textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(otpTimerInterval);
+      document.getElementById('otp-timer').innerHTML =
+        '<button class="otp-resend" onclick="sendOTP()">Resend OTP</button>';
+    }
   }, 1000);
 }
 
-function emailLogin() {
-  const email = document.getElementById('email-addr').value.trim();
-  const pass = document.getElementById('email-pass').value;
-  if (!email || !pass) { showErr('mErr','Please enter your email and password.'); return; }
-  if (!email.includes('@')) { showErr('mErr','Please enter a valid email address.'); return; }
-  window.location.href = 'dashboard.html';
+function otpNext(el, nextId) {
+  if (el.value.length === 1 && nextId) {
+    document.getElementById(nextId).focus();
+  }
 }
 
-function googleLogin() {
-  // In production: initiate OAuth flow
-  window.location.href = 'dashboard.html';
+function verifyOTP() {
+  const otp = ['otp1','otp2','otp3','otp4'].map(id => document.getElementById(id).value).join('');
+  if (otp === '1234') {
+    showMsg('ind-msg','success','Verified! Redirecting to your dashboard...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+  } else {
+    showMsg('ind-msg','error','Incorrect OTP. Please try again. (Demo OTP: 1234)');
+  }
 }
 
+// ── EMAIL LOGIN ───────────────────────────────────────────────────────
+function emailLogin(e) {
+  if(e) e.preventDefault();
+  const email = document.getElementById('email-input').value.trim();
+  const pass  = document.getElementById('pass-input').value;
+  if (!email || !pass) {
+    showMsg('ind-msg','error','Please enter both email and password.');
+    return;
+  }
+  showMsg('ind-msg','success','Signing in... Redirecting to dashboard.');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+}
+
+// ── SOCIAL LOGIN ──────────────────────────────────────────────────────
+function socialLogin(provider) {
+  showMsg('ind-msg','success','Redirecting to ' + provider + ' sign-in...');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+}
+
+// ── BUSINESS LOGIN ────────────────────────────────────────────────────
 function bizLogin() {
   const email = document.getElementById('biz-email').value.trim();
-  const pass = document.getElementById('biz-pass').value;
-  if (!email || !pass) { showErr('bErr','Please enter your business email and password.'); return; }
-  // In production: check against B2B accounts
-  window.location.href = '../partner/dashboard.html';
+  const pass  = document.getElementById('biz-pass').value;
+  if (!email || !pass) {
+    showMsg('biz-msg','error','Please enter your company email and password.');
+    return;
+  }
+  showMsg('biz-msg','success','Signing in... Redirecting to business dashboard.');
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
 }
 
-function togglePass(id, btn) {
-  const el = document.getElementById(id);
-  if (el.type === 'password') { el.type = 'text'; btn.innerHTML = '<i class="fa fa-eye-slash"></i>'; }
-  else { el.type = 'password'; btn.innerHTML = '<i class="fa fa-eye"></i>'; }
+function showBizKYC() {
+  document.getElementById('biz-login-section').style.display = 'none';
+  document.getElementById('biz-kyc-section').style.display = 'block';
 }
 
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+// ── KYC STEPS ─────────────────────────────────────────────────────────
+let kycStep = 1;
+function kycNext(from) {
+  document.getElementById('kstep'+from).classList.remove('active');
+  document.getElementById('kstep'+(from+1)).classList.add('active');
+  document.getElementById('s'+from).className = 'step done';
+  document.getElementById('sl'+from).className = 'step-line done';
+  document.getElementById('s'+(from+1)).className = 'step active';
+  kycStep = from + 1;
 }
-function showSuccess(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+function kycBack(to) {
+  document.getElementById('kstep'+(to+1)).classList.remove('active');
+  document.getElementById('kstep'+to).classList.add('active');
+  document.getElementById('s'+(to+1)).className = 'step';
+  document.getElementById('sl'+to).className = 'step-line';
+  document.getElementById('s'+to).className = 'step active';
+  kycStep = to;
+}
+function fakeUpload(box, docType) {
+  box.innerHTML = '<i class="fas fa-check-circle" style="color:var(--green);"></i><strong style="color:var(--green);">Uploaded</strong><p style="color:var(--green);font-size:10px;">' + docType + '.pdf</p>';
+  box.style.borderColor = 'var(--green)';
+  box.style.background  = 'rgba(34,197,94,.04)';
+}
+function submitKYC() {
+  const pass  = document.getElementById('k-pass').value;
+  const pass2 = document.getElementById('k-pass2').value;
+  if (pass.length < 8) {
+    alert('Password must be at least 8 characters.');
+    return;
+  }
+  if (pass !== pass2) {
+    alert('Passwords do not match.');
+    return;
+  }
+  // All steps done
+  document.querySelectorAll('.step').forEach(s=>s.className='step done');
+  document.querySelectorAll('.step-line').forEach(l=>l.className='step-line done');
+  document.getElementById('biz-kyc-section').innerHTML = `
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;">Application Submitted!</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px;">
+        Your KYC application has been received. Our team will verify your documents within 24 hours.
+        You will get an email and WhatsApp confirmation once your account is activated.
+      </div>
+      <a href="../index.html" style="display:inline-block;background:var(--blue);color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;">Back to Home</a>
+    </div>
+  `;
 }
 
-// Check URL param for type
-window.addEventListener('load', () => {
+// ── UTILS ─────────────────────────────────────────────────────────────
+function showMsg(id, type, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+}
+function togglePass(id) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// ── URL PARAM CHECK ───────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
-  if (params.get('type') === 'business') switchType('business');
+  if (params.get('type') === 'business') {
+    setTab('business');
+  }
 });
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
