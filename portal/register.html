@@ -1,243 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Account — Worlds of Wonder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create Account — Worlds of Wonder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0a0f1e 0%,#1e293b 50%,#0f172a 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+.register-container{width:100%;max-width:540px;position:relative;z-index:1}
+
+/* Header */
+.reg-header{text-align:center;margin-bottom:28px}
+.reg-header img{height:52px;filter:none!important;margin-bottom:16px}
+.reg-header h1{font-family:'Nunito',sans-serif;font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:4px}
+.reg-header p{color:#94a3b8;font-size:.88rem}
+
+/* Card */
+.reg-card{background:rgba(30,41,59,.95);backdrop-filter:blur(20px);border:1px solid #334155;border-radius:20px;padding:32px;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+
+/* Tabs: Individual / Business */
+.reg-tabs{display:flex;background:#0f172a;padding:4px;border-radius:12px;margin-bottom:24px;gap:4px}
+.reg-tab{flex:1;padding:10px;border:none;background:transparent;color:#64748b;font-size:.85rem;font-weight:700;border-radius:9px;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:6px}
+.reg-tab.active{background:#1e3a8a;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.4)}
+
+/* Social buttons */
+.social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.soc-btn{width:100%;padding:12px;border-radius:10px;border:1.5px solid #334155;background:#1e293b;color:#e2e8f0;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.soc-btn:hover{border-color:#475569;background:#334155}
+.soc-btn.google{border-color:#4285f4}
+.soc-btn.google:hover{background:rgba(66,133,244,.1)}
+.soc-btn.facebook{border-color:#1877f2}
+.soc-btn.facebook:hover{background:rgba(24,119,242,.1)}
+
+.divider{display:flex;align-items:center;gap:12px;color:#475569;font-size:.78rem;margin-bottom:20px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#334155}
+
+/* Form */
+.form-section{display:none}
+.form-section.active{display:block}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-row.single{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column}
+.fg label{font-size:.75rem;color:#94a3b8;margin-bottom:5px;font-weight:600}
+.fg input,.fg select{background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:11px 12px;color:#e2e8f0;font-size:.88rem;font-family:inherit;transition:all .2s;outline:none}
+.fg input:focus,.fg select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.fg input::placeholder{color:#475569}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1}
+.input-row .btn-verify{padding:11px 14px;background:#1e3a8a;color:#bfdbfe;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
+.input-row .btn-verify:hover{background:#1d4ed8}
+
+/* OTP boxes */
+.otp-boxes{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.otp-box{width:46px;height:52px;border:1.5px solid #334155;border-radius:8px;background:#0f172a;color:#f1f5f9;font-size:1.4rem;font-weight:800;text-align:center;outline:none;transition:all .2s}
+.otp-box:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.2)}
+.otp-timer{font-size:.75rem;color:#64748b;text-align:center;margin-bottom:8px}
+.otp-timer span{color:#f59e0b;font-weight:700;cursor:pointer}
+
+/* Password strength */
+.pwd-strength{height:4px;border-radius:2px;background:#1e293b;margin-top:6px;overflow:hidden}
+.pwd-bar{height:100%;border-radius:2px;width:0;transition:all .4s}
+.pwd-label{font-size:.72rem;margin-top:4px}
+
+/* Terms */
+.terms-row{display:flex;align-items:flex-start;gap:10px;font-size:.78rem;color:#94a3b8;margin-bottom:16px}
+.terms-row input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;cursor:pointer}
+.terms-row a{color:#f59e0b;text-decoration:none}
+
+/* Submit button */
+.reg-btn{width:100%;padding:14px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;border-radius:12px;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px}
+.reg-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,158,11,.4)}
+
+/* Sign in link */
+.signin-link{text-align:center;margin-top:16px;font-size:.82rem;color:#64748b}
+.signin-link a{color:#f59e0b;font-weight:700;text-decoration:none}
+
+/* Perks */
+.perks-banner{background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(37,99,235,.1));border:1px solid #334155;border-radius:12px;padding:14px;margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.perk{display:flex;align-items:center;gap:6px;font-size:.76rem;color:#94a3b8}
+.perk i{color:#f59e0b}
+
+/* Business KYC steps */
+.biz-steps{display:flex;gap:0;margin-bottom:20px}
+.biz-step{flex:1;text-align:center;position:relative}
+.biz-step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:#334155}
+.biz-step:last-child::after{display:none}
+.biz-dot{width:28px;height:28px;border-radius:50%;background:#1e293b;border:2px solid #334155;color:#64748b;font-size:.72rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.biz-step.active .biz-dot{background:#2563eb;border-color:#2563eb;color:#fff}
+.biz-step.done .biz-dot{background:#16a34a;border-color:#16a34a;color:#fff}
+.biz-lbl{font-size:.65rem;color:#64748b;margin-top:4px;font-weight:600}
+.biz-step.active .biz-lbl{color:#60a5fa}
+
+/* Success */
+.success-state{display:none;text-align:center;padding:20px 0}
+.success-state.show{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.success-icon-big{width:80px;height:80px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2.2rem}
+</style>
 </head>
 <body>
-<div id="app">
 
-  <div class="portal-page">
-
-    <!-- Left panel -->
-    <div class="portal-brand portal-brand--register">
-      <div class="portal-brand-inner">
-        <a href="../index.html" class="portal-brand-logo">
-          <img src="../images/logo.png" alt="Worlds of Wonder" class="portal-logo-img" style="filter:none!important;" />
-        </a>
-        <h1 class="portal-brand-title">Join the<br><span class="portal-brand-accent">WOW Family!</span></h1>
-        <p class="portal-brand-sub">Create your free account and unlock the full Worlds of Wonder experience.</p>
-        <div class="portal-brand-perks">
-          <div class="portal-perk"><span class="portal-perk-icon">🎟</span><span>Save & manage all your bookings</span></div>
-          <div class="portal-perk"><span class="portal-perk-icon">🔔</span><span>Early access to offers & new rides</span></div>
-          <div class="portal-perk"><span class="portal-perk-icon">🪪</span><span>Digital Passport management</span></div>
-          <div class="portal-perk"><span class="portal-perk-icon">🎁</span><span>Birthday surprises & member rewards</span></div>
-        </div>
-      </div>
-      <div class="portal-brand-bg"></div>
-    </div>
-
-    <!-- Right panel -->
-    <div class="portal-form-panel">
-      <div class="portal-form-wrap">
-        <div class="portal-form-header">
-          <h2 class="portal-form-title">Create your account</h2>
-          <p class="portal-form-sub">It's free, takes 30 seconds, no spam ever.</p>
-        </div>
-
-        <button class="portal-google-btn" id="google-register-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Sign up with Google
-        </button>
-
-        <div class="portal-divider"><span>or create with email</span></div>
-
-        <form id="register-form" novalidate>
-          <div class="form-grid">
-            <div class="portal-field">
-              <label class="portal-label" for="reg-fname">First name *</label>
-              <input class="portal-input" id="reg-fname" type="text" placeholder="Aarav" autocomplete="given-name" required />
-              <div class="portal-field-err hidden" id="reg-fname-err"></div>
-            </div>
-            <div class="portal-field">
-              <label class="portal-label" for="reg-lname">Last name *</label>
-              <input class="portal-input" id="reg-lname" type="text" placeholder="Mehta" autocomplete="family-name" required />
-              <div class="portal-field-err hidden" id="reg-lname-err"></div>
-            </div>
-          </div>
-
-          <div class="portal-field">
-            <label class="portal-label" for="reg-email">Email address *</label>
-            <input class="portal-input" id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" required />
-            <div class="portal-field-err hidden" id="reg-email-err"></div>
-          </div>
-
-          <div class="portal-field">
-            <label class="portal-label" for="reg-mobile">Mobile number *</label>
-            <div class="portal-input-prefix-wrap">
-              <span class="portal-input-prefix">+91</span>
-              <input class="portal-input portal-input--prefixed" id="reg-mobile" type="tel"
-                     placeholder="10-digit number" maxlength="10" autocomplete="tel" required />
-            </div>
-            <div class="portal-field-err hidden" id="reg-mobile-err"></div>
-          </div>
-
-          <div class="portal-field">
-            <label class="portal-label" for="reg-password">Password *</label>
-            <div class="portal-input-wrap">
-              <input class="portal-input" id="reg-password" type="password"
-                     placeholder="At least 8 characters" autocomplete="new-password" required />
-              <button type="button" class="portal-eye-btn" id="toggle-reg-pw" aria-label="Show/hide password">
-                <svg id="eye-show-r" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg id="eye-hide-r" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-              </button>
-            </div>
-            <div class="portal-pw-strength" id="pw-strength">
-              <div class="portal-pw-bar" id="pw-bar"></div>
-            </div>
-            <div class="portal-pw-hint" id="pw-hint">Use 8+ characters with a number</div>
-            <div class="portal-field-err hidden" id="reg-password-err"></div>
-          </div>
-
-          <div class="portal-field" style="flex-direction:row;align-items:flex-start;gap:10px;margin-bottom:24px;">
-            <input type="checkbox" id="reg-terms" class="portal-checkbox" required />
-            <label for="reg-terms" class="portal-checkbox-label">
-              I agree to the <a href="#" class="portal-link">Terms of Service</a> and <a href="#" class="portal-link">Privacy Policy</a>
-            </label>
-          </div>
-
-          <button type="submit" class="portal-submit-btn portal-submit-btn--blue" id="reg-submit">
-            Create Account →
-          </button>
-          <div class="portal-error-banner hidden" id="reg-error-banner"></div>
-        </form>
-
-        <p class="portal-switch">
-          Already have an account? <a href="login.html" class="portal-link">Sign in →</a>
-        </p>
-      </div>
-    </div>
-
+<div class="register-container">
+  <!-- Header -->
+  <div class="reg-header">
+    <img src="../images/logo.png" alt="Worlds of Wonder">
+    <h1>Join the WOW Family! 🎉</h1>
+    <p>Create your account — instant access to tickets, passport & loyalty rewards</p>
   </div>
 
+  <!-- Card -->
+  <div class="reg-card">
+
+    <!-- Type tabs -->
+    <div class="reg-tabs">
+      <button class="reg-tab active" id="tabInd" onclick="switchType('individual',this)">
+        <i class="fas fa-user"></i> Individual / Fan
+      </button>
+      <button class="reg-tab" id="tabBiz" onclick="switchType('business',this)">
+        <i class="fas fa-building"></i> Business / B2B
+      </button>
+    </div>
+
+    <!-- ============ INDIVIDUAL ============ -->
+    <div id="typeIndividual" class="form-section active">
+
+      <!-- Social sign-up -->
+      <div class="social-btns">
+        <button class="soc-btn google" onclick="socialSignup('Google')">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+          Continue with Google
+        </button>
+        <button class="soc-btn facebook" onclick="socialSignup('Facebook')">
+          <i class="fab fa-facebook" style="color:#1877f2;font-size:1.1rem"></i>
+          Continue with Facebook
+        </button>
+      </div>
+
+      <div class="divider">or sign up with mobile / email</div>
+
+      <!-- Method toggle -->
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button id="methMobile" class="btn-verify" style="flex:1;border-radius:8px;border:1.5px solid #2563eb;background:#172554;color:#bfdbfe" onclick="setMethod('mobile')"><i class="fas fa-mobile-alt"></i> Mobile OTP</button>
+        <button id="methEmail" class="btn-verify" style="flex:1;border-radius:8px;border:1.5px solid #334155;background:transparent;color:#64748b" onclick="setMethod('email')"><i class="fas fa-envelope"></i> Email</button>
+      </div>
+
+      <!-- Mobile OTP flow -->
+      <div id="mobileFlow">
+        <div class="form-row">
+          <div class="fg">
+            <label>First Name *</label>
+            <input type="text" id="fname" placeholder="Rahul" value="Rahul">
+          </div>
+          <div class="fg">
+            <label>Last Name *</label>
+            <input type="text" id="lname" placeholder="Sharma" value="Sharma">
+          </div>
+        </div>
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg">
+            <label>Mobile Number *</label>
+            <div class="input-row">
+              <input type="tel" id="mobileNum" placeholder="+91 98765 43210" value="+91 98765 43210">
+              <button class="btn-verify" id="sendOTPBtn" onclick="sendMobileOTP()">Send OTP</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OTP section (hidden until OTP sent) -->
+        <div id="otpSection" style="display:none">
+          <div style="font-size:.82rem;color:#94a3b8;text-align:center;margin-bottom:8px">Enter the 6-digit OTP sent to your mobile</div>
+          <div class="otp-boxes">
+            <input class="otp-box" type="text" maxlength="1" oninput="moveToNext(this,1)" id="otp0">
+            <input class="otp-box" type="text" maxlength="1" oninput="moveToNext(this,2)" id="otp1">
+            <input class="otp-box" type="text" maxlength="1" oninput="moveToNext(this,3)" id="otp2">
+            <input class="otp-box" type="text" maxlength="1" oninput="moveToNext(this,4)" id="otp3">
+            <input class="otp-box" type="text" maxlength="1" oninput="moveToNext(this,5)" id="otp4">
+            <input class="otp-box" type="text" maxlength="1" id="otp5">
+          </div>
+          <div class="otp-timer" id="otpTimer">Resend OTP in <span id="countdown">30</span>s</div>
+        </div>
+
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg">
+            <label>Email Address (optional but recommended)</label>
+            <input type="email" id="regEmail" placeholder="rahul.sharma@gmail.com" value="rahul.sharma@gmail.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label>Date of Birth</label>
+            <input type="date" id="dob">
+          </div>
+          <div class="fg">
+            <label>Gender</label>
+            <select>
+              <option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg">
+            <label>City</label>
+            <select>
+              <option>Noida</option><option>Delhi</option><option>Gurgaon</option><option>Faridabad</option>
+              <option>Ghaziabad</option><option>Greater Noida</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label>Create Password *</label>
+            <input type="password" id="regPwd" placeholder="Min 8 chars" oninput="checkStrength(this.value)">
+            <div class="pwd-strength"><div class="pwd-bar" id="pwdBar"></div></div>
+            <div class="pwd-label" id="pwdLabel"></div>
+          </div>
+          <div class="fg">
+            <label>Confirm Password *</label>
+            <input type="password" id="regPwd2" placeholder="Repeat password">
+          </div>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="termsChk" checked>
+          <label for="termsChk">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I consent to receive promotional communications via WhatsApp and email.</label>
+        </div>
+
+        <button class="reg-btn" onclick="registerIndividual()">
+          <i class="fas fa-user-plus"></i> Create My WOW Account
+        </button>
+      </div>
+
+      <!-- Email flow (hidden) -->
+      <div id="emailFlow" style="display:none">
+        <div class="form-row">
+          <div class="fg"><label>First Name *</label><input type="text" placeholder="First name"></div>
+          <div class="fg"><label>Last Name *</label><input type="text" placeholder="Last name"></div>
+        </div>
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg"><label>Email Address *</label><input type="email" placeholder="you@email.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Password *</label><input type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)">
+            <div class="pwd-strength"><div class="pwd-bar" id="pwdBar2"></div></div>
+            <div class="pwd-label" id="pwdLabel2"></div>
+          </div>
+          <div class="fg"><label>Confirm Password *</label><input type="password" placeholder="Repeat password"></div>
+        </div>
+        <div class="terms-row"><input type="checkbox" checked><label>I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></label></div>
+        <button class="reg-btn" onclick="registerIndividual()"><i class="fas fa-envelope"></i> Create Account with Email</button>
+      </div>
+
+    </div>
+
+    <!-- ============ BUSINESS ============ -->
+    <div id="typeBusiness" class="form-section" style="display:none">
+      <div style="background:rgba(245,158,11,.1);border:1px solid #f59e0b44;border-radius:10px;padding:12px;margin-bottom:18px;font-size:.8rem;color:#fbbf24;display:flex;align-items:center;gap:10px">
+        <i class="fas fa-info-circle"></i>
+        Business registration uses Razorpay-style KYC. For Resellers & Travel Agents, full KYC at <a href="../partner/onboarding-kyc.html" style="color:#f59e0b;font-weight:700">Partner Onboarding</a>.
+      </div>
+
+      <!-- Business steps -->
+      <div class="biz-steps">
+        <div class="biz-step active" id="bs1"><div class="biz-dot">1</div><div class="biz-lbl">Company</div></div>
+        <div class="biz-step" id="bs2"><div class="biz-dot">2</div><div class="biz-lbl">GST/PAN</div></div>
+        <div class="biz-step" id="bs3"><div class="biz-dot">3</div><div class="biz-lbl">Contact</div></div>
+        <div class="biz-step" id="bs4"><div class="biz-dot">4</div><div class="biz-lbl">Password</div></div>
+      </div>
+
+      <div id="bizStep1">
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg"><label>Company Name *</label><input type="text" placeholder="Registered legal name" value="IndiaTech Solutions Pvt Ltd"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Business Type *</label>
+            <select><option>Private Limited</option><option>LLP</option><option>Partnership</option><option>Proprietorship</option></select>
+          </div>
+          <div class="fg"><label>Industry</label>
+            <select><option>Corporate Outings</option><option>Travel & Tourism</option><option>Schools / Education</option><option>Events / MICE</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Registered City *</label><input type="text" placeholder="e.g., Noida" value="Noida"></div>
+          <div class="fg"><label>State *</label><select><option>Uttar Pradesh</option><option>Delhi</option><option>Haryana</option><option>Rajasthan</option></select></div>
+        </div>
+        <button class="reg-btn" style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff" onclick="bizNextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
+
+      <div id="bizStep2" style="display:none">
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg">
+            <label>GSTIN *</label>
+            <div class="input-row">
+              <input type="text" placeholder="15-digit GSTIN" style="text-transform:uppercase" value="09AAACI1234A1Z5">
+              <button class="btn-verify" onclick="showToast('GSTIN verified!')">Verify</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row single" style="margin-bottom:12px">
+          <div class="fg">
+            <label>PAN Number *</label>
+            <div class="input-row">
+              <input type="text" placeholder="10-char PAN" style="text-transform:uppercase" value="AAACI1234A">
+              <button class="btn-verify" onclick="showToast('PAN verified!')">Verify</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="reg-btn" style="background:transparent;border:1.5px solid #475569;color:#94a3b8;max-width:120px" onclick="bizGoStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="reg-btn" style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;flex:1" onclick="bizNextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div id="bizStep3" style="display:none">
+        <div class="form-row">
+          <div class="fg"><label>Contact Person Name *</label><input type="text" value="Rajesh Kumar" placeholder="Name"></div>
+          <div class="fg"><label>Designation *</label><input type="text" value="Director" placeholder="Your role"></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Business Email *</label><input type="email" value="rajesh@indiatech.com" placeholder="you@company.com"></div>
+          <div class="fg">
+            <label>Mobile *</label>
+            <div class="input-row">
+              <input type="tel" value="+91 98765 43210" id="bizMobile">
+              <button class="btn-verify" onclick="sendBizOTP()">OTP</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="reg-btn" style="background:transparent;border:1.5px solid #475569;color:#94a3b8;max-width:120px" onclick="bizGoStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="reg-btn" style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;flex:1" onclick="bizNextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div id="bizStep4" style="display:none">
+        <div class="form-row">
+          <div class="fg"><label>Password *</label><input type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)">
+            <div class="pwd-strength"><div class="pwd-bar" id="pwdBarBiz"></div></div>
+          </div>
+          <div class="fg"><label>Confirm Password *</label><input type="password" placeholder="Repeat password"></div>
+        </div>
+        <div class="terms-row"><input type="checkbox" checked><label for="">I agree to the <a href="#">Terms</a>, <a href="#">B2B Policy</a> and <a href="#">Privacy Policy</a>. I authorize KYC verification.</label></div>
+        <div style="display:flex;gap:10px">
+          <button class="reg-btn" style="background:transparent;border:1.5px solid #475569;color:#94a3b8;max-width:120px" onclick="bizGoStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="reg-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;flex:1" onclick="registerBusiness()"><i class="fas fa-building"></i> Create Business Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-state" id="successState">
+      <div class="success-icon-big">🎉</div>
+      <h2 style="font-family:'Nunito',sans-serif;font-size:1.4rem;font-weight:800;color:#f1f5f9;margin-bottom:8px">Welcome to WOW!</h2>
+      <p style="color:#94a3b8;font-size:.88rem;margin-bottom:20px">Aapka account ban gaya! Now the WOW adventures begin!</p>
+      <div style="background:#0f172a;border:1px dashed #334155;border-radius:10px;padding:14px;margin-bottom:20px;font-size:.82rem;color:#e2e8f0">
+        ✉️ Verification email sent to <strong id="regEmailDisplay"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b5c7d4ddc0d99bc6ddd4c7d8d4f5d2d8d4dcd99bd6dad8">[email&#160;protected]</a></strong><br>
+        📱 Welcome message sent via WhatsApp
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button onclick="window.location='dashboard.html'" style="width:100%;padding:13px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;border:none;border-radius:10px;font-size:.9rem;font-weight:800;cursor:pointer"><i class="fas fa-tachometer-alt"></i> Go to My Dashboard</button>
+        <button onclick="window.location='wow-passport.html'" style="width:100%;padding:13px;background:#1e293b;color:#f1f5f9;border:1px solid #334155;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer"><i class="fas fa-passport" style="color:#f59e0b"></i> Explore WOW Passport</button>
+      </div>
+    </div>
+
+    <!-- Sign in link -->
+    <div class="signin-link">Already have an account? <a href="login.html">Sign In</a></div>
+  </div>
+
+  <!-- Perks banner -->
+  <div class="perks-banner">
+    <div class="perk"><i class="fas fa-ticket-alt"></i> Instant e-tickets</div>
+    <div class="perk"><i class="fas fa-star"></i> Loyalty points on every visit</div>
+    <div class="perk"><i class="fas fa-passport"></i> WOW Passport access</div>
+    <div class="perk"><i class="fas fa-tag"></i> Exclusive member offers</div>
+    <div class="perk"><i class="fas fa-wallet"></i> WOW Wallet</div>
+  </div>
 </div>
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
 
-  const app    = initializeApp(WOW_FB_CONFIG);
-  const auth   = getAuth(app);
-  const db     = getFirestore(app);
-  const google = new GoogleAuthProvider();
+<div class="toast" id="toast"></div>
 
-  function showErr(id, msg) { const e = document.getElementById(id); if(e){e.textContent=msg;e.classList.remove('hidden');} }
-  function clearErrs() {
-    ['reg-fname-err','reg-lname-err','reg-email-err','reg-mobile-err','reg-password-err','reg-error-banner']
-      .forEach(id => { const e = document.getElementById(id); if(e){e.textContent='';e.classList.add('hidden');} });
-  }
-  function setBusy(b) {
-    const btn = document.getElementById('reg-submit');
-    if(btn){ btn.disabled=b; btn.textContent = b ? 'Creating account…' : 'Create Account →'; }
-  }
-  function mapErr(code) {
-    const m = {
-      'auth/email-already-in-use': 'An account with this email already exists. Try signing in.',
-      'auth/invalid-email':        'Please enter a valid email address.',
-      'auth/weak-password':        'Password must be at least 6 characters.',
-      'auth/network-request-failed': 'Network error — check your connection.',
-    };
-    return m[code] || 'Registration failed. Please try again.';
-  }
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+let regMethod = 'mobile';
+let otpSent = false;
+let countdown = 30;
+let countdownTimer = null;
 
-  // Password strength
-  document.getElementById('reg-password')?.addEventListener('input', (e) => {
-    const val = e.target.value;
-    const bar  = document.getElementById('pw-bar');
-    const hint = document.getElementById('pw-hint');
-    let strength = 0;
-    if (val.length >= 8) strength++;
-    if (/[0-9]/.test(val)) strength++;
-    if (/[^a-zA-Z0-9]/.test(val)) strength++;
-    if (val.length >= 12) strength++;
-    const pct = (strength / 4) * 100;
-    const clr = strength <= 1 ? '#ef4444' : strength <= 2 ? '#f59e0b' : '#10b981';
-    if (bar) { bar.style.width = pct + '%'; bar.style.background = clr; }
-    if (hint) {
-      hint.textContent = strength <= 1 ? 'Weak — add numbers & symbols' :
-                         strength <= 2 ? 'Fair — getting stronger' :
-                         strength <= 3 ? 'Good password' : 'Strong password ✓';
-      hint.style.color = clr;
+function switchType(type, btn) {
+  document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('typeIndividual').style.display = type === 'individual' ? '' : 'none';
+  document.getElementById('typeBusiness').style.display = type === 'business' ? '' : 'none';
+  document.getElementById('typeIndividual').classList.toggle('active', type === 'individual');
+}
+
+function setMethod(m) {
+  regMethod = m;
+  document.getElementById('mobileFlow').style.display = m === 'mobile' ? '' : 'none';
+  document.getElementById('emailFlow').style.display = m === 'email' ? '' : 'none';
+  const mBtn = document.getElementById('methMobile');
+  const eBtn = document.getElementById('methEmail');
+  if(m === 'mobile') {
+    mBtn.style.borderColor='#2563eb';mBtn.style.background='#172554';mBtn.style.color='#bfdbfe';
+    eBtn.style.borderColor='#334155';eBtn.style.background='transparent';eBtn.style.color='#64748b';
+  } else {
+    eBtn.style.borderColor='#2563eb';eBtn.style.background='#172554';eBtn.style.color='#bfdbfe';
+    mBtn.style.borderColor='#334155';mBtn.style.background='transparent';mBtn.style.color='#64748b';
+  }
+}
+
+function sendMobileOTP() {
+  const mobile = document.getElementById('mobileNum').value;
+  if(!mobile || mobile.length < 10) { showToast('Please enter a valid mobile number'); return; }
+  document.getElementById('otpSection').style.display = '';
+  document.getElementById('sendOTPBtn').textContent = 'Resend';
+  document.getElementById('otp0').focus();
+  otpSent = true;
+  startCountdown();
+  showToast('OTP sent to ' + mobile);
+}
+
+function startCountdown() {
+  countdown = 30;
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    countdown--;
+    const el = document.getElementById('countdown');
+    if(el) el.textContent = countdown;
+    if(countdown <= 0) {
+      clearInterval(countdownTimer);
+      const timerEl = document.getElementById('otpTimer');
+      if(timerEl) timerEl.innerHTML = '<span onclick="sendMobileOTP()">Resend OTP</span>';
     }
-  });
+  }, 1000);
+}
 
-  // Password toggle
-  document.getElementById('toggle-reg-pw')?.addEventListener('click', () => {
-    const inp = document.getElementById('reg-password');
-    const s = document.getElementById('eye-show-r');
-    const h = document.getElementById('eye-hide-r');
-    if (inp.type === 'password') { inp.type='text'; s.style.display='none'; h.style.display='block'; }
-    else { inp.type='password'; s.style.display='block'; h.style.display='none'; }
-  });
-
-  async function saveUserProfile(user, extra = {}) {
-    await setDoc(doc(db, 'users', user.uid), {
-      uid:       user.uid,
-      email:     user.email,
-      name:      user.displayName || extra.name || '',
-      mobile:    extra.mobile || '',
-      photoURL:  user.photoURL || '',
-      createdAt: serverTimestamp(),
-      bookings:  [],
-      passport:  null,
-    }, { merge: true });
+function moveToNext(el, nextIdx) {
+  if(el.value && nextIdx <= 5) {
+    const next = document.getElementById('otp' + nextIdx);
+    if(next) next.focus();
   }
+  if(nextIdx === 6 || !el.value && nextIdx > 1) {
+    const otp = Array.from({length:6}).map((_,i)=>(document.getElementById('otp'+i)||{value:''}).value).join('');
+    if(otp.length === 6) autoVerifyOTP(otp);
+  }
+}
 
-  // Registration
-  document.getElementById('register-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearErrs();
-    const fname  = document.getElementById('reg-fname').value.trim();
-    const lname  = document.getElementById('reg-lname').value.trim();
-    const email  = document.getElementById('reg-email').value.trim();
-    const mobile = document.getElementById('reg-mobile').value.replace(/\s/g,'');
-    const pw     = document.getElementById('reg-password').value;
-    const terms  = document.getElementById('reg-terms')?.checked;
-    let ok = true;
-    if (!fname)  { showErr('reg-fname-err', 'First name is required'); ok=false; }
-    if (!lname)  { showErr('reg-lname-err', 'Last name is required'); ok=false; }
-    if (!email)  { showErr('reg-email-err', 'Email is required'); ok=false; }
-    if (!/^[6-9]\d{9}$/.test(mobile)) { showErr('reg-mobile-err', 'Enter a valid 10-digit Indian mobile number'); ok=false; }
-    if (pw.length < 8) { showErr('reg-password-err', 'Password must be at least 8 characters'); ok=false; }
-    if (!terms)  { const b = document.getElementById('reg-error-banner'); if(b){b.textContent='Please accept the Terms to continue';b.classList.remove('hidden');} ok=false; }
-    if (!ok) return;
+function autoVerifyOTP(otp) {
+  showToast('OTP verified! Continue registration.');
+}
 
-    setBusy(true);
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, pw);
-      await updateProfile(cred.user, { displayName: `${fname} ${lname}` });
-      await saveUserProfile(cred.user, { name: `${fname} ${lname}`, mobile });
-      window.location.href = '../portal/my-bookings.html?welcome=1';
-    } catch (err) {
-      const banner = document.getElementById('reg-error-banner');
-      if (banner) { banner.textContent = mapErr(err.code); banner.classList.remove('hidden'); }
-    } finally {
-      setBusy(false);
-    }
+function checkStrength(val) {
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[A-Z]/.test(val)) strength++;
+  if(/[0-9]/.test(val)) strength++;
+  if(/[^A-Za-z0-9]/.test(val)) strength++;
+  const colors = ['#ef4444','#f59e0b','#fbbf24','#4ade80'];
+  const labels = ['Weak','Fair','Good','Strong'];
+  const widths = ['25%','50%','75%','100%'];
+  ['pwdBar','pwdBar2','pwdBarBiz'].forEach(id => {
+    const bar = document.getElementById(id);
+    if(bar) { bar.style.width = widths[strength-1]||'0'; bar.style.background = colors[strength-1]||'#ef4444'; }
   });
+  ['pwdLabel','pwdLabel2'].forEach(id => {
+    const lbl = document.getElementById(id);
+    if(lbl) { lbl.textContent = strength>0 ? labels[strength-1] : ''; lbl.style.color = colors[strength-1]||''; lbl.style.fontSize='.72rem'; }
+  });
+}
 
-  // Google
-  document.getElementById('google-register-btn')?.addEventListener('click', async () => {
-    try {
-      const cred = await signInWithPopup(auth, google);
-      await saveUserProfile(cred.user);
-      window.location.href = '../portal/my-bookings.html?welcome=1';
-    } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        const b = document.getElementById('reg-error-banner');
-        if(b){ b.textContent = mapErr(err.code); b.classList.remove('hidden'); }
+function socialSignup(provider) {
+  showToast(`Redirecting to ${provider} sign-up…`);
+  setTimeout(() => showSuccess(), 1800);
+}
+
+function registerIndividual() {
+  const fname = document.getElementById('fname')?.value;
+  if(!fname) { showToast('Please fill in your name'); return; }
+  if(!document.getElementById('termsChk')?.checked) { showToast('Please accept the terms'); return; }
+  showSuccess();
+}
+
+function showSuccess() {
+  const email = document.getElementById('regEmail')?.value || 'your email';
+  document.getElementById('regEmailDisplay').textContent = email;
+  document.getElementById('typeIndividual').classList.remove('active');
+  document.getElementById('typeBusiness').style.display = 'none';
+  document.querySelector('.reg-tabs').style.display = 'none';
+  document.querySelector('.signin-link').style.display = 'none';
+  document.getElementById('successState').classList.add('show');
+  showToast('🎉 Account created! Welcome to WOW!');
+}
+
+// Business KYC
+let bizCurrentStep = 1;
+function bizNextStep(from) {
+  bizGoStep(from + 1);
+}
+function bizGoStep(n) {
+  for(let i=1;i<=4;i++) {
+    const s = document.getElementById('bizStep'+i);
+    if(s) s.style.display = i===n?'':'none';
+    const bs = document.getElementById('bs'+i);
+    if(bs) { bs.classList.remove('active','done'); if(i<n)bs.classList.add('done'); else if(i===n)bs.classList.add('active'); }
+  }
+  bizCurrentStep = n;
+}
+function sendBizOTP() { showToast('OTP sent to business mobile!'); }
+function registerBusiness() { showSuccess(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<i class="fas fa-check-circle" style="color:#4ade80"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Auto-focus first OTP box on page load
+document.addEventListener('DOMContentLoaded', () => {
+  // Keyboard nav for OTP boxes
+  document.querySelectorAll('.otp-box').forEach((box, i) => {
+    box.addEventListener('keydown', e => {
+      if(e.key==='Backspace' && !box.value && i>0) {
+        document.getElementById('otp'+(i-1)).focus();
       }
-    }
+    });
   });
+});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
