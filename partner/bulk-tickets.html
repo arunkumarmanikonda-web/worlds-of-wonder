@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bulk QR Ticket Engine — WOW Partner Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;display:flex;min-height:100vh;}
+/* Sidebar */
+.sidebar{width:216px;background:linear-gradient(180deg,#0d1220,#080c18);border-right:1px solid rgba(255,215,0,.1);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-brand{padding:16px;border-bottom:1px solid rgba(255,215,0,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo{width:34px;height:34px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0a0e1a;flex-shrink:0;}
+.sb-name{font-size:12px;font-weight:700;color:#ffd700;}
+.sb-role{font-size:10px;color:#8899aa;}
+.nav-section{padding:12px 10px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;margin:1px 6px;cursor:pointer;color:#8899aa;font-size:12px;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:rgba(255,215,0,.07);color:#ffd700;}
+.nav-item.active{background:rgba(255,215,0,.12);color:#ffd700;border-left:2px solid #ffd700;}
+.nav-item i{width:15px;text-align:center;font-size:12px;}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.05);}
+.partner-chip{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.13);border-radius:8px;padding:10px;}
+.partner-chip .name{font-size:12px;font-weight:700;color:#ffd700;}
+.partner-chip .code{font-size:10px;color:#8899aa;}
+.partner-chip .st{font-size:10px;color:#10b981;margin-top:5px;}
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:rgba(255,255,255,.025);border-bottom:1px solid rgba(255,255,255,.06);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;}
+.topbar h2{font-size:17px;font-weight:700;}
+.topbar .sub{font-size:11px;color:#8899aa;}
+.topbar-right{display:flex;gap:9px;}
+.tb-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 13px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;text-decoration:none;}
+.tb-btn:hover{background:rgba(255,215,0,.1);color:#ffd700;border-color:rgba(255,215,0,.25);}
+.tb-btn.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;}
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:10px;padding:3px;margin-bottom:18px;width:fit-content;}
+.tab{padding:8px 20px;text-align:center;font-size:12px;font-weight:600;border-radius:8px;cursor:pointer;color:#8899aa;transition:.2s;}
+.tab.active{background:linear-gradient(135deg,#6c63ff,#9333ea);color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.card-title{font-size:14px;font-weight:700;}
+.card-subtitle{font-size:11px;color:#8899aa;margin-top:1px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:10px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
+.field label .req{color:#ff6b6b;}
+.field input,.field select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:9px 12px;color:#e0e6f0;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
+.field input:focus,.field select:focus{border-color:#6c63ff;}
+.field select option{background:#1a1f35;}
+.field-hint{font-size:10px;color:#8899aa;}
+/* Ticket type selector */
+.ticket-types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.tt-card{border:2px solid rgba(255,255,255,.08);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.3s;}
+.tt-card:hover{border-color:rgba(255,215,0,.3);}
+.tt-card.selected{border-color:rgba(255,215,0,.6);background:rgba(255,215,0,.06);}
+.tt-emoji{font-size:24px;margin-bottom:6px;}
+.tt-name{font-size:12px;font-weight:700;}
+.tt-price{font-size:13px;font-weight:800;color:#ffd700;margin-top:3px;}
+.tt-sub{font-size:10px;color:#8899aa;}
+/* Order summary */
+.order-summary{background:linear-gradient(135deg,rgba(108,99,255,.08),rgba(147,51,234,.05));border:1px solid rgba(108,99,255,.2);border-radius:12px;padding:16px;}
+.os-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);}
+.os-row:last-child{border-bottom:none;font-weight:800;font-size:15px;color:#ffd700;}
+.btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.3s;display:flex;align-items:center;gap:6px;}
+.btn-primary{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;justify-content:center;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(255,215,0,.4);}
+.btn-purple{background:linear-gradient(135deg,#6c63ff,#9333ea);color:#fff;justify-content:center;}
+.btn-purple:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(108,99,255,.4);}
+.btn-ghost{background:rgba(255,255,255,.07);color:#e0e6f0;border:1px solid rgba(255,255,255,.1);justify-content:center;}
+/* Generated tickets */
+#ticket-output{display:none;}
+.ticket-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-height:400px;overflow-y:auto;padding:4px;}
+.ticket-item{background:linear-gradient(135deg,#1a1f35,#0d1220);border:1px solid rgba(255,215,0,.2);border-radius:10px;padding:12px;text-align:center;position:relative;overflow:hidden;}
+.ticket-item::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffd700,#ff8c00);}
+.ticket-serial{font-size:9px;font-weight:700;color:#ffd700;margin-bottom:6px;letter-spacing:.5px;}
+.ticket-qr{margin:6px auto;}
+.ticket-info{font-size:9px;color:#8899aa;margin-top:6px;line-height:1.4;}
+.ticket-park{font-size:10px;font-weight:700;color:#a78bfa;margin-top:4px;}
+/* Batch history */
+.batch-row{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;transition:.2s;}
+.batch-row:hover{border-color:rgba(255,215,0,.2);}
+.batch-icon{width:40px;height:40px;background:rgba(108,99,255,.12);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.batch-info{flex:1;}
+.batch-title{font-size:13px;font-weight:700;}
+.batch-meta{font-size:11px;color:#8899aa;margin-top:2px;}
+.batch-badges{display:flex;gap:5px;margin-top:5px;}
+.b-badge{padding:2px 8px;border-radius:18px;font-size:10px;font-weight:600;}
+.bb-valid{background:rgba(16,185,129,.15);color:#10b981;}
+.bb-expired{background:rgba(239,68,68,.15);color:#ef4444;}
+.bb-used{background:rgba(251,191,36,.15);color:#fbbf24;}
+/* Alert */
+.alert{border-radius:9px;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;margin-bottom:14px;font-size:12px;}
+.alert.info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#93c5fd;}
+.alert.success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7;}
+@media(max-width:900px){.sidebar{display:none;}.two-col{grid-template-columns:1fr;}.ticket-types{grid-template-columns:1fr 1fr;}.ticket-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-brand"><div class="sb-logo">WW</div><div><div class="sb-name">WOW Partner Portal</div><div class="sb-role">Bulk Ticket Engine</div></div></div>
+  <div class="nav-section">Main</div>
+  <a class="nav-item" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a class="nav-item" href="quote-builder.html"><i class="fas fa-file-invoice"></i> Quote Builder</a>
+  <a class="nav-item active" href="bulk-tickets.html"><i class="fas fa-qrcode"></i> Bulk Tickets</a>
+  <div class="nav-section">Commerce</div>
+  <a class="nav-item" href="invoice-gst.html"><i class="fas fa-receipt"></i> Invoices &amp; GST</a>
+  <a class="nav-item" href="#"><i class="fas fa-wallet"></i> Commissions</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="onboarding-kyc.html"><i class="fas fa-id-badge"></i> KYC / Profile</a>
+  <a class="nav-item" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <div class="sidebar-footer"><div class="partner-chip"><div class="name">XYZ Tours Pvt Ltd</div><div class="code">WOW-TA-2026-0089</div><div class="st">● KYC Approved · Active</div></div></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div><h2>🎟 Bulk QR Ticket Engine</h2><div class="sub">Generate non-reusable QR tickets with reseller-prefixed IDs for Water Park &amp; Amusement Park</div></div>
+    <div class="topbar-right">
+      <a class="tb-btn" href="dashboard.html"><i class="fas fa-arrow-left"></i> Back</a>
+      <button class="tb-btn gold" onclick="switchTab('generate')"><i class="fas fa-plus"></i> New Order</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="tab-bar">
+      <div class="tab active" id="t-generate" onclick="switchTab('generate')">🎫 Generate Tickets</div>
+      <div class="tab" id="t-history" onclick="switchTab('history')">📋 My Batches</div>
+      <div class="tab" id="t-verify" onclick="switchTab('verify')">🔍 Verify Ticket</div>
+    </div>
+
+    <!-- GENERATE -->
+    <div class="tab-panel active" id="panel-generate">
+      <div class="two-col">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+
+          <!-- Park Selection -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon" style="background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.2);">🎡</div>
+              <div><div class="card-title">Select Park &amp; Ticket Type</div><div class="card-subtitle">Choose combo or individual tickets</div></div>
+            </div>
+            <div class="ticket-types" id="ticket-type-grid">
+              <div class="tt-card selected" data-type="combo" data-price="699" onclick="selectTicketType(this)">
+                <div class="tt-emoji">🌊🎢</div>
+                <div class="tt-name">Combo Pass</div>
+                <div class="tt-price">₹699</div>
+                <div class="tt-sub">Water + Amusement</div>
+              </div>
+              <div class="tt-card" data-type="water" data-price="499" onclick="selectTicketType(this)">
+                <div class="tt-emoji">🌊</div>
+                <div class="tt-name">Water Park Only</div>
+                <div class="tt-price">₹499</div>
+                <div class="tt-sub">Full day access</div>
+              </div>
+              <div class="tt-card" data-type="amusement" data-price="449" onclick="selectTicketType(this)">
+                <div class="tt-emoji">🎢</div>
+                <div class="tt-name">Amusement Only</div>
+                <div class="tt-price">₹449</div>
+                <div class="tt-sub">All rides included</div>
+              </div>
+              <div class="tt-card" data-type="child" data-price="349" onclick="selectTicketType(this)">
+                <div class="tt-emoji">👶</div>
+                <div class="tt-name">Child Ticket</div>
+                <div class="tt-price">₹349</div>
+                <div class="tt-sub">Below 3ft height</div>
+              </div>
+              <div class="tt-card" data-type="senior" data-price="399" onclick="selectTicketType(this)">
+                <div class="tt-emoji">👴</div>
+                <div class="tt-name">Senior Citizen</div>
+                <div class="tt-price">₹399</div>
+                <div class="tt-sub">60+ years ID proof</div>
+              </div>
+              <div class="tt-card" data-type="corporate" data-price="549" onclick="selectTicketType(this)">
+                <div class="tt-emoji">🏢</div>
+                <div class="tt-name">Corporate Bulk</div>
+                <div class="tt-price">₹549</div>
+                <div class="tt-sub">Min 50 tickets</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Details -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon" style="background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);">📋</div>
+              <div><div class="card-title">Order Details</div></div>
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>Quantity <span class="req">*</span></label><input id="qty" type="number" value="100" min="1" max="5000" oninput="updateOrder()"/><div class="field-hint">Max 5,000 per order</div></div>
+              <div class="field"><label>Visit Date <span class="req">*</span></label><input id="t-visit-date" type="date" oninput="updateOrder()"/></div>
+              <div class="field"><label>Group / Booking Name</label><input id="group-name" type="text" placeholder="DPS Noida School Trip"/></div>
+              <div class="field"><label>Validity</label><select id="validity" onchange="updateOrder()"><option value="1">Single Day Only</option><option value="7">7 Days Window</option><option value="30">30 Days</option><option value="0">Admin Controlled</option></select></div>
+            </div>
+            <div class="form-grid" style="margin-top:10px;">
+              <div class="field"><label>Reseller Prefix</label><input id="reseller-prefix" value="XYZTA" readonly style="color:#ffd700;font-weight:700;"/><div class="field-hint">Auto-set from your account</div></div>
+              <div class="field"><label>ID Format Preview</label><input value="XYZTA-WP-000001…" readonly style="color:#a78bfa;font-size:11px;"/></div>
+            </div>
+            <div class="alert info" style="margin-top:12px;"><i class="fas fa-info-circle"></i><div>All tickets are <b>non-reusable</b>. Each QR scans once at gate. Duplicate scan attempts are logged and blocked.</div></div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div>
+          <div class="order-summary">
+            <div style="font-size:15px;font-weight:700;color:#6c63ff;margin-bottom:14px;">🛒 Order Summary</div>
+            <div class="os-row"><span>Ticket Type</span><span id="os-type">Combo Pass</span></div>
+            <div class="os-row"><span>Quantity</span><span id="os-qty">100</span></div>
+            <div class="os-row"><span>Unit Price</span><span id="os-unit">₹699</span></div>
+            <div class="os-row"><span>Sub-Total</span><span id="os-sub">₹69,900</span></div>
+            <div class="os-row"><span>GST 18%</span><span id="os-gst">₹12,582</span></div>
+            <div class="os-row"><span>Reseller Discount (5%)</span><span id="os-disc" style="color:#10b981;">-₹3,495</span></div>
+            <div class="os-row"><span>GRAND TOTAL</span><span id="os-total">₹79,000</span></div>
+            <div style="background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.12);border-radius:8px;padding:10px;margin-top:12px;font-size:11px;color:#8899aa;">
+              <div style="font-weight:700;color:#ffd700;margin-bottom:4px;">Ticket IDs will be:</div>
+              <div id="id-preview" style="font-family:monospace;font-size:11px;color:#a78bfa;line-height:1.6;">XYZTA-COMBO-000001<br/>XYZTA-COMBO-000002<br/>XYZTA-COMBO-000003<br/>… up to 000100</div>
+            </div>
+            <button class="btn btn-purple" style="width:100%;margin-top:14px;" onclick="generateTickets()"><i class="fas fa-magic"></i> Generate QR Tickets</button>
+          </div>
+
+          <!-- Payment -->
+          <div class="card" style="margin-top:14px;">
+            <div class="card-header">
+              <div class="card-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);">💳</div>
+              <div><div class="card-title">Settlement Mode</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;" id="pay-modes">
+              <label style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;cursor:pointer;">
+                <input type="radio" name="paymode" value="credit" checked/> <div><div style="font-size:13px;font-weight:600;">Credit Account</div><div style="font-size:11px;color:#8899aa;">Deducted from credit limit (₹5L available)</div></div>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;cursor:pointer;">
+                <input type="radio" name="paymode" value="upi"/> <div><div style="font-size:13px;font-weight:600;">UPI Payment</div><div style="font-size:11px;color:#8899aa;">Instant settlement via UPI</div></div>
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;cursor:pointer;">
+                <input type="radio" name="paymode" value="neft"/> <div><div style="font-size:13px;font-weight:600;">NEFT / RTGS</div><div style="font-size:11px;color:#8899aa;">Bank transfer, tickets after clearance</div></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generated Output -->
+      <div id="ticket-output" style="margin-top:16px;">
+        <div class="alert success"><i class="fas fa-check-circle"></i><div id="gen-success-msg"></div></div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="downloadAll()"><i class="fas fa-download"></i> Download All (PDF)</button>
+          <button class="btn" style="background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.25);" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
+          <button class="btn btn-ghost" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+          <button class="btn btn-ghost" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+        </div>
+        <div class="ticket-grid" id="ticket-grid"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="tab-panel" id="panel-history">
+      <div id="history-list">
+        <div class="batch-row">
+          <div class="batch-icon">🌊🎢</div>
+          <div class="batch-info">
+            <div class="batch-title">DPS Noida School Trip — 240 Combo Tickets</div>
+            <div class="batch-meta">Generated: 10 Apr 2026 · Valid: 15 Apr 2026 · Batch: WOW-BATCH-001</div>
+            <div class="batch-badges"><span class="b-badge bb-valid">✓ 185 Valid</span><span class="b-badge bb-used">55 Scanned</span></div>
+          </div>
+          <div style="text-align:right;font-size:13px;font-weight:700;color:#ffd700;">₹1,67,760</div>
+        </div>
+        <div class="batch-row">
+          <div class="batch-icon">🏢</div>
+          <div class="batch-info">
+            <div class="batch-title">Infosys Outing — 85 Corporate Tickets</div>
+            <div class="batch-meta">Generated: 12 Apr 2026 · Valid: 18 Apr 2026 · Batch: WOW-BATCH-002</div>
+            <div class="batch-badges"><span class="b-badge bb-valid">✓ 85 Valid</span><span class="b-badge" style="background:rgba(59,130,246,.15);color:#60a5fa;">0 Scanned</span></div>
+          </div>
+          <div style="text-align:right;font-size:13px;font-weight:700;color:#ffd700;">₹55,000</div>
+        </div>
+        <div class="batch-row">
+          <div class="batch-icon">🎂</div>
+          <div class="batch-info">
+            <div class="batch-title">Birthday — 30 Combo Tickets</div>
+            <div class="batch-meta">Generated: 08 Apr 2026 · Visit: 14 Apr 2026 · Batch: WOW-BATCH-003</div>
+            <div class="batch-badges"><span class="b-badge bb-expired">Expired</span><span class="b-badge bb-used">30 Scanned</span></div>
+          </div>
+          <div style="text-align:right;font-size:13px;font-weight:700;color:#8899aa;">₹20,970</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="tab-panel" id="panel-verify">
+      <div style="max-width:500px;margin:0 auto;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);">🔍</div>
+            <div><div class="card-title">Verify Ticket Status</div><div class="card-subtitle">Check if a ticket ID is valid, used or expired</div></div>
+          </div>
+          <div class="field">
+            <label>Ticket ID / QR Code Value</label>
+            <input id="verify-input" type="text" placeholder="XYZTA-COMBO-000042" style="font-family:monospace;"/>
+          </div>
+          <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="verifyTicket()"><i class="fas fa-search"></i> Check Ticket</button>
+          <div id="verify-result" style="display:none;margin-top:14px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedType = {type:'combo', price:699, name:'Combo Pass'};
+let generatedTickets = [];
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('t-'+tab).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+function selectTicketType(el) {
+  document.querySelectorAll('.tt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = {type: el.dataset.type, price: parseFloat(el.dataset.price), name: el.querySelector('.tt-name').textContent};
+  updateOrder();
+}
+
+function updateOrder() {
+  const qty = parseInt(document.getElementById('qty').value) || 0;
+  const date = document.getElementById('t-visit-date').value || '—';
+  const prefix = document.getElementById('reseller-prefix').value || 'TA';
+  const sub = qty * selectedType.price;
+  const gst = sub * 0.18;
+  const disc = sub * 0.05;
+  const total = sub + gst - disc;
+  document.getElementById('os-type').textContent = selectedType.name;
+  document.getElementById('os-qty').textContent = qty.toLocaleString('en-IN');
+  document.getElementById('os-unit').textContent = '₹' + selectedType.price;
+  document.getElementById('os-sub').textContent = '₹' + fmt(sub);
+  document.getElementById('os-gst').textContent = '₹' + fmt(gst);
+  document.getElementById('os-disc').textContent = '-₹' + fmt(disc);
+  document.getElementById('os-total').textContent = '₹' + fmt(total);
+  const typeCode = selectedType.type.toUpperCase().substring(0,5);
+  let preview = '';
+  for (let i = 1; i <= Math.min(3, qty); i++) {
+    preview += `${prefix}-${typeCode}-${String(i).padStart(6,'0')}\n`;
+  }
+  if (qty > 3) preview += `… up to ${String(qty).padStart(6,'0')}`;
+  document.getElementById('id-preview').textContent = preview;
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('en-IN'); }
+
+async function generateTickets() {
+  const qty = parseInt(document.getElementById('qty').value) || 0;
+  const date = document.getElementById('t-visit-date').value;
+  const group = document.getElementById('group-name').value || 'Group';
+  const prefix = document.getElementById('reseller-prefix').value || 'TA';
+  const typeCode = selectedType.type.toUpperCase().substring(0,5);
+
+  if (qty < 1 || qty > 5000) { alert('Please enter a valid quantity (1–5000).'); return; }
+  if (!date) { alert('Please select a visit date.'); return; }
+
+  const batchId = 'WOW-BATCH-' + Date.now().toString(36).toUpperCase();
+  generatedTickets = [];
+
+  for (let i = 1; i <= qty; i++) {
+    generatedTickets.push({
+      id: `${prefix}-${typeCode}-${String(i).padStart(6,'0')}`,
+      type: selectedType.name, park: selectedType.type,
+      date: date, group: group, batch: batchId, status: 'valid'
+    });
+  }
+
+  // Save batch to API
+  try {
+    await fetch('tables/bulk_ticket_batches', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({batch_id: batchId, partner: prefix, qty, type: selectedType.type, visit_date: date, group_name: group, status: 'generated', created_at: new Date().toISOString()})
+    });
+  } catch(e) {}
+
+  // Show output
+  document.getElementById('ticket-output').style.display = 'block';
+  document.getElementById('gen-success-msg').innerHTML =
+    `✅ <b>${qty} QR tickets generated!</b> Batch ID: <b>${batchId}</b>. All tickets are non-reusable and valid for <b>${date}</b> only.`;
+
+  const grid = document.getElementById('ticket-grid');
+  grid.innerHTML = '';
+  const show = Math.min(qty, 12); // show first 12
+
+  for (let i = 0; i < show; i++) {
+    const t = generatedTickets[i];
+    const div = document.createElement('div');
+    div.className = 'ticket-item';
+    div.innerHTML = `<div class="ticket-serial">${t.id}</div><div class="ticket-qr" id="qr-${i}"></div><div class="ticket-park">${t.type}</div><div class="ticket-info">${date}<br/>${group}</div>`;
+    grid.appendChild(div);
+    setTimeout(() => {
+      new QRCode(document.getElementById('qr-'+i), {text: t.id, width: 60, height: 60, colorDark:'#fff', colorLight:'transparent'});
+    }, 50 * i);
+  }
+
+  if (qty > 12) {
+    const more = document.createElement('div');
+    more.style.cssText = 'grid-column:span 4;text-align:center;padding:16px;font-size:13px;color:#8899aa;background:rgba(255,255,255,.03);border-radius:10px;';
+    more.textContent = `+ ${qty - 12} more tickets (shown in downloaded PDF)`;
+    grid.appendChild(more);
+  }
+
+  // Add to history
+  const histList = document.getElementById('history-list');
+  const row = document.createElement('div');
+  row.className = 'batch-row';
+  row.innerHTML = `<div class="batch-icon">🎫</div><div class="batch-info"><div class="batch-title">${group} — ${qty} ${selectedType.name}</div><div class="batch-meta">Generated: now · Valid: ${date} · Batch: ${batchId}</div><div class="batch-badges"><span class="b-badge bb-valid">✓ ${qty} Valid</span></div></div><div style="text-align:right;font-size:13px;font-weight:700;color:#ffd700;">₹${fmt(qty * selectedType.price)}</div>`;
+  histList.prepend(row);
+
+  grid.scrollIntoView({behavior:'smooth'});
+}
+
+function downloadAll() { alert('PDF generation: ' + generatedTickets.length + ' tickets being compiled.\nIn production, a server-side PDF with all QR codes is emailed + available for download.'); }
+function sendWhatsApp() { alert('WhatsApp dispatch: Ticket batch link sent to your registered WhatsApp number.'); }
+function exportCSV() {
+  let csv = 'Ticket ID,Type,Park,Visit Date,Group,Batch,Status\n';
+  generatedTickets.forEach(t => { csv += `${t.id},${t.type},${t.park},${t.date},${t.group},${t.batch},${t.status}\n`; });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wow-tickets-' + Date.now() + '.csv';
+  a.click();
+}
+
+function verifyTicket() {
+  const id = document.getElementById('verify-input').value.trim();
+  const result = document.getElementById('verify-result');
+  result.style.display = 'block';
+  if (!id) { result.innerHTML = '<div class="alert" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:11px 14px;font-size:12px;color:#f87171;">Enter a ticket ID to verify.</div>'; return; }
+  // Simulate
+  const found = generatedTickets.find(t => t.id === id);
+  if (found) {
+    result.innerHTML = `<div class="alert success"><i class="fas fa-check-circle"></i><div><b style="color:#10b981;">✓ VALID TICKET</b><br/>${id}<br/>Type: ${found.type}<br/>Visit: ${found.date}<br/>Group: ${found.group}<br/>Status: <b>Not yet scanned</b></div></div>`;
+  } else if (id.startsWith('XYZTA')) {
+    result.innerHTML = `<div class="alert" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:9px;padding:11px 14px;font-size:12px;color:#f87171;"><i class="fas fa-times-circle"></i> <div><b>INVALID / EXPIRED</b><br/>Ticket ${id} not found in active batches.</div></div>`;
+  } else {
+    result.innerHTML = `<div class="alert" style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:9px;padding:11px 14px;font-size:12px;color:#fde68a;"><i class="fas fa-exclamation-triangle"></i> <div>Ticket not in your reseller batches. Contact WOW admin to verify.</div></div>`;
+  }
+}
+
+// Init
+updateOrder();
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('t-visit-date').value = today;
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
