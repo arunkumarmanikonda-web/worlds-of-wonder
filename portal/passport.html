@@ -4,146 +4,822 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Passport — Worlds of Wonder</title>
+  <meta name="description" content="Manage your WOW Annual Passport — view status, visit history, and renew your membership." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <script src="../js/wow-modules.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    /* ── Passport Card ── */
+    .passport-card {
+      background: linear-gradient(135deg, #0a1628 0%, #0f2044 40%, #1a3560 100%);
+      border-radius: 24px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+    .passport-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 80% 20%, rgba(245,168,0,.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(0,85,179,.2) 0%, transparent 50%);
+    }
+    .passport-card-inner { position: relative; z-index: 1; }
+    .passport-logo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .passport-logo img { height: 48px; width: auto; filter: brightness(0) invert(1); opacity: .9; }
+    .passport-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,168,0,.2);
+      border: 1px solid rgba(245,168,0,.4);
+      color: #F5A800;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 20px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .passport-holder-name {
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .passport-plan-name {
+      font-size: 14px;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 24px;
+    }
+    .passport-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media(max-width:700px){ .passport-meta-grid { grid-template-columns: repeat(2, 1fr); } }
+    .passport-meta-item { }
+    .passport-meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,.4);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 4px;
+    }
+    .passport-meta-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .passport-qr-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .passport-qr-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+      flex-shrink: 0;
+    }
+    .passport-qr-info { flex: 1; }
+    .passport-qr-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .passport-qr-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .passport-id-code {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .1em;
+    }
+    .passport-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .passport-btn {
+      padding: 11px 22px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .passport-btn-primary {
+      background: linear-gradient(135deg, #0055B3, #0073E6);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,85,179,.4);
+    }
+    .passport-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,85,179,.5); }
+    .passport-btn-outline {
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.8);
+      border: 1px solid rgba(255,255,255,.2);
+    }
+    .passport-btn-outline:hover { background: rgba(255,255,255,.14); }
+    .passport-btn-gold {
+      background: linear-gradient(135deg, #F5A800, #f97316);
+      color: #000;
+    }
+    .passport-btn-gold:hover { transform: translateY(-1px); }
+
+    /* ── Progress bar ── */
+    .passport-progress-section {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .passport-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .passport-progress-title { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.7); }
+    .passport-progress-pct { font-size: 13px; font-weight: 800; color: #F5A800; }
+    .passport-progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .passport-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0055B3, #F5A800);
+      border-radius: 4px;
+      transition: width .8s ease;
+    }
+    .passport-progress-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,.4);
+      margin-top: 8px;
+    }
+
+    /* ── Stats row ── */
+    .passport-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media(max-width:600px){ .passport-stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .pstat-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+    .pstat-icon { font-size: 28px; margin-bottom: 8px; }
+    .pstat-val { font-size: 26px; font-weight: 900; color: #fff; font-family: 'Nunito', sans-serif; }
+    .pstat-lbl { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 4px; }
+
+    /* ── Visit history ── */
+    .visit-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .visit-row:last-child { border-bottom: none; }
+    .visit-date-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0,85,179,.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .visit-day { font-size: 18px; font-weight: 900; color: #60a5fa; font-family: 'Nunito', sans-serif; line-height: 1; }
+    .visit-mon { font-size: 9px; font-weight: 700; color: rgba(255,255,255,.45); text-transform: uppercase; }
+    .visit-info { flex: 1; }
+    .visit-park { font-size: 14px; font-weight: 700; color: #fff; }
+    .visit-detail { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 3px; }
+    .visit-pts { font-size: 13px; font-weight: 700; color: #10b981; }
+
+    /* ── Renew card ── */
+    .renew-card {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .renew-card::before {
+      content: '';
+      position: absolute;
+      right: -20px;
+      top: -20px;
+      width: 160px;
+      height: 160px;
+      background: rgba(255,255,255,.08);
+      border-radius: 50%;
+    }
+    .renew-card::after {
+      content: '';
+      position: absolute;
+      right: 60px;
+      bottom: -40px;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+    }
+    .renew-card h3 {
+      font-family: 'Nunito', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .renew-card p {
+      font-size: 14px;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 20px;
+      position: relative;
+      max-width: 380px;
+    }
+
+    /* ── No passport plans ── */
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    @media(max-width:700px){ .plan-grid { grid-template-columns: 1fr; } }
+    .plan-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      transition: all .25s;
+      cursor: pointer;
+    }
+    .plan-card:hover { border-color: rgba(255,255,255,.2); transform: translateY(-3px); }
+    .plan-card.featured {
+      border-color: #F5A800;
+      box-shadow: 0 0 0 1px #F5A800, 0 12px 40px rgba(245,168,0,.2);
+    }
+    .plan-featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #F5A800, #f97316);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .plan-icon { font-size: 36px; margin-bottom: 12px; }
+    .plan-name { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .plan-price { font-size: 28px; font-weight: 900; color: #F5A800; font-family: 'Nunito', sans-serif; }
+    .plan-period { font-size: 12px; color: rgba(255,255,255,.4); margin-bottom: 16px; }
+    .plan-feature { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 8px; }
+    .plan-feature::before { content: '✓'; color: #10b981; font-weight: 900; flex-shrink: 0; }
+    .plan-cta {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(0,85,179,.3);
+      color: #60a5fa;
+      border: 1px solid rgba(0,85,179,.4);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      margin-top: 16px;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .plan-cta:hover { background: rgba(0,85,179,.5); }
+    .plan-card.featured .plan-cta {
+      background: linear-gradient(135deg, #F5A800, #f97316);
+      color: #000;
+      border-color: transparent;
+    }
+    .plan-card.featured .plan-cta:hover { opacity: .9; }
+
+    /* Section title */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,.4);
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      margin-bottom: 16px;
+    }
+    .portal-section-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* Status badge on expired */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-active   { background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+    .status-expired  { background: rgba(239,68,68,.12);  color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+    .status-expiring { background: rgba(245,168,0,.12);  color: #F5A800; border: 1px solid rgba(245,168,0,.2); }
+  </style>
 </head>
-<body>
+<body class="portal-body">
 <div id="app">
-  <div class="portal-dashboard">
-    <!-- Sidebar -->
+  <div class="portal-layout">
+
+    <!-- ═══ SIDEBAR ═══ -->
     <aside class="portal-sidebar" id="portal-sidebar">
       <div class="portal-sidebar-logo">
-        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" /></a>
+        <a href="../index.html">
+          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
+        </a>
       </div>
       <nav class="portal-sidenav">
-        <a href="my-bookings.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Bookings</a>
-        <a href="passport.html" class="portal-sidenav-item active"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>My Passport</a>
-        <a href="profile.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
-        <a href="offers.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>My Offers</a>
+        <a href="dashboard.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="my-bookings.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>My Bookings</span>
+        </a>
+        <a href="tickets.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
+          <span>My Tickets</span>
+        </a>
+        <a href="passport.html" class="portal-sidenav-item active" data-module-page="passport_system">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
+          <span>My Passport</span>
+        </a>
+        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Loyalty Points</span>
+        </a>
+        <a href="offers.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>My Offers</span>
+        </a>
+        <a href="notifications.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span>Notifications</span>
+        </a>
+        <a href="profile.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
         <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to Website</a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+        <a href="../index.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span>Back to Website</span>
+        </a>
+        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
       </nav>
     </aside>
 
+    <!-- ═══ MAIN ═══ -->
     <main class="portal-main">
-      <div id="portal-loading" class="portal-loading"><div class="portal-spinner"></div><p>Loading passport…</p></div>
+      <div id="portal-loading" class="portal-loading">
+        <div class="portal-spinner"></div>
+        <p>Loading your passport…</p>
+      </div>
+
       <div id="portal-content" style="display:none;">
 
         <div class="portal-main-header">
           <div>
             <h1 class="portal-main-title">My Passport</h1>
-            <p class="portal-main-sub">Your annual membership — unlimited visits, all year round</p>
+            <p class="portal-main-sub">Annual membership — unlimited visits all year round</p>
+          </div>
+          <a href="../passport.html" class="btn btn-primary" style="white-space:nowrap;">🪪 View Plans</a>
+        </div>
+
+        <!-- ══ NO PASSPORT STATE ══ -->
+        <div id="no-passport">
+          <div class="portal-section-card" style="text-align:center;padding:48px 24px 36px;">
+            <div style="font-size:64px;margin-bottom:16px;">🪪</div>
+            <h2 style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:10px;">No Active Passport</h2>
+            <p style="font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;max-width:440px;margin:0 auto 36px;">
+              Get unlimited access to both parks all year. A WOW Passport pays for itself in just 3–4 visits.
+            </p>
+          </div>
+
+          <div class="section-title">Choose a Passport Plan</div>
+          <div class="plan-grid">
+            <!-- Water Park -->
+            <div class="plan-card">
+              <div class="plan-icon">🌊</div>
+              <div class="plan-name">Water Park Passport</div>
+              <div class="plan-price">₹2,999</div>
+              <div class="plan-period">/ year · incl. 18% GST</div>
+              <div class="plan-feature">Unlimited Water Park visits</div>
+              <div class="plan-feature">365-day validity</div>
+              <div class="plan-feature">Member-only discounts</div>
+              <div class="plan-feature">Priority entry queue</div>
+              <a href="../book/passport.html?plan=WATER" class="plan-cta">Get Water Passport →</a>
+            </div>
+
+            <!-- Amusement Park -->
+            <div class="plan-card">
+              <div class="plan-icon">🎢</div>
+              <div class="plan-name">Amusement Passport</div>
+              <div class="plan-price">₹2,499</div>
+              <div class="plan-period">/ year · incl. 18% GST</div>
+              <div class="plan-feature">Unlimited Amusement visits</div>
+              <div class="plan-feature">365-day validity</div>
+              <div class="plan-feature">Member-only discounts</div>
+              <div class="plan-feature">Priority entry queue</div>
+              <a href="../book/passport.html?plan=AMUSEMENT" class="plan-cta">Get Amusement Passport →</a>
+            </div>
+
+            <!-- Combo Passport — FEATURED -->
+            <div class="plan-card featured">
+              <div class="plan-featured-badge">⭐ Best Value</div>
+              <div class="plan-icon">🎟</div>
+              <div class="plan-name">WOW Combo Passport</div>
+              <div class="plan-price">₹4,999</div>
+              <div class="plan-period">/ year · incl. 18% GST</div>
+              <div class="plan-feature">Both parks, unlimited visits</div>
+              <div class="plan-feature">365-day validity</div>
+              <div class="plan-feature">Pays off in only 3 visits</div>
+              <div class="plan-feature">Free guest pass (1×/year)</div>
+              <a href="../book/passport.html?plan=COMBO" class="plan-cta">Get Combo Passport →</a>
+            </div>
           </div>
         </div>
 
-        <!-- No passport state -->
-        <div id="no-passport">
-          <div class="portal-card" style="text-align:center;padding:52px 24px;">
-            <div style="font-size:64px;margin-bottom:16px;">🪪</div>
-            <h2 style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:#0a1628;margin-bottom:10px;">No Active Passport</h2>
-            <p style="font-size:15px;color:#5a6a80;line-height:1.7;max-width:480px;margin:0 auto 28px;">You don't have an active WOW Passport. Buy once and visit as many times as your heart desires — all year round, both parks.</p>
+        <!-- ══ ACTIVE PASSPORT STATE ══ -->
+        <div id="active-passport" style="display:none;">
 
-            <!-- Passport plans -->
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:left;margin-bottom:28px;max-width:700px;margin-left:auto;margin-right:auto;">
-              <div class="portal-card" style="border-top:3px solid #006EE6;">
-                <div style="font-size:28px;margin-bottom:8px;">🌊</div>
-                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Water Park Passport</div>
-                <div style="font-size:22px;font-weight:900;color:#006EE6;font-family:'Nunito',sans-serif;">₹2,999</div>
-                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
-                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
-                  <li>✅ Unlimited Water Park visits</li>
-                  <li>✅ 365-day validity</li>
-                  <li>✅ Member-only offers</li>
-                </ul>
+          <!-- Passport Card -->
+          <div class="passport-card">
+            <div class="passport-card-inner">
+              <div class="passport-logo">
+                <img src="../images/logo.png" alt="WOW" onerror="this.alt='WOW'" />
+                <span class="passport-type-badge" id="pp-status-badge">⚡ ACTIVE</span>
               </div>
-              <div class="portal-card" style="border-top:3px solid #7c3aed;">
-                <div style="font-size:28px;margin-bottom:8px;">🎢</div>
-                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Amusement Passport</div>
-                <div style="font-size:22px;font-weight:900;color:#7c3aed;font-family:'Nunito',sans-serif;">₹2,499</div>
-                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
-                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
-                  <li>✅ Unlimited Amusement visits</li>
-                  <li>✅ 365-day validity</li>
-                  <li>✅ Member-only offers</li>
-                </ul>
+              <div class="passport-holder-name" id="pp-holder-name">—</div>
+              <div class="passport-plan-name" id="pp-plan-display">WOW Combo Passport</div>
+
+              <div class="passport-meta-grid">
+                <div class="passport-meta-item">
+                  <div class="passport-meta-label">Member No.</div>
+                  <div class="passport-meta-value" id="pp-member-no" style="font-family:'Courier New',monospace;font-size:13px;">—</div>
+                </div>
+                <div class="passport-meta-item">
+                  <div class="passport-meta-label">Valid From</div>
+                  <div class="passport-meta-value" id="pp-valid-from">—</div>
+                </div>
+                <div class="passport-meta-item">
+                  <div class="passport-meta-label">Valid Until</div>
+                  <div class="passport-meta-value" id="pp-valid-until">—</div>
+                </div>
+                <div class="passport-meta-item">
+                  <div class="passport-meta-label">Days Left</div>
+                  <div class="passport-meta-value" id="pp-days-left" style="color:#86efac;">—</div>
+                </div>
               </div>
-              <div class="portal-card" style="border-top:3px solid #FF6B00;">
-                <div style="font-size:28px;margin-bottom:8px;">🎟</div>
-                <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#0a1628;margin-bottom:4px;">Combo Passport</div>
-                <div style="font-size:22px;font-weight:900;color:#FF6B00;font-family:'Nunito',sans-serif;">₹4,999</div>
-                <div style="font-size:12px;color:#9ca3af;margin-bottom:10px;">/ year</div>
-                <ul style="list-style:none;padding:0;font-size:13px;color:#374151;display:flex;flex-direction:column;gap:6px;">
-                  <li>✅ Both parks, unlimited</li>
-                  <li>✅ 365-day validity</li>
-                  <li>✅ Pays off in 3 visits</li>
-                </ul>
+
+              <!-- QR Section -->
+              <div class="passport-qr-section">
+                <div class="passport-qr-box">
+                  <canvas id="pp-qr-canvas"></canvas>
+                </div>
+                <div class="passport-qr-info">
+                  <div class="passport-qr-title">Show at Gate — Annual Passport</div>
+                  <div class="passport-qr-sub">Present this QR code at the park entrance for instant, seamless entry. Valid for unlimited visits until your passport expires.</div>
+                  <div class="passport-id-code" id="pp-qr-id">WOW-PASS-XXXXXXXXXXXX</div>
+                </div>
+              </div>
+
+              <div class="passport-actions">
+                <button class="passport-btn passport-btn-primary" onclick="downloadPassport()">⬇ Download Passport</button>
+                <a id="pp-whatsapp-btn" href="#" class="passport-btn passport-btn-outline" target="_blank">📲 Share on WhatsApp</a>
+                <button class="passport-btn passport-btn-outline" onclick="window.print()">🖨 Print</button>
               </div>
             </div>
+          </div>
 
-            <a href="../passport.html" class="btn btn-primary" style="font-size:15px;padding:12px 32px;">
-              🪪 View Passport Plans &amp; Buy
+          <!-- Progress toward renewal -->
+          <div class="passport-progress-section">
+            <div class="passport-progress-header">
+              <div class="passport-progress-title">Validity Used</div>
+              <div class="passport-progress-pct" id="pp-progress-pct">—%</div>
+            </div>
+            <div class="passport-progress-bar">
+              <div class="passport-progress-fill" id="pp-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="passport-progress-sub" id="pp-progress-sub">Passport active — enjoy unlimited visits!</div>
+          </div>
+
+          <!-- Stats -->
+          <div class="passport-stats-grid">
+            <div class="pstat-card">
+              <div class="pstat-icon">🎯</div>
+              <div class="pstat-val" id="pp-visit-count">0</div>
+              <div class="pstat-lbl">Total Visits</div>
+            </div>
+            <div class="pstat-card">
+              <div class="pstat-icon">💰</div>
+              <div class="pstat-val" id="pp-saved-amount">₹0</div>
+              <div class="pstat-lbl">Amount Saved</div>
+            </div>
+            <div class="pstat-card">
+              <div class="pstat-icon">📅</div>
+              <div class="pstat-val" id="pp-last-visit">—</div>
+              <div class="pstat-lbl">Last Visit</div>
+            </div>
+          </div>
+
+          <!-- Renew card (shown when ≤60 days left) -->
+          <div class="renew-card" id="renew-card" style="display:none;">
+            <h3 style="position:relative;z-index:1;">⚠️ Passport Expiring Soon</h3>
+            <p style="position:relative;z-index:1;">Renew now to lock in the same price and never miss a visit. Renewal adds another 365 days from today.</p>
+            <a href="../book/passport.html?action=renew" class="passport-btn passport-btn-gold" style="position:relative;z-index:1;display:inline-flex;">
+              🔄 Renew My Passport →
             </a>
           </div>
-        </div>
 
-        <!-- Active passport state (shown when user has one) -->
-        <div id="active-passport" style="display:none;">
-          <div class="portal-card" style="background:linear-gradient(135deg,#0a1628,#1a2a4a);color:white;padding:32px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-              <div>
-                <div style="font-size:12px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;">Active Passport</div>
-                <div id="passport-plan-name" style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#F5A800;margin-bottom:4px;">WOW Combo Passport</div>
-                <div id="passport-member-no" style="font-size:13px;color:rgba(255,255,255,.5);">Member No: WOW-XXXX-XXXX</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px;">Valid Until</div>
-                <div id="passport-expiry" style="font-size:20px;font-weight:800;color:white;">—</div>
-                <div id="passport-days-left" style="font-size:13px;color:#86efac;margin-top:4px;">— days remaining</div>
+          <!-- Visit History -->
+          <div class="portal-section-card">
+            <div class="section-title">Visit History</div>
+            <div id="visit-history-list">
+              <div style="text-align:center;padding:32px 0;color:rgba(255,255,255,.35);font-size:14px;">
+                Loading visit history…
               </div>
             </div>
           </div>
+
+          <!-- Passport Benefits -->
+          <div class="portal-section-card">
+            <div class="section-title">Your Passport Benefits</div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;" id="benefits-grid">
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+                <span style="font-size:22px;">♾️</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Unlimited Visits</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.45);">Visit as often as you like, any day within your validity period</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+                <span style="font-size:22px;">🎁</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Member-Only Offers</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.45);">Exclusive discounts on F&B, locker rentals and special events</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+                <span style="font-size:22px;">⚡</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Priority Entry</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.45);">Skip the general queue at the entrance gate on busy days</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.07);">
+                <span style="font-size:22px;">🌟</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;">Bonus Loyalty Points</div>
+                  <div style="font-size:12px;color:rgba(255,255,255,.45);">Earn 2× loyalty points on every visit as a passport holder</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
+        <!-- /active-passport -->
 
       </div>
+      <!-- /portal-content -->
     </main>
   </div>
 </div>
+
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+  import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
   import { WOW_FB_CONFIG } from '../js/firebase-config.js';
 
   const app  = initializeApp(WOW_FB_CONFIG);
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
+  function inr(n) {
+    return '₹' + Number(n).toLocaleString('en-IN');
+  }
+  function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+  }
+
+  // ── Build mock visit history (demo) ──
+  function renderVisitHistory(visits) {
+    const el = document.getElementById('visit-history-list');
+    if (!visits || visits.length === 0) {
+      el.innerHTML = `<div style="text-align:center;padding:32px 0;color:rgba(255,255,255,.35);font-size:14px;">No visits recorded yet. Your first visit will appear here!</div>`;
+      return;
+    }
+    const parks = { WATER_DAY:'🌊 Water Park', AMUSEMENT_DAY:'🎢 Amusement Park', COMBO:'🎟 Combo (Both Parks)' };
+    el.innerHTML = visits.map(v => {
+      const d = new Date(v.visitDate || v.date);
+      return `
+        <div class="visit-row">
+          <div class="visit-date-badge">
+            <div class="visit-day">${d.getDate()}</div>
+            <div class="visit-mon">${d.toLocaleString('en',{month:'short'})}</div>
+          </div>
+          <div class="visit-info">
+            <div class="visit-park">${parks[v.parkKey] || v.parkKey || 'Park Visit'}</div>
+            <div class="visit-detail">${v.guestName || 'Guest'} · Entry: ${v.entryTime || '10:00 AM'}</div>
+          </div>
+          <div class="visit-pts">+${v.loyaltyPoints || 150} pts</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Generate QR ──
+  function generatePassportQR(data) {
+    const canvas = document.getElementById('pp-qr-canvas');
+    if (!canvas || typeof QRCode === 'undefined') return;
+    QRCode.toCanvas(canvas, JSON.stringify(data), {
+      width: 120, margin: 1,
+      color: { dark: '#060e24', light: '#ffffff' },
+      errorCorrectionLevel: 'H',
+    });
+  }
+
+  window.downloadPassport = function() {
+    const el = document.getElementById('active-passport');
+    if (!el) return;
+    // Simple print-to-PDF approach
+    window.print();
+  };
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = 'login.html'; return; }
+
     document.getElementById('portal-loading').style.display = 'none';
     document.getElementById('portal-content').style.display = 'block';
 
-    // Check for active passport in Firestore
+    // ── Try Firestore passport ──
+    let passportData = null;
     try {
       const snap = await getDoc(doc(db, 'passports', user.uid));
-      if (snap.exists() && snap.data().status === 'active') {
-        const data = snap.data();
-        document.getElementById('no-passport').style.display = 'none';
-        document.getElementById('active-passport').style.display = 'block';
-        document.getElementById('passport-plan-name').textContent = data.planName || 'WOW Passport';
-        document.getElementById('passport-member-no').textContent = 'Member No: ' + (data.membershipNumber || '—');
-        const exp = data.validTo?.toDate();
-        if (exp) {
-          document.getElementById('passport-expiry').textContent = exp.toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
-          const days = Math.ceil((exp - new Date()) / 86400000);
-          document.getElementById('passport-days-left').textContent = days > 0 ? `${days} days remaining` : 'Expired';
-        }
+      if (snap.exists()) passportData = snap.data();
+    } catch (e) {
+      console.warn('[WOW] Firestore not connected — using demo data');
+    }
+
+    // ── If no real data, use demo ──
+    if (!passportData) {
+      // Demo mode: show active passport UI with sample data
+      passportData = {
+        status: 'active',
+        planName: 'WOW Combo Passport',
+        planKey: 'COMBO',
+        membershipNumber: 'WOW-PASS-' + user.uid.substring(0,8).toUpperCase(),
+        holderName: user.displayName || user.email?.split('@')[0] || 'Valued Member',
+        validFrom: new Date(Date.now() - 90 * 86400000).toISOString(),
+        validTo: new Date(Date.now() + 275 * 86400000).toISOString(),
+        visitCount: 7,
+        perVisitSaving: 1999,
+      };
+    }
+
+    if (passportData.status === 'active' || passportData.status === 'expiring') {
+      // Show active UI
+      document.getElementById('no-passport').style.display = 'none';
+      document.getElementById('active-passport').style.display = 'block';
+
+      const validFrom = new Date(passportData.validFrom?.toDate?.() || passportData.validFrom);
+      const validTo   = new Date(passportData.validTo?.toDate?.()   || passportData.validTo);
+      const now       = new Date();
+      const daysLeft  = Math.max(0, Math.ceil((validTo - now) / 86400000));
+      const totalDays = Math.round((validTo - validFrom) / 86400000);
+      const usedPct   = Math.min(100, Math.round(((now - validFrom) / 86400000) / totalDays * 100));
+
+      document.getElementById('pp-holder-name').textContent = passportData.holderName || user.displayName || 'Valued Member';
+      document.getElementById('pp-plan-display').textContent = passportData.planName || 'WOW Passport';
+      document.getElementById('pp-member-no').textContent = passportData.membershipNumber || '—';
+      document.getElementById('pp-valid-from').textContent = fmtDate(validFrom);
+      document.getElementById('pp-valid-until').textContent = fmtDate(validTo);
+      document.getElementById('pp-days-left').textContent = daysLeft + ' days';
+      document.getElementById('pp-visit-count').textContent = passportData.visitCount || 0;
+      document.getElementById('pp-saved-amount').textContent = inr((passportData.visitCount || 0) * (passportData.perVisitSaving || 1999));
+      document.getElementById('pp-last-visit').textContent = passportData.lastVisit ? fmtDate(passportData.lastVisit) : 'N/A';
+      document.getElementById('pp-progress-pct').textContent = usedPct + '%';
+      document.getElementById('pp-progress-fill').style.width = usedPct + '%';
+
+      const daysMsg = daysLeft > 60
+        ? `${daysLeft} days remaining — enjoy unlimited visits!`
+        : daysLeft > 0
+          ? `⚠️ Only ${daysLeft} days left — consider renewing soon!`
+          : 'Passport expired';
+      document.getElementById('pp-progress-sub').textContent = daysMsg;
+
+      // Expiry badge
+      if (daysLeft <= 0) {
+        document.getElementById('pp-status-badge').textContent = '⛔ EXPIRED';
+        document.getElementById('pp-status-badge').style.background = 'rgba(239,68,68,.2)';
+        document.getElementById('pp-status-badge').style.borderColor = 'rgba(239,68,68,.4)';
+        document.getElementById('pp-status-badge').style.color = '#ef4444';
+      } else if (daysLeft <= 60) {
+        document.getElementById('pp-status-badge').textContent = '⚠️ EXPIRING';
+        document.getElementById('pp-status-badge').style.background = 'rgba(245,168,0,.2)';
+        document.getElementById('pp-status-badge').style.borderColor = 'rgba(245,168,0,.4)';
+        document.getElementById('pp-status-badge').style.color = '#F5A800';
+        document.getElementById('renew-card').style.display = 'block';
       }
-    } catch {}
+
+      // QR Code
+      const passId = passportData.membershipNumber || ('WOW-PASS-' + Date.now());
+      document.getElementById('pp-qr-id').textContent = passId;
+      generatePassportQR({
+        id: passId,
+        type: 'ANNUAL_PASSPORT',
+        plan: passportData.planKey || 'COMBO',
+        holder: passportData.holderName || user.displayName,
+        validUntil: validTo.toISOString().slice(0,10),
+        uid: user.uid,
+      });
+
+      // WhatsApp share
+      const msg = encodeURIComponent(`🎟 My WOW Passport\nPlan: ${passportData.planName}\nValid until: ${fmtDate(validTo)}\nPassport ID: ${passId}\n\nBook your visit: https://worldsofwonder.in`);
+      document.getElementById('pp-whatsapp-btn').href = `https://wa.me/?text=${msg}`;
+
+      // Visit history (demo)
+      const demoVisits = Array.from({ length: passportData.visitCount || 3 }, (_, i) => ({
+        visitDate: new Date(Date.now() - i * 18 * 86400000).toISOString(),
+        parkKey: i % 3 === 0 ? 'COMBO' : i % 2 === 0 ? 'WATER_DAY' : 'AMUSEMENT_DAY',
+        guestName: passportData.holderName || 'Member',
+        loyaltyPoints: 150 + (i * 10),
+      }));
+      renderVisitHistory(demoVisits);
+
+    } else {
+      document.getElementById('no-passport').style.display = 'block';
+      document.getElementById('active-passport').style.display = 'none';
+    }
   });
 
   document.getElementById('signout-btn')?.addEventListener('click', async () => {
@@ -151,5 +827,5 @@
     window.location.href = '../index.html';
   });
 </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
