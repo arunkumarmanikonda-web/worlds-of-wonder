@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passport Products Config — WOW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold-light:#F0D080;--gold-dark:#9A6F2A;--bg:#0a0a14;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:#0e0e22;border-bottom:1px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .tb-brand{display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:800;color:var(--gold)}
+    .tb-brand .ico{width:34px;height:34px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem}
+    .tb-actions{display:flex;gap:10px}
+    .btn{padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;border:none;text-decoration:none}
+    .btn.gold{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0a0a14}
+    .btn.gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
+    .btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+    .btn.outline:hover{border-color:var(--gold);color:var(--gold)}
+    .btn.green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+    .btn.red{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+    .content{max-width:1100px;margin:0 auto;padding:28px 24px}
+    .page-head{margin-bottom:28px}
+    .page-head h1{font-size:1.4rem;font-weight:900}
+    .page-head h1 span{color:var(--gold)}
+    .page-head p{font-size:.85rem;color:var(--muted);margin-top:4px}
+    /* PLAN CARDS EDITOR */
+    .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+    .plan-editor{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .2s}
+    .plan-editor:hover{box-shadow:0 4px 20px rgba(201,168,76,.1)}
+    .pe-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .pe-head h3{font-size:.92rem;font-weight:800;display:flex;align-items:center;gap:8px}
+    .pe-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800}
+    .pe-badge.water{background:rgba(59,130,246,.15);color:#60a5fa}
+    .pe-badge.amuse{background:rgba(168,85,247,.15);color:#c084fc}
+    .pe-badge.combo{background:rgba(201,168,76,.15);color:var(--gold)}
+    .pe-body{padding:16px 18px}
+    .pe-toggle{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+    .toggle-sw{position:relative;width:42px;height:22px;flex-shrink:0}
+    .toggle-sw input{opacity:0;width:0;height:0}
+    .toggle-sw .sw-track{position:absolute;inset:0;background:#2a2a4a;border-radius:20px;cursor:pointer;transition:.3s}
+    .toggle-sw .sw-track::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+    .toggle-sw input:checked+.sw-track{background:var(--green)}
+    .toggle-sw input:checked+.sw-track::before{transform:translateX(20px)}
+    .field{margin-bottom:12px}
+    .field label{font-size:.7rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+    .field input,.field select,.field textarea{width:100%;background:#0d0d22;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;color:#fff;font-size:.85rem;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+    .field select option{background:#0d0d22}
+    .field textarea{resize:vertical;min-height:70px}
+    .price-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    /* BENEFITS EDITOR */
+    .ben-list{list-style:none;margin-bottom:10px}
+    .ben-item{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+    .ben-item input{flex:1;background:#0d0d22;border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:#fff;font-size:.78rem;font-family:'Nunito',sans-serif;outline:none}
+    .ben-item input:focus{border-color:var(--gold)}
+    .ben-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;transition:color .2s;padding:0 4px}
+    .ben-del:hover{color:var(--red)}
+    .add-ben-btn{font-size:.75rem;color:var(--gold);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;display:flex;align-items:center;gap:5px}
+    .add-ben-btn:hover{opacity:.8}
+    /* VOUCHERS */
+    .voucher-editor{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+    .voucher-field{background:#0d0d22;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:4px}
+    .voucher-field label{font-size:.65rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+    .voucher-field input{background:none;border:none;color:var(--gold);font-size:.9rem;font-weight:800;font-family:'Poppins',sans-serif;outline:none;width:100%}
+    /* AGENTS SECTION */
+    .section-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:24px}
+    .sc-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .sc-head h2{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
+    .sc-head h2 i{color:var(--gold)}
+    .sc-body{padding:16px 20px}
+    .agent-table{width:100%;border-collapse:collapse}
+    .agent-table th{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:700}
+    .agent-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem;vertical-align:middle}
+    .agent-table tr:last-child td{border-bottom:none}
+    .agent-table tr:hover td{background:rgba(255,255,255,.02)}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+    .badge.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .badge.red{background:rgba(239,68,68,.15);color:var(--red)}
+    .badge.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    /* MODAL */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center}
+    .modal.show{display:flex}
+    .modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+    .modal-box h3{font-size:1.1rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .modal-box h3 i{color:var(--gold)}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+    .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--card);border:1px solid var(--green);border-radius:12px;padding:14px 20px;font-size:.85rem;font-weight:700;color:var(--green);display:none;align-items:center;gap:8px;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+    .toast.show{display:flex}
+    @media(max-width:900px){.plans-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-brand"><div class="ico"><i class="fas fa-passport"></i></div>Passport Products Config</div>
+  <div class="tb-actions">
+    <a href="index.html" class="btn outline"><i class="fas fa-arrow-left"></i> Admin Home</a>
+    <button class="btn gold" onclick="saveAllPlans()"><i class="fas fa-save"></i> Save All Changes</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="page-head">
+    <h1>Passport <span>Products & Plans</span></h1>
+    <p>Configure passport plans, pricing, entry limits, benefits, vouchers and agent commissions. Changes reflect in the sales portal immediately.</p>
+  </div>
+
+  <!-- PLAN CARDS -->
+  <div class="plans-grid" id="plansGrid">
+    <!-- Generated by JS -->
+  </div>
+
+  <!-- AGENTS MANAGEMENT -->
+  <div class="section-card">
+    <div class="sc-head">
+      <h2><i class="fas fa-users"></i> Sales Agents Management</h2>
+      <button class="btn gold" onclick="openAgentModal()"><i class="fas fa-plus"></i> Add Agent</button>
+    </div>
+    <div class="sc-body">
+      <table class="agent-table">
+        <thead><tr><th>Agent</th><th>Employee ID</th><th>Zone</th><th>Role</th><th>Monthly Target</th><th>Commission %</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="agentsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GLOBAL SETTINGS -->
+  <div class="section-card">
+    <div class="sc-head"><h2><i class="fas fa-cog"></i> Global Passport Settings</h2></div>
+    <div class="sc-body">
+      <div class="form-grid-2">
+        <div class="field"><label>Passport Validity (Days)</label><input type="number" id="validityDays" value="365"/></div>
+        <div class="field"><label>Max Entries Per Visit</label><input type="number" id="maxEntries" value="1"/></div>
+        <div class="field"><label>Guest Pass Limit/Month</label><input type="number" id="guestPassLimit" value="3"/></div>
+        <div class="field"><label>Agent Commission Base %</label><input type="number" id="baseCommission" value="3"/></div>
+        <div class="field"><label>OTP Verification</label>
+          <select id="otpMode"><option value="sms">SMS (MSG91)</option><option value="email">Email</option><option value="both">Both</option><option value="none">Disabled</option></select>
+        </div>
+        <div class="field"><label>Auto-send Digital Passport</label>
+          <select id="autoSend"><option value="whatsapp">WhatsApp</option><option value="email">Email</option><option value="both">Both</option><option value="manual">Manual Only</option></select>
+        </div>
+        <div class="field"><label>KYC Photo Required</label>
+          <select id="kycPhoto"><option value="yes">Yes – Mandatory</option><option value="optional">Optional</option></select>
+        </div>
+        <div class="field"><label>Portal Login Method</label>
+          <select id="loginMethod"><option value="both">Mobile OR Email</option><option value="mobile">Mobile Only</option><option value="email">Email Only</option></select>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px">
+        <button class="btn gold" onclick="saveGlobalSettings()"><i class="fas fa-save"></i> Save Global Settings</button>
+        <button class="btn outline" onclick="resetDefaults()"><i class="fas fa-undo"></i> Reset Defaults</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD AGENT MODAL -->
+<div class="modal" id="agentModal">
+  <div class="modal-box">
+    <h3><i class="fas fa-user-plus"></i> <span id="agentModalTitle">Add New Agent</span></h3>
+    <input type="hidden" id="editAgentIdx" value="-1"/>
+    <div class="form-grid-2">
+      <div class="field"><label>Full Name *</label><input type="text" id="aName" placeholder="Agent full name"/></div>
+      <div class="field"><label>Employee ID *</label><input type="text" id="aEmpId" placeholder="EMP-001"/></div>
+      <div class="field"><label>Email *</label><input type="email" id="aEmail" placeholder="agent@wow.com"/></div>
+      <div class="field"><label>Mobile</label><input type="tel" id="aMobile" placeholder="10-digit mobile" maxlength="10"/></div>
+      <div class="field"><label>Zone</label><input type="text" id="aZone" placeholder="e.g. North Delhi"/></div>
+      <div class="field"><label>Role</label>
+        <select id="aRole"><option value="agent">Field Agent</option><option value="manager">Team Manager</option><option value="senior">Senior Agent</option></select>
+      </div>
+      <div class="field"><label>Monthly Target</label><input type="number" id="aTarget" value="50" min="1"/></div>
+      <div class="field"><label>Commission %</label><input type="number" id="aComm" value="3" step="0.5" min="0"/></div>
+    </div>
+    <div class="field"><label>Default PIN (4 digits)</label><input type="password" id="aPin" placeholder="4-digit PIN" maxlength="4" inputmode="numeric"/></div>
+    <div class="field"><label>Default Password</label><input type="password" id="aPwd" placeholder="Temporary password"/></div>
+    <div class="modal-footer">
+      <button class="btn outline" onclick="closeModal('agentModal')">Cancel</button>
+      <button class="btn gold" onclick="saveAgent()"><i class="fas fa-check"></i> Save Agent</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toastMsg">Saved!</span></div>
+
+<script>
+const DEFAULT_PLANS = [
+  {
+    key:'water', name:'Water Park Passport', active:true,
+    badge:'water', icon:'fa-water',
+    basePrice:2999, strikePrice:3999, gst:18, maxEntries:999, validity:365,
+    benefits:['Unlimited water park entries (365 days)','10% discount on F&B','2 free guest passes/month','Priority queue access','3 free meal vouchers','10% off merchandise'],
+    vouchers:[{label:'Meal Vouchers',val:'3x'},{label:'F&B Discount',val:'₹200'},{label:'Guest Passes',val:'2x/mo'}],
+    commission:3, highlights:'Best for Water Park lovers!'
+  },
+  {
+    key:'amuse', name:'Amusement Passport', active:true,
+    badge:'amuse', icon:'fa-gamepad',
+    basePrice:2499, strikePrice:3499, gst:18, maxEntries:999, validity:365,
+    benefits:['Unlimited amusement park entries','15% discount on all rides','1 free guest pass/month','Exclusive member events','2 free meal vouchers','Birthday special privileges'],
+    vouchers:[{label:'Meal Vouchers',val:'2x'},{label:'Ride Discount',val:'₹150'},{label:'Guest Pass',val:'1x/mo'}],
+    commission:3, highlights:'Perfect for thrill seekers!'
+  },
+  {
+    key:'combo', name:'Combo Passport', active:true,
+    badge:'combo', icon:'fa-star',
+    basePrice:4999, strikePrice:6999, gst:18, maxEntries:999, validity:365,
+    benefits:['Both Water + Amusement parks unlimited','20% discount on F&B & merchandise','3 free guest passes/month','VIP lounge access','5 free meal vouchers','Free locker every visit','Exclusive combo events'],
+    vouchers:[{label:'Meal Vouchers',val:'5x'},{label:'F&B Voucher',val:'₹500'},{label:'Guest Passes',val:'3x/mo'},{label:'Locker/Visit',val:'FREE'}],
+    commission:4, highlights:'Best value – both parks!'
+  },
+];
+
+const DEFAULT_AGENTS = [
+  {name:'Raj Sharma',empId:'EMP-001',email:'raj.sharma@wow.com',mobile:'9811001001',zone:'North Delhi',role:'agent',target:50,commission:3,pin:'1234',pwd:'Pass@1234',status:'active'},
+  {name:'Priya Singh',empId:'EMP-002',email:'priya.singh@wow.com',mobile:'9811001002',zone:'Rohini',role:'agent',target:60,commission:3,pin:'2345',pwd:'Pass@1234',status:'active'},
+  {name:'Karan Verma',empId:'EMP-003',email:'karan.verma@wow.com',mobile:'9811001003',zone:'Dwarka',role:'agent',target:45,commission:3,pin:'3456',pwd:'Pass@1234',status:'active'},
+  {name:'Amit Kumar',empId:'MGR-001',email:'amit.kumar@wow.com',mobile:'9811001004',zone:'All Zones',role:'manager',target:200,commission:2,pin:'5678',pwd:'Mgr@5678',status:'active'},
+];
+
+let plans = JSON.parse(localStorage.getItem('wow_passport_plans')||JSON.stringify(DEFAULT_PLANS));
+let agents = JSON.parse(localStorage.getItem('wow_passport_agents')||JSON.stringify(DEFAULT_AGENTS));
+
+function renderPlans(){
+  document.getElementById('plansGrid').innerHTML = plans.map((p,i)=>`
+    <div class="plan-editor">
+      <div class="pe-head">
+        <h3><i class="fas ${p.icon}" style="color:var(--gold)"></i>${p.name}</h3>
+        <span class="pe-badge ${p.badge}">${p.badge.toUpperCase()}</span>
+      </div>
+      <div class="pe-body">
+        <div class="pe-toggle">
+          <span style="font-size:.8rem;font-weight:700">Plan Active</span>
+          <label class="toggle-sw"><input type="checkbox" ${p.active?'checked':''} onchange="plans[${i}].active=this.checked"/><div class="sw-track"></div></label>
+        </div>
+        <div class="price-row">
+          <div class="field"><label>Price (₹)</label><input type="number" value="${p.basePrice}" onchange="plans[${i}].basePrice=+this.value"/></div>
+          <div class="field"><label>Strike Price (₹)</label><input type="number" value="${p.strikePrice}" onchange="plans[${i}].strikePrice=+this.value"/></div>
+        </div>
+        <div class="price-row">
+          <div class="field"><label>GST %</label><input type="number" value="${p.gst}" onchange="plans[${i}].gst=+this.value"/></div>
+          <div class="field"><label>Commission %</label><input type="number" value="${p.commission}" step="0.5" onchange="plans[${i}].commission=+this.value"/></div>
+        </div>
+        <div class="field"><label>Validity (Days)</label><input type="number" value="${p.validity}" onchange="plans[${i}].validity=+this.value"/></div>
+        <div class="field"><label>Highlight Text</label><input type="text" value="${p.highlights}" onchange="plans[${i}].highlights=this.value"/></div>
+        <div style="margin-bottom:6px;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Benefits</div>
+        <ul class="ben-list" id="benList-${i}">
+          ${p.benefits.map((b,j)=>`<li class="ben-item"><input type="text" value="${b}" onchange="plans[${i}].benefits[${j}]=this.value"/><button class="ben-del" onclick="removeBenefit(${i},${j})"><i class="fas fa-times"></i></button></li>`).join('')}
+        </ul>
+        <button class="add-ben-btn" onclick="addBenefit(${i})"><i class="fas fa-plus-circle"></i> Add Benefit</button>
+        <div style="margin:12px 0 6px;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Vouchers / Inclusions</div>
+        <div class="voucher-editor">
+          ${p.vouchers.map((v,j)=>`<div class="voucher-field"><label>${v.label}</label><input type="text" value="${v.val}" onchange="plans[${i}].vouchers[${j}].val=this.value"/></div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addBenefit(pi){
+  plans[pi].benefits.push('New benefit');
+  renderPlans();
+}
+function removeBenefit(pi,bi){
+  plans[pi].benefits.splice(bi,1);
+  renderPlans();
+}
+
+function renderAgents(){
+  document.getElementById('agentsTbody').innerHTML = agents.map((a,i)=>`
+    <tr>
+      <td><div style="font-weight:700">${a.name}</div><div style="font-size:.7rem;color:var(--muted)">${a.email}</div></td>
+      <td style="font-family:'Poppins',sans-serif;font-weight:700;font-size:.82rem">${a.empId}</td>
+      <td>${a.zone}</td>
+      <td><span class="badge ${a.role==='manager'?'gold':a.role==='senior'?'blue':'green'}">${a.role}</span></td>
+      <td>${a.target}/mo</td>
+      <td>${a.commission}%</td>
+      <td><span class="badge ${a.status==='active'?'green':'red'}">${a.status}</span></td>
+      <td style="display:flex;gap:6px">
+        <button class="btn outline" style="padding:4px 10px;font-size:.72rem" onclick="editAgent(${i})"><i class="fas fa-edit"></i></button>
+        <button class="btn red" style="padding:4px 10px;font-size:.72rem" onclick="toggleAgentStatus(${i})">${a.status==='active'?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function openAgentModal(){
+  document.getElementById('agentModalTitle').textContent='Add New Agent';
+  document.getElementById('editAgentIdx').value='-1';
+  ['aName','aEmpId','aEmail','aMobile','aZone','aPin','aPwd'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('aTarget').value='50';
+  document.getElementById('aComm').value='3';
+  document.getElementById('aRole').value='agent';
+  document.getElementById('agentModal').classList.add('show');
+}
+function editAgent(i){
+  const a=agents[i];
+  document.getElementById('agentModalTitle').textContent='Edit Agent';
+  document.getElementById('editAgentIdx').value=i;
+  document.getElementById('aName').value=a.name;
+  document.getElementById('aEmpId').value=a.empId;
+  document.getElementById('aEmail').value=a.email;
+  document.getElementById('aMobile').value=a.mobile||'';
+  document.getElementById('aZone').value=a.zone;
+  document.getElementById('aRole').value=a.role;
+  document.getElementById('aTarget').value=a.target;
+  document.getElementById('aComm').value=a.commission;
+  document.getElementById('aPin').value=a.pin;
+  document.getElementById('aPwd').value=a.pwd;
+  document.getElementById('agentModal').classList.add('show');
+}
+function saveAgent(){
+  const idx=parseInt(document.getElementById('editAgentIdx').value);
+  const ag={
+    name:document.getElementById('aName').value,
+    empId:document.getElementById('aEmpId').value,
+    email:document.getElementById('aEmail').value,
+    mobile:document.getElementById('aMobile').value,
+    zone:document.getElementById('aZone').value,
+    role:document.getElementById('aRole').value,
+    target:+document.getElementById('aTarget').value,
+    commission:+document.getElementById('aComm').value,
+    pin:document.getElementById('aPin').value,
+    pwd:document.getElementById('aPwd').value,
+    status:'active'
+  };
+  if(!ag.name||!ag.empId||!ag.email){alert('Name, Employee ID, and Email are required.');return;}
+  if(idx===-1) agents.push(ag); else agents[idx]={...agents[idx],...ag};
+  localStorage.setItem('wow_passport_agents',JSON.stringify(agents));
+  renderAgents();
+  closeModal('agentModal');
+  showToast('Agent saved successfully!');
+}
+function toggleAgentStatus(i){
+  agents[i].status=agents[i].status==='active'?'inactive':'active';
+  localStorage.setItem('wow_passport_agents',JSON.stringify(agents));
+  renderAgents();
+}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function saveAllPlans(){
+  localStorage.setItem('wow_passport_plans',JSON.stringify(plans));
+  showToast('All plan changes saved!');
+}
+function saveGlobalSettings(){
+  const s={
+    validityDays:+document.getElementById('validityDays').value,
+    maxEntries:+document.getElementById('maxEntries').value,
+    guestPassLimit:+document.getElementById('guestPassLimit').value,
+    baseCommission:+document.getElementById('baseCommission').value,
+    otpMode:document.getElementById('otpMode').value,
+    autoSend:document.getElementById('autoSend').value,
+    kycPhoto:document.getElementById('kycPhoto').value,
+    loginMethod:document.getElementById('loginMethod').value,
+  };
+  localStorage.setItem('wow_passport_settings',JSON.stringify(s));
+  showToast('Global settings saved!');
+}
+function resetDefaults(){if(confirm('Reset all plans to defaults?')){plans=[...DEFAULT_PLANS];renderPlans();showToast('Defaults restored!');}}
+function showToast(msg){
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+// Close modal on outside click
+document.getElementById('agentModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal('agentModal')});
+
+renderPlans();
+renderAgents();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
