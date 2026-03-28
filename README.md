@@ -1,309 +1,204 @@
-# 🎡 Worlds of Wonder — Full-Stack Digital Platform
-
-**Worlds of Wonder, Noida** — Complete digital operations platform covering public website, customer portal, partner/TA portal, passport programme, admin ERP, and sales CRM.
-
-Reference: [worldsofwonder.in](https://worldsofwonder.in)
+# Worlds of Wonder — Digital Platform
+**Version 8.0 · March 2025**  
+Live: https://worldsofwonder.in | Repo: https://github.com/arunkumarmanikonda-web/worlds-of-wonder
 
 ---
 
-## 📁 Project Structure
+## Platform Overview
+
+Full-stack digital platform for Worlds of Wonder (WOW), Delhi NCR's premier dual-park destination. Includes the public website, customer portal, internal staff portals, partner ERPs, passport system, and sales tools.
+
+---
+
+## Directory Structure
 
 ```
-/                          → Public-facing website (root)
-/admin/                    → Admin ERP (36 pages)
-/partner/                  → TA/Reseller partner portal (13 pages)
-/portal/                   → Customer portal (13 pages)
-/passport/                 → WOW Passport holder portal (3 pages)
-/sales/                    → Sales ERP (13 pages)
-/book/                     → Booking flows
-/groups/                   → Group/school booking
-/css/                      → Shared design system
-/js/                       → Shared scripts
-/images/                   → Static assets
-/data/                     → Static JSON data
+/                   Public website (index.html, water-park, amusement-park, combo, etc.)
+/css/               Master stylesheets
+/js/                Shared JS (shell.js, modules, booking)
+/images/            All park images and logo (logo.png — unaltered)
+/book/              Booking flow (payment, confirmation)
+/groups/            Group pages (corporate, schools, birthdays)
+/portal/            Customer portal (login, dashboard, tickets, passport, loyalty, wallet)
+/passport/          Passport holder portal (login, register, my-passport)
+/internal/          Staff gateway — single login selector for all portals
+/admin/             Admin & Operations ERP (36+ pages)
+/sales/             Sales Force ERP (passport sales, CRM, agents, reports)
+/partner/           Partner portal (TA/reseller onboarding, KYC, dashboard)
+/reseller/          Reseller ERP (inventory, bulk tickets, team, commissions)
+/ta/                Travel Agent ERP (leads, pipeline, team, bookings)
+/data/              Static JSON data files
 ```
 
 ---
 
-## ✅ Completed Pages
+## Completed Features
 
-### 🌐 Public Website (root)
-| File | Description |
-|------|-------------|
-| `index.html` | Homepage — hero, rides preview, offers, passport CTA |
-| `water-park.html` | Water Park rides & attractions |
-| `amusement-park.html` | Amusement Park rides & attractions |
-| `combo.html` | Combo ticket page |
-| `offers.html` | Seasonal offers & discounts |
-| `passport.html` | WOW Passport marketing page |
-| `plan-your-visit.html` | Visitor guide |
-| `rides-attractions.html` | Full rides & attractions listing |
-| `safety-guidelines.html` | Safety guidelines |
-| `schools.html` | School groups page |
-| `birthdays.html` | Birthday packages |
-| `corporate.html` | Corporate bookings |
-| `travel-agent.html` | TA landing page |
-| `reseller.html` | Reseller landing page |
-| `gallery.html` | Photo/video gallery |
-| `faq.html` | FAQ |
-| `contact.html` | Contact page |
+### Public Website
+- [x] Homepage with cinematic hero carousel (YouTube BG + photo slides)
+- [x] Water Park, Amusement Park, Combo, Passport public pages
+- [x] Offers, Gallery, FAQ, Plan Your Visit, Safety Guidelines, Contact
+- [x] Mega-nav with dropdown menus, live weather chip (Open-Meteo)
+- [x] Cheeky Hinglish comms ticker
+- [x] Customer login buttons (Individual + Business) BEFORE the WOW logo in nav
+- [x] All internal/staff portal links in footer
+- [x] Groups pages (Corporate, Schools, Birthdays)
+- [x] Real-time weather display
+- [x] WOW logo unaltered across all 100+ pages
 
----
+### WOW Passport System (Indian Passport Design)
+- [x] `portal/wow-passport.html` — Full Indian passport-style digital passport
+- [x] Three tiers: **Explore** (₹1,999 · 5 visits), **Together** (₹3,499 · 10 visits · 4 pax), **Legacy** (₹5,999 · Unlimited · 1 year)
+- [x] Passport cover with embossed guilloché background, emblem, gold bar accent
+- [x] Biographical data page with MRZ (Machine Readable Zone)
+- [x] Visa-stamp style voucher pages — each voucher has its own QR code (used/unused states)
+- [x] Validity circle with days/tier info
+- [x] Passport privileges page per tier
+- [x] Back cover with master QR code
+- [x] QRCode.js integration for dynamic QR generation
+- [x] Download / Share / Scan at Gate actions
 
-### 🎫 WOW Passport Holder Portal (`/passport/`)
-| File | Description |
-|------|-------------|
-| `login.html` | Passport holder login — Mobile OTP or Passport ID + PIN |
-| `register.html` | 5-step registration: Plan → Details → KYC → PIN → Payment |
-| `my-passport.html` | Passport dashboard — Physical card, QR, vouchers, history, profile |
+### Internal Staff Gateway
+- [x] `internal/index.html` — Unified portal selector for all staff roles
+- [x] Single-page with login modals per portal (Super Admin, Admin, Sales, Passport, Call Centre, Reseller, Travel Agent, Corporate)
+- [x] Full Authority & Access Matrix table
+- [x] Super Admin shortcut with credentials pre-noted
 
-**3-Tier Passport Programme:**
-| Tier | Badge | Price | Visits | Users | Validity |
-|------|-------|-------|--------|-------|----------|
-| WOW Explore Pass | 🔵 Entry | ₹2,499 | 4 | 1 adult | 6 months |
-| WOW Together Pass | ⚪ Duo | ₹4,999 | 4 | 1A + 1C | 6–9 months |
-| WOW Legacy Pass | 🔴 Premium | ₹9,999 | 8 | 2A + 2C | 12 months |
+### Super Admin Panel
+- [x] `admin/super-admin.html` — Complete super admin control panel
+- [x] Dashboard with stats + pending KYC approvals
+- [x] User Management — create, edit, suspend all role types
+- [x] Module Control — 21 modules with live toggle (on/off checkboxes)
+- [x] Rights & Roles — full escalation matrix
+- [x] Audit Logs — system event trail
+- [x] Super Admin credentials: `akm@indiagully.com` / `India@5327`
 
-**Strategic Journey:** Explore → Together → Legacy (Entry → Attachment → Ownership)
+### Customer Portal (`/portal/`)
+- [x] Multi-method login: Mobile OTP, Email/Password, Google OAuth
+- [x] Business login with redirect to KYC onboarding
+- [x] Dashboard, My Bookings, Tickets, Notifications, Wallet, Loyalty, Offers
+- [x] WOW Passport (Indian passport design, all 3 tiers)
+- [x] Profile & KYC
 
----
+### Passport Holder Portal (`/passport/`)
+- [x] Login, Register with full KYC, My Passport dashboard
 
-### 👤 Customer Portal (`/portal/`)
-| File | Description |
-|------|-------------|
-| `login.html` | Customer login |
-| `register.html` | New customer registration |
-| `dashboard.html` | Customer dashboard |
-| `my-bookings.html` | Booking history |
-| `tickets.html` | My tickets (QR codes) |
-| `passport.html` | My passport view |
-| `offers.html` | Available offers |
-| `loyalty.html` | Loyalty points & rewards |
-| `profile.html` | Profile management |
-| `notifications.html` | Notifications centre |
-| `wallet.html` | WOW Wallet |
-| `forgot-password.html` | Password reset |
+### Admin ERP (`/admin/`) — 38+ pages
+- [x] Dashboard, Bookings, Tickets, Inventory, Pricing, Offers, Banners
+- [x] Passport Engine, Loyalty Engine, CRM, B2B/TA Approvals
+- [x] Ticketing Engine (Water Park + Amusement Park separate)
+- [x] F&B Packages, Reseller Config, Call Centre, Finance, Invoices
+- [x] GST Engine, Notifications, CMS, Users & Roles, Module Control
+- [x] API Secrets, System Config, Audit Logs, Advisories, Reports
+- [x] **Super Admin Panel** (user management, module toggle, rights matrix)
 
----
+### Sales ERP (`/sales/`) — 13 pages
+- [x] Passport Sales Portal (login, dashboard, KYC, payment, issued)
+- [x] Main ERP Dashboard, CRM & Leads, Agent Management
+- [x] Reports, Products, Quote Builder, Pipeline
 
-### 🤝 Partner / TA-Reseller Portal (`/partner/`)
-| File | Description |
-|------|-------------|
-| `login.html` | Partner login |
-| `onboarding.html` | Basic onboarding |
-| `onboarding-kyc.html` | 6-step Razorpay-style KYC — camera, docs, IFSC verify, auto-login |
-| `dashboard.html` | Mini-ERP — 5 KPIs, ECharts revenue, commission & TDS tracker |
-| `quote-builder.html` | Segment quotes (School/Corporate/Birthday/FIT) — live pricing, add-ons, GST, T&C |
-| `bulk-tickets.html` | Bulk QR ticket engine — 6 types, non-reusable IDs, CSV export |
-| `invoice-gst.html` | GST invoice engine — forward/reverse GST, CGST/SGST/IGST, PDF/email/WhatsApp |
-| `buy-tickets.html` | Buy tickets (partner rate) |
-| `ticket-batches.html` | Ticket batch history |
-| `invoices.html` | Partner invoice list |
-| `statements.html` | Commission statements |
-| `support.html` | Partner support |
-| `reports.html` | Partner reports |
+### Partner Portal (`/partner/`) — 13 pages
+- [x] Onboarding, KYC, Dashboard, Buy Tickets, Ticket Batches
+- [x] Quote Builder, Bulk Tickets, GST Invoice, Statements, Reports, Support
 
----
+### Reseller ERP (`/reseller/`) — NEW
+- [x] Dashboard with inventory alerts
+- [x] Ticket inventory tracking (allocated/sold/remaining with visual bars)
+- [x] Bulk ticket batch creation with QR code generation
+- [x] Team management (add agents, set daily limits, toggle rights)
+- [x] Sales history, GST invoices, commission statements
+- [x] Inventory restock request workflow
 
-### 🛡️ Admin ERP (`/admin/`) — 36 Pages
-#### Overview
-| File | Description |
-|------|-------------|
-| `index.html` | Leadership Dashboard — live KPIs, revenue, footfall, leads |
-| `bookings.html` | All bookings with filters |
-| `tickets.html` | Tickets issued — QR search, extend/block controls |
+### Travel Agent ERP (`/ta/`) — NEW
+- [x] Dashboard with leads and booking overview
+- [x] Full leads management (add, assign, score: HOT/WARM/COLD/BOOKED)
+- [x] Kanban pipeline (New → Quoted → Negotiating → Confirmed)
+- [x] Booking history with GST invoices
+- [x] Sub-agent creation with granular rights (Full / Leads Only / Bookings Only / View Only)
+- [x] Commission ledger and payout tracking
+- [x] Dedicated account manager contact card
 
-#### Commerce
-| File | Description |
-|------|-------------|
-| `inventory.html` | Inventory management — stock bars, restock alerts |
-| `pricing.html` | Pricing rules engine — 4-tab: segments, complimentary, seasonal, GST |
-| `offers.html` | Offers & campaigns |
-| `passport-engine.html` | **WOW Passport Engine** — tier config, voucher rules, upsell logic, redemption rules, analytics |
-| `loyalty-engine.html` | **Loyalty Engine** — Silver/Gold/Platinum/Diamond tiers, points rules, rewards, campaigns |
-| `passport-products.html` | Passport plans configuration |
-
-#### B2B & Partner
-| File | Description |
-|------|-------------|
-| `crm.html` | CRM & pipeline |
-| `b2b-approvals.html` | B2B group/corporate approval workflow |
-| `ta-approvals.html` | TA/Reseller KYC review queue |
-| `reseller-config.html` | Tier slabs, credit limits, TDS/payout rules |
-| `partners.html` | Partner management |
-
-#### Ticketing & F&B
-| File | Description |
-|------|-------------|
-| `ticketing-engine.html` | Rate cards, combo builder, validity matrix, segment pricing |
-| `fnb-packages.html` | F&B package grid, CSV upload, push campaigns |
-
-#### Operations
-| File | Description |
-|------|-------------|
-| `gate.html` | Gate redemption / QR scanner |
-| `ops-dashboard.html` | Live ride status, gate status, footfall, staff deployment, incidents |
-| `passport-redemptions.html` | **Passport voucher redemption** — QR scanner, redemption log, dispute audit |
-| `call-center.html` | Call Center ERP — 3-level escalation, P1–P4 queue, SLA, live activity |
-
-#### Finance
-| File | Description |
-|------|-------------|
-| `finance.html` | Finance & GST dashboard |
-| `invoices.html` | Invoice management — bulk email, status filters |
-
-#### Content & System
-| File | Description |
-|------|-------------|
-| `cms.html` | CMS |
-| `users.html` | Users & Roles |
-| `module-control.html` | Module on/off controls |
-| `api-secrets.html` | API key management |
-| `gst-engine.html` | GST configuration |
-| `notifications.html` | Notification templates |
-| `config.html` | System config — payment gateway, email, WhatsApp |
-| `audit-logs.html` | Immutable audit trail |
-| `advisories.html` | Emergency numbers, weather, traffic, safety alerts |
-
-#### Reports
-| File | Description |
-|------|-------------|
-| `reports.html` | Comprehensive reports dashboard — 12 report types, 5 charts, TA leaderboard |
+### Module Toggle System
+21 modules controllable by Super Admin:
+Ticketing Engine, WOW Passport, Loyalty Program, Combo Tickets, CRM, GST Auto-Reverse, QR Ticket Validation, F&B Packages, Weather Alerts, WhatsApp Comms, Email Engine, SMS Gateway, Reseller Module, Travel Agent Module, Corporate/Groups, Call Centre CRM, CMS & Banners, Advanced Reporting, Audit Trail, Dual Voucher Storage, Finance & Invoicing
 
 ---
 
-### 💼 Sales ERP (`/sales/`) — 13 Pages
-| File | Description |
+## Key URLs / Entry Points
+
+| Path | Description |
 |------|-------------|
-| `erp-agents.html` | **Agent Sales Portal** — login, sell passport, dashboard, commission, leaderboard, passport lookup, renewals |
-| `erp-crm.html` | **CRM & Leads** — pipeline board, all leads, follow-ups, analytics, segments |
-| `erp-dashboard.html` | Sales ERP dashboard |
-| `erp-crm.html` | CRM & leads management |
-| `erp-reports.html` | Sales reports |
-| `erp-products.html` | Product management |
-| `leads.html` | Lead management |
-| `pipeline.html` | Sales pipeline |
-| `passport-login.html` | Passport agent login |
-| `passport-dashboard.html` | Passport sales dashboard |
-| `passport-kyc.html` | Passport KYC flow |
-| `passport-payment.html` | Passport payment |
-| `passport-issued.html` | Issued passport view |
-| `quote-builder.html` | Quote builder |
+| `/` | Public homepage |
+| `/portal/login.html` | Customer login (individual + business) |
+| `/internal/index.html` | **Staff & Partner Gateway** |
+| `/admin/super-admin.html` | Super Admin Panel |
+| `/admin/index.html` | Admin & Ops ERP |
+| `/sales/erp-dashboard.html` | Sales Force ERP |
+| `/sales/passport-login.html` | Passport Sales Portal |
+| `/reseller/index.html` | Reseller ERP |
+| `/ta/index.html` | Travel Agent ERP |
+| `/partner/dashboard.html` | Partner Portal |
+| `/portal/wow-passport.html` | WOW Passport (Indian-style, 3 tiers) |
+| `/passport/login.html` | Passport Holder Portal |
+| `/github-push.html` | Push all files to GitHub |
 
 ---
 
-## 🗄️ Data Tables (14 schemas)
+## Credentials
 
-| Table | Fields | Description |
-|-------|--------|-------------|
-| `passport_plans` | 13 | WOW Passport tier definitions (Explore/Together/Legacy) |
-| `passport_vouchers` | 15 | Per-passport vouchers with QR — single-use, non-transferable |
-| `passport_redemptions` | 13 | Voucher redemption audit trail — agent, device, timestamp, IP |
-| `passport_holders` | 23 | Passport holder KYC + login credentials |
-| `passport_products` | 14 | Passport product catalogue |
-| `passport_sales` | 16 | Passport sale transactions |
-| `passport_agents` | 12 | Sales agent profiles |
-| `erp_leads` | 14 | CRM lead pipeline |
-| `sales_agents` | 12 | Sales agent records |
-| `ta_applications` | 22 | TA/Reseller KYC applications |
-| `ta_quotes` | 17 | Partner segment quotes |
-| `bulk_ticket_batches` | 14 | Bulk ticket batch records |
-| `ta_invoices` | 17 | GST invoices for TA/partners |
-| `fnb_packages` | 12 | F&B package catalogue |
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | akm@indiagully.com | India@5327 |
+| Admin (demo) | admin@wow.com | admin123 |
+| Sales (demo) | sales@wow.com | sales123 |
+| Passport Agent (demo) | passport@wow.com | passport123 |
+| Reseller (demo) | reseller@wow.com | reseller123 |
+| Travel Agent (demo) | ta@wow.com | ta123 |
 
 ---
 
-## 🎫 Voucher & Redemption System
+## Technology Stack
 
-### How it works
-1. **Issuance** — At passport purchase, vouchers are auto-generated with unique QR codes per holder
-2. **QR Format** — `WOW-{TYPE}-{TIER}-{PASSPORT_ID}-{SEQ}` (e.g., `WOW-PHO-EXP-00142-001`)
-3. **Redemption** — Gate/staff scans QR → system checks `is_redeemed` → marks used → logs in `passport_redemptions`
-4. **Single-use lock** — Repeat scan returns ❌ INVALID
-5. **Audit trail** — Every redemption stores agent ID, device ID, timestamp, IP for disputes
-
-### Voucher types by tier
-| Voucher | Explore | Together | Legacy |
-|---------|---------|----------|--------|
-| Photo Coupon | 2 | 3 | 4 (premium) |
-| F&B Discount | 10% | 15% | 20% |
-| Locker Voucher | — | 4 visits | All 8 visits |
-| VIP Fast-Track | — | — | ✅ |
-| Costume Voucher | — | — | All 8 visits |
-| Guest Pass | — | — | 2–4 passes |
-| Birthday Benefit | — | 1 free entry | Full celebration |
-| Priority Event | — | — | ✅ |
+- **Frontend:** Pure HTML5, CSS3, Vanilla JavaScript
+- **CDN Libraries:** Font Awesome 6.4, Google Fonts (Nunito, Poppins, Cinzel, Courier Prime, Libre Baskerville)
+- **QR Codes:** QRCode.js (CDN)
+- **Charts:** Chart.js / ECharts (where applicable)
+- **Data API:** RESTful Table API (tables/{table})
+- **Weather:** Open-Meteo API (no key required)
+- **Deployment:** Cloudflare Pages
 
 ---
 
-## 🔗 Key Entry Points / URLs
+## Deployment
 
-| Role | URL |
-|------|-----|
-| Admin Dashboard | `admin/index.html` |
-| Passport Engine | `admin/passport-engine.html` |
-| Loyalty Engine | `admin/loyalty-engine.html` |
-| Passport Redemptions | `admin/passport-redemptions.html` |
-| Passport Login | `passport/login.html` |
-| Buy Passport | `passport/register.html` |
-| My Passport | `passport/my-passport.html` |
-| Agent Sales Portal | `sales/erp-agents.html` |
-| CRM & Leads | `sales/erp-crm.html` |
-| Partner KYC | `partner/onboarding-kyc.html` |
-| Partner Dashboard | `partner/dashboard.html` |
-| Customer Portal | `portal/dashboard.html` |
-| Public Website | `index.html` |
+1. Open `github-push.html` in preview
+2. Enter GitHub PAT (`ghp_...` with `repo` scope)
+3. Owner: `arunkumarmanikonda-web` · Repo: `worlds-of-wonder` · Branch: `main`
+4. Click "Push All Files to GitHub"
+5. Connect repo to Cloudflare Pages → deploy (no build command, output: `/`)
+6. Live at: `worlds-of-wonder.pages.dev`
 
 ---
 
-## 🚧 Not Yet Implemented / Recommended Next Steps
+## Not Yet Implemented
 
-### High Priority
-- [ ] **Payment gateway integration** — Razorpay/PhonePe live payment in `passport/register.html`
-- [ ] **Real-time gate QR scanner** — Camera-based scan in `admin/passport-redemptions.html`
-- [ ] **WhatsApp API integration** — Auto-message on voucher redemption, renewal alerts
-- [ ] **OTP verification** — SMS OTP via MSG91 or Twilio in `passport/login.html`
-
-### Medium Priority
-- [ ] **Passport renewal flow** — Extend validity for existing holders
-- [ ] **Passport physical card PDF** — Printable card design with gold logo
-- [ ] **Loyalty points live calculation** — Real-time points ledger per customer
-- [ ] **Discount/voucher engine** — Admin-configured discount codes and campaign vouchers
-- [ ] **Push notifications** — FCM integration for app-style alerts
-- [ ] **Multi-park config** — If WOW expands to second location
-
-### Low Priority
-- [ ] **Mobile app wrapper** — PWA manifest + service worker for offline use
-- [ ] **Advanced analytics** — Google Analytics / Mixpanel event tracking
-- [ ] **A/B testing** — Upsell message experiments on passport purchase flow
-- [ ] **Chatbot** — WhatsApp bot for passport status, voucher balance queries
+- [ ] Real OTP gateway (Twilio/MSG91 — currently demo)
+- [ ] Real Google OAuth flow
+- [ ] Real Razorpay/payment gateway integration
+- [ ] Real email/WhatsApp automation (backend required)
+- [ ] On-gate QR scanner app (camera-based, PWA)
+- [ ] Single-use QR validation (requires backend)
+- [ ] Dual-backend voucher dispute storage (requires DB)
+- [ ] Real-time push notifications
+- [ ] AI-driven demand forecasting
 
 ---
 
-## 🛠️ Tech Stack
+## Logo Policy
 
-- **Frontend**: HTML5 · CSS3 · Vanilla JavaScript (ES2020+)
-- **UI Libraries**: Chart.js · ECharts · QRCode.js · Font Awesome
-- **Fonts**: Google Fonts (Inter, Nunito, Poppins)
-- **Data**: RESTful Table API (tables/{name})
-- **Design**: Custom WOW Design System (`css/wow-design-system.css`)
-- **Deployment**: Static hosting (Netlify/Cloudflare Pages compatible)
+**The WOW logo (`images/logo.png`) is used AS-IS across all pages with NO filters, NO alterations, NO changes.**  
+Every page renders `<img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;">`.
 
 ---
 
-## 📊 Platform Statistics
-
-- **Total pages**: ~75 HTML pages
-- **Admin pages**: 36
-- **Partner pages**: 13
-- **Customer portal pages**: 13
-- **Passport portal pages**: 3
-- **Sales ERP pages**: 13
-- **Public website pages**: ~15
-- **Data tables**: 14 schemas
-- **Passport tiers**: 3 (Explore · Together · Legacy)
-- **Loyalty tiers**: 4 (Silver · Gold · Platinum · Diamond)
-
----
-
-*Last updated: March 2026 · WOW Digital Platform v3.0*
+© 2025 India Gully Technologies · Worlds of Wonder · Noida, UP
