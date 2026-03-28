@@ -14,7 +14,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:
 /* Header */
 .header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:14px 28px;display:flex;justify-content:space-between;align-items:center}
 .header-logo{display:flex;align-items:center;gap:12px}
-.header-logo .wow{font-size:22px;font-weight:800;color:#FFD700;letter-spacing:2px}
+.header-logo .wow{height:44px;width:auto;object-fit:contain;display:block;}
 .header-logo .divider{width:1px;height:28px;background:rgba(255,255,255,0.3)}
 .header-logo .park{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.3}
 .header-nav{display:flex;align-items:center;gap:20px}
@@ -178,9 +178,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:
 <!-- Header -->
 <div class="header">
   <div class="header-logo">
-    <div class="wow">WOW</div>
-    <div class="divider"></div>
-    <div class="park">Worlds of Wonder<br>My Passport</div>
+    <a href="../index.html"><img class="wow" src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
   </div>
   <div class="header-nav">
     <a href="../index.html"><i class="fas fa-home"></i> WOW Home</a>
