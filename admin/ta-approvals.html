@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TA / Reseller KYC Approvals — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;min-height:100vh;}
+.admin-header{background:linear-gradient(135deg,#0d1220,#1a0a2e);border-bottom:1px solid rgba(255,215,0,.15);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;}
+.admin-brand{display:flex;align-items:center;gap:10px;}
+.admin-logo{width:36px;height:36px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#0a0e1a;}
+.admin-title{font-size:16px;font-weight:700;color:#ffd700;}
+.admin-subtitle{font-size:11px;color:#8899aa;}
+.admin-nav{display:flex;gap:8px;}
+.anav{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 12px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;}
+.anav:hover{background:rgba(255,215,0,.1);color:#ffd700;border-color:rgba(255,215,0,.25);}
+.anav.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+.content{max-width:1300px;margin:0 auto;padding:22px 20px;}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.kpi-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;text-align:center;}
+.kpi-num{font-size:26px;font-weight:800;}
+.kpi-label{font-size:11px;color:#8899aa;margin-top:3px;}
+.kpi-card.yellow .kpi-num{color:#ffd700;}
+.kpi-card.green .kpi-num{color:#10b981;}
+.kpi-card.red .kpi-num{color:#ef4444;}
+.kpi-card.blue .kpi-num{color:#60a5fa;}
+.kpi-card.purple .kpi-num{color:#a78bfa;}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.filter-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 14px;color:#e0e6f0;font-size:13px;outline:none;min-width:200px;}
+.filter-input:focus{border-color:#6c63ff;}
+.filter-select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:8px 14px;color:#e0e6f0;font-size:13px;outline:none;}
+.filter-select option{background:#1a1f35;}
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px;width:fit-content;}
+.tab{padding:7px 16px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:#8899aa;transition:.2s;}
+.tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+
+/* Applications list */
+.app-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:.2s;}
+.app-card:hover{border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.03);}
+.app-card.selected{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.06);}
+.app-top{display:flex;align-items:center;gap:12px;}
+.app-avatar{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#6c63ff,#9333ea);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;}
+.app-main{flex:1;}
+.app-name{font-size:14px;font-weight:700;}
+.app-meta{font-size:11px;color:#8899aa;margin-top:2px;}
+.app-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:18px;font-size:10px;font-weight:600;}
+.b-pending{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.2);}
+.b-approved{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+.b-rejected{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2);}
+.b-docs{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.b-type{background:rgba(255,255,255,.1);color:#e0e6f0;}
+.app-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);}
+
+/* Buttons */
+.btn{padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:6px;transition:.3s;}
+.btn-approve{background:linear-gradient(135deg,#10b981,#059669);color:#fff;}
+.btn-approve:hover{transform:translateY(-1px);box-shadow:0 3px 14px rgba(16,185,129,.4);}
+.btn-reject{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;}
+.btn-reject:hover{transform:translateY(-1px);box-shadow:0 3px 14px rgba(239,68,68,.4);}
+.btn-view{background:rgba(108,99,255,.15);color:#a78bfa;border:1px solid rgba(108,99,255,.25);}
+.btn-view:hover{background:rgba(108,99,255,.25);}
+.btn-docs{background:rgba(255,215,0,.12);color:#ffd700;border:1px solid rgba(255,215,0,.2);}
+.btn-docs:hover{background:rgba(255,215,0,.2);}
+.btn-msg{background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.modal-box{background:#13182a;border:1px solid rgba(255,215,0,.2);border-radius:16px;padding:24px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:#8899aa;font-size:20px;cursor:pointer;}
+.doc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.doc-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:12px;text-align:center;}
+.doc-icon{font-size:24px;margin-bottom:6px;}
+.doc-name{font-size:12px;font-weight:600;margin-bottom:4px;}
+.doc-status{font-size:10px;font-weight:600;}
+.doc-status.ok{color:#10b981;}
+.doc-status.pending{color:#fbbf24;}
+.doc-status.missing{color:#ef4444;}
+.doc-actions{display:flex;gap:6px;margin-top:8px;justify-content:center;}
+.doc-btn{padding:4px 10px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:none;}
+.doc-btn.approve{background:rgba(16,185,129,.2);color:#10b981;}
+.doc-btn.reject{background:rgba(239,68,68,.2);color:#ef4444;}
+.review-row{display:flex;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.review-row:last-child{border-bottom:none;}
+.review-label{width:160px;color:#8899aa;font-size:11px;flex-shrink:0;}
+.review-value{font-weight:600;flex:1;}
+.commission-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:10px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#e0e6f0;font-size:13px;outline:none;}
+.field input:focus,.field select:focus{border-color:#ffd700;}
+.field select option{background:#1a1f35;}
+.alert{border-radius:9px;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;margin-bottom:12px;font-size:12px;}
+.alert.warning{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:#fde68a;}
+
+/* Pagination */
+.pagination{display:flex;gap:6px;justify-content:flex-end;margin-top:16px;align-items:center;}
+.pg-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 12px;color:#e0e6f0;font-size:12px;cursor:pointer;transition:.2s;}
+.pg-btn:hover,.pg-btn.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+
+@media(max-width:700px){.kpi-strip{grid-template-columns:repeat(3,1fr);}.doc-grid{grid-template-columns:1fr 1fr;}.commission-form{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="admin-header">
+  <div class="admin-brand">
+    <div class="admin-logo">WW</div>
+    <div><div class="admin-title">WOW Admin — TA / Reseller Approvals</div><div class="admin-subtitle">Review, approve or reject partner KYC applications</div></div>
+  </div>
+  <div class="admin-nav">
+    <a class="anav" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a class="anav" href="reseller-config.html"><i class="fas fa-cog"></i> Reseller Config</a>
+    <a class="anav gold" id="pending-count-btn"><i class="fas fa-clock"></i> <span id="pend-count">5</span> Pending</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- KPIs -->
+  <div class="kpi-strip">
+    <div class="kpi-card yellow"><div class="kpi-num" id="kpi-pending">5</div><div class="kpi-label">Pending Review</div></div>
+    <div class="kpi-card green"><div class="kpi-num" id="kpi-approved">47</div><div class="kpi-label">Approved Partners</div></div>
+    <div class="kpi-card red"><div class="kpi-num" id="kpi-rejected">8</div><div class="kpi-label">Rejected</div></div>
+    <div class="kpi-card blue"><div class="kpi-num" id="kpi-total">60</div><div class="kpi-label">Total Applications</div></div>
+    <div class="kpi-card purple"><div class="kpi-num">₹2.4Cr</div><div class="kpi-label">Partner Revenue MTD</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <input class="filter-input" type="text" id="search-input" placeholder="🔍 Search by company, email, phone…" oninput="filterApps()"/>
+    <select class="filter-select" id="type-filter" onchange="filterApps()">
+      <option value="">All Types</option>
+      <option value="travel_agent">Travel Agent</option>
+      <option value="school">School / College</option>
+      <option value="corporate">Corporate</option>
+      <option value="reseller">Online Reseller</option>
+    </select>
+    <select class="filter-select" id="status-filter" onchange="filterApps()">
+      <option value="">All Status</option>
+      <option value="pending_review">Pending Review</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+      <option value="docs_required">Docs Required</option>
+    </select>
+    <div class="tab-bar">
+      <div class="tab active" onclick="filterByStatus('')">All</div>
+      <div class="tab" onclick="filterByStatus('pending_review')">⏳ Pending</div>
+      <div class="tab" onclick="filterByStatus('approved')">✅ Approved</div>
+      <div class="tab" onclick="filterByStatus('rejected')">❌ Rejected</div>
+    </div>
+  </div>
+
+  <!-- Applications -->
+  <div id="apps-container"></div>
+
+  <div class="pagination">
+    <span style="font-size:12px;color:#8899aa;">Showing <span id="showing-count">10</span> of <span id="total-count">60</span></span>
+    <button class="pg-btn active">1</button>
+    <button class="pg-btn">2</button>
+    <button class="pg-btn">3</button>
+    <button class="pg-btn"><i class="fas fa-angle-right"></i></button>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>🏢 Partner Application Review</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal-overlay" id="reject-modal" style="display:none;">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-title"><span>❌ Reject Application</span><button class="modal-close" onclick="closeReject()">×</button></div>
+    <div class="alert warning"><i class="fas fa-exclamation-triangle"></i><div>This will notify the partner via email + WhatsApp with the rejection reason.</div></div>
+    <div class="field"><label>Rejection Reason <span style="color:#ff6b6b;">*</span></label>
+      <select id="reject-reason"><option value="">Select reason…</option><option>Incomplete documents</option><option>Invalid GST / PAN number</option><option>Suspicious / fake documents</option><option>Duplicate application</option><option>Does not meet partner criteria</option><option>Other (see notes)</option></select></div>
+    <div class="field" style="margin-top:10px;"><label>Additional Notes</label><textarea id="reject-notes" placeholder="Provide details for the partner…" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#e0e6f0;font-size:13px;min-height:80px;resize:vertical;font-family:'Inter',sans-serif;width:100%;outline:none;"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-reject" style="flex:1;justify-content:center;" onclick="confirmReject()"><i class="fas fa-times"></i> Confirm Rejection</button>
+      <button class="btn btn-view" onclick="closeReject()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const typeLabels = {travel_agent:'✈️ Travel Agent', school:'🏫 School', corporate:'🏢 Corporate', reseller:'🔄 Reseller'};
+let rejectTargetId = null;
+
+const sampleApps = [
+  {id:'WOW-TA-001',company:'XYZ Tours & Travels Pvt Ltd',brand:'XYZ Tours',type:'travel_agent',gst:'07AABCX1234M1Z1',pan:'AABCX1234M',person:'Rajesh Sharma',email:'rajesh@xyztours.com',mobile:'+91 98100 12345',status:'pending_review',docs:{pan:true,gst:true,inc:true,aadhar:true,iata:false,cheque:true},commission:12,credit_limit:500000,applied:'2026-04-10'},
+  {id:'WOW-TA-002',company:'Sunrise Holiday Makers',brand:'Sunrise',type:'travel_agent',gst:'07AADCS5678M1Z2',pan:'AADCS5678M',person:'Suresh Patel',email:'suresh@sunrise.in',mobile:'+91 87654 43210',status:'pending_review',docs:{pan:true,gst:true,inc:false,aadhar:true,iata:true,cheque:true},commission:10,credit_limit:300000,applied:'2026-04-11'},
+  {id:'WOW-TA-003',company:'DPS Rohini Education Trust',brand:'DPS Rohini',type:'school',gst:'07ABCDT9012M1Z3',pan:'ABCDT9012M',person:'Mrs. Anita Bahl',email:'principal@dpsrohini.edu',mobile:'+91 98765 54321',status:'docs_required',docs:{pan:true,gst:false,inc:true,aadhar:true,iata:false,cheque:false},commission:8,credit_limit:200000,applied:'2026-04-09'},
+  {id:'WOW-TA-004',company:'Infosys BPM Limited',brand:'Infosys',type:'corporate',gst:'07AABCI3456M1Z4',pan:'AABCI3456M',person:'HR Events Team',email:'events@infosys.com',mobile:'+91 80000 11111',status:'approved',docs:{pan:true,gst:true,inc:true,aadhar:true,iata:false,cheque:true},commission:15,credit_limit:1000000,applied:'2026-04-01'},
+  {id:'WOW-TA-005',company:'MakeMyTrip Corporate',brand:'MMT',type:'reseller',gst:'07AAACM7890M1Z5',pan:'AAACM7890M',person:'Partnerships Desk',email:'partner@mmt.com',mobile:'+91 11 4000 0000',status:'approved',docs:{pan:true,gst:true,inc:true,aadhar:true,iata:false,cheque:true},commission:18,credit_limit:2000000,applied:'2026-03-15'},
+  {id:'WOW-TA-006',company:'Star Events Noida',brand:'Star Events',type:'corporate',gst:'09AABCS2345M1Z6',pan:'AABCS2345M',person:'Vikram Singh',email:'vikram@starevents.co',mobile:'+91 98900 55555',status:'rejected',docs:{pan:false,gst:false,inc:false,aadhar:false,iata:false,cheque:false},commission:0,credit_limit:0,applied:'2026-04-08'},
+  {id:'WOW-TA-007',company:'Happy Journeys Pvt Ltd',brand:'Happy Journeys',type:'travel_agent',gst:'07AABHJ3456M1Z7',pan:'AABHJ3456M',person:'Amit Gupta',email:'amit@happyjourneys.in',mobile:'+91 99110 77777',status:'pending_review',docs:{pan:true,gst:true,inc:true,aadhar:true,iata:true,cheque:true},commission:11,credit_limit:400000,applied:'2026-04-13'},
+];
+
+let filteredApps = [...sampleApps];
+let currentFilter = '';
+
+function filterApps() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const typeF = document.getElementById('type-filter').value;
+  const statusF = document.getElementById('status-filter').value;
+  filteredApps = sampleApps.filter(a => {
+    const matchSearch = !search || a.company.toLowerCase().includes(search) || a.email.toLowerCase().includes(search) || a.mobile.includes(search);
+    const matchType = !typeF || a.type === typeF;
+    const matchStatus = !statusF || a.status === statusF;
+    return matchSearch && matchType && matchStatus;
+  });
+  renderApps();
+}
+
+function filterByStatus(s) {
+  currentFilter = s;
+  document.getElementById('status-filter').value = s;
+  filterApps();
+}
+
+function renderApps() {
+  const container = document.getElementById('apps-container');
+  container.innerHTML = '';
+  document.getElementById('showing-count').textContent = filteredApps.length;
+  filteredApps.forEach(app => {
+    const docsOk = Object.values(app.docs).filter(Boolean).length;
+    const docsTotal = Object.values(app.docs).length;
+    const statusBadge = {pending_review:'b-pending',approved:'b-approved',rejected:'b-rejected',docs_required:'b-docs'}[app.status] || 'b-pending';
+    const statusLabel = {pending_review:'⏳ Pending Review',approved:'✅ Approved',rejected:'❌ Rejected',docs_required:'📎 Docs Required'}[app.status];
+    const el = document.createElement('div');
+    el.className = 'app-card';
+    el.innerHTML = `
+      <div class="app-top">
+        <div class="app-avatar">${app.company[0]}</div>
+        <div class="app-main">
+          <div class="app-name">${app.company}</div>
+          <div class="app-meta">${app.person} · ${app.email} · ${app.mobile} · Applied: ${app.applied}</div>
+          <div class="app-badges">
+            <span class="badge b-type">${typeLabels[app.type]||app.type}</span>
+            <span class="badge ${statusBadge}">${statusLabel}</span>
+            <span class="badge" style="background:rgba(255,255,255,.06);color:#a0aec0;">Docs: ${docsOk}/${docsTotal}</span>
+            ${app.status==='approved'?`<span class="badge" style="background:rgba(255,215,0,.12);color:#ffd700;">Commission: ${app.commission}%</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:#8899aa;">
+          <div>GST: ${app.gst||'—'}</div>
+          <div style="margin-top:3px;">PAN: ${app.pan||'—'}</div>
+        </div>
+      </div>
+      <div class="app-actions">
+        <button class="btn btn-view" onclick="openModal('${app.id}')"><i class="fas fa-eye"></i> Review</button>
+        ${app.status==='pending_review'||app.status==='docs_required'?`
+          <button class="btn btn-approve" onclick="approveApp('${app.id}')"><i class="fas fa-check"></i> Approve</button>
+          <button class="btn btn-reject" onclick="rejectApp('${app.id}')"><i class="fas fa-times"></i> Reject</button>
+          <button class="btn btn-docs" onclick="requestDocs('${app.id}')"><i class="fas fa-folder"></i> Request Docs</button>
+        `:''}
+        <button class="btn btn-msg" onclick="sendMessage('${app.id}')"><i class="fab fa-whatsapp"></i> Message</button>
+        ${app.status==='approved'?`<button class="btn btn-docs" onclick="openModal('${app.id}')"><i class="fas fa-edit"></i> Edit Config</button>`:''}
+      </div>`;
+    container.appendChild(el);
+  });
+}
+
+function openModal(id) {
+  const app = sampleApps.find(a => a.id === id);
+  if (!app) return;
+  const docList = [
+    {key:'pan',label:'Company PAN',icon:'🪪'},{key:'gst',label:'GST Certificate',icon:'📄'},{key:'inc',label:'Incorporation Cert',icon:'🏛'},{key:'aadhar',label:'Auth Person Aadhar',icon:'🔍'},{key:'iata',label:'IATA / TAAI',icon:'✈️'},{key:'cheque',label:'Cancelled Cheque',icon:'🏦'}
+  ];
+  document.getElementById('modal-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">🏢 Company</div>
+        <div class="review-row"><span class="review-label">Company Name</span><span class="review-value">${app.company}</span></div>
+        <div class="review-row"><span class="review-label">Type</span><span class="review-value">${typeLabels[app.type]}</span></div>
+        <div class="review-row"><span class="review-label">GST</span><span class="review-value">${app.gst}</span></div>
+        <div class="review-row"><span class="review-label">PAN</span><span class="review-value">${app.pan}</span></div>
+        <div class="review-row"><span class="review-label">Applied On</span><span class="review-value">${app.applied}</span></div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">👤 Auth Person</div>
+        <div class="review-row"><span class="review-label">Name</span><span class="review-value">${app.person}</span></div>
+        <div class="review-row"><span class="review-label">Email</span><span class="review-value">${app.email}</span></div>
+        <div class="review-row"><span class="review-label">Mobile</span><span class="review-value">${app.mobile}</span></div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">📎 Documents</div>
+    <div class="doc-grid">
+      ${docList.map(d => `
+        <div class="doc-item">
+          <div class="doc-icon">${d.icon}</div>
+          <div class="doc-name">${d.label}</div>
+          <div class="doc-status ${app.docs[d.key]?'ok':'missing'}">${app.docs[d.key]?'✓ Uploaded':'✗ Missing'}</div>
+          ${app.docs[d.key]?`<div class="doc-actions"><button class="doc-btn approve" onclick="approvDoc('${id}','${d.key}')">✓ Approve</button><button class="doc-btn reject" onclick="flagDoc('${id}','${d.key}')">✗ Flag</button></div>`:''}
+        </div>`).join('')}
+    </div>
+    <div style="font-size:13px;font-weight:700;color:#ffd700;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">⚙️ Partner Configuration</div>
+    <div class="commission-form">
+      <div class="field"><label>Commission % <span style="color:#ff6b6b;">*</span></label><input type="number" value="${app.commission}" min="0" max="30" id="cfg-comm-${id}"/></div>
+      <div class="field"><label>Credit Limit (₹)</label><input type="number" value="${app.credit_limit}" id="cfg-credit-${id}"/></div>
+      <div class="field"><label>Slab Tier</label><select id="cfg-slab-${id}"><option>Bronze (8–10%)</option><option ${app.commission>=10&&app.commission<15?'selected':''}>Silver (10–15%)</option><option ${app.commission>=15?'selected':''}>Gold (15–18%)</option><option>Platinum (18–20%)</option></select></div>
+      <div class="field"><label>Credit Period (days)</label><input type="number" value="7" min="0" max="60"/></div>
+    </div>
+    ${app.status==='pending_review'||app.status==='docs_required'?`
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button class="btn btn-approve" style="flex:1;justify-content:center;" onclick="approveApp('${app.id}');closeModal()"><i class="fas fa-check"></i> Approve Partner</button>
+      <button class="btn btn-reject" style="flex:1;justify-content:center;" onclick="closeModal();rejectApp('${app.id}')"><i class="fas fa-times"></i> Reject</button>
+    </div>`:'<div style="margin-top:14px;"><button class="btn btn-approve" onclick="saveConfig(\''+id+'\')"><i class="fas fa-save"></i> Save Configuration</button></div>'}
+  `;
+  document.getElementById('detail-modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('detail-modal').style.display = 'none'; }
+
+function approveApp(id) {
+  const app = sampleApps.find(a => a.id === id);
+  if (!app) return;
+  app.status = 'approved';
+  updateKPIs();
+  filterApps();
+  alert(`✅ ${app.company} approved!\nLogin credentials sent via Email + WhatsApp.\nCommission: ${app.commission}% · Credit: ₹${app.credit_limit.toLocaleString('en-IN')}`);
+}
+
+function rejectApp(id) {
+  rejectTargetId = id;
+  document.getElementById('reject-modal').style.display = 'flex';
+}
+
+function closeReject() { document.getElementById('reject-modal').style.display = 'none'; rejectTargetId = null; }
+
+function confirmReject() {
+  const reason = document.getElementById('reject-reason').value;
+  if (!reason) { alert('Please select a rejection reason.'); return; }
+  const app = sampleApps.find(a => a.id === rejectTargetId);
+  if (app) app.status = 'rejected';
+  updateKPIs();
+  filterApps();
+  closeReject();
+  alert(`❌ Application rejected.\nPartner notified via Email + WhatsApp with reason: ${reason}`);
+}
+
+function requestDocs(id) { alert('📧 Document request email + WhatsApp sent to the partner. Required documents checklist attached.'); }
+function sendMessage(id) { alert('💬 WhatsApp message panel opened (in production: Twilio / WhatsApp Business API).'); }
+function approvDoc(id, key) { alert(`Doc "${key}" marked as verified.`); }
+function flagDoc(id, key) { alert(`Doc "${key}" flagged for re-upload. Partner notified.`); }
+function saveConfig(id) { alert('Partner configuration saved successfully.'); closeModal(); }
+
+function updateKPIs() {
+  const pending = sampleApps.filter(a => a.status === 'pending_review').length;
+  const approved = sampleApps.filter(a => a.status === 'approved').length;
+  const rejected = sampleApps.filter(a => a.status === 'rejected').length;
+  document.getElementById('kpi-pending').textContent = pending;
+  document.getElementById('kpi-approved').textContent = approved;
+  document.getElementById('kpi-rejected').textContent = rejected;
+  document.getElementById('pend-count').textContent = pending;
+}
+
+// Init
+renderApps();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
