@@ -143,6 +143,8 @@
         <button class="qbb-tab active" data-park="WATER_DAY" data-price="1299" onclick="selectParkQBB(this)">🌊 Water Park <strong>₹1,299</strong></button>
         <button class="qbb-tab" data-park="AMUSEMENT_DAY" data-price="1199" onclick="selectParkQBB(this)">🎢 Amusement <strong>₹1,199</strong></button>
         <button class="qbb-tab" data-park="COMBO_DAY" data-price="1999" onclick="selectParkQBB(this)">🎟 Combo Deal <strong>₹1,999</strong></button>
+        <button class="qbb-tab" data-park="GROUP" data-price="1299" onclick="selectParkQBB(this)">👥 Group (20+) <strong>Custom</strong></button>
+        <a href="passport.html" class="qbb-tab" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;">🪪 Annual Passport <strong>₹4,999</strong></a>
       </div>
       <div class="qbb-fields">
         <div class="qbb-field">
@@ -654,7 +656,7 @@
         <div class="info-card">
           <div class="info-icon">📞</div>
           <h3>Help &amp; Support</h3>
-          <p>Questions? We're here. Call <a href="tel:08069090000" style="color:var(--blue);font-weight:700;">080-6909-0000</a> or email <a href="/cdn-cgi/l/email-protection#b3c0c6c3c3dcc1c7f3c4dcc1dfd7c0dcd5c4dcddd7d6c19ddadd" style="color:var(--blue);"><span class="__cf_email__" data-cfemail="d5a6a0a5a5baa7a195a2baa7b9b1a6bab3a2babbb1b0a7fbbcbb">[email&#160;protected]</span></a>. Service hours 9 AM – 7 PM.</p>
+          <p>Questions? We're here. Call <a href="tel:08069090000" style="color:var(--blue);font-weight:700;">080-6909-0000</a> or email <a href="/cdn-cgi/l/email-protection#fd8e888d8d928f89bd8a928f91998e929b8a929399988fd39493" style="color:var(--blue);"><span class="__cf_email__" data-cfemail="93e0e6e3e3fce1e7d3e4fce1fff7e0fcf5e4fcfdf7f6e1bdfafd">[email&#160;protected]</span></a>. Service hours 9 AM – 7 PM.</p>
         </div>
       </div>
     </div>
@@ -1007,9 +1009,9 @@ function initHeroCarousel() {
 </script>
 <script>
 /* ── Quick-book bar logic ──────────────────────────────── */
-const QBB_PRICES    = { WATER_DAY: 1299, AMUSEMENT_DAY: 1199, COMBO_DAY: 1999 };
-const QBB_HREFS     = { WATER_DAY: 'book/water-park.html', AMUSEMENT_DAY: 'book/amusement-park.html', COMBO_DAY: 'book/combo.html' };
-const QBB_DISCOUNTS = { WATER_DAY: 75, AMUSEMENT_DAY: 50, COMBO_DAY: 125 };
+const QBB_PRICES    = { WATER_DAY: 1299, AMUSEMENT_DAY: 1199, COMBO_DAY: 1999, GROUP: 0 };
+const QBB_HREFS     = { WATER_DAY: 'book/water-park.html', AMUSEMENT_DAY: 'book/amusement-park.html', COMBO_DAY: 'book/combo.html', GROUP: 'book/group.html' };
+const QBB_DISCOUNTS = { WATER_DAY: 75, AMUSEMENT_DAY: 50, COMBO_DAY: 125, GROUP: 200 };
 let qbbPark = 'WATER_DAY';
 
 function selectParkQBB(btn) {
@@ -1022,17 +1024,31 @@ function selectParkQBB(btn) {
 }
 
 function updateQBB() {
-  const adults   = parseInt(document.getElementById('qbb-adults')?.value) || 0;
+  const adults   = parseInt(document.getElementById('qbb-adults')?.value) || 1;
   const children = parseInt(document.getElementById('qbb-children')?.value) || 0;
+  const date     = document.getElementById('qbb-date')?.value || '';
   const qty      = Math.max(1, adults + children);
   const savings  = document.getElementById('qbb-savings');
+
+  // Wire book button with query params so booking page auto-fills
+  const bookBtn = document.getElementById('qbb-btn');
+  if (bookBtn) {
+    const base = QBB_HREFS[qbbPark] || 'book/combo.html';
+    bookBtn.href = `${base}?date=${date}&adults=${adults}&children=${children}&from=homepage`;
+  }
+
   if (!savings) return;
   if (qty >= 4) {
     const save = QBB_DISCOUNTS[qbbPark] * qty;
-    savings.textContent = `🎉 Group discount applied — you save ₹${save.toLocaleString('en-IN')} total!`;
+    savings.textContent = `🎉 Group discount applied — save ₹${save.toLocaleString('en-IN')} total!`;
+    savings.classList.remove('hidden');
+  } else if (qty >= 2) {
+    const total = QBB_PRICES[qbbPark] * qty;
+    savings.textContent = `Total: ₹${total.toLocaleString('en-IN')} · ${qty} guests · Add 2 more for group discount!`;
     savings.classList.remove('hidden');
   } else {
-    savings.classList.add('hidden');
+    savings.textContent = `₹${QBB_PRICES[qbbPark].toLocaleString('en-IN')} / person · Add guests to see group savings`;
+    savings.classList.remove('hidden');
   }
 }
 
