@@ -12,7 +12,7 @@
 body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;display:flex;min-height:100vh}
 /* ── Sidebar ── */
 .sidebar{width:220px;background:linear-gradient(180deg,#1a1a2e,#16213e);flex-shrink:0;position:fixed;height:100vh;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
-.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.08);display:block;}
 .sidebar-logo .brand{font-size:17px;font-weight:800;color:#FFD700}
 .sidebar-logo .sub{font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
 .sidebar-section{padding:14px 12px 4px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px}
@@ -116,8 +116,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;display:fle
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="sidebar-logo">
-    <div class="brand">⚡ WOW SALES ERP</div>
-    <div class="sub">CRM &amp; Leads</div>
+    <a href="erp-dashboard.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;display:block;" /></a>
   </div>
   <div class="sidebar-section">Sales ERP</div>
   <a href="erp-dashboard.html"><i class="fas fa-th-large"></i> ERP Dashboard</a>
