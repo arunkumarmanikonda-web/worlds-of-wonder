@@ -31,10 +31,10 @@ const NAV_ITEMS = [
   {
     label: 'Tickets',
     children: [
-      { label: '🎟 Book Water Park',  href: 'book/water-park.html',    desc: 'From ₹999 · Instant QR' },
-      { label: '🎟 Book Amusement',   href: 'book/amusement-park.html',desc: 'From ₹999 · Instant QR' },
-      { label: '🎉 Book Combo',       href: 'book/combo.html',         desc: 'From ₹1,999 · Best value' },
-      { label: '🪪 Annual Passport',  href: 'passport.html',           desc: '₹4,999 — unlimited visits' },
+      { label: '🎟 Book Water Park',  href: 'book/water-park.html',    desc: 'From ₹1,299 · Instant QR' },
+      { label: '🎟 Book Amusement',   href: 'book/amusement-park.html',desc: 'From ₹1,199 · Instant QR', module: 'amusement_ticketing' },
+      { label: '🎉 Book Combo',       href: 'book/combo.html',         desc: 'From ₹1,999 · Best value', module: 'combo_ticketing' },
+      { label: '🪪 Annual Passport',  href: 'passport.html',           desc: '₹4,999 — unlimited visits', module: 'passport_system' },
     ]
   },
   {
@@ -58,10 +58,10 @@ const NAV_ITEMS = [
   {
     label: 'Partners',
     children: [
-      { label: '✈️ Travel Agents',    href: 'travel-agent.html', desc: 'Commission & onboarding' },
-      { label: '🏪 Resellers',        href: 'reseller.html',     desc: 'Kiosk & retail partners' },
-      { label: '🏢 Corporate Sales',  href: 'corporate.html',    desc: 'Bulk & B2B bookings' },
-      { label: '🔑 Partner Portal',   href: 'partner/login.html',desc: 'Sign in to your account' },
+      { label: '✈️ Travel Agents',    href: 'partner/onboarding.html', desc: 'Commission & onboarding' },
+      { label: '🏪 Resellers',        href: 'partner/onboarding.html', desc: 'Kiosk & retail partners' },
+      { label: '🏢 Corporate Sales',  href: 'groups/corporate.html',   desc: 'Bulk & B2B bookings' },
+      { label: '🔑 Partner Portal',   href: 'partner/login.html',      desc: 'Sign in to your account' },
     ]
   },
 ];
@@ -188,7 +188,7 @@ function buildNav() {
         </button>
         <div class="nav-dropdown-menu">
           ${item.children.map(c => `
-            <a href="${BASE}${c.href}" class="nav-dropdown-item${cur===c.href?' nav-dropdown-item--active':''}">
+            <a href="${BASE}${c.href}" class="nav-dropdown-item${cur===c.href?' nav-dropdown-item--active':''}"${c.module ? ` data-module="${c.module}"` : ''}>
               <div class="nav-dropdown-item-label">${c.label}</div>
               ${c.desc ? `<div class="nav-dropdown-item-desc">${c.desc}</div>` : ''}
             </a>`).join('')}
@@ -280,7 +280,7 @@ function buildFooter() {
         <a href="${BASE}water-park.html">Water Park</a>
         <a href="${BASE}amusement-park.html">Amusement Park</a>
         <a href="${BASE}combo.html">Combo Tickets</a>
-        <a href="${BASE}passport.html">Annual Passport</a>
+        <a href="${BASE}passport.html" data-module="passport_system">Annual Passport</a>
         <a href="${BASE}rides-attractions.html">Rides &amp; Attractions</a>
       </div>
       <div class="footer-col">
@@ -304,7 +304,7 @@ function buildFooter() {
           <a href="${BASE}portal/login.html">Sign In</a>
           <a href="${BASE}portal/register.html">Create Account</a>
           <a href="${BASE}portal/my-bookings.html">My Bookings</a>
-          <a href="${BASE}portal/loyalty.html">My Rewards</a>
+          <a href="${BASE}portal/loyalty.html" data-module="loyalty_program">My Rewards</a>
         </div>
       </div>
     </div>
@@ -397,6 +397,11 @@ function initShell() {
 
   /* Kick off weather fetch */
   fetchWeather();
+
+  /* Apply module gates to freshly-built DOM */
+  if (window.WOWModules) {
+    window.WOWModules._applyDOMGates(window.WOWModules.getState());
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initShell);
