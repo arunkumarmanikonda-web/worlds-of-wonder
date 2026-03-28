@@ -4,227 +4,635 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Notifications — Worlds of Wonder</title>
+  <meta name="description" content="Your WOW notification centre — booking updates, offers, loyalty alerts and system messages." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
+  <script src="../js/wow-modules.js"></script>
   <style>
-    .notif-tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px; }
-    .notif-tab { padding:8px 18px; border-radius:20px; border:1px solid rgba(255,255,255,.15); background:transparent; color:rgba(255,255,255,.6); font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; font-family:inherit; }
-    .notif-tab.active { background:#0055B3; border-color:#0055B3; color:#fff; }
-    .notif-item { display:flex; gap:16px; align-items:flex-start; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.06); position:relative; }
-    .notif-item:last-child { border-bottom:none; }
-    .notif-item.unread { background:rgba(0,85,179,.05); margin:0 -24px; padding:18px 24px; border-radius:12px; }
-    .notif-item.unread::before { content:''; width:8px; height:8px; background:#0055B3; border-radius:50%; position:absolute; left:4px; top:24px; }
-    .notif-icon-wrap { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-    .ni-booking   { background:rgba(0,85,179,.15); }
-    .ni-offer     { background:rgba(245,168,0,.15); }
-    .ni-loyalty   { background:rgba(139,92,246,.15); }
-    .ni-passport  { background:rgba(16,185,129,.15); }
-    .ni-system    { background:rgba(255,255,255,.08); }
-    .ni-alert     { background:rgba(239,68,68,.15); }
-    .notif-body   { flex:1; }
-    .notif-title  { font-size:14px; font-weight:700; color:#fff; margin-bottom:4px; }
-    .notif-desc   { font-size:13px; color:rgba(255,255,255,.55); line-height:1.5; }
-    .notif-time   { font-size:11px; color:rgba(255,255,255,.35); margin-top:6px; }
-    .notif-action { display:inline-block; margin-top:10px; font-size:12px; font-weight:700; color:#F5A800; text-decoration:none; }
-    .notif-actions-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
-    .settings-section { background:#1a2235; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; margin-bottom:24px; }
-    .settings-title { font-size:14px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.08em; margin-bottom:18px; }
-    .setting-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.05); }
-    .setting-row:last-child { border-bottom:none; }
-    .setting-label { font-size:14px; color:#fff; font-weight:600; }
-    .setting-sub   { font-size:12px; color:rgba(255,255,255,.4); margin-top:2px; }
-    .toggle { position:relative; width:44px; height:24px; }
-    .toggle input { opacity:0; width:0; height:0; }
-    .toggle-slider { position:absolute; inset:0; background:rgba(255,255,255,.15); border-radius:12px; cursor:pointer; transition:.3s; }
-    .toggle-slider:before { content:''; position:absolute; height:18px; width:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.3s; }
-    .toggle input:checked + .toggle-slider { background:#0055B3; }
-    .toggle input:checked + .toggle-slider:before { transform:translateX(20px); }
+    /* ── Notification Items ── */
+    .notif-list-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 0 24px;
+      margin-bottom: 20px;
+    }
+    .notif-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      position: relative;
+      transition: background .2s;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { background: rgba(0,85,179,.04); margin: 0 -24px; padding: 18px 24px; }
+    .notif-item.unread::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #0055B3;
+      border-radius: 50%;
+      position: absolute;
+      left: 6px;
+      top: 26px;
+    }
+
+    .notif-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ni-booking   { background: rgba(0,85,179,.15); }
+    .ni-offer     { background: rgba(245,168,0,.15); }
+    .ni-loyalty   { background: rgba(139,92,246,.15); }
+    .ni-passport  { background: rgba(16,185,129,.15); }
+    .ni-system    { background: rgba(255,255,255,.07); }
+    .ni-alert     { background: rgba(239,68,68,.12); }
+    .ni-gate      { background: rgba(0,158,115,.15); }
+
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+      line-height: 1.4;
+    }
+    .notif-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.5;
+    }
+    .notif-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .notif-time { font-size: 11px; color: rgba(255,255,255,.3); }
+    .notif-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    .notif-action:hover { color: #93c5fd; }
+    .notif-dismiss {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: transparent;
+      color: rgba(255,255,255,.25);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all .2s;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notif-dismiss:hover { background: rgba(239,68,68,.12); color: #ef4444; }
+
+    /* ── Tabs ── */
+    .notif-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .notif-tab {
+      padding: 7px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: transparent;
+      color: rgba(255,255,255,.55);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+      position: relative;
+    }
+    .notif-tab.active, .notif-tab:hover { background: #0055B3; border-color: #0055B3; color: #fff; }
+    .notif-tab .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #e11d48;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 800;
+      margin-left: 6px;
+    }
+
+    /* ── Top controls ── */
+    .notif-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .notif-count { font-size: 13px; color: rgba(255,255,255,.45); }
+    .notif-count span { color: #60a5fa; font-weight: 700; }
+    .ctrl-btns { display: flex; gap: 8px; }
+    .ctrl-btn {
+      padding: 7px 16px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.6);
+      border: 1px solid rgba(255,255,255,.1);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+    }
+    .ctrl-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,.35);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin: 24px 0 8px;
+    }
+
+    /* ── Notification Settings ── */
+    .settings-card {
+      background: #1a2235;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .settings-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,.45);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 18px;
+    }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { font-size: 14px; color: #fff; font-weight: 600; }
+    .setting-sub   { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.15);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .3s;
+    }
+    .toggle input:checked + .toggle-slider { background: #0055B3; }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+      color: rgba(255,255,255,.35);
+    }
+    .empty-icon { font-size: 56px; margin-bottom: 14px; }
+    .empty-title { font-size: 16px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 6px; }
+    .empty-sub { font-size: 13px; }
   </style>
 </head>
 <body class="portal-body">
 <div id="app">
   <div class="portal-layout">
-    <aside class="portal-sidebar">
+
+    <!-- ═══ SIDEBAR ═══ -->
+    <aside class="portal-sidebar" id="portal-sidebar">
       <div class="portal-sidebar-logo">
         <a href="../index.html">
           <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
         </a>
       </div>
       <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🏠</span><span>Dashboard</span></a>
-        <a href="my-bookings.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🎟️</span><span>My Bookings</span></a>
-        <a href="tickets.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">📱</span><span>My Tickets</span></a>
-        <a href="passport.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🛂</span><span>My Passport</span></a>
-        <a href="loyalty.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">⭐</span><span>Loyalty Points</span></a>
-        <a href="offers.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">🎁</span><span>My Offers</span></a>
-        <a href="notifications.html" class="portal-sidenav-item active"><span class="portal-sidenav-icon">🔔</span><span>Notifications</span></a>
-        <a href="profile.html" class="portal-sidenav-item"><span class="portal-sidenav-icon">👤</span><span>Profile</span></a>
-        <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);">
-          <a href="../index.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);"><span class="portal-sidenav-icon">🌐</span><span>Back to Site</span></a>
-        </div>
+        <a href="dashboard.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="my-bookings.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>My Bookings</span>
+        </a>
+        <a href="tickets.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
+          <span>My Tickets</span>
+        </a>
+        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
+          <span>My Passport</span>
+        </a>
+        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>Loyalty Points</span>
+        </a>
+        <a href="offers.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span>My Offers</span>
+        </a>
+        <a href="notifications.html" class="portal-sidenav-item active">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span>Notifications <span class="badge" id="sidebar-badge" style="display:none;"></span></span>
+        </a>
+        <a href="profile.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+        <div class="portal-sidenav-divider"></div>
+        <a href="../index.html" class="portal-sidenav-item">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+          <span>Back to Website</span>
+        </a>
+        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Sign Out</span>
+        </button>
       </nav>
     </aside>
 
+    <!-- ═══ MAIN ═══ -->
     <main class="portal-main">
-      <div class="portal-topbar">
-        <div>
-          <h1 class="portal-page-title">Notifications</h1>
-          <p style="color:rgba(255,255,255,.5);font-size:14px;margin-top:4px;">Stay updated on bookings, offers and rewards</p>
-        </div>
+      <div id="portal-loading" class="portal-loading">
+        <div class="portal-spinner"></div>
+        <p>Loading notifications…</p>
       </div>
 
-      <div class="notif-tabs">
-        <button class="notif-tab active" onclick="switchTab('all',this)">All (12)</button>
-        <button class="notif-tab" onclick="switchTab('unread',this)">Unread (3)</button>
-        <button class="notif-tab" onclick="switchTab('booking',this)">Bookings</button>
-        <button class="notif-tab" onclick="switchTab('offer',this)">Offers</button>
-        <button class="notif-tab" onclick="switchTab('loyalty',this)">Loyalty</button>
-        <button class="notif-tab" onclick="switchTab('settings',this)">⚙ Settings</button>
-      </div>
+      <div id="portal-content" style="display:none;">
+        <div class="portal-main-header">
+          <div>
+            <h1 class="portal-main-title">Notifications</h1>
+            <p class="portal-main-sub" id="unread-summary">All caught up!</p>
+          </div>
+        </div>
 
-      <!-- Notifications Panel -->
-      <div id="notifPanel">
-        <div class="notif-actions-top">
-          <span style="font-size:13px;color:rgba(255,255,255,.4);">3 unread notifications</span>
-          <button onclick="markAllRead()" style="background:none;border:none;color:#F5A800;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Mark all as read</button>
+        <!-- ── Tabs ── -->
+        <div class="notif-tabs">
+          <button class="notif-tab active" onclick="filterNotifs('all', this)">
+            All <span class="badge" id="badge-all">0</span>
+          </button>
+          <button class="notif-tab" onclick="filterNotifs('booking', this)">Bookings</button>
+          <button class="notif-tab" onclick="filterNotifs('offer', this)">Offers</button>
+          <button class="notif-tab" onclick="filterNotifs('loyalty', this)" data-module="loyalty_program">Loyalty</button>
+          <button class="notif-tab" onclick="filterNotifs('passport', this)" data-module="passport_system">Passport</button>
+          <button class="notif-tab" onclick="filterNotifs('system', this)">System</button>
         </div>
-        <div style="background:#1a2235;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;" id="notifList">
-        </div>
-      </div>
 
-      <!-- Settings Panel (hidden by default) -->
-      <div id="settingsPanel" style="display:none;">
-        <div class="settings-section">
-          <div class="settings-title">Email Notifications</div>
-          <div class="setting-row">
-            <div><div class="setting-label">Booking Confirmations</div><div class="setting-sub">Receive email when booking is confirmed</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Visit Reminders</div><div class="setting-sub">Reminder 1 day before your visit</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Offers & Deals</div><div class="setting-sub">Personalised offers based on your preferences</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Loyalty Updates</div><div class="setting-sub">Points earned and tier upgrades</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
-          </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Newsletter</div><div class="setting-sub">Monthly WOW newsletter</div></div>
-            <label class="toggle"><input type="checkbox" /><span class="toggle-slider"></span></label>
+        <!-- ── Controls ── -->
+        <div class="notif-controls">
+          <div class="notif-count">Showing <span id="showing-count">—</span> notifications</div>
+          <div class="ctrl-btns">
+            <button class="ctrl-btn" onclick="markAllRead()">✓ Mark all read</button>
+            <button class="ctrl-btn" onclick="clearAll()">🗑 Clear all</button>
           </div>
         </div>
-        <div class="settings-section">
-          <div class="settings-title">SMS &amp; WhatsApp Notifications</div>
-          <div class="setting-row">
-            <div><div class="setting-label">SMS — Booking Confirmations</div><div class="setting-sub">Instant SMS with ticket QR codes</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+
+        <!-- ── Notification List ── -->
+        <div id="notif-list"></div>
+
+        <!-- ── Settings ── -->
+        <div style="margin-top:12px;">
+          <div class="settings-title" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;">
+            Notification Preferences
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">WhatsApp Alerts</div><div class="setting-sub">Real-time WhatsApp updates</div></div>
-            <label class="toggle"><input type="checkbox" checked /><span class="toggle-slider"></span></label>
+          <div class="settings-card">
+            <div class="settings-title">In-App Notifications</div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Booking Confirmations</div>
+                <div class="setting-sub">When a booking is confirmed, modified or cancelled</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_booking', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Flash Offers &amp; Deals</div>
+                <div class="setting-sub">Time-limited offers and personalised discounts</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_offers', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row" data-module="loyalty_program">
+              <div>
+                <div class="setting-label">Loyalty Points Updates</div>
+                <div class="setting-sub">When you earn, redeem or tier-up your WOW Points</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_loyalty', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Visit Reminders</div>
+                <div class="setting-sub">24-hour reminder before your booked visit date</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_reminders', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">System Announcements</div>
+                <div class="setting-sub">Park closures, maintenance and safety updates</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_system', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
           </div>
-          <div class="setting-row">
-            <div><div class="setting-label">Promotional SMS</div><div class="setting-sub">Offers and seasonal promotions</div></div>
-            <label class="toggle"><input type="checkbox" /><span class="toggle-slider"></span></label>
+
+          <div class="settings-card">
+            <div class="settings-title">Push Notifications (Email / SMS)</div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Email — Booking Updates</div>
+                <div class="setting-sub">Confirmation PDFs and ticket changes</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('email_booking', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">SMS — Entry Reminders</div>
+                <div class="setting-sub">Day-before visit reminder and gate instructions</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('sms_reminder', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row" data-module="whatsapp_campaigns">
+              <div>
+                <div class="setting-label">WhatsApp — Instant Ticket Delivery</div>
+                <div class="setting-sub">Receive your e-ticket and QR code via WhatsApp</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked onchange="savePref('wa_ticket', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Promotional Emails</div>
+                <div class="setting-sub">Seasonal offers and new ride announcements</div>
+              </div>
+              <label class="toggle"><input type="checkbox" onchange="savePref('email_promo', this.checked)" /><span class="toggle-slider"></span></label>
+            </div>
           </div>
         </div>
-        <div class="settings-section">
-          <div class="settings-title">Push Notifications</div>
-          <div class="setting-row">
-            <div><div class="setting-label">Browser Push Notifications</div><div class="setting-sub">Get notified even when you're not on the site</div></div>
-            <label class="toggle"><input type="checkbox" id="pushToggle" onchange="requestPushPermission(this)" /><span class="toggle-slider"></span></label>
-          </div>
-        </div>
-        <button onclick="saveSettings()" class="btn btn-primary" style="margin-top:8px;">Save Preferences</button>
+
       </div>
     </main>
   </div>
 </div>
+
 <script>
-const notifications = [
-  { id:1, type:'booking', unread:true, icon:'🎟️', iconClass:'ni-booking', title:'Booking Confirmed — BK-2026-08841', desc:'Your Water Park booking for 28 March 2026 is confirmed. 3 e-tickets have been sent to rajesh@example.com', time:'2 hours ago', action:'View Tickets', actionUrl:'tickets.html' },
-  { id:2, type:'offer',   unread:true, icon:'🎁', iconClass:'ni-offer', title:'New Offer: 15% Off Combo Tickets', desc:'As a Gold Loyalty member, you\'ve unlocked an exclusive 15% discount on Combo tickets. Valid till 31 May 2026.', time:'Yesterday', action:'View Offer', actionUrl:'offers.html' },
-  { id:3, type:'loyalty', unread:true, icon:'⭐', iconClass:'ni-loyalty', title:'You earned 250 WOW Points!', desc:'250 points were added for your Water Park booking BK-2026-08841. Your total: 2,450 points.', time:'2 hours ago', action:'View Points', actionUrl:'loyalty.html' },
-  { id:4, type:'booking', unread:false, icon:'🔔', iconClass:'ni-booking', title:'Visit Reminder — Tomorrow!', desc:'Don\'t forget your Combo visit tomorrow (28 Mar). Gates open at 10:00 AM. Have your e-tickets ready.', time:'3 days ago', action:'View Tickets', actionUrl:'tickets.html' },
-  { id:5, type:'loyalty', unread:false, icon:'🏆', iconClass:'ni-loyalty', title:'Welcome to Gold Tier!', desc:'Congratulations! You\'ve reached Gold tier with 2,000+ points. Enjoy exclusive Gold member benefits.', time:'1 week ago', action:'View Benefits', actionUrl:'loyalty.html' },
-  { id:6, type:'passport', unread:false, icon:'🛂', iconClass:'ni-passport', title:'Passport Renewal Reminder', desc:'Your Annual Passport expires on 31 March 2026. Renew now at a special member price of ₹3,999.', time:'2 weeks ago', action:'Renew Passport', actionUrl:'passport.html' },
-  { id:7, type:'offer',   unread:false, icon:'🎂', iconClass:'ni-offer', title:'Birthday Month Special!', desc:'Happy Birthday month! Enjoy a free entry to Water Park for you and flat 25% off for companions.', time:'3 weeks ago', action:'Redeem', actionUrl:'../book/water-park.html' },
-  { id:8, type:'booking', unread:false, icon:'✅', iconClass:'ni-booking', title:'Booking Confirmed — BK-2026-08712', desc:'Your Combo booking for 15 March is confirmed. 3 e-tickets sent to your email.', time:'3 weeks ago', action:'View Tickets', actionUrl:'tickets.html' },
-  { id:9, type:'system',  unread:false, icon:'🔐', iconClass:'ni-system', title:'Security Alert: New Login Detected', desc:'New login from Chrome on Windows at 09:12 AM. If this wasn\'t you, change your password immediately.', time:'1 month ago', action:'Review', actionUrl:'profile.html' },
-  { id:10, type:'loyalty', unread:false, icon:'⭐', iconClass:'ni-loyalty', title:'Points Expiry Warning', desc:'150 points will expire on 30 June 2026. Book a visit or make a purchase to keep them active.', time:'1 month ago', action:'View Points', actionUrl:'loyalty.html' },
-];
+  /* ── Sample notifications ── */
+  const NOTIFS = [
+    {
+      id: 'n1', type: 'booking', icon: '🎟', iconClass: 'ni-booking', unread: true,
+      title: 'Booking Confirmed — Water Park',
+      desc: 'Your Water Park booking for 2 Adults on 15 Apr 2026 is confirmed. Booking ID: BK-2026-08142.',
+      time: '2 hours ago',
+      action: { label: 'View Ticket', href: 'tickets.html' },
+    },
+    {
+      id: 'n2', type: 'offer', icon: '⚡', iconClass: 'ni-offer', unread: true,
+      title: 'Flash Deal: Weekend Water Park at ₹999!',
+      desc: 'This weekend only — Water Park tickets are just ₹999 (was ₹1,299). Use code FLASH300. Expires Sunday midnight.',
+      time: '5 hours ago',
+      action: { label: 'Book Now', href: '../book/water-park.html?promo=FLASH300' },
+    },
+    {
+      id: 'n3', type: 'loyalty', icon: '⭐', iconClass: 'ni-loyalty', unread: true,
+      title: 'You earned 260 WOW Points!',
+      desc: 'Great news! Your recent Water Park visit earned you 260 WOW Points. You now have 1,010 points. Just 490 more to reach Gold Tier!',
+      time: '1 day ago',
+      action: { label: 'View Points', href: 'loyalty.html' },
+    },
+    {
+      id: 'n4', type: 'passport', icon: '🪪', iconClass: 'ni-passport', unread: false,
+      title: 'Passport Renewal Reminder',
+      desc: 'Your WOW Combo Passport expires in 45 days. Renew now and get 30 extra days free with code RENEW30!',
+      time: '3 days ago',
+      action: { label: 'Renew Passport', href: 'passport.html' },
+    },
+    {
+      id: 'n5', type: 'booking', icon: '📅', iconClass: 'ni-booking', unread: false,
+      title: 'Visit Reminder — Tomorrow!',
+      desc: 'You have a booked visit tomorrow (Water Park, 2 Adults). Gates open at 10:00 AM. Don\'t forget to carry a photo ID!',
+      time: '4 days ago',
+      action: { label: 'View Booking', href: 'my-bookings.html' },
+    },
+    {
+      id: 'n6', type: 'offer', icon: '🎂', iconClass: 'ni-offer', unread: false,
+      title: 'Birthday Month Special Unlocked! 🎉',
+      desc: 'Happy birthday month! Your exclusive birthday offer is now active — free entry + 50% companion discount. Use code BDAY2026.',
+      time: '5 days ago',
+      action: { label: 'Use Offer', href: 'offers.html' },
+    },
+    {
+      id: 'n7', type: 'system', icon: '⚠️', iconClass: 'ni-alert', unread: false,
+      title: 'Scheduled Maintenance — Wave Pool',
+      desc: 'The Wave Pool will be temporarily closed for maintenance on 20 Apr 2026. All other rides remain open. We apologise for the inconvenience.',
+      time: '1 week ago',
+    },
+    {
+      id: 'n8', type: 'system', icon: 'ℹ️', iconClass: 'ni-system', unread: false,
+      title: 'New Ride Opening — Cyclone Coaster',
+      desc: 'Exciting news! The Cyclone Coaster (Amusement Park) is now open to the public. Height requirement: 120 cm. Come experience the thrill!',
+      time: '2 weeks ago',
+      action: { label: 'Learn More', href: '../rides-attractions.html' },
+    },
+    {
+      id: 'n9', type: 'booking', icon: '✅', iconClass: 'ni-gate', unread: false,
+      title: 'Entry Scanned — 5 Feb 2026',
+      desc: 'Your ticket BK-2026-00041 was successfully scanned at Gate 2. Enjoy your day at WOW! 🎉',
+      time: '7 weeks ago',
+    },
+  ];
 
-let activeTab = 'all';
+  let currentFilter = 'all';
+  let notifs = JSON.parse(localStorage.getItem('wow_notifs') || 'null') || NOTIFS;
 
-function switchTab(tab, btn) {
-  activeTab = tab;
-  document.querySelectorAll('.notif-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  if (tab === 'settings') {
-    document.getElementById('notifPanel').style.display = 'none';
-    document.getElementById('settingsPanel').style.display = 'block';
-  } else {
-    document.getElementById('notifPanel').style.display = 'block';
-    document.getElementById('settingsPanel').style.display = 'none';
-    renderNotifications();
+  function saveNotifs() {
+    localStorage.setItem('wow_notifs', JSON.stringify(notifs));
   }
-}
 
-function renderNotifications() {
-  let list = notifications;
-  if (activeTab === 'unread') list = notifications.filter(n => n.unread);
-  else if (activeTab !== 'all') list = notifications.filter(n => n.type === activeTab);
-  
-  const container = document.getElementById('notifList');
-  if (!list.length) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.4);">No notifications</div>';
-    return;
+  function getUnreadCount(type = null) {
+    return notifs.filter(n => n.unread && (!type || n.type === type)).length;
   }
-  container.innerHTML = list.map(n => `
-    <div class="notif-item ${n.unread ? 'unread' : ''}">
-      <div class="notif-icon-wrap ${n.iconClass}">${n.icon}</div>
-      <div class="notif-body">
-        <div class="notif-title">${n.title}</div>
-        <div class="notif-desc">${n.desc}</div>
-        <div class="notif-time">${n.time}</div>
-        <a href="${n.actionUrl}" class="notif-action">${n.action} →</a>
-      </div>
-      ${n.unread ? `<button onclick="markRead(${n.id})" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;" title="Mark read">✓</button>` : ''}
-    </div>
-  `).join('');
-}
 
-function markRead(id) {
-  const n = notifications.find(x => x.id === id);
-  if (n) n.unread = false;
-  renderNotifications();
-}
+  function updateBadges() {
+    const unread = getUnreadCount();
+    document.getElementById('badge-all').textContent = unread;
+    document.getElementById('badge-all').style.display = unread ? 'inline-flex' : 'none';
+    const sb = document.getElementById('sidebar-badge');
+    if (sb) { sb.textContent = unread; sb.style.display = unread ? 'inline-flex' : 'none'; }
+    const unreadTxt = unread
+      ? `You have <b style="color:#60a5fa">${unread} unread</b> notification${unread > 1 ? 's' : ''}`
+      : 'You\'re all caught up! 🎉';
+    document.getElementById('unread-summary').innerHTML = unreadTxt;
+  }
 
-function markAllRead() {
-  notifications.forEach(n => n.unread = false);
-  renderNotifications();
-  document.querySelector('.notif-actions-top span').textContent = '0 unread notifications';
-}
+  function renderNotifs(filter = 'all') {
+    const list = document.getElementById('notif-list');
+    const filtered = filter === 'all' ? notifs : notifs.filter(n => n.type === filter);
+    document.getElementById('showing-count').textContent = filtered.length;
 
-function requestPushPermission(el) {
-  if (el.checked && 'Notification' in window) {
-    Notification.requestPermission().then(p => {
-      if (p !== 'granted') { el.checked = false; alert('Push notifications blocked. Allow in browser settings.'); }
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="notif-list-card">
+          <div class="empty-state">
+            <div class="empty-icon">🔔</div>
+            <div class="empty-title">No notifications here</div>
+            <div class="empty-sub">You don't have any ${filter === 'all' ? '' : filter + ' '}notifications yet.</div>
+          </div>
+        </div>`;
+      return;
+    }
+
+    // Group by today / this week / older
+    const now = Date.now();
+    const groups = { today: [], week: [], older: [] };
+    filtered.forEach(n => {
+      if (n.time.includes('hour') || n.time === 'Just now') groups.today.push(n);
+      else if (n.time.includes('day') && !n.time.includes('week')) groups.week.push(n);
+      else groups.older.push(n);
+    });
+
+    let html = '';
+    const renderGroup = (label, items) => {
+      if (!items.length) return '';
+      return `<div class="section-title">${label}</div>
+              <div class="notif-list-card">` +
+        items.map(n => `
+          <div class="notif-item${n.unread ? ' unread' : ''}" id="notif-${n.id}">
+            <div class="notif-icon-wrap ${n.iconClass}">${n.icon}</div>
+            <div class="notif-body">
+              <div class="notif-title">${n.title}</div>
+              <div class="notif-desc">${n.desc}</div>
+              <div class="notif-meta">
+                <div class="notif-time">${n.time}</div>
+                ${n.action ? `<a href="${n.action.href}" class="notif-action">${n.action.label} →</a>` : ''}
+                ${n.unread ? `<button onclick="markRead('${n.id}')" class="notif-action" style="background:none;border:none;cursor:pointer;padding:0;font-family:inherit;">Mark read</button>` : ''}
+              </div>
+            </div>
+            <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Dismiss">✕</button>
+          </div>`).join('') +
+      `</div>`;
+    };
+
+    html += renderGroup('Today', groups.today);
+    html += renderGroup('This Week', groups.week);
+    html += renderGroup('Earlier', groups.older);
+    list.innerHTML = html;
+    updateBadges();
+  }
+
+  window.filterNotifs = function(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderNotifs(filter);
+  };
+
+  window.markRead = function(id) {
+    const n = notifs.find(x => x.id === id);
+    if (n) { n.unread = false; saveNotifs(); renderNotifs(currentFilter); }
+  };
+
+  window.dismissNotif = function(id) {
+    notifs = notifs.filter(n => n.id !== id);
+    saveNotifs();
+    renderNotifs(currentFilter);
+  };
+
+  window.markAllRead = function() {
+    notifs.forEach(n => n.unread = false);
+    saveNotifs();
+    renderNotifs(currentFilter);
+  };
+
+  window.clearAll = function() {
+    if (confirm('Clear all notifications? This cannot be undone.')) {
+      notifs = [];
+      saveNotifs();
+      renderNotifs(currentFilter);
+    }
+  };
+
+  window.savePref = function(key, val) {
+    const prefs = JSON.parse(localStorage.getItem('wow_notif_prefs') || '{}');
+    prefs[key] = val;
+    localStorage.setItem('wow_notif_prefs', JSON.stringify(prefs));
+  };
+
+  // Load saved prefs
+  function loadPrefs() {
+    const prefs = JSON.parse(localStorage.getItem('wow_notif_prefs') || '{}');
+    document.querySelectorAll('.toggle input').forEach(input => {
+      const key = input.getAttribute('onchange')?.match(/'([^']+)'/)?.[1];
+      if (key && key in prefs) input.checked = prefs[key];
     });
   }
-}
 
-function saveSettings() {
-  alert('Notification preferences saved!\n\nAPI call: PATCH /api/user/notification-preferences');
-}
-
-renderNotifications();
+  // Initial render
+  renderNotifs('all');
+  loadPrefs();
 </script>
-</body>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+
+  const app  = initializeApp(WOW_FB_CONFIG);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    document.getElementById('portal-loading').style.display = 'none';
+    document.getElementById('portal-content').style.display = 'block';
+  });
+
+  document.getElementById('signout-btn')?.addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = '../index.html';
+  });
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
