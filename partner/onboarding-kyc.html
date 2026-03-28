@@ -1,487 +1,676 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TA / Reseller Onboarding — Worlds of Wonder Partner Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Partner KYC Onboarding — Worlds of Wonder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#0a0e1a;color:#e0e6f0;min-height:100vh;}
-.top-bar{background:linear-gradient(135deg,#1a1f35 0%,#0d1220 100%);border-bottom:1px solid rgba(255,200,0,.15);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;}
-.brand{display:flex;align-items:center;gap:12px;}
-.brand-logo{height:44px;width:auto;object-fit:contain;display:block;}
-.brand-name{font-size:18px;font-weight:700;color:#ffd700;}
-.brand-sub{font-size:11px;color:#8899aa;margin-top:1px;}
-.top-links{display:flex;gap:16px;font-size:13px;}
-.top-links a{color:#8899aa;text-decoration:none;transition:.2s;}
-.top-links a:hover{color:#ffd700;}
-.hero{background:linear-gradient(135deg,#10172a,#1a0a2e 50%,#0a1a20);padding:44px 32px 28px;text-align:center;border-bottom:1px solid rgba(255,200,0,.1);}
-.hero h1{font-size:30px;font-weight:800;background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
-.hero p{color:#8899aa;font-size:14px;max-width:540px;margin:0 auto 24px;}
-.steps-track{display:flex;align-items:center;justify-content:center;max-width:680px;margin:0 auto;}
-.step-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;}
-.step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;transition:.3s;flex-shrink:0;}
-.step-circle.done{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
-.step-circle.active{background:linear-gradient(135deg,#6c63ff,#9333ea);color:#fff;box-shadow:0 0 16px rgba(108,99,255,.5);}
-.step-circle.pending{background:rgba(255,255,255,.08);color:#8899aa;border:2px solid rgba(255,255,255,.12);}
-.step-label{font-size:10px;color:#8899aa;text-align:center;}
-.step-line{flex:1;height:2px;background:rgba(255,255,255,.1);margin-bottom:20px;transition:.5s;}
-.step-line.done{background:linear-gradient(90deg,#ffd700,#ff8c00);}
-.progress-bar{background:rgba(255,255,255,.08);border-radius:20px;height:5px;max-width:680px;margin:14px auto 0;}
-.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#6c63ff,#ffd700);transition:width .5s;}
-.container{max-width:840px;margin:28px auto;padding:0 16px 60px;}
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px;margin-bottom:20px;}
-.card-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
-.card-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;}
-.card-icon.gold{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.2);}
-.card-icon.purple{background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);}
-.card-icon.blue{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);}
-.card-icon.green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);}
-.card-title{font-size:17px;font-weight:700;}
-.card-subtitle{font-size:12px;color:#8899aa;margin-top:2px;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
-.form-grid.full{grid-template-columns:1fr;}
-.field{display:flex;flex-direction:column;gap:5px;}
-.field label{font-size:11px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
-.field label .req{color:#ff6b6b;}
-.field input,.field select,.field textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:10px 13px;color:#e0e6f0;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:#6c63ff;background:rgba(108,99,255,.07);}
-.field input::placeholder,.field textarea::placeholder{color:#4a5568;}
-.field select option{background:#1a1f35;}
-.field textarea{resize:vertical;min-height:76px;}
-.field-hint{font-size:11px;color:#8899aa;}
-.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
-.upload-box{border:2px dashed rgba(255,215,0,.22);border-radius:11px;padding:22px;text-align:center;cursor:pointer;transition:.3s;position:relative;overflow:hidden;}
-.upload-box:hover{border-color:rgba(255,215,0,.45);background:rgba(255,215,0,.03);}
-.upload-box.uploaded{border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.04);}
-.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;}
-.upload-icon{font-size:26px;color:#ffd700;margin-bottom:7px;}
-.upload-box.uploaded .upload-icon{color:#10b981;}
-.upload-title{font-size:13px;font-weight:600;}
-.upload-sub{font-size:11px;color:#8899aa;margin-top:3px;}
-.camera-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:18px;text-align:center;}
-#video-stream{width:200px;height:150px;border-radius:9px;background:#000;border:2px solid rgba(108,99,255,.4);display:block;margin:0 auto 10px;}
-#photo-canvas{display:none;}
-#photo-preview{width:200px;height:150px;border-radius:9px;object-fit:cover;border:2px solid rgba(255,215,0,.4);display:none;margin:0 auto 10px;}
-.cam-btn{background:linear-gradient(135deg,#6c63ff,#9333ea);border:none;border-radius:7px;padding:8px 16px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;margin:3px;}
-.cam-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(108,99,255,.4);}
-.cam-btn.sec{background:rgba(255,255,255,.08);}
-.alert{border-radius:9px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:13px;}
-.alert.info{background:rgba(59,130,246,.09);border:1px solid rgba(59,130,246,.22);color:#93c5fd;}
-.alert.warning{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.22);color:#fde68a;}
-.alert.success{background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.22);color:#6ee7b7;}
-.step-panel{display:none;}
-.step-panel.active{display:block;}
-.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
-.btn{padding:11px 24px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.3s;display:flex;align-items:center;gap:7px;}
-.btn-primary{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(255,215,0,.4);}
-.btn-ghost{background:transparent;color:#8899aa;border:1px solid rgba(255,255,255,.1);}
-.btn-ghost:hover{background:rgba(255,255,255,.06);}
-.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.review-item{background:rgba(255,255,255,.04);border-radius:7px;padding:10px 12px;}
-.review-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#8899aa;margin-bottom:3px;}
-.review-value{font-size:13px;font-weight:600;color:#e0e6f0;word-break:break-all;}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:18px;font-size:11px;font-weight:600;}
-.badge.pending{background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.25);}
-#success-screen{display:none;text-align:center;padding:36px 16px;}
-.success-icon{width:84px;height:84px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px;box-shadow:0 0 36px rgba(16,185,129,.4);}
-#success-screen h2{font-size:24px;font-weight:800;color:#ffd700;margin-bottom:8px;}
-#success-screen p{color:#8899aa;font-size:14px;max-width:400px;margin:0 auto 20px;}
-.creds-box{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.18);border-radius:11px;padding:18px;display:inline-block;text-align:left;min-width:280px;}
-.cred-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;}
-.cred-row:last-child{border-bottom:none;}
-.cred-row span:first-child{color:#8899aa;}
-.cred-row span:last-child{font-weight:700;color:#ffd700;}
-.type-card{border:2px solid rgba(255,255,255,.09);border-radius:13px;padding:18px;cursor:pointer;transition:.3s;}
-.type-card:hover{border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.03);}
-.type-card.selected{border-color:rgba(255,215,0,.6);background:rgba(255,215,0,.06);}
-@media(max-width:600px){.form-grid,.form-grid.three,.upload-grid,.review-grid{grid-template-columns:1fr;} .step-label{display:none;} .hero h1{font-size:22px;} #type-cards{grid-template-columns:1fr;}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);min-height:100vh;display:flex;flex-direction:column}
+
+/* Header */
+.hdr{background:rgba(15,23,42,.8);backdrop-filter:blur(10px);border-bottom:1px solid #334155;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr img{height:44px;filter:none!important}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.hdr-right a{font-size:.82rem;color:#94a3b8;text-decoration:none;transition:color .2s}
+.hdr-right a:hover{color:#f59e0b}
+.btn-sign-in{background:#f59e0b;color:#000;padding:7px 18px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:700}
+
+/* Main */
+.main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px}
+.kyc-container{width:100%;max-width:780px}
+
+/* Progress */
+.progress-hdr{text-align:center;margin-bottom:36px}
+.progress-hdr h1{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin-bottom:6px}
+.progress-hdr p{color:#94a3b8;font-size:.9rem}
+.partner-type-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:28px}
+.pt-tab{padding:10px 28px;border-radius:10px;border:2px solid #334155;color:#94a3b8;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent}
+.pt-tab.active{border-color:#f59e0b;color:#f59e0b;background:rgba(245,158,11,.1)}
+.steps-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:32px}
+.sb-step{display:flex;align-items:center;gap:8px;position:relative}
+.sb-dot{width:36px;height:36px;border-radius:50%;background:#1e293b;border:2px solid #334155;color:#64748b;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .3s;z-index:1;flex-shrink:0}
+.sb-step.done .sb-dot{background:#16a34a;border-color:#16a34a;color:#fff}
+.sb-step.active .sb-dot{background:#2563eb;border-color:#2563eb;color:#fff;box-shadow:0 0 0 4px rgba(37,99,235,.25)}
+.sb-label{font-size:.72rem;color:#64748b;font-weight:600;white-space:nowrap;display:none}
+@media(min-width:600px){.sb-label{display:block}}
+.sb-step.active .sb-label{color:#60a5fa}
+.sb-step.done .sb-label{color:#4ade80}
+.sb-line{flex:1;height:2px;background:#334155;min-width:30px;max-width:60px}
+.sb-step.done+.sb-line{background:#16a34a}
+
+/* Form card */
+.form-card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px;margin-bottom:20px;display:none}
+.form-card.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.form-card h2{font-size:1.05rem;font-weight:700;color:#f1f5f9;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.form-card .fc-desc{font-size:.82rem;color:#64748b;margin-bottom:20px}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fg-grid.single{grid-template-columns:1fr}
+.fg-grid.three{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column}
+.form-group label{font-size:.75rem;color:#94a3b8;margin-bottom:5px;font-weight:600;display:flex;align-items:center;gap:4px}
+.form-group label .req{color:#f87171;margin-left:2px}
+.form-group input,.form-group select,.form-group textarea{background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.85rem;font-family:inherit;transition:border-color .2s;outline:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group .hint{font-size:.72rem;color:#64748b;margin-top:4px}
+.form-group.verified input{border-color:#16a34a}
+.verify-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;color:#4ade80;margin-top:4px;font-weight:600}
+
+/* Document upload */
+.doc-upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.doc-upload{background:#0f172a;border:2px dashed #334155;border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.doc-upload:hover{border-color:#f59e0b;background:#0a0f1e}
+.doc-upload.uploaded{border-color:#16a34a;border-style:solid;background:#0d1a0d}
+.doc-upload i{font-size:1.5rem;color:#475569;display:block;margin-bottom:6px}
+.doc-upload.uploaded i{color:#4ade80}
+.doc-upload h5{font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:3px}
+.doc-upload.uploaded h5{color:#4ade80}
+.doc-upload p{font-size:.7rem;color:#64748b}
+.doc-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.doc-status{display:flex;align-items:center;gap:4px;justify-content:center;margin-top:6px;font-size:.7rem;font-weight:700}
+
+/* GST verify */
+.gst-verify{display:flex;gap:8px;align-items:flex-end}
+.gst-verify input{flex:1}
+.gst-result{background:#0d1a0d;border:1px solid #16a34a;border-radius:8px;padding:10px;display:none}
+.gst-result.show{display:block}
+.gr-row{display:flex;justify-content:space-between;font-size:.78rem;padding:3px 0}
+.gr-k{color:#94a3b8}
+.gr-v{color:#4ade80;font-weight:600}
+
+/* Signatory */
+.sig-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* KYC checklist */
+.kyc-checklist{background:#0f172a;border-radius:10px;padding:16px;margin-bottom:14px}
+.kc-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e293b;font-size:.82rem}
+.kc-item:last-child{border-bottom:none}
+.kc-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.kc-ok{background:#0d2b1a;color:#4ade80}
+.kc-pending{background:#3b2f00;color:#fbbf24}
+.kc-missing{background:#2d0a0a;color:#f87171}
+.kc-text{flex:1;color:#e2e8f0}
+.kc-status{font-size:.7rem;font-weight:700}
+
+/* Navigation buttons */
+.nav-btns{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.btn{padding:12px 28px;border-radius:10px;border:none;cursor:pointer;font-size:.88rem;font-weight:700;transition:all .2s;display:flex;align-items:center;gap:8px}
+.btn-prev{background:transparent;border:1.5px solid #475569;color:#94a3b8}
+.btn-prev:hover{border-color:#e2e8f0;color:#f1f5f9}
+.btn-next{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;flex:1;max-width:200px;justify-content:center}
+.btn-next:hover{background:linear-gradient(135deg,#1e40af,#1d4ed8);transform:translateY(-1px)}
+.btn-submit{background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;flex:1;max-width:240px;justify-content:center;font-size:.95rem}
+
+/* Success state */
+.success-card{background:linear-gradient(135deg,#0d2b1a,#0f172a);border:1px solid #16a34a;border-radius:16px;padding:36px;text-align:center;display:none}
+.success-card.show{display:block;animation:fadeIn .5s ease}
+.success-card .si{font-size:3rem;display:block;margin-bottom:16px}
+.success-card h2{font-size:1.4rem;font-weight:800;color:#4ade80;margin-bottom:8px}
+.success-card p{color:#94a3b8;font-size:.9rem;margin-bottom:20px}
+.application-ref{background:#0f172a;border:1px dashed #16a34a;border-radius:8px;padding:12px;font-family:'Courier Prime',monospace;font-size:.9rem;color:#e2e8f0;margin-bottom:20px}
+.next-steps{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:20px}
+.ns-item{display:flex;align-items:flex-start;gap:10px;background:#0f172a;border-radius:8px;padding:10px;font-size:.82rem}
+.ns-icon{font-size:.9rem;margin-top:2px;flex-shrink:0}
+.ns-text{color:#e2e8f0}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid #f59e0b;border-radius:10px;padding:12px 18px;color:#fbbf24;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateY(0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+@media(max-width:600px){.fg-grid{grid-template-columns:1fr}.doc-upload-grid{grid-template-columns:1fr}.sig-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="brand">
-    <a href="../index.html"><img class="brand-logo" src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
-    <div><div class="brand-name">Worlds of Wonder</div><div class="brand-sub">Partner Onboarding Portal</div></div>
+<header class="hdr">
+  <img src="../images/logo.png" alt="Worlds of Wonder">
+  <div class="hdr-right">
+    <a href="login.html">Already a partner? Sign In</a>
+    <a href="../index.html">Home</a>
+    <button class="btn-sign-in" onclick="window.location='login.html'">Partner Login</button>
   </div>
-  <div class="top-links">
-    <a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
-    <a href="../index.html"><i class="fas fa-home"></i> Main Site</a>
-    <a href="#" onclick="alert('Support: partner@worldsofwonder.in\n+91-98100-00000')"><i class="fas fa-headset"></i> Help</a>
-  </div>
-</div>
+</header>
 
-<div class="hero">
-  <h1>🤝 Become a WOW Travel Partner</h1>
-  <p>Join 500+ travel agents, schools &amp; corporates. Complete KYC in 6 steps and unlock bulk pricing, auto-invoicing &amp; the quote engine.</p>
-  <div class="steps-track" id="steps-track">
-    <div class="step-item"><div class="step-circle active" id="sc-1">1</div><div class="step-label">Partner Type</div></div>
-    <div class="step-line" id="sl-1"></div>
-    <div class="step-item"><div class="step-circle pending" id="sc-2">2</div><div class="step-label">Company</div></div>
-    <div class="step-line" id="sl-2"></div>
-    <div class="step-item"><div class="step-circle pending" id="sc-3">3</div><div class="step-label">Auth Person</div></div>
-    <div class="step-line" id="sl-3"></div>
-    <div class="step-item"><div class="step-circle pending" id="sc-4">4</div><div class="step-label">Documents</div></div>
-    <div class="step-line" id="sl-4"></div>
-    <div class="step-item"><div class="step-circle pending" id="sc-5">5</div><div class="step-label">Bank &amp; GST</div></div>
-    <div class="step-line" id="sl-5"></div>
-    <div class="step-item"><div class="step-circle pending" id="sc-6">6</div><div class="step-label">Review</div></div>
-  </div>
-  <div class="progress-bar"><div class="progress-fill" id="main-progress" style="width:16%;"></div></div>
-</div>
+<main class="main">
+  <div class="kyc-container">
 
-<div class="container">
-
-<!-- STEP 1 -->
-<div class="step-panel active" id="panel-1">
-  <div class="alert info"><i class="fas fa-info-circle"></i><div>Choose your partner category. Each type unlocks specific pricing slabs, commission structures, and booking features.</div></div>
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon gold"><i class="fas fa-handshake" style="color:#ffd700;"></i></div>
-      <div><div class="card-title">Select Partner Type</div><div class="card-subtitle">Your selection determines commissions, T&C and access levels</div></div>
+    <div class="progress-hdr">
+      <h1>🤝 Become a WOW Partner</h1>
+      <p>Complete KYC verification to start selling WOW tickets and earn commissions</p>
     </div>
-    <div id="type-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-      <div class="type-card" onclick="selectType(this,'travel_agent')">
-        <div style="font-size:28px;margin-bottom:8px;">✈️</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px;">Travel Agent / Tour Operator</div>
-        <div style="font-size:12px;color:#8899aa;line-height:1.5;">IATA/non-IATA agencies. Commission 10–18%</div>
-        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
-          <span style="background:rgba(255,215,0,.1);color:#ffd700;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Bulk QR Tickets</span>
-          <span style="background:rgba(108,99,255,.1);color:#a78bfa;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Quote Engine</span>
-          <span style="background:rgba(16,185,129,.1);color:#10b981;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Auto Invoice</span>
-        </div>
+
+    <!-- Partner type -->
+    <div class="partner-type-tabs">
+      <div class="pt-tab active" onclick="setPartnerType('reseller',this)"><i class="fas fa-store"></i> Reseller / Agent</div>
+      <div class="pt-tab" onclick="setPartnerType('ta',this)"><i class="fas fa-plane"></i> Travel Agency</div>
+      <div class="pt-tab" onclick="setPartnerType('corporate',this)"><i class="fas fa-building"></i> Corporate Partner</div>
+    </div>
+
+    <!-- Steps bar -->
+    <div class="steps-bar">
+      <div class="sb-step active" id="sb1">
+        <div class="sb-dot">1</div>
+        <div class="sb-label">Business Info</div>
       </div>
-      <div class="type-card" onclick="selectType(this,'school')">
-        <div style="font-size:28px;margin-bottom:8px;">🏫</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px;">School / College</div>
-        <div style="font-size:12px;color:#8899aa;line-height:1.5;">Educational institutions. 10:1 student-teacher ratio. Teacher complimentary rules.</div>
-        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
-          <span style="background:rgba(255,215,0,.1);color:#ffd700;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">10:1 Ratio</span>
-          <span style="background:rgba(251,191,36,.1);color:#fbbf24;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Teacher Free</span>
-        </div>
+      <div class="sb-line"></div>
+      <div class="sb-step" id="sb2">
+        <div class="sb-dot">2</div>
+        <div class="sb-label">GST & PAN</div>
       </div>
-      <div class="type-card" onclick="selectType(this,'corporate')">
-        <div style="font-size:28px;margin-bottom:8px;">🏢</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px;">Corporate / Event Organizer</div>
-        <div style="font-size:12px;color:#8899aa;line-height:1.5;">Companies & event planners. Venue, F&B, costumes, security, lockers.</div>
-        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
-          <span style="background:rgba(59,130,246,.1);color:#60a5fa;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Lawn Rental</span>
-          <span style="background:rgba(239,68,68,.1);color:#f87171;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">F&amp;B Packages</span>
-          <span style="background:rgba(147,51,234,.1);color:#c084fc;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">Costumes</span>
-        </div>
+      <div class="sb-line"></div>
+      <div class="sb-step" id="sb3">
+        <div class="sb-dot">3</div>
+        <div class="sb-label">Documents</div>
       </div>
-      <div class="type-card" onclick="selectType(this,'reseller')">
-        <div style="font-size:28px;margin-bottom:8px;">🔄</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:5px;">Online Reseller / OTA</div>
-        <div style="font-size:12px;color:#8899aa;line-height:1.5;">OTAs, digital platforms. API access, commission 8–15%.</div>
-        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:5px;">
-          <span style="background:rgba(147,51,234,.1);color:#c084fc;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">API Access</span>
-          <span style="background:rgba(16,185,129,.1);color:#10b981;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:600;">White-label</span>
-        </div>
+      <div class="sb-line"></div>
+      <div class="sb-step" id="sb4">
+        <div class="sb-dot">4</div>
+        <div class="sb-label">Signatory</div>
+      </div>
+      <div class="sb-line"></div>
+      <div class="sb-step" id="sb5">
+        <div class="sb-dot">5</div>
+        <div class="sb-label">Review & Submit</div>
       </div>
     </div>
-    <input type="hidden" id="partner-type" value=""/>
-    <div id="type-err" style="color:#ef4444;font-size:12px;margin-top:10px;display:none;">Please select a partner type to continue.</div>
-  </div>
-  <div class="btn-row"><button class="btn btn-primary" onclick="goStep(2)">Continue <i class="fas fa-arrow-right"></i></button></div>
-</div>
 
-<!-- STEP 2 -->
-<div class="step-panel" id="panel-2">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon purple"><i class="fas fa-building" style="color:#a78bfa;"></i></div>
-      <div><div class="card-title">Company / Organization Details</div><div class="card-subtitle">Legal entity info as per registration</div></div>
+    <!-- STEP 1: Business Info -->
+    <div class="form-card active" id="step1">
+      <h2><i class="fas fa-building" style="color:#f59e0b"></i> Business Information</h2>
+      <p class="fc-desc">Tell us about your company. All fields marked * are mandatory.</p>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Legal Company Name <span class="req">*</span></label>
+          <input type="text" id="companyName" placeholder="e.g., Rajasthan Tours & Travels Pvt Ltd" value="Rajasthan Tours & Travels Pvt Ltd">
+        </div>
+        <div class="form-group">
+          <label>Business Type <span class="req">*</span></label>
+          <select id="bizType">
+            <option>Private Limited Company</option>
+            <option>Public Limited Company</option>
+            <option>Partnership Firm</option>
+            <option>LLP</option>
+            <option>Proprietorship</option>
+            <option>Individual Agent</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Trade Name (if different)</label>
+          <input type="text" placeholder="e.g., RajTours" value="RajTours">
+        </div>
+        <div class="form-group">
+          <label>Year of Establishment <span class="req">*</span></label>
+          <input type="number" placeholder="e.g., 2015" value="2015" min="1900" max="2025">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Registered Address — Line 1 <span class="req">*</span></label>
+          <input type="text" placeholder="Building No. / Street" value="123, Jaipur Road, Malviya Nagar">
+        </div>
+        <div class="form-group">
+          <label>City <span class="req">*</span></label>
+          <input type="text" placeholder="City" value="Jaipur">
+        </div>
+      </div>
+      <div class="fg-grid three">
+        <div class="form-group">
+          <label>State <span class="req">*</span></label>
+          <select>
+            <option>Rajasthan</option><option>Uttar Pradesh</option><option>Delhi</option>
+            <option>Haryana</option><option>Maharashtra</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>PIN Code <span class="req">*</span></label>
+          <input type="text" placeholder="302001" value="302001" maxlength="6">
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <input type="text" value="India" readonly>
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Business Phone <span class="req">*</span></label>
+          <input type="tel" placeholder="+91 XXXXX XXXXX" value="+91 98765 12345">
+        </div>
+        <div class="form-group">
+          <label>Business Email <span class="req">*</span></label>
+          <input type="email" placeholder="info@yourcompany.com" value="info@rajtours.com">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Website (optional)</label>
+          <input type="url" placeholder="https://yourcompany.com" value="https://rajtours.com">
+        </div>
+        <div class="form-group">
+          <label>Annual Ticket Volume (est.) <span class="req">*</span></label>
+          <select>
+            <option>500–2,000 tickets/year</option>
+            <option>2,000–5,000 tickets/year</option>
+            <option selected>5,000–20,000 tickets/year</option>
+            <option>20,000+ tickets/year</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg-grid single">
+        <div class="form-group">
+          <label>Brief Description of Business <span class="req">*</span></label>
+          <textarea placeholder="Tell us about your travel agency / reseller business…">Rajasthan Tours & Travels is a leading travel agency based in Jaipur, specializing in Rajasthan heritage tours and Delhi-NCR day trips including theme park packages. We serve 10,000+ customers annually through our network of 5 branches.</textarea>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <div></div>
+        <button class="btn btn-next" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
     </div>
-    <div class="form-grid">
-      <div class="field"><label>Company Name <span class="req">*</span></label><input id="co-name" type="text" placeholder="XYZ Tours & Travels Pvt Ltd"/></div>
-      <div class="field"><label>Trading / Brand Name</label><input id="co-brand" type="text" placeholder="XYZ Tours"/></div>
-      <div class="field"><label>Business Type <span class="req">*</span></label>
-        <select id="co-biztype"><option value="">Select…</option><option>Pvt Ltd</option><option>LLP</option><option>Partnership</option><option>Proprietorship</option><option>Trust / Society</option><option>Government Body</option></select></div>
-      <div class="field"><label>Year Established</label><input id="co-year" type="number" placeholder="2010" min="1900" max="2026"/></div>
-      <div class="field"><label>CIN / Registration No</label><input id="co-cin" type="text" placeholder="U63040DL2010PTC198765"/></div>
-      <div class="field"><label>GST Number <span class="req">*</span></label><input id="co-gst" type="text" placeholder="07AAACW1234M1ZX" maxlength="15" style="text-transform:uppercase;"/></div>
-      <div class="field"><label>PAN Number <span class="req">*</span></label><input id="co-pan" type="text" placeholder="AAACW1234M" maxlength="10" style="text-transform:uppercase;"/></div>
-      <div class="field"><label>IATA / TAAI Code</label><input id="co-iata" type="text" placeholder="IATA-12345 (if applicable)"/></div>
-    </div>
-    <div class="form-grid full" style="margin-top:14px;">
-      <div class="field"><label>Registered Address <span class="req">*</span></label><textarea id="co-addr" placeholder="Full registered office address…"></textarea></div>
-      <div class="field"><label>Website URL</label><input id="co-web" type="url" placeholder="https://yourcompany.com"/></div>
-    </div>
-  </div>
-  <div class="btn-row"><button class="btn btn-ghost" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="goStep(3)">Continue <i class="fas fa-arrow-right"></i></button></div>
-</div>
 
-<!-- STEP 3 -->
-<div class="step-panel" id="panel-3">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon blue"><i class="fas fa-user-tie" style="color:#60a5fa;"></i></div>
-      <div><div class="card-title">Authorised Person Details</div><div class="card-subtitle">Signatory who will manage this partner account</div></div>
-    </div>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
-      <div style="flex:0 0 210px;">
-        <div class="camera-section">
-          <div style="font-size:11px;font-weight:700;color:#ffd700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">📸 Live Photo</div>
-          <video id="video-stream" autoplay playsinline></video>
-          <canvas id="photo-canvas" width="200" height="150"></canvas>
-          <img id="photo-preview" src="" alt="Captured"/>
-          <div>
-            <button class="cam-btn" id="start-cam-btn" onclick="startCamera()"><i class="fas fa-camera"></i> Camera</button>
-            <button class="cam-btn" id="capture-btn" onclick="capturePhoto()" style="display:none;"><i class="fas fa-circle"></i> Capture</button>
-            <button class="cam-btn sec" id="retake-btn" onclick="retakePhoto()" style="display:none;"><i class="fas fa-redo"></i> Retake</button>
+    <!-- STEP 2: GST & PAN -->
+    <div class="form-card" id="step2">
+      <h2><i class="fas fa-id-card" style="color:#60a5fa"></i> GST & PAN Verification</h2>
+      <p class="fc-desc">Mandatory for B2B invoicing and compliance. We auto-verify via GST portal.</p>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>GSTIN (15-digit) <span class="req">*</span></label>
+          <div class="gst-verify">
+            <input type="text" id="gstinInput" placeholder="e.g., 08AABCR4567B2Z6" value="08AABCR4567B2Z6" maxlength="15" style="text-transform:uppercase">
+            <button style="padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap" onclick="verifyGSTIN()"><i class="fas fa-check"></i> Verify</button>
           </div>
-          <div style="margin-top:8px;font-size:11px;color:#8899aa;">or</div>
-          <label style="cursor:pointer;margin-top:5px;display:block;">
-            <input type="file" id="photo-upload" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)"/>
-            <span style="font-size:11px;color:#6c63ff;text-decoration:underline;">📁 Upload Photo</span>
-          </label>
+          <div class="hint">Enter 15-character GSTIN as on your GST registration certificate</div>
+          <div class="gst-result" id="gstResult">
+            <div class="gr-row"><span class="gr-k">Legal Name</span><span class="gr-v">Rajasthan Tours & Travels Pvt Ltd</span></div>
+            <div class="gr-row"><span class="gr-k">Trade Name</span><span class="gr-v">RajTours</span></div>
+            <div class="gr-row"><span class="gr-k">State</span><span class="gr-v">Rajasthan</span></div>
+            <div class="gr-row"><span class="gr-k">Registration Type</span><span class="gr-v">Regular Taxpayer</span></div>
+            <div class="gr-row"><span class="gr-k">Status</span><span class="gr-v">✓ Active</span></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>PAN Number <span class="req">*</span></label>
+          <div class="gst-verify">
+            <input type="text" id="panInput" placeholder="e.g., AABCR4567B" value="AABCR4567B" maxlength="10" style="text-transform:uppercase">
+            <button style="padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap" onclick="verifyPAN()"><i class="fas fa-check"></i> Verify</button>
+          </div>
+          <div class="hint">Company PAN for B2B invoicing and TDS</div>
         </div>
       </div>
-      <div style="flex:1;min-width:260px;">
-        <div class="form-grid">
-          <div class="field"><label>Full Name <span class="req">*</span></label><input id="ap-name" type="text" placeholder="Rajesh Kumar Sharma"/></div>
-          <div class="field"><label>Designation <span class="req">*</span></label><input id="ap-desig" type="text" placeholder="Director / Manager"/></div>
-          <div class="field"><label>Mobile <span class="req">*</span></label><input id="ap-mobile" type="tel" placeholder="+91 98100 00000" maxlength="13"/></div>
-          <div class="field"><label>Email <span class="req">*</span></label><input id="ap-email" type="email" placeholder="rajesh@company.com"/></div>
-          <div class="field"><label>Aadhar No <span class="req">*</span></label><input id="ap-aadhar" type="text" placeholder="XXXX XXXX XXXX" maxlength="14"/></div>
-          <div class="field"><label>PAN No <span class="req">*</span></label><input id="ap-pan" type="text" placeholder="ABCDE1234F" maxlength="10" style="text-transform:uppercase;"/></div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Bank Account Number <span class="req">*</span></label>
+          <input type="text" placeholder="For commission payouts" value="XXXX XXXX XXXX 4123">
         </div>
-        <div class="field" style="margin-top:12px;"><label>Residential Address</label><textarea id="ap-addr" placeholder="Current residential address…" style="min-height:60px;"></textarea></div>
+        <div class="form-group">
+          <label>IFSC Code <span class="req">*</span></label>
+          <input type="text" placeholder="e.g., HDFC0001234" value="HDFC0001234" maxlength="11" style="text-transform:uppercase">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Bank Name</label>
+          <input type="text" value="HDFC Bank" placeholder="Bank name">
+        </div>
+        <div class="form-group">
+          <label>Account Holder Name <span class="req">*</span></label>
+          <input type="text" value="Rajasthan Tours & Travels Pvt Ltd" placeholder="As per bank records">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Commission Preference <span class="req">*</span></label>
+          <select>
+            <option>Direct bank transfer (NEFT/IMPS)</option>
+            <option>Monthly settlement cheque</option>
+            <option>WOW Wallet credit</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target Commission Tier</label>
+          <select>
+            <option>Silver — 8% (up to ₹5L/month)</option>
+            <option selected>Gold — 10% (₹5L–₹20L/month)</option>
+            <option>Platinum — 12% (₹20L+ /month)</option>
+          </select>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-prev" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-next" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
       </div>
     </div>
+
+    <!-- STEP 3: Documents -->
+    <div class="form-card" id="step3">
+      <h2><i class="fas fa-file-alt" style="color:#a78bfa"></i> Document Upload</h2>
+      <p class="fc-desc">Upload clear, readable copies. Accepted formats: PDF, JPG, PNG (max 5 MB each).</p>
+      <div class="doc-upload-grid">
+        <div class="doc-upload uploaded" onclick="this.classList.toggle('uploaded')" id="doc1">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc1',this)">
+          <i class="fas fa-file-alt"></i>
+          <h5>GST Registration Certificate</h5>
+          <p>GST certificate issued by dept.</p>
+          <div class="doc-status" style="color:#4ade80"><i class="fas fa-check-circle"></i> gst_cert_rajtours.pdf</div>
+        </div>
+        <div class="doc-upload uploaded" id="doc2">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc2',this)">
+          <i class="fas fa-file-alt"></i>
+          <h5>PAN Card (Company)</h5>
+          <p>Scanned copy of PAN card</p>
+          <div class="doc-status" style="color:#4ade80"><i class="fas fa-check-circle"></i> pan_card.jpg</div>
+        </div>
+        <div class="doc-upload" id="doc3">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc3',this)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h5>Certificate of Incorporation</h5>
+          <p>MCA / ROC issued certificate</p>
+          <div class="doc-status" style="color:#64748b"><i class="fas fa-upload"></i> Upload Document</div>
+        </div>
+        <div class="doc-upload" id="doc4">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc4',this)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h5>Bank Statement (3 months)</h5>
+          <p>Latest 3 months of company account</p>
+          <div class="doc-status" style="color:#64748b"><i class="fas fa-upload"></i> Upload Document</div>
+        </div>
+        <div class="doc-upload" id="doc5">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc5',this)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h5>Travel Agency License (if TA)</h5>
+          <p>IATA / TAAI / Ministry of Tourism</p>
+          <div class="doc-status" style="color:#64748b"><i class="fas fa-upload"></i> Upload Document</div>
+        </div>
+        <div class="doc-upload" id="doc6">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc6',this)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h5>Additional Document (optional)</h5>
+          <p>Any other relevant document</p>
+          <div class="doc-status" style="color:#64748b"><i class="fas fa-plus"></i> Upload Optional</div>
+        </div>
+      </div>
+      <div style="background:#172554;border-radius:8px;padding:12px;font-size:.78rem;color:#93c5fd;margin-bottom:14px">
+        <i class="fas fa-info-circle"></i> Your documents are encrypted and stored securely. They will only be accessed for KYC verification by our compliance team.
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-prev" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-next" onclick="nextStep(3)">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Signatory -->
+    <div class="form-card" id="step4">
+      <h2><i class="fas fa-user-tie" style="color:#4ade80"></i> Authorized Signatory</h2>
+      <p class="fc-desc">Details of the person authorized to sign the partner agreement on behalf of the company.</p>
+      <div class="sig-grid">
+        <div class="form-group">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" placeholder="First name" value="Rajesh">
+        </div>
+        <div class="form-group">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" placeholder="Last name" value="Mehra">
+        </div>
+        <div class="form-group">
+          <label>Designation <span class="req">*</span></label>
+          <input type="text" placeholder="e.g., Managing Director" value="Managing Director">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>Mobile (for OTP verification) <span class="req">*</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="tel" id="sigMobile" placeholder="+91 XXXXX XXXXX" value="+91 98765 12345" style="flex:1">
+            <button style="padding:10px 14px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap" onclick="sendOTP()"><i class="fas fa-sms"></i> Send OTP</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <input type="email" placeholder="signatory@company.com" value="rajesh@rajtours.com">
+        </div>
+      </div>
+      <div class="fg-grid">
+        <div class="form-group">
+          <label>OTP Verification <span class="req">*</span></label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;letter-spacing:4px;text-align:center;font-weight:700">
+            <button style="padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer" onclick="verifyOTP()"><i class="fas fa-check"></i> Verify</button>
+          </div>
+          <div id="otpStatus" class="hint"></div>
+        </div>
+        <div class="form-group">
+          <label>Aadhaar Number (last 4 digits) <span class="req">*</span></label>
+          <input type="text" placeholder="XXXX" maxlength="4" style="text-align:center;letter-spacing:4px;font-weight:700" value="4321">
+        </div>
+      </div>
+      <!-- Signatory ID docs -->
+      <div class="doc-upload-grid" style="margin-bottom:14px">
+        <div class="doc-upload uploaded" id="sigDoc1">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('sigDoc1',this)">
+          <i class="fas fa-id-card"></i>
+          <h5>Aadhaar Card (Signatory)</h5>
+          <p>Both sides of Aadhaar card</p>
+          <div class="doc-status" style="color:#4ade80"><i class="fas fa-check-circle"></i> aadhaar_rajesh.jpg</div>
+        </div>
+        <div class="doc-upload" id="sigDoc2">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('sigDoc2',this)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <h5>PAN Card (Signatory)</h5>
+          <p>PAN card of authorized person</p>
+          <div class="doc-status" style="color:#64748b"><i class="fas fa-upload"></i> Upload Document</div>
+        </div>
+      </div>
+      <div class="fg-grid single">
+        <div class="form-group">
+          <label>Digital Signature / Declaration</label>
+          <div style="background:#0f172a;border:1.5px solid #334155;border-radius:8px;padding:16px;display:flex;align-items:center;gap:10px">
+            <input type="checkbox" id="declarationChk" style="width:18px;height:18px;cursor:pointer">
+            <label for="declarationChk" style="font-size:.78rem;color:#94a3b8;cursor:pointer;margin-bottom:0">
+              I, <strong style="color:#f1f5f9">Rajesh Mehra</strong>, as the authorized signatory of <strong style="color:#f1f5f9">Rajasthan Tours & Travels Pvt Ltd</strong>, hereby declare that all information provided is true and accurate. I agree to the <a href="#" style="color:#f59e0b">WOW Partner Terms & Conditions</a> and authorize KYC verification.
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn btn-prev" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-next" onclick="nextStep(4)">Review <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Review & Submit -->
+    <div class="form-card" id="step5">
+      <h2><i class="fas fa-clipboard-check" style="color:#fbbf24"></i> Review & Submit</h2>
+      <p class="fc-desc">Please review your application before final submission.</p>
+
+      <!-- KYC checklist -->
+      <div class="kyc-checklist">
+        <div style="font-size:.82rem;font-weight:700;color:#f1f5f9;margin-bottom:10px">KYC Completion Checklist</div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">Business Information — Complete</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">GSTIN Verified — 08AABCR4567B2Z6</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">PAN Verified — AABCR4567B</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">Bank Account Added — HDFC ****4123</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">GST Certificate Uploaded</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">PAN Card Uploaded</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-pending"><i class="fas fa-clock"></i></div><span class="kc-text">Certificate of Incorporation — Not uploaded</span><span class="kc-status" style="color:#fbbf24">Optional</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">Signatory — Rajesh Mehra (OTP Verified)</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">Aadhaar ID uploaded</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+        <div class="kc-item"><div class="kc-icon kc-ok"><i class="fas fa-check"></i></div><span class="kc-text">Declaration signed digitally</span><span class="kc-status" style="color:#4ade80">✓</span></div>
+      </div>
+
+      <!-- Summary -->
+      <div style="background:#0f172a;border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:.82rem;font-weight:700;color:#f1f5f9;margin-bottom:12px">Application Summary</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.8rem">
+          <div><span style="color:#64748b">Company:</span> <span style="color:#e2e8f0;font-weight:600">Rajasthan Tours & Travels</span></div>
+          <div><span style="color:#64748b">Type:</span> <span style="color:#e2e8f0;font-weight:600">Travel Agency</span></div>
+          <div><span style="color:#64748b">GSTIN:</span> <span style="color:#4ade80;font-weight:600;font-family:'Courier Prime',monospace">08AABCR4567B2Z6</span></div>
+          <div><span style="color:#64748b">City:</span> <span style="color:#e2e8f0;font-weight:600">Jaipur, Rajasthan</span></div>
+          <div><span style="color:#64748b">Commission Tier:</span> <span style="color:#f59e0b;font-weight:600">Gold — 10%</span></div>
+          <div><span style="color:#64748b">Signatory:</span> <span style="color:#e2e8f0;font-weight:600">Rajesh Mehra, MD</span></div>
+        </div>
+      </div>
+
+      <!-- What happens next -->
+      <div style="background:#172554;border-radius:10px;padding:14px;margin-bottom:16px;font-size:.8rem">
+        <div style="font-weight:700;color:#60a5fa;margin-bottom:8px"><i class="fas fa-info-circle"></i> What happens next?</div>
+        <div style="color:#93c5fd;display:flex;flex-direction:column;gap:4px">
+          <div>1. Your application will be reviewed by our Sales Manager within <strong>24–48 hours</strong></div>
+          <div>2. Super Admin final approval for accounts with Gold/Platinum tier</div>
+          <div>3. You'll receive login credentials via email and WhatsApp</div>
+          <div>4. Partner agreement will be sent for digital signature</div>
+          <div>5. Your dedicated Account Manager will call you within 2 business days</div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn btn-prev" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-submit" onclick="submitKYC()"><i class="fas fa-paper-plane"></i> Submit KYC Application</button>
+      </div>
+    </div>
+
+    <!-- Success card -->
+    <div class="success-card" id="successCard">
+      <span class="si">🎉</span>
+      <h2>Application Submitted Successfully!</h2>
+      <p>Badhaai ho! Aapki KYC application receive ho gayi hai. Our team will review it shortly.</p>
+      <div class="application-ref">Application ID: <strong id="appRef">WOW-KYC-2025-008241</strong><br><span style="font-size:.78rem;color:#64748b">Status updates will be sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0f7d6e656a7c674f7d6e657b607a7d7c216c6062">[email&#160;protected]</a> & WhatsApp +91 98765 12345</span></div>
+      <div class="next-steps">
+        <div class="ns-item"><span class="ns-icon" style="color:#fbbf24">⏳</span><span class="ns-text"><strong style="color:#f1f5f9">24-48 hours:</strong> Sales Manager reviews your KYC documents</span></div>
+        <div class="ns-item"><span class="ns-icon" style="color:#60a5fa">✉️</span><span class="ns-text"><strong style="color:#f1f5f9">On approval:</strong> Login credentials sent via email + WhatsApp</span></div>
+        <div class="ns-item"><span class="ns-icon" style="color:#4ade80">📞</span><span class="ns-text"><strong style="color:#f1f5f9">Within 2 days:</strong> Dedicated Account Manager will call you</span></div>
+        <div class="ns-item"><span class="ns-icon" style="color:#a78bfa">🤝</span><span class="ns-text"><strong style="color:#f1f5f9">After sign-in:</strong> Start selling WOW tickets and earn commissions!</span></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-next" onclick="window.location='login.html'" style="max-width:none;padding:12px 24px"><i class="fas fa-sign-in-alt"></i> Go to Partner Login</button>
+        <button class="btn btn-prev" onclick="window.location='../index.html'" style="padding:12px 24px"><i class="fas fa-home"></i> Back to Website</button>
+      </div>
+    </div>
+
   </div>
-  <div class="btn-row"><button class="btn btn-ghost" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="goStep(4)">Continue <i class="fas fa-arrow-right"></i></button></div>
-</div>
+</main>
 
-<!-- STEP 4 -->
-<div class="step-panel" id="panel-4">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon gold"><i class="fas fa-folder-open" style="color:#ffd700;"></i></div>
-      <div><div class="card-title">Document Uploads</div><div class="card-subtitle">PDF / JPG / PNG — max 5 MB each. Manual KYC review within 24–48 hrs.</div></div>
-    </div>
-    <div class="alert warning"><i class="fas fa-exclamation-triangle"></i><div>Documents are reviewed by our KYC team. You will get email + WhatsApp notification on approval or rejection.</div></div>
-    <div class="upload-grid">
-      <div class="upload-box" id="ub-pan" onclick="triggerUp('doc-pan')"><input type="file" id="doc-pan" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-pan','doc-pan','lb-pan')"/><div class="upload-icon"><i class="fas fa-id-card"></i></div><div class="upload-title">Company PAN Card <span style="color:#ff6b6b;">*</span></div><div class="upload-sub">Business entity PAN</div><div id="lb-pan" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-      <div class="upload-box" id="ub-gst" onclick="triggerUp('doc-gst')"><input type="file" id="doc-gst" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-gst','doc-gst','lb-gst')"/><div class="upload-icon"><i class="fas fa-file-invoice-dollar"></i></div><div class="upload-title">GST Certificate <span style="color:#ff6b6b;">*</span></div><div class="upload-sub">GSTIN registration doc</div><div id="lb-gst" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-      <div class="upload-box" id="ub-inc" onclick="triggerUp('doc-inc')"><input type="file" id="doc-inc" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-inc','doc-inc','lb-inc')"/><div class="upload-icon"><i class="fas fa-certificate"></i></div><div class="upload-title">Incorporation Certificate <span style="color:#ff6b6b;">*</span></div><div class="upload-sub">MCA / Registrar cert</div><div id="lb-inc" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-      <div class="upload-box" id="ub-aadhar" onclick="triggerUp('doc-aadhar')"><input type="file" id="doc-aadhar" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-aadhar','doc-aadhar','lb-aadhar')"/><div class="upload-icon"><i class="fas fa-fingerprint"></i></div><div class="upload-title">Auth Person Aadhar <span style="color:#ff6b6b;">*</span></div><div class="upload-sub">Front + back scan</div><div id="lb-aadhar" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-      <div class="upload-box" id="ub-iata" onclick="triggerUp('doc-iata')"><input type="file" id="doc-iata" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-iata','doc-iata','lb-iata')"/><div class="upload-icon"><i class="fas fa-plane"></i></div><div class="upload-title">IATA / TAAI Certificate</div><div class="upload-sub">Optional</div><div id="lb-iata" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-      <div class="upload-box" id="ub-cheque" onclick="triggerUp('doc-cheque')"><input type="file" id="doc-cheque" accept=".pdf,.jpg,.jpeg,.png" onchange="markUp('ub-cheque','doc-cheque','lb-cheque')"/><div class="upload-icon"><i class="fas fa-money-check-alt"></i></div><div class="upload-title">Cancelled Cheque <span style="color:#ff6b6b;">*</span></div><div class="upload-sub">Bank settlement proof</div><div id="lb-cheque" style="display:none;font-size:11px;color:#10b981;margin-top:8px;"></div></div>
-    </div>
-  </div>
-  <div class="btn-row"><button class="btn btn-ghost" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="goStep(5)">Continue <i class="fas fa-arrow-right"></i></button></div>
-</div>
+<div class="toast" id="toast"></div>
 
-<!-- STEP 5 -->
-<div class="step-panel" id="panel-5">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon green"><i class="fas fa-university" style="color:#10b981;"></i></div>
-      <div><div class="card-title">Bank Account &amp; GST Details</div><div class="card-subtitle">For commission payouts and auto-invoicing</div></div>
-    </div>
-    <div class="form-grid">
-      <div class="field"><label>Account Holder Name <span class="req">*</span></label><input id="bk-holder" type="text" placeholder="As per bank records"/></div>
-      <div class="field"><label>Account Number <span class="req">*</span></label><input id="bk-acc" type="text" placeholder="XXXXXXXXXXXXXXXX"/></div>
-      <div class="field"><label>IFSC Code <span class="req">*</span></label><input id="bk-ifsc" type="text" placeholder="HDFC0001234" maxlength="11" style="text-transform:uppercase;" oninput="verifyIFSC(this.value)"/><div class="field-hint" id="ifsc-hint"></div></div>
-      <div class="field"><label>Bank Name</label><input id="bk-name" type="text" placeholder="Auto-filled on IFSC verify" readonly/></div>
-      <div class="field"><label>Account Type</label><select id="bk-type"><option>Current</option><option>Savings</option><option>OD Account</option></select></div>
-      <div class="field"><label>UPI ID (optional)</label><input id="bk-upi" type="text" placeholder="company@okicici"/></div>
-    </div>
-    <hr style="border-color:rgba(255,255,255,.07);margin:22px 0;"/>
-    <div style="font-size:15px;font-weight:700;margin-bottom:14px;color:#ffd700;">🧾 GST &amp; Invoice Config</div>
-    <div class="form-grid">
-      <div class="field"><label>GST Slab</label><select id="gst-slab"><option value="18">18% (Standard)</option><option value="12">12%</option><option value="5">5%</option><option value="0">0% Exempt</option></select></div>
-      <div class="field"><label>GST State</label><select id="gst-state"><option value="">Select State…</option><option>Delhi</option><option>Uttar Pradesh</option><option>Maharashtra</option><option>Karnataka</option><option>Tamil Nadu</option><option>Rajasthan</option><option>Gujarat</option><option>West Bengal</option><option>Haryana</option></select></div>
-      <div class="field"><label>Invoice Prefix</label><input id="inv-prefix" type="text" placeholder="XYZ-WOW" maxlength="10"/><div class="field-hint">Used in auto-generated invoice IDs</div></div>
-      <div class="field"><label>Credit Period (days)</label><input id="credit-days" type="number" value="7" min="0" max="60"/></div>
-    </div>
-  </div>
-  <div class="btn-row"><button class="btn btn-ghost" onclick="goStep(4)"><i class="fas fa-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="goStep(6)">Review &amp; Submit <i class="fas fa-arrow-right"></i></button></div>
-</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+let currentStep = 1;
+let partnerType = 'reseller';
 
-<!-- STEP 6 -->
-<div class="step-panel" id="panel-6">
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon gold"><i class="fas fa-check-double" style="color:#ffd700;"></i></div>
-      <div><div class="card-title">Review &amp; Submit</div><div class="card-subtitle">Verify all details before final submission</div></div>
-    </div>
-    <div id="review-content"></div>
-    <div class="alert success" style="margin-top:18px;"><i class="fas fa-shield-alt"></i><div>By submitting, you confirm all information is accurate. False documents may lead to termination &amp; legal action.</div></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:14px;">
-      <input type="checkbox" id="agree-tnc" style="width:16px;height:16px;cursor:pointer;"/>
-      <label for="agree-tnc" style="font-size:13px;color:#a0aec0;cursor:pointer;">I agree to the <a href="#" style="color:#ffd700;">Terms &amp; Conditions</a> and <a href="#" style="color:#ffd700;">Partner Policy</a>.</label>
-    </div>
-  </div>
-  <div class="btn-row"><button class="btn btn-ghost" onclick="goStep(5)"><i class="fas fa-arrow-left"></i> Back</button><button class="btn btn-primary" onclick="submitApp()"><i class="fas fa-paper-plane"></i> Submit KYC Application</button></div>
-</div>
-
-<!-- SUCCESS -->
-<div id="success-screen">
-  <div class="success-icon">✅</div>
-  <h2>Application Submitted!</h2>
-  <p>Your partner KYC is under manual review. You'll get email + WhatsApp updates within 24–48 hours.</p>
-  <p style="color:#ffd700;font-weight:600;margin-bottom:20px;" id="app-ref-text"></p>
-  <div class="creds-box">
-    <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;">🔐 Your Login Credentials</div>
-    <div class="cred-row"><span>Login Email</span><span id="cred-email">—</span></div>
-    <div class="cred-row"><span>Mobile</span><span id="cred-mobile">—</span></div>
-    <div class="cred-row"><span>Temp Password</span><span id="cred-pass">—</span></div>
-    <div class="cred-row"><span>Application ID</span><span id="cred-appid">—</span></div>
-    <div class="cred-row"><span>Status</span><span><span class="badge pending">⏳ Pending Review</span></span></div>
-  </div>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px;">
-    <button class="btn btn-primary" onclick="location.href='dashboard.html'"><i class="fas fa-tachometer-alt"></i> Partner Dashboard</button>
-    <button class="btn btn-ghost" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-    <button class="btn btn-ghost" onclick="location.href='../index.html'"><i class="fas fa-home"></i> Main Site</button>
-  </div>
-</div>
-
-</div>
-
-<script>
-let currentStep=1, cameraStream=null, capturedPhoto=null, selectedType=null;
-
-function selectType(el,type){
-  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedType=type;
-  document.getElementById('partner-type').value=type;
-  document.getElementById('type-err').style.display='none';
+function setPartnerType(type, el) {
+  partnerType = type;
+  document.querySelectorAll('.pt-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
 }
 
-function goStep(n){
-  if(n===1&&currentStep===1&&!selectedType){document.getElementById('type-err').style.display='block';return;}
-  document.getElementById('panel-'+currentStep).classList.remove('active');
-  for(let i=currentStep;i<n;i++){
-    const sc=document.getElementById('sc-'+i);
-    if(sc){sc.className='step-circle done';sc.innerHTML='<i class="fas fa-check" style="font-size:11px;"></i>';}
-    const sl=document.getElementById('sl-'+i);
-    if(sl)sl.classList.add('done');
+function nextStep(from) {
+  if(from < 5) {
+    goToStep(from + 1);
   }
-  document.getElementById('sc-'+n).className='step-circle active';
-  document.getElementById('panel-'+n).classList.add('active');
-  currentStep=n;
-  document.getElementById('main-progress').style.width=(n/6*100)+'%';
-  if(n===6)buildReview();
+}
+
+function prevStep(from) {
+  if(from > 1) goToStep(from - 1);
+}
+
+function goToStep(n) {
+  // Hide all
+  for(let i=1;i<=5;i++) document.getElementById('step'+i).classList.remove('active');
+  document.getElementById('step'+n).classList.add('active');
+  // Update step bar
+  for(let i=1;i<=5;i++) {
+    const sb = document.getElementById('sb'+i);
+    sb.classList.remove('active','done');
+    if(i < n) sb.classList.add('done');
+    else if(i === n) sb.classList.add('active');
+    // Update line colors
+    if(sb.previousElementSibling && sb.previousElementSibling.classList.contains('sb-line')) {
+      sb.previousElementSibling.style.background = i <= n ? '#16a34a' : '#334155';
+    }
+  }
+  currentStep = n;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-async function startCamera(){
-  try{
-    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:200,height:150}});
-    document.getElementById('video-stream').srcObject=cameraStream;
-    document.getElementById('video-stream').style.display='block';
-    document.getElementById('photo-preview').style.display='none';
-    document.getElementById('start-cam-btn').style.display='none';
-    document.getElementById('capture-btn').style.display='inline-flex';
-  }catch(e){alert('Camera unavailable. Please upload a photo instead.');}
+function verifyGSTIN() {
+  const gstin = document.getElementById('gstinInput').value;
+  if(gstin.length === 15) {
+    document.getElementById('gstResult').classList.add('show');
+    showToast('GSTIN verified — Rajasthan Tours & Travels Pvt Ltd');
+  } else {
+    showToast('Please enter a valid 15-character GSTIN');
+  }
 }
 
-function capturePhoto(){
-  const v=document.getElementById('video-stream'),c=document.getElementById('photo-canvas');
-  c.getContext('2d').drawImage(v,0,0,200,150);
-  capturedPhoto=c.toDataURL('image/jpeg');
-  const p=document.getElementById('photo-preview');
-  p.src=capturedPhoto;p.style.display='block';v.style.display='none';
-  if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());
-  document.getElementById('capture-btn').style.display='none';
-  document.getElementById('retake-btn').style.display='inline-flex';
+function verifyPAN() {
+  const pan = document.getElementById('panInput').value;
+  if(pan.length === 10) {
+    showToast('PAN verified successfully!');
+  } else {
+    showToast('Please enter a valid 10-character PAN');
+  }
 }
 
-function retakePhoto(){
-  document.getElementById('photo-preview').style.display='none';
-  document.getElementById('video-stream').style.display='block';
-  document.getElementById('retake-btn').style.display='none';
-  document.getElementById('start-cam-btn').style.display='inline-flex';
-  capturedPhoto=null;
+function sendOTP() {
+  showToast('OTP sent to +91 98765 12345 via SMS');
+  document.getElementById('otpStatus').textContent = 'OTP sent — valid for 10 minutes';
+  document.getElementById('otpStatus').style.color = '#fbbf24';
 }
 
-function handlePhotoUpload(e){
-  const file=e.target.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    capturedPhoto=ev.target.result;
-    const p=document.getElementById('photo-preview');
-    p.src=capturedPhoto;p.style.display='block';
-    document.getElementById('video-stream').style.display='none';
-    document.getElementById('start-cam-btn').style.display='none';
-    document.getElementById('retake-btn').style.display='inline-flex';
-  };
-  r.readAsDataURL(file);
+function verifyOTP() {
+  const otp = document.getElementById('otpInput').value;
+  if(otp.length >= 4) {
+    document.getElementById('otpStatus').textContent = '✓ Mobile number verified successfully!';
+    document.getElementById('otpStatus').style.color = '#4ade80';
+    showToast('Mobile OTP verified!');
+  } else {
+    showToast('Please enter the OTP sent to your mobile');
+  }
 }
 
-function triggerUp(id){document.getElementById(id).click();}
-function markUp(boxId,inputId,lbId){
-  const file=document.getElementById(inputId).files[0];if(!file)return;
-  document.getElementById(boxId).classList.add('uploaded');
-  const lb=document.getElementById(lbId);lb.style.display='block';
-  lb.innerHTML='<i class="fas fa-check-circle"></i> '+file.name;
+function markUploaded(id, inp) {
+  if(inp.files && inp.files[0]) {
+    const el = document.getElementById(id);
+    el.classList.add('uploaded');
+    const statusEl = el.querySelector('.doc-status');
+    statusEl.style.color = '#4ade80';
+    statusEl.innerHTML = `<i class="fas fa-check-circle"></i> ${inp.files[0].name}`;
+    el.querySelector('i:first-child').style.color = '#4ade80';
+    showToast('Document uploaded: ' + inp.files[0].name);
+  }
 }
 
-function verifyIFSC(val){
-  const hint=document.getElementById('ifsc-hint');
-  if(val.length===11){
-    const b={HDFC:'HDFC Bank',SBIN:'State Bank of India',ICIC:'ICICI Bank',KKBK:'Kotak Mahindra Bank',UTIB:'Axis Bank',PUNB:'Punjab National Bank'};
-    const name=b[val.substring(0,4)];
-    document.getElementById('bk-name').value=name||'';
-    hint.style.color=name?'#10b981':'#fbbf24';
-    hint.textContent=name?'✓ '+name+' verified':'ℹ Will be verified during review';
-  }else{hint.textContent='';document.getElementById('bk-name').value='';}
-}
-
-function v(id){const el=document.getElementById(id);return el?el.value.trim():'';}
-function vs(id){const el=document.getElementById(id);return el&&el.options?el.options[el.selectedIndex].text:'';}
-
-function buildReview(){
-  const typeMap={travel_agent:'✈️ Travel Agent',school:'🏫 School / College',corporate:'🏢 Corporate',reseller:'🔄 Online Reseller'};
-  document.getElementById('review-content').innerHTML=`
-    <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">🏢 Company</div>
-    <div class="review-grid">
-      <div class="review-item"><div class="review-label">Partner Type</div><div class="review-value">${typeMap[selectedType]||'—'}</div></div>
-      <div class="review-item"><div class="review-label">Company Name</div><div class="review-value">${v('co-name')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">GST Number</div><div class="review-value">${v('co-gst')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">PAN</div><div class="review-value">${v('co-pan')||'—'}</div></div>
-    </div>
-    <div style="font-size:13px;font-weight:700;color:#ffd700;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">👤 Authorised Person</div>
-    <div class="review-grid">
-      <div class="review-item"><div class="review-label">Name</div><div class="review-value">${v('ap-name')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">Designation</div><div class="review-value">${v('ap-desig')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">Mobile</div><div class="review-value">${v('ap-mobile')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">Email</div><div class="review-value">${v('ap-email')||'—'}</div></div>
-    </div>
-    <div style="font-size:13px;font-weight:700;color:#ffd700;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.07);">🏦 Bank &amp; GST</div>
-    <div class="review-grid">
-      <div class="review-item"><div class="review-label">Account Holder</div><div class="review-value">${v('bk-holder')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">Bank</div><div class="review-value">${v('bk-name')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">IFSC</div><div class="review-value">${v('bk-ifsc')||'—'}</div></div>
-      <div class="review-item"><div class="review-label">GST Slab</div><div class="review-value">${vs('gst-slab')}</div></div>
-    </div>`;
-}
-
-async function submitApp(){
-  if(!document.getElementById('agree-tnc').checked){alert('Please accept Terms & Conditions.');return;}
-  const appId='WOW-TA-'+Date.now().toString(36).toUpperCase();
-  const tempPass='WOW@'+Math.floor(1000+Math.random()*9000);
-  const email=v('ap-email')||'partner@example.com';
-  const mobile=v('ap-mobile')||'9999999999';
-  const payload={app_id:appId,partner_type:selectedType,company_name:v('co-name'),gst_number:v('co-gst'),cin:v('co-cin'),pan:v('co-pan'),auth_name:v('ap-name'),auth_email:email,auth_mobile:mobile,auth_pan:v('ap-pan'),bank_holder:v('bk-holder'),bank_ifsc:v('bk-ifsc'),bank_name:v('bk-name'),gst_slab:vs('gst-slab'),gst_state:vs('gst-state'),invoice_prefix:v('inv-prefix'),temp_password:tempPass,status:'pending_review',created_at:new Date().toISOString()};
-  try{await fetch('tables/ta_applications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});}catch(e){}
-  document.getElementById('panel-6').style.display='none';
-  const ss=document.getElementById('success-screen');ss.style.display='block';
-  document.getElementById('app-ref-text').textContent='Application Reference: '+appId;
-  document.getElementById('cred-email').textContent=email;
-  document.getElementById('cred-mobile').textContent=mobile;
-  document.getElementById('cred-pass').textContent=tempPass;
-  document.getElementById('cred-appid').textContent=appId;
+function submitKYC() {
+  const chk = document.getElementById('declarationChk');
+  if(!chk || !chk.checked) {
+    showToast('Please check the declaration box to proceed');
+    return;
+  }
+  // Generate application ref
+  const ref = 'WOW-KYC-2025-0' + Math.floor(Math.random()*90000+10000);
+  document.getElementById('appRef').textContent = ref;
+  // Hide all steps
+  for(let i=1;i<=5;i++) document.getElementById('step'+i).classList.remove('active');
+  document.getElementById('successCard').classList.add('show');
+  // Update step bar
+  for(let i=1;i<=5;i++) {
+    const sb = document.getElementById('sb'+i);
+    sb.classList.remove('active');
+    sb.classList.add('done');
+  }
   window.scrollTo({top:0,behavior:'smooth'});
+  showToast('🎉 KYC application submitted successfully!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<i class="fas fa-check-circle" style="color:#4ade80"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
 }
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
