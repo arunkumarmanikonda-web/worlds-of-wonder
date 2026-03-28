@@ -211,12 +211,17 @@ function buildNav() {
 
     <nav class="nav-links" id="nav-links">${links}</nav>
 
-    <!-- CENTER: Book CTA + Sign In -->
+    <!-- CENTER: Customer Login (before logo) + Book CTA -->
     <div class="nav-cta-wrap">
-      <a href="${BASE}book/water-park.html" class="btn btn-nav-book">🎟 Book Tickets</a>
-      <a href="${BASE}portal/login.html" class="btn btn-nav-signin" id="nav-signin-btn" aria-label="Sign In">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Sign In
-      </a>
+      <div class="nav-login-group">
+        <a href="${BASE}portal/login.html" class="btn btn-nav-signin" id="nav-signin-btn" aria-label="Sign In — Individual Customer">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Sign In
+        </a>
+        <a href="${BASE}portal/login.html?type=business" class="btn btn-nav-business" aria-label="Business Sign In">
+          🏢 Business
+        </a>
+      </div>
+      <a href="${BASE}book/water-park.html" class="btn btn-nav-book">🎟 Book Now</a>
     </div>
 
     <!-- RIGHT: WOW Logo — HARD ADOPTED — real logo.png — NO FILTERS, NO ALTERATIONS, NO CHANGES -->
@@ -289,22 +294,51 @@ function buildFooter() {
         <a href="${BASE}groups/schools.html">School Trips</a>
         <a href="${BASE}groups/birthdays.html">Birthday Events</a>
         <a href="${BASE}sales/quote-builder.html">Get a Quote</a>
-        <a href="${BASE}travel-agent.html">Travel Agents</a>
-        <a href="${BASE}partner/login.html">Partner Login</a>
+        <a href="${BASE}partner/onboarding.html">Travel Agent Onboarding</a>
+        <a href="${BASE}partner/login.html">Partner Portal Login</a>
+        <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resellers</div>
+          <a href="${BASE}reseller/onboarding.html">Reseller Onboarding</a>
+          <a href="${BASE}reseller/login.html">Reseller Portal Login</a>
+        </div>
       </div>
       <div class="footer-col">
         <h4>Visit &amp; Help</h4>
         <a href="${BASE}offers.html">Offers &amp; Deals</a>
         <a href="${BASE}plan-your-visit.html">Plan Your Visit</a>
         <a href="${BASE}safety-guidelines.html">Safety Guidelines</a>
-        <a href="${BASE}contact.html#faq">FAQs</a>
+        <a href="${BASE}faq.html">FAQs</a>
         <a href="${BASE}contact.html">Contact Us</a>
-        <div style="margin-top:18px;border-top:1px solid rgba(255,255,255,.07);padding-top:16px;">
-          <div style="font-size:11px;color:rgba(255,255,255,.3);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">My Account</div>
-          <a href="${BASE}portal/login.html">Sign In</a>
+        <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">My Account</div>
+          <a href="${BASE}portal/login.html">\ud83d\udc64 Individual Sign In</a>
+          <a href="${BASE}portal/login.html?type=business">\ud83c\udfe2 Business Sign In</a>
           <a href="${BASE}portal/register.html">Create Account</a>
           <a href="${BASE}portal/my-bookings.html">My Bookings</a>
           <a href="${BASE}portal/loyalty.html" data-module="loyalty_program">My Rewards</a>
+          <a href="${BASE}portal/wow-passport.html">My WOW Passport</a>
+        </div>
+        <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Passport Holder</div>
+          <a href="${BASE}passport/login.html">Passport Holder Login</a>
+          <a href="${BASE}portal/wow-passport.html">View My Passport</a>
+        </div>
+      </div>
+      <!-- STAFF & PARTNER PORTALS COL -->
+      <div class="footer-col">
+        <h4>Staff &amp; Partner Portals</h4>
+        <a href="${BASE}internal/index.html" style="color:var(--yellow);font-weight:700;">&#128274; Internal Staff Gateway</a>
+        <a href="${BASE}admin/super-admin.html" style="color:rgba(168,85,247,.8);">&#128737; Super Admin Panel</a>
+        <a href="${BASE}admin/index.html">&#9881; Admin &amp; Ops ERP</a>
+        <a href="${BASE}sales/erp-dashboard.html">&#128200; Sales ERP</a>
+        <a href="${BASE}sales/passport-login.html">&#128220; Passport Sales Portal</a>
+        <a href="${BASE}admin/call-center.html">&#127911; Call Centre CRM</a>
+        <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;">
+          <div style="font-size:10px;color:rgba(255,255,255,.25);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Partner Portals</div>
+          <a href="${BASE}partner/dashboard.html">&#128722; Reseller ERP</a>
+          <a href="${BASE}partner/dashboard.html">&#9992;&#65039; Travel Agent Portal</a>
+          <a href="${BASE}partner/onboarding-kyc.html">Reseller / TA Onboarding</a>
+          <a href="${BASE}groups/corporate.html">&#127970; Corporate Portal</a>
         </div>
       </div>
     </div>
