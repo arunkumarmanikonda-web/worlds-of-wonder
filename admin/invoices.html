@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Invoices — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.inv-table { width:100%;border-collapse:collapse; }
+.inv-table th { background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left;text-transform:uppercase;letter-spacing:.5px; }
+.inv-table td { padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle; }
+.inv-table tr:hover td { background:var(--bg); }
+.inv-status { padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700; }
+.inv-paid   { background:var(--green-lt);color:var(--green); }
+.inv-pending{ background:var(--amber-lt);color:var(--amber); }
+.inv-overdue{ background:var(--red-lt);color:var(--red); }
+.inv-draft  { background:var(--bg3);color:var(--muted); }
+.inv-cancelled { background:var(--bg3);color:var(--text3); }
+.kpi-strip { display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px; }
+.kpi-box { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center; }
+.kpi-box-val { font-size:24px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--ink); }
+.kpi-box-lbl { font-size:11px;color:var(--muted);font-weight:600;margin-top:4px; }
+</style>
+</head>
+<body>
+<div class="adm-layout">
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <a href="tickets.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Tickets Issued</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
+    <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <a href="loyalty-admin.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
+    <div class="adm-nav-section">B2B &amp; Partner</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
+    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
+    <a href="ta-approvals.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> TA/Reseller KYC</a>
+    <a href="reseller-config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> Reseller Config</a>
+    <a href="partners.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Partners</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
+    <a href="ops-dashboard.html" class="adm-nav-item"><span class="nav-icon">🎡</span> Ops Dashboard</a>
+    <a href="call-center.html" class="adm-nav-item"><span class="nav-icon">📞</span> Call Center ERP</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <a href="invoices.html" class="adm-nav-item active"><span class="nav-icon">🧾</span> Invoices</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="module-control.html" class="adm-nav-item"><span class="nav-icon">🔧</span> Module Control</a>
+    <a href="api-secrets.html" class="adm-nav-item"><span class="nav-icon">🔑</span> API Secrets</a>
+    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="advisories.html" class="adm-nav-item"><span class="nav-icon">📢</span> Advisories</a>
+    <div class="adm-nav-section">Reports</div>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
+    <div style="margin-top:auto;"></div>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+    <a href="../partner/dashboard.html" class="adm-nav-item"><span class="nav-icon">🤝</span> Partner Portal</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user"><div class="adm-user-avatar">SA</div><div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div></div>
+  </div>
+</aside>
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div><div class="adm-topbar-title">🧾 Invoice Management</div><div class="adm-topbar-sub">All GST invoices · Auto-generated · Bulk dispatch</div></div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="bulkEmail()"><i class="fa fa-envelope"></i> Bulk Email</button>
+      <button class="btn btn-primary btn-sm" onclick="exportInvoices()"><i class="fa fa-download"></i> Export</button>
+    </div>
+  </div>
+  <div class="adm-content">
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-box"><div class="kpi-box-val">₹7.2Cr</div><div class="kpi-box-lbl">Total Invoiced (Mar)</div></div>
+      <div class="kpi-box" style="border-color:var(--green);"><div class="kpi-box-val" style="color:var(--green);">₹6.8Cr</div><div class="kpi-box-lbl">Collected (Paid)</div></div>
+      <div class="kpi-box" style="border-color:var(--amber);"><div class="kpi-box-val" style="color:var(--amber);">₹28.4L</div><div class="kpi-box-lbl">Pending</div></div>
+      <div class="kpi-box" style="border-color:var(--red);"><div class="kpi-box-val" style="color:var(--red);">₹4.2L</div><div class="kpi-box-lbl">Overdue</div></div>
+      <div class="kpi-box"><div class="kpi-box-val">2,841</div><div class="kpi-box-lbl">Total Invoices</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card" style="padding:0;margin-bottom:20px;overflow:hidden;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);">
+        <input class="form-input" id="inv-search" placeholder="🔍 Invoice ID, customer, GSTIN..." style="width:240px;font-size:12px;padding:7px 12px;" oninput="filterInvoices()"/>
+        <select class="form-input" id="inv-status" style="width:140px;font-size:12px;padding:7px 10px;" onchange="filterInvoices()">
+          <option value="">All Status</option>
+          <option>Paid</option><option>Pending</option><option>Overdue</option><option>Draft</option><option>Cancelled</option>
+        </select>
+        <select class="form-input" id="inv-type" style="width:160px;font-size:12px;padding:7px 10px;" onchange="filterInvoices()">
+          <option value="">All Types</option>
+          <option>B2B Invoice</option><option>B2C Invoice</option><option>TA Commission</option><option>Passport</option><option>Credit Note</option>
+        </select>
+        <input type="month" class="form-input" id="inv-month" style="width:160px;font-size:12px;padding:7px 10px;" onchange="filterInvoices()"/>
+        <button class="btn btn-ghost btn-sm" onclick="clearInvFilters()">Clear</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="inv-table">
+          <thead><tr>
+            <th><input type="checkbox" id="sel-all" onchange="toggleAll(this)"/></th>
+            <th>Invoice #</th><th>Date</th><th>Customer / Partner</th><th>Type</th>
+            <th>Amount</th><th>GST</th><th>Total</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="inv-tbody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--muted);" id="inv-count">Showing 20 of 2,841</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm"><i class="fa fa-chevron-left"></i></button>
+          <button class="btn btn-ghost btn-sm" style="background:var(--primary);color:#fff;">1</button>
+          <button class="btn btn-ghost btn-sm">2</button><button class="btn btn-ghost btn-sm">3</button>
+          <button class="btn btn-ghost btn-sm"><i class="fa fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+const invoices = [
+  {id:'INV-2025-03-0291',date:'27 Mar 2025',customer:'DPS Noida School',type:'B2B Invoice',amt:52800,gst:9504,total:62304,status:'paid'},
+  {id:'INV-2025-03-0290',date:'27 Mar 2025',customer:'Raj Tour Operators',type:'TA Commission',amt:18200,gst:3276,total:21476,status:'pending'},
+  {id:'INV-2025-03-0289',date:'26 Mar 2025',customer:'Rahul Kumar',type:'B2C Invoice',amt:1799,gst:216,total:2015,status:'paid'},
+  {id:'INV-2025-03-0288',date:'26 Mar 2025',customer:'Sunita Travels',type:'B2B Invoice',amt:84000,gst:15120,total:99120,status:'paid'},
+  {id:'INV-2025-03-0287',date:'25 Mar 2025',customer:'City Explorer Pvt',type:'B2B Invoice',amt:64400,gst:11592,total:75992,status:'overdue'},
+  {id:'INV-2025-03-0286',date:'25 Mar 2025',customer:'Ananya Singh',type:'Passport',amt:3999,gst:480,total:4479,status:'paid'},
+  {id:'INV-2025-03-0285',date:'24 Mar 2025',customer:'Vikas Tiwari',type:'B2C Invoice',amt:2399,gst:288,total:2687,status:'pending'},
+  {id:'INV-2025-03-0284',date:'24 Mar 2025',customer:'NCR Adventures',type:'B2B Invoice',amt:42000,gst:7560,total:49560,status:'paid'},
+  {id:'INV-2025-03-0283',date:'23 Mar 2025',customer:'Manish Gupta',type:'B2C Invoice',amt:1199,gst:144,total:1343,status:'draft'},
+  {id:'INV-2025-03-0282',date:'23 Mar 2025',customer:'Fun World Tours',type:'TA Commission',amt:12400,gst:2232,total:14632,status:'paid'},
+  {id:'INV-2025-03-0281',date:'22 Mar 2025',customer:'Pooja Sharma',type:'Passport',amt:5999,gst:720,total:6719,status:'paid'},
+  {id:'INV-2025-03-0280',date:'22 Mar 2025',customer:'Capital Holidays',type:'B2B Invoice',amt:36800,gst:6624,total:43424,status:'overdue'},
+  {id:'INV-2025-03-0279',date:'21 Mar 2025',customer:'Deepak Agarwal',type:'B2C Invoice',amt:1799,gst:216,total:2015,status:'cancelled'},
+  {id:'INV-2025-03-0278',date:'21 Mar 2025',customer:'Holiday Makers Co',type:'B2B Invoice',amt:28400,gst:5112,total:33512,status:'paid'},
+  {id:'INV-2025-03-0277',date:'20 Mar 2025',customer:'Arjun Mehta',type:'Passport',amt:3499,gst:420,total:3919,status:'paid'},
+];
+
+const sc = {paid:'inv-paid',pending:'inv-pending',overdue:'inv-overdue',draft:'inv-draft',cancelled:'inv-cancelled'};
+
+function renderInvoices(data) {
+  document.getElementById('inv-tbody').innerHTML = data.map(inv => `
+    <tr>
+      <td><input type="checkbox" class="inv-check"/></td>
+      <td><span style="font-size:12px;font-weight:700;color:var(--primary);">${inv.id}</span></td>
+      <td style="color:var(--muted);">${inv.date}</td>
+      <td style="font-weight:600;">${inv.customer}</td>
+      <td><span class="badge badge-blue" style="font-size:10px;">${inv.type}</span></td>
+      <td>₹${inv.amt.toLocaleString('en-IN')}</td>
+      <td style="color:var(--amber);">₹${inv.gst.toLocaleString('en-IN')}</td>
+      <td style="font-weight:800;color:var(--ink);">₹${inv.total.toLocaleString('en-IN')}</td>
+      <td><span class="inv-status ${sc[inv.status]}">${inv.status.charAt(0).toUpperCase()+inv.status.slice(1)}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px;" onclick="viewInvoice('${inv.id}')"><i class="fa fa-eye"></i></button>
+          <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px;" onclick="downloadInvoice('${inv.id}')"><i class="fa fa-download"></i></button>
+          <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px;" onclick="emailInvoice('${inv.id}')"><i class="fa fa-envelope"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('inv-count').textContent = `Showing ${data.length} of 2,841`;
+}
+
+function filterInvoices() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  const s = document.getElementById('inv-status').value.toLowerCase();
+  const t = document.getElementById('inv-type').value;
+  renderInvoices(invoices.filter(i =>
+    (!q || i.id.toLowerCase().includes(q) || i.customer.toLowerCase().includes(q)) &&
+    (!s || i.status === s) &&
+    (!t || i.type === t)
+  ));
+}
+
+function clearInvFilters() {
+  ['inv-search','inv-status','inv-type','inv-month'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderInvoices(invoices);
+}
+
+function toggleAll(cb) { document.querySelectorAll('.inv-check').forEach(c => c.checked = cb.checked); }
+function viewInvoice(id) { alert(`Opening invoice ${id}...`); }
+function downloadInvoice(id) { alert(`Downloading PDF: ${id}...`); }
+function emailInvoice(id) { alert(`Sending invoice ${id} by email...`); }
+function bulkEmail() { const checked = document.querySelectorAll('.inv-check:checked').length; alert(`Sending ${checked} invoices by email...`); }
+function exportInvoices() { alert('Exporting invoice list as CSV/Excel...'); }
+
+renderInvoices(invoices);
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
