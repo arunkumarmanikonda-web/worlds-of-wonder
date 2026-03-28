@@ -1,378 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GST Engine — WOW Super Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/wow-design-system.css" />
-  <style>
-    body { background:#0a0f1e; font-family:'Inter',sans-serif; color:#e2e8f0; min-height:100vh; }
-    .admin-layout { display:flex; min-height:100vh; }
-    .admin-sidebar { width:240px; background:#060b17; border-right:1px solid rgba(255,255,255,.06); flex-shrink:0; padding:24px 0; }
-    .admin-sidebar-logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,.06); margin-bottom:16px; }
-    .admin-sidebar-logo img { height:40px; filter:none !important; opacity:1; object-fit:contain; }
-    .admin-nav-link { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; font-weight:600; color:rgba(255,255,255,.5); text-decoration:none; border-radius:8px; margin:2px 8px; transition:all .15s; }
-    .admin-nav-link:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
-    .admin-nav-link.active { background:rgba(0,85,179,.25); color:#60A5FA; }
-    .admin-main { flex:1; overflow:auto; }
-    .admin-topbar { background:#060b17; border-bottom:1px solid rgba(255,255,255,.06); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
-    .admin-topbar h1 { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; }
-    .admin-topbar p  { font-size:12px; color:rgba(255,255,255,.4); margin-top:1px; }
-    .admin-content { padding:28px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GST Engine — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.hdr{background:#1e293b;border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hdr img{height:42px;filter:none!important}
+.hdr h1{font-size:1rem;font-weight:700;color:#f1f5f9}
+.hdr h1 span{color:#f59e0b;font-size:.72rem;display:block;font-weight:400}
+.btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.btn-gold{background:#f59e0b;color:#000}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-green{background:#16a34a;color:#fff}
+.btn-red{background:#dc2626;color:#fff}
+.btn-outline{background:transparent;border:1px solid #475569;color:#cbd5e1}
+.btn:hover{transform:translateY(-1px);opacity:.9}
 
-    .gst-card { background:#111827; border:1px solid rgba(255,255,255,.07); border-radius:16px; margin-bottom:20px; overflow:hidden; }
-    .gst-card-head { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:12px; }
-    .gst-card-icon { font-size:22px; }
-    .gst-card-title { font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:#fff; }
-    .gst-card-desc  { font-size:12px; color:rgba(255,255,255,.4); margin-top:2px; }
-    .gst-card-body  { padding:20px; }
+.body{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 69px)}
+.sidebar{background:#1e293b;border-right:1px solid #334155;padding:14px 10px}
+.sidebar-title{font-size:.7rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.82rem;color:#94a3b8;transition:all .2s}
+.nav-item:hover,.nav-item.active{background:#0f172a;color:#f1f5f9}
+.nav-item.active{border-left:3px solid #f59e0b}
+.nav-item i{width:16px;text-align:center}
+.main{flex:1;padding:24px;overflow-y:auto}
 
-    /* Rate Table */
-    .gst-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .gst-table th { padding:10px 14px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.4); background:rgba(255,255,255,.03); border-bottom:1px solid rgba(255,255,255,.06); }
-    .gst-table td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.05); vertical-align:middle; }
-    .gst-table tr:last-child td { border-bottom:none; }
-    .gst-table tr:hover td { background:rgba(255,255,255,.02); }
+/* Cards */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px}
+.stat-card .sv{font-size:1.5rem;font-weight:800;color:#f59e0b}
+.stat-card .sl{font-size:.72rem;color:#64748b;margin-top:3px}
+.stat-card .sd{font-size:.75rem;color:#4ade80;margin-top:2px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:20px}
+.card h4{font-size:.9rem;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #334155;padding-bottom:10px}
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.section-hdr h2{font-size:1.05rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 
-    .gst-rate-input {
-      width:80px; padding:6px 10px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.1);
-      border-radius:6px; color:#fff; font-size:13px; font-family:'Inter',sans-serif; outline:none; text-align:right;
-    }
-    .gst-rate-input:focus { border-color:#0055B3; }
+/* GST Calculator */
+.gst-calc{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:20px}
+.gst-form{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.gf-item label{display:block;font-size:.75rem;color:#94a3b8;margin-bottom:5px;font-weight:600}
+.gf-item input,.gf-item select{width:100%;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:.83rem}
+.gf-item.span-2{grid-column:span 2}
+.gf-item.span-3{grid-column:1/-1}
+.gst-result{background:#1e293b;border-radius:10px;padding:16px}
+.gst-result-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0f172a;font-size:.83rem}
+.gst-result-row .grk{color:#94a3b8}
+.gst-result-row .grv{color:#f1f5f9;font-weight:600;font-family:'Courier Prime',monospace}
+.gst-result-row.total{border-top:2px solid #334155;border-bottom:none;margin-top:4px}
+.gst-result-row.total .grk{color:#f1f5f9;font-weight:700;font-size:.9rem}
+.gst-result-row.total .grv{color:#4ade80;font-size:1rem;font-weight:800}
 
-    /* Calculator */
-    .gst-calc { background:rgba(0,85,179,.1); border:1px solid rgba(0,85,179,.2); border-radius:12px; padding:20px; }
-    .gst-calc h3 { font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; color:#60A5FA; margin-bottom:14px; }
+/* Rates table */
+.rates-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.rates-table th{text-align:left;padding:10px;color:#64748b;font-weight:700;font-size:.73rem;border-bottom:1px solid #334155;background:#0f172a}
+.rates-table td{padding:10px;border-bottom:1px solid #1e293b;color:#e2e8f0;vertical-align:middle}
+.rates-table tr:hover td{background:#0f172a}
+.gst-badge{padding:3px 10px;border-radius:8px;font-size:.72rem;font-weight:700}
+.gst-5{background:#1c3a1c;color:#4ade80}
+.gst-12{background:#172554;color:#60a5fa}
+.gst-18{background:#3b1f00;color:#fbbf24}
+.gst-28{background:#4a1d1d;color:#f87171}
+.gst-exempt{background:#1e293b;color:#94a3b8}
 
-    .gst-calc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
-    .gst-calc-field label { font-size:11px; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.04em; display:block; margin-bottom:4px; }
-    .gst-calc-input {
-      width:100%; padding:10px 12px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.12);
-      border-radius:8px; color:#fff; font-size:14px; font-family:'Inter',sans-serif; outline:none;
-    }
-    .gst-calc-input:focus { border-color:#0055B3; }
-    .gst-calc-input[readonly] { color:#7DD3FC; font-weight:700; background:rgba(0,85,179,.08); }
+/* Invoices */
+.inv-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.inv-table th{text-align:left;padding:10px;color:#64748b;font-weight:700;font-size:.73rem;border-bottom:1px solid #334155}
+.inv-table td{padding:10px;border-bottom:1px solid #1e293b;color:#e2e8f0;vertical-align:middle}
+.inv-table tr:hover td{background:#0f172a}
+.status-pill{padding:3px 10px;border-radius:10px;font-size:.7rem;font-weight:700}
+.sp-paid{background:#0d2b1a;color:#4ade80}
+.sp-pending{background:#3b2f00;color:#fbbf24}
+.sp-draft{background:#1e293b;color:#94a3b8}
+.sp-overdue{background:#4a1d1d;color:#f87171}
 
-    .gst-breakdown { background:rgba(255,255,255,.04); border-radius:10px; padding:14px 16px; }
-    .gst-brow { display:flex; justify-content:space-between; font-size:13px; padding:5px 0; }
-    .gst-brow .bl { color:rgba(255,255,255,.5); }
-    .gst-brow .bv { font-weight:700; color:#fff; }
-    .gst-brow.total { border-top:1px solid rgba(255,255,255,.1); margin-top:6px; padding-top:10px; }
-    .gst-brow.total .bl { color:#fff; font-size:14px; font-weight:700; }
-    .gst-brow.total .bv { color:#60A5FA; font-size:16px; font-weight:900; }
+/* Invoice preview */
+.invoice-preview{background:#fff;color:#1a1a1a;border-radius:12px;padding:32px;font-family:'Courier Prime',monospace;max-width:700px;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.inv-prev-hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1a1a1a;padding-bottom:16px;margin-bottom:16px}
+.inv-prev-title{font-size:1.5rem;font-weight:700;color:#1a1a1a}
+.inv-prev-num{font-size:.85rem;color:#666}
+.inv-prev-company{font-size:.9rem;color:#333;margin-bottom:16px}
+.inv-prev-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:.82rem}
+.inv-prev-table th{background:#f0f0f0;padding:8px;text-align:left;border:1px solid #ddd}
+.inv-prev-table td{padding:8px;border:1px solid #ddd}
+.inv-totals{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:.85rem}
+.inv-total-row{display:flex;gap:60px;justify-content:flex-end}
+.inv-total-row .ik{color:#666}
+.inv-total-row .iv{color:#1a1a1a;font-weight:700;min-width:80px;text-align:right}
+.inv-grand{font-size:1rem;font-weight:800;border-top:2px solid #1a1a1a;padding-top:8px;margin-top:4px}
+.inv-footer{font-size:.72rem;color:#888;border-top:1px solid #ddd;margin-top:16px;padding-top:12px;text-align:center}
 
-    /* Invoice format */
-    .gst-invoice-preview { background:#fff; color:#1A2235; border-radius:12px; padding:24px; font-size:12px; }
-    .gst-inv-header { display:flex; justify-content:space-between; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #DDE3EE; }
-    .gst-inv-table { width:100%; border-collapse:collapse; font-size:12px; }
-    .gst-inv-table th { background:#F7F9FC; padding:8px 10px; text-align:left; color:#6B7280; font-size:11px; font-weight:700; text-transform:uppercase; border-bottom:1px solid #DDE3EE; }
-    .gst-inv-table td { padding:8px 10px; border-bottom:1px solid #F0F4FA; }
-    .gst-inv-totals { margin-top:16px; display:flex; justify-content:flex-end; }
-    .gst-inv-totals-inner { min-width:240px; }
-    .gst-inv-row { display:flex; justify-content:space-between; font-size:12px; padding:4px 0; }
-    .gst-inv-row.grand { border-top:2px solid #DDE3EE; margin-top:8px; padding-top:8px; font-weight:900; font-size:14px; color:#0055B3; }
+/* GSTR reports */
+.gstr-tabs{display:flex;gap:4px;background:#0f172a;padding:4px;border-radius:10px;margin-bottom:20px}
+.gstr-tab{flex:1;padding:9px;border:none;background:transparent;color:#64748b;font-size:.8rem;font-weight:600;border-radius:7px;cursor:pointer;transition:all .2s;text-align:center}
+.gstr-tab.active{background:#1e293b;color:#f1f5f9;border:1px solid #334155}
+.filing-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:16px;display:flex;align-items:center;gap:16px;margin-bottom:10px}
+.fc-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.fc-info{flex:1}
+.fc-info .fn{font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.fc-info .fd{font-size:.78rem;color:#94a3b8}
+.fc-status{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.fc-amount{font-size:1rem;font-weight:800;color:#f59e0b;font-family:'Courier Prime',monospace}
 
-    /* Buttons */
-    .gst-save-btn { padding:10px 24px; border-radius:8px; border:none; background:linear-gradient(135deg,#003D82,#0055B3); color:#fff; font-family:'Nunito',sans-serif; font-size:13px; font-weight:800; cursor:pointer; }
-  </style>
+/* Progress reconcile */
+.recon-bar{background:#0f172a;border-radius:4px;height:8px;width:100%;margin:8px 0}
+.recon-fill{height:8px;border-radius:4px;background:linear-gradient(90deg,#16a34a,#4ade80);transition:width .8s}
+
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid #f59e0b;border-radius:10px;padding:12px 18px;color:#fbbf24;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
 </head>
 <body>
-<div class="admin-layout">
-  <nav class="admin-sidebar">
-    <div class="admin-sidebar-logo"><a href="index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:40px;width:auto;object-fit:contain;filter:none!important;" /></a></div>
-    <a href="index.html" class="admin-nav-link">📊 Dashboard</a>
-    <a href="bookings.html" class="admin-nav-link">🎫 Bookings</a>
-    <a href="finance.html" class="admin-nav-link">💰 Finance</a>
-    <a href="reporting.html" class="admin-nav-link">📈 Reports</a>
-    <a href="settings.html" class="admin-nav-link">🛠 Settings</a>
-    <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
-    <a href="module-control.html" class="admin-nav-link">⚙️ Module Control</a>
-    <a href="api-secrets.html" class="admin-nav-link">🔑 API Secrets</a>
-    <a href="gst-engine.html" class="admin-nav-link active">📊 GST Engine</a>
+
+<header class="hdr">
+  <div style="display:flex;align-items:center;gap:14px">
+    <img src="../images/logo.png" alt="WOW">
+    <h1>GST Engine — Auto-Reverse & B2B Invoicing <span>⚡ GSTIN: 09AAACW1234F1Z5 · Worlds of Wonder Leisure Ltd</span></h1>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-green" onclick="generateGSTR()"><i class="fas fa-file-alt"></i> Generate GSTR-1</button>
+    <button class="btn btn-gold" onclick="showSection('invoice')"><i class="fas fa-plus"></i> New Invoice</button>
+    <button class="btn btn-outline" onclick="window.location='index.html'"><i class="fas fa-th"></i> Admin</button>
+  </div>
+</header>
+
+<div class="body">
+  <nav class="sidebar">
+    <div class="sidebar-title">GST Modules</div>
+    <div class="nav-item active" onclick="showSection('dashboard',this)"><i class="fas fa-chart-bar" style="color:#f59e0b"></i> Dashboard</div>
+    <div class="nav-item" onclick="showSection('calculator',this)"><i class="fas fa-calculator" style="color:#4ade80"></i> GST Calculator</div>
+    <div class="nav-item" onclick="showSection('rates',this)"><i class="fas fa-percent" style="color:#60a5fa"></i> Tax Rate Table</div>
+    <div class="nav-item" onclick="showSection('invoice',this)"><i class="fas fa-file-invoice" style="color:#fbbf24"></i> B2B Invoices</div>
+    <div class="nav-item" onclick="showSection('bulk',this)"><i class="fas fa-layer-group" style="color:#a78bfa"></i> Bulk Invoicing</div>
+    <div class="sidebar-title">Compliance</div>
+    <div class="nav-item" onclick="showSection('gstr',this)"><i class="fas fa-file-alt" style="color:#f87171"></i> GSTR Filing</div>
+    <div class="nav-item" onclick="showSection('recon',this)"><i class="fas fa-sync" style="color:#4ade80"></i> Reconciliation</div>
+    <div class="nav-item" onclick="showSection('reverse',this)"><i class="fas fa-undo" style="color:#fbbf24"></i> Reverse Charge (RCM)</div>
+    <div class="sidebar-title">Reports</div>
+    <div class="nav-item" onclick="showSection('reports',this)"><i class="fas fa-chart-line" style="color:#94a3b8"></i> GST Reports</div>
+    <div class="nav-item" onclick="showSection('einvoice',this)"><i class="fas fa-qrcode" style="color:#f59e0b"></i> E-Invoice / IRN</div>
   </nav>
 
-  <div class="admin-main">
-    <div class="admin-topbar">
-      <div>
-        <h1>📊 GST Auto-Compute Engine</h1>
-        <p>Configure GST rates, SAC codes, reverse computation, and bulk invoice generation.</p>
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="sec-dashboard">
+      <div class="section-hdr">
+        <h2><i class="fas fa-chart-bar" style="color:#f59e0b"></i> GST Dashboard — FY 2024-25</h2>
+        <div style="display:flex;gap:8px">
+          <select style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:.8rem">
+            <option>March 2025</option><option>February 2025</option><option>January 2025</option>
+          </select>
+          <button class="btn btn-outline"><i class="fas fa-download"></i> Export</button>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;">
-        <button class="gst-save-btn" onclick="saveGST()">Save GST Config</button>
+      <div class="stats-row">
+        <div class="stat-card"><div class="sv">₹42.8L</div><div class="sl">Total GST Collected (Mar)</div><div class="sd">↑ 8% vs Feb</div></div>
+        <div class="stat-card"><div class="sv" style="color:#60a5fa">₹28.1L</div><div class="sl">GST Payable (Net)</div><div class="sd">After ITC adjustment</div></div>
+        <div class="stat-card"><div class="sv" style="color:#4ade80">₹14.7L</div><div class="sl">Input Tax Credit (ITC)</div><div class="sd">Claimed this month</div></div>
+        <div class="stat-card"><div class="sv" style="color:#a78bfa">248</div><div class="sl">B2B Invoices Issued</div><div class="sd">Apr–Mar FY2025</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h4><i class="fas fa-chart-pie" style="color:#f59e0b"></i> GST by Product Type</h4><div style="height:200px"><canvas id="gstPieChart"></canvas></div></div>
+        <div class="card"><h4><i class="fas fa-chart-bar" style="color:#4ade80"></i> Monthly GST Liability</h4><div style="height:200px"><canvas id="gstBarChart"></canvas></div></div>
+      </div>
+      <!-- Filing status -->
+      <div class="card">
+        <h4><i class="fas fa-calendar-check" style="color:#4ade80"></i> GSTR Filing Status — FY 2024-25</h4>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="background:#0f172a;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:6px">GSTR-1 (Sales)</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#4ade80">Filed ✓</div>
+            <div style="font-size:.72rem;color:#64748b">Feb 2025 · Due 11 Mar</div>
+          </div>
+          <div style="background:#0f172a;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:6px">GSTR-3B (Summary)</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#4ade80">Filed ✓</div>
+            <div style="font-size:.72rem;color:#64748b">Feb 2025 · Due 20 Mar</div>
+          </div>
+          <div style="background:#0f172a;border-radius:8px;padding:12px;text-align:center">
+            <div style="font-size:.78rem;font-weight:700;color:#94a3b8;margin-bottom:6px">GSTR-1 (Mar 2025)</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#fbbf24">Pending</div>
+            <div style="font-size:.72rem;color:#64748b">Due: 11 Apr 2025</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="admin-content">
+    <!-- CALCULATOR -->
+    <div id="sec-calculator" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-calculator" style="color:#4ade80"></i> GST Calculator & Invoice Builder</h2></div>
+      <div class="gst-calc">
+        <h4 style="font-size:.9rem;font-weight:700;color:#f1f5f9;margin-bottom:16px"><i class="fas fa-magic" style="color:#a78bfa"></i> Auto-calculate GST for any transaction</h4>
+        <div class="gst-form">
+          <div class="gf-item">
+            <label>Product / Service</label>
+            <select id="gstProduct" onchange="autoFillGST()">
+              <option value="">Select product…</option>
+              <option value="ticket_water" data-rate="18" data-hsn="9996">Water Park Ticket</option>
+              <option value="ticket_amuse" data-rate="18" data-hsn="9996">Amusement Park Ticket</option>
+              <option value="ticket_combo" data-rate="18" data-hsn="9996">Combo Ticket</option>
+              <option value="passport_explore" data-rate="18" data-hsn="9996">WOW Passport — Explore</option>
+              <option value="passport_together" data-rate="18" data-hsn="9996">WOW Passport — Together</option>
+              <option value="passport_legacy" data-rate="18" data-hsn="9996">WOW Passport — Legacy</option>
+              <option value="fnb" data-rate="5" data-hsn="9963">F&amp;B (Restaurant / Snacks)</option>
+              <option value="merchandise" data-rate="12" data-hsn="6301">Merchandise</option>
+              <option value="locker" data-rate="18" data-hsn="9972">Locker Rental</option>
+              <option value="security" data-rate="18" data-hsn="9985">Security Services</option>
+              <option value="lawn" data-rate="18" data-hsn="9972">Lawn / Venue Rental</option>
+              <option value="photography" data-rate="18" data-hsn="9983">Photography / Costume</option>
+            </select>
+          </div>
+          <div class="gf-item"><label>HSN / SAC Code</label><input type="text" id="gstHSN" value="9996"></div>
+          <div class="gf-item"><label>GST Rate (%)</label><select id="gstRate" onchange="calculateGST()"><option value="5">5%</option><option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option><option value="0">Exempt</option></select></div>
+          <div class="gf-item"><label>Sale Type</label><select id="gstType" onchange="calculateGST()"><option value="b2c">B2C (Individual)</option><option value="b2b">B2B (Business)</option></select></div>
+          <div class="gf-item"><label>Transaction Type</label><select id="txType" onchange="calculateGST()"><option value="intra">Intra-state (CGST + SGST)</option><option value="inter">Inter-state (IGST)</option></select></div>
+          <div class="gf-item"><label>Quantity</label><input type="number" id="gstQty" value="1" min="1" oninput="calculateGST()"></div>
+          <div class="gf-item"><label>Unit Price (₹) — excl. GST</label><input type="number" id="gstUnitPrice" value="1100" oninput="calculateGST()"></div>
+          <div class="gf-item"><label>Discount (₹)</label><input type="number" id="gstDiscount" value="0" oninput="calculateGST()"></div>
+          <div class="gf-item"><label>Include price in GST? (incl.)</label><select id="gstMode" onchange="calculateGST()"><option value="exclusive">Exclusive (add GST on top)</option><option value="inclusive">Inclusive (extract from price)</option></select></div>
+        </div>
+        <div class="gst-result" id="gstResult">
+          <div class="gst-result-row"><span class="grk">Base Amount</span><span class="grv" id="rBase">₹1,100.00</span></div>
+          <div class="gst-result-row"><span class="grk">Discount</span><span class="grv" id="rDiscount">- ₹0.00</span></div>
+          <div class="gst-result-row"><span class="grk">Taxable Value</span><span class="grv" id="rTaxable">₹1,100.00</span></div>
+          <div class="gst-result-row"><span class="grk">CGST (9%)</span><span class="grv" id="rCGST">₹99.00</span></div>
+          <div class="gst-result-row"><span class="grk">SGST (9%)</span><span class="grv" id="rSGST">₹99.00</span></div>
+          <div class="gst-result-row"><span class="grk">IGST (0%)</span><span class="grv" id="rIGST" style="color:#64748b">₹0.00</span></div>
+          <div class="gst-result-row total"><span class="grk">Total Invoice Amount</span><span class="grv" id="rTotal">₹1,298.00</span></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-outline" onclick="showSection('invoice')"><i class="fas fa-file-invoice"></i> Create Invoice</button>
+          <button class="btn btn-gold" onclick="showToast('Invoice created with GST breakdown!')"><i class="fas fa-plus"></i> Add to Invoice</button>
+        </div>
+      </div>
+    </div>
 
-      <!-- GST Rate Configuration -->
-      <div class="gst-card">
-        <div class="gst-card-head">
-          <div class="gst-card-icon">⚡</div>
-          <div>
-            <div class="gst-card-title">GST Rate Configuration by Product Type</div>
-            <div class="gst-card-desc">SAC code and applicable GST rate for each ticketing category</div>
+    <!-- RATES TABLE -->
+    <div id="sec-rates" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-percent" style="color:#60a5fa"></i> WOW GST Rate Table — Theme Park Products</h2></div>
+      <div class="card">
+        <h4><i class="fas fa-table" style="color:#f59e0b"></i> Applicable HSN / SAC Codes & GST Rates</h4>
+        <table class="rates-table">
+          <thead><tr><th>Product / Service</th><th>HSN/SAC</th><th>GST Rate</th><th>CGST</th><th>SGST</th><th>IGST</th><th>Remarks</th></tr></thead>
+          <tbody>
+            <tr><td>Water Park Entry Ticket</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Amusement / Theme Park entry</td></tr>
+            <tr><td>Amusement Park Entry Ticket</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Amusement / Theme Park entry</td></tr>
+            <tr><td>Combo Ticket (Both Parks)</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Bundled entry — same HSN</td></tr>
+            <tr><td>WOW Annual Passport (Explore)</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Subscription service — amusement</td></tr>
+            <tr><td>WOW Annual Passport (Together)</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Subscription service — amusement</td></tr>
+            <tr><td>WOW Annual Passport (Legacy)</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Subscription service — amusement</td></tr>
+            <tr><td>F&B — Restaurant / Food Court</td><td>9963</td><td><span class="gst-badge gst-5">5%</span></td><td>2.5%</td><td>2.5%</td><td>5%</td><td>No ITC claim on restaurant</td></tr>
+            <tr><td>F&B — Pre-packaged / MRP items</td><td>2106</td><td><span class="gst-badge gst-12">12%</span></td><td>6%</td><td>6%</td><td>12%</td><td>Packaged food items</td></tr>
+            <tr><td>Merchandise / Branded Items</td><td>6301</td><td><span class="gst-badge gst-12">12%</span></td><td>6%</td><td>6%</td><td>12%</td><td>Apparel & souvenirs</td></tr>
+            <tr><td>Locker Rental</td><td>9972</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Support service at park</td></tr>
+            <tr><td>Photography / Costume Service</td><td>9983</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Professional services</td></tr>
+            <tr><td>Security Services (B2B)</td><td>9985</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>RCM applicable if unregistered</td></tr>
+            <tr><td>Lawn / Venue Rental</td><td>9972</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Immovable property service</td></tr>
+            <tr><td>Corporate Package (All-in)</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Principal supply — amusement</td></tr>
+            <tr><td>Group / School Package</td><td>9996</td><td><span class="gst-badge gst-18">18%</span></td><td>9%</td><td>9%</td><td>18%</td><td>Composite supply — amusement</td></tr>
+          </tbody>
+        </table>
+        <div style="background:#172554;border-radius:8px;padding:12px;margin-top:14px;font-size:.78rem;color:#93c5fd">
+          <i class="fas fa-info-circle"></i> <strong>Note:</strong> As per Notification No. 11/2017-CT(Rate) dated 28-Jun-2017, entry to amusement parks and theme parks attracting rides and recreational services falls under SAC 9996 @ 18% GST. F&B within the park (non-AC) @ 5% with no ITC. Verify with your CA for composite supply treatment.
+        </div>
+      </div>
+    </div>
+
+    <!-- B2B INVOICES -->
+    <div id="sec-invoice" style="display:none">
+      <div class="section-hdr">
+        <h2><i class="fas fa-file-invoice" style="color:#fbbf24"></i> B2B Invoice Manager</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline"><i class="fas fa-filter"></i> Filter</button>
+          <button class="btn btn-gold" onclick="generateInvoice()"><i class="fas fa-plus"></i> Generate Invoice</button>
+        </div>
+      </div>
+      <div class="card">
+        <h4><i class="fas fa-list" style="color:#60a5fa"></i> Recent B2B Invoices</h4>
+        <table class="inv-table">
+          <thead><tr><th>Invoice #</th><th>Party (GSTIN)</th><th>Date</th><th>Product</th><th>Taxable (₹)</th><th>GST (₹)</th><th>Total (₹)</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="invoiceTableBody"></tbody>
+        </table>
+      </div>
+      <!-- Invoice preview -->
+      <div class="card" id="invoicePreviewCard" style="display:none">
+        <h4><i class="fas fa-eye" style="color:#f59e0b"></i> Invoice Preview</h4>
+        <div class="invoice-preview" id="invoicePreview"></div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+          <button class="btn btn-outline" onclick="document.getElementById('invoicePreviewCard').style.display='none'">Close</button>
+          <button class="btn btn-blue" onclick="showToast('Sending invoice via email…')"><i class="fas fa-envelope"></i> Email to Party</button>
+          <button class="btn btn-gold" onclick="showToast('Downloading invoice PDF…')"><i class="fas fa-download"></i> Download PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULK INVOICING -->
+    <div id="sec-bulk" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-layer-group" style="color:#a78bfa"></i> Bulk Invoice Generation</h2></div>
+      <div class="card">
+        <h4><i class="fas fa-upload" style="color:#60a5fa"></i> Upload Bulk Sales Data</h4>
+        <div style="background:#0f172a;border:2px dashed #334155;border-radius:12px;padding:32px;text-align:center;margin-bottom:16px" ondragover="return false" ondrop="handleDrop(event)">
+          <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:#475569;display:block;margin-bottom:12px"></i>
+          <div style="font-size:.9rem;color:#94a3b8;margin-bottom:12px">Drop CSV / Excel file here or click to upload</div>
+          <div style="font-size:.75rem;color:#64748b;margin-bottom:16px">Required columns: party_name, gstin, product, qty, unit_price, date</div>
+          <button class="btn btn-blue" onclick="simulateBulkUpload()"><i class="fas fa-folder-open"></i> Choose File</button>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline" onclick="downloadTemplate()"><i class="fas fa-download"></i> Download CSV Template</button>
+          <button class="btn btn-green" onclick="simulateBulkUpload()"><i class="fas fa-magic"></i> Generate All Invoices</button>
+        </div>
+      </div>
+      <div class="card" id="bulkResult" style="display:none">
+        <h4><i class="fas fa-check-circle" style="color:#4ade80"></i> Bulk Processing Results</h4>
+        <div class="stats-row" style="margin-bottom:0">
+          <div class="stat-card"><div class="sv" style="color:#4ade80">142</div><div class="sl">Invoices Generated</div></div>
+          <div class="stat-card"><div class="sv">₹48.2L</div><div class="sl">Total Taxable</div></div>
+          <div class="stat-card"><div class="sv" style="color:#fbbf24">₹8.7L</div><div class="sl">Total GST</div></div>
+          <div class="stat-card"><div class="sv" style="color:#f87171">3</div><div class="sl">Errors / Review</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GSTR FILING -->
+    <div id="sec-gstr" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-file-alt" style="color:#f87171"></i> GSTR Filing — Government Portal</h2></div>
+      <div class="gstr-tabs">
+        <button class="gstr-tab active">GSTR-1</button>
+        <button class="gstr-tab">GSTR-3B</button>
+        <button class="gstr-tab">GSTR-2A/2B</button>
+        <button class="gstr-tab">GSTR-9 Annual</button>
+      </div>
+      <div class="filing-card">
+        <div class="fc-icon" style="background:#0d2b1a"><i class="fas fa-check-circle" style="color:#4ade80"></i></div>
+        <div class="fc-info"><div class="fn">GSTR-1 — February 2025</div><div class="fd">B2B Invoices: 142 · B2C: 1,247 · Credit Notes: 8 · Filed on 11 Mar 2025</div></div>
+        <div class="fc-status"><div class="fc-amount">₹28.4L</div><span class="status-pill sp-paid">Filed</span></div>
+      </div>
+      <div class="filing-card">
+        <div class="fc-icon" style="background:#3b2f00"><i class="fas fa-clock" style="color:#fbbf24"></i></div>
+        <div class="fc-info"><div class="fn">GSTR-1 — March 2025</div><div class="fd">Due: 11 April 2025 · Status: Data Preparation in Progress</div></div>
+        <div class="fc-status"><div class="fc-amount">₹42.8L</div><button class="btn btn-gold btn" style="font-size:.75rem;padding:5px 12px" onclick="generateGSTR()">Prepare Now</button></div>
+      </div>
+      <div class="filing-card">
+        <div class="fc-icon" style="background:#0d2b1a"><i class="fas fa-check-circle" style="color:#4ade80"></i></div>
+        <div class="fc-info"><div class="fn">GSTR-3B — February 2025</div><div class="fd">Tax Paid: ₹28.1L · ITC: ₹14.7L · Net: ₹13.4L · Filed 20 Mar 2025</div></div>
+        <div class="fc-status"><div class="fc-amount">₹13.4L</div><span class="status-pill sp-paid">Filed</span></div>
+      </div>
+    </div>
+
+    <!-- RECONCILIATION -->
+    <div id="sec-recon" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-sync" style="color:#4ade80"></i> GST Reconciliation — 2A vs Books</h2></div>
+      <div class="card">
+        <h4><i class="fas fa-balance-scale" style="color:#f59e0b"></i> ITC Reconciliation Status</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+          <div style="background:#0f172a;border-radius:10px;padding:14px">
+            <div style="font-size:.78rem;color:#64748b;margin-bottom:6px">GSTR-2A (Portal)</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#60a5fa;font-family:'Courier Prime',monospace">₹18.42L</div>
+            <div style="font-size:.72rem;color:#64748b">142 suppliers · Mar 2025</div>
+          </div>
+          <div style="background:#0f172a;border-radius:10px;padding:14px">
+            <div style="font-size:.78rem;color:#64748b;margin-bottom:6px">Books (ITC Claimed)</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#4ade80;font-family:'Courier Prime',monospace">₹14.70L</div>
+            <div style="font-size:.72rem;color:#64748b">Conservative claim (80%)</div>
+          </div>
+          <div style="background:#0f172a;border-radius:10px;padding:14px">
+            <div style="font-size:.78rem;color:#64748b;margin-bottom:6px">Difference / Pending</div>
+            <div style="font-size:1.3rem;font-weight:800;color:#fbbf24;font-family:'Courier Prime',monospace">₹3.72L</div>
+            <div style="font-size:.72rem;color:#64748b">Supplier upload pending</div>
           </div>
         </div>
-        <div class="gst-card-body">
-          <table class="gst-table">
-            <thead>
-              <tr>
-                <th>Product / Service</th>
-                <th>SAC Code</th>
-                <th>GST Category</th>
-                <th>Rate (%)</th>
-                <th>CGST (%)</th>
-                <th>SGST (%)</th>
-                <th>IGST (%)</th>
-                <th>Applicable</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="font-weight:700;">Water Park Day Entry</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
-                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
-                <td><input class="gst-rate-input" value="18" oninput="splitRates(this)" /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="18" readonly /></td>
-                <td><label style="cursor:pointer;"><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700;">Amusement Park Day Entry</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
-                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
-                <td><input class="gst-rate-input" value="18" oninput="splitRates(this)" /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="18" readonly /></td>
-                <td><label style="cursor:pointer;"><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700;">Combo Ticket (Both Parks)</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
-                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
-                <td><input class="gst-rate-input" value="18" /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="18" readonly /></td>
-                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700;">WOW Passport (Annual)</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">999691</code></td>
-                <td><span style="font-size:11px;background:rgba(245,168,0,.15);color:#F5D679;padding:2px 8px;border-radius:20px;">Entertainment</span></td>
-                <td><input class="gst-rate-input" value="18" /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="18" readonly /></td>
-                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700;">F&amp;B (Food and Beverages)</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">996331</code></td>
-                <td><span style="font-size:11px;background:rgba(16,185,129,.15);color:#6EE7B7;padding:2px 8px;border-radius:20px;">Restaurant</span></td>
-                <td><input class="gst-rate-input" value="5" /></td>
-                <td><input class="gst-rate-input" value="2.5" readonly /></td>
-                <td><input class="gst-rate-input" value="2.5" readonly /></td>
-                <td><input class="gst-rate-input" value="5" readonly /></td>
-                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-              <tr>
-                <td style="font-weight:700;">Locker / Facility Rental</td>
-                <td><code style="color:#7DD3FC;background:rgba(0,85,179,.15);padding:2px 6px;border-radius:4px;">997313</code></td>
-                <td><span style="font-size:11px;background:rgba(94,53,177,.15);color:#C4B5FD;padding:2px 8px;border-radius:20px;">Rental</span></td>
-                <td><input class="gst-rate-input" value="18" /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="9" readonly /></td>
-                <td><input class="gst-rate-input" value="18" readonly /></td>
-                <td><label><input type="checkbox" checked style="accent-color:#0055B3;" /> Enabled</label></td>
-              </tr>
-            </tbody>
+        <div style="font-size:.82rem;font-weight:600;color:#94a3b8;margin-bottom:8px">Reconciliation Progress</div>
+        <div class="recon-bar"><div class="recon-fill" style="width:79%"></div></div>
+        <div style="font-size:.75rem;color:#64748b;text-align:right">79% matched · 21% pending supplier upload</div>
+      </div>
+    </div>
+
+    <!-- REVERSE CHARGE -->
+    <div id="sec-reverse" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-undo" style="color:#fbbf24"></i> Reverse Charge Mechanism (RCM)</h2></div>
+      <div class="card">
+        <h4><i class="fas fa-exclamation-triangle" style="color:#fbbf24"></i> RCM Transactions — March 2025</h4>
+        <div style="background:#3b2f00;border-radius:8px;padding:14px;margin-bottom:16px;font-size:.82rem;color:#fbbf24">
+          ⚠️ <strong>RCM Applies When:</strong> Purchasing security, manpower, sponsorship, freight, insurance, or GTA services from unregistered dealers OR from specified registered suppliers under GST law.
+        </div>
+        <table class="inv-table">
+          <thead><tr><th>Supplier</th><th>Service</th><th>Amount</th><th>GST Rate</th><th>RCM GST</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Star Security Services</td><td>Security Guards (Unregistered)</td><td>₹2,40,000</td><td>18%</td><td>₹43,200</td><td><span class="status-pill sp-paid">Self-assessed & Paid</span></td></tr>
+            <tr><td>Shiv Transport Co.</td><td>GTA — Goods Freight</td><td>₹85,000</td><td>5%</td><td>₹4,250</td><td><span class="status-pill sp-pending">Pending</span></td></tr>
+            <tr><td>Priya Manpower Agency</td><td>Manpower Supply</td><td>₹1,20,000</td><td>18%</td><td>₹21,600</td><td><span class="status-pill sp-paid">Self-assessed & Paid</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="sec-reports" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-chart-line" style="color:#94a3b8"></i> GST Reports</h2></div>
+      <div class="grid-2">
+        <div class="card"><h4>FY 2024-25 GST Summary</h4>
+          <table class="rates-table">
+            <tr><td style="color:#94a3b8">Total Outward Supplies</td><td style="font-weight:700;color:#f1f5f9;font-family:'Courier Prime',monospace">₹4,28,47,200</td></tr>
+            <tr><td style="color:#94a3b8">Total GST Collected</td><td style="font-weight:700;color:#f59e0b;font-family:'Courier Prime',monospace">₹77,12,496</td></tr>
+            <tr><td style="color:#94a3b8">Total ITC Availed</td><td style="font-weight:700;color:#4ade80;font-family:'Courier Prime',monospace">₹14,70,000</td></tr>
+            <tr><td style="color:#94a3b8">Net GST Paid</td><td style="font-weight:700;color:#60a5fa;font-family:'Courier Prime',monospace">₹62,42,496</td></tr>
           </table>
         </div>
-      </div>
-
-      <!-- Live GST Calculator -->
-      <div class="gst-card">
-        <div class="gst-card-head">
-          <div class="gst-card-icon">🧮</div>
-          <div>
-            <div class="gst-card-title">Live GST Calculator</div>
-            <div class="gst-card-desc">Forward computation (ex-GST to inclusive) and reverse computation (inclusive to ex-GST)</div>
-          </div>
-        </div>
-        <div class="gst-card-body">
-          <div class="gst-calc">
-            <h3>🧮 GST Reverse Computation Tool</h3>
-            <div class="gst-calc-grid">
-              <div class="gst-calc-field">
-                <label>Inclusive Price (₹)</label>
-                <input class="gst-calc-input" id="calc-inclusive" type="number" value="1299" oninput="computeGST()" />
-              </div>
-              <div class="gst-calc-field">
-                <label>GST Rate (%)</label>
-                <input class="gst-calc-input" id="calc-rate" type="number" value="18" oninput="computeGST()" />
-              </div>
-              <div class="gst-calc-field">
-                <label>Quantity</label>
-                <input class="gst-calc-input" id="calc-qty" type="number" value="2" min="1" oninput="computeGST()" />
-              </div>
-            </div>
-
-            <div class="gst-breakdown" id="gst-breakdown">
-              <!-- Populated by JS -->
-            </div>
+        <div class="card"><h4>Download Reports</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-outline" style="width:100%;text-align:left" onclick="showToast('Downloading GSTR-1 JSON…')"><i class="fas fa-download" style="color:#60a5fa"></i> GSTR-1 JSON (NIC Portal Format)</button>
+            <button class="btn btn-outline" style="width:100%;text-align:left" onclick="showToast('Downloading GSTR-3B…')"><i class="fas fa-download" style="color:#4ade80"></i> GSTR-3B Summary Excel</button>
+            <button class="btn btn-outline" style="width:100%;text-align:left" onclick="showToast('Downloading ITC report…')"><i class="fas fa-download" style="color:#fbbf24"></i> ITC Register (Month-wise)</button>
+            <button class="btn btn-outline" style="width:100%;text-align:left" onclick="showToast('Downloading B2B invoice list…')"><i class="fas fa-download" style="color:#a78bfa"></i> B2B Invoice List CSV</button>
           </div>
         </div>
       </div>
-
-      <!-- Invoice Preview -->
-      <div class="gst-card">
-        <div class="gst-card-head">
-          <div class="gst-card-icon">🧾</div>
-          <div>
-            <div class="gst-card-title">GST Invoice Format Preview</div>
-            <div class="gst-card-desc">Standard invoice generated for every booking. Download as PDF.</div>
-          </div>
-        </div>
-        <div class="gst-card-body">
-          <div class="gst-invoice-preview">
-            <div class="gst-inv-header">
-              <div>
-                <div style="font-size:18px;font-weight:900;color:#0055B3;font-family:'Nunito',sans-serif;">Worlds of Wonder</div>
-                <div style="font-size:11px;color:#6B7280;margin-top:4px;">Entertainment &amp; Amusement Land Concepts Pvt. Ltd.</div>
-                <div style="font-size:11px;color:#6B7280;">A-2, Sector 38A, Noida, UP 201301</div>
-                <div style="font-size:11px;color:#6B7280;">GSTIN: 09AAACE0000A1Z5 | CIN: U92410UP2000PTC000001</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:16px;font-weight:800;color:#080E1E;">TAX INVOICE</div>
-                <div style="font-size:12px;color:#6B7280;margin-top:4px;">Invoice #: <strong>WOW-2024-000001</strong></div>
-                <div style="font-size:12px;color:#6B7280;">Date: <strong id="inv-date"></strong></div>
-                <div style="font-size:12px;color:#6B7280;">Booking ID: <strong>WOW-XYZ123</strong></div>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;font-size:12px;">
-              <div>
-                <div style="font-weight:700;margin-bottom:4px;">Bill To:</div>
-                <div>Guest Name (as booked)</div>
-                <div>+91 XXXXX XXXXX</div>
-                <div><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="284f5d4d5b5c684d45494144064b4745">[email&#160;protected]</a></div>
-              </div>
-              <div>
-                <div style="font-weight:700;margin-bottom:4px;">Supply Details:</div>
-                <div>Place of Supply: 09 — Uttar Pradesh</div>
-                <div>Transaction Type: B2C</div>
-                <div>SAC Code: 999691</div>
-              </div>
-            </div>
-            <table class="gst-inv-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Description</th>
-                  <th>SAC</th>
-                  <th>Qty</th>
-                  <th>Rate (Ex-GST)</th>
-                  <th>CGST 9%</th>
-                  <th>SGST 9%</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Water Park Day Entry (Adult)</td>
-                  <td>999691</td>
-                  <td>2</td>
-                  <td>₹1,101.69</td>
-                  <td>₹99.15</td>
-                  <td>₹99.15</td>
-                  <td>₹2,598.00</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Water Park Day Entry (Child)</td>
-                  <td>999691</td>
-                  <td>1</td>
-                  <td>₹847.46</td>
-                  <td>₹76.27</td>
-                  <td>₹76.27</td>
-                  <td>₹999.00</td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="gst-inv-totals">
-              <div class="gst-inv-totals-inner">
-                <div class="gst-inv-row"><span>Subtotal (Ex-GST)</span><span>₹3,051.61</span></div>
-                <div class="gst-inv-row"><span>CGST @9%</span><span>₹274.64</span></div>
-                <div class="gst-inv-row"><span>SGST @9%</span><span>₹274.64</span></div>
-                <div class="gst-inv-row grand"><span>Total (Incl. GST)</span><span>₹3,597.00</span></div>
-              </div>
-            </div>
-            <div style="margin-top:16px;font-size:11px;color:#6B7280;text-align:center;">
-              This is a computer-generated invoice. Authorised signatory not required. | worldsofwonder.in
-            </div>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:14px;">
-            <button onclick="alert('PDF invoice download initiated...')" class="gst-save-btn" style="font-size:13px;">⬇ Download PDF</button>
-            <button onclick="alert('Email sent to guest!')" style="padding:10px 20px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);font-size:13px;cursor:pointer;">✉️ Email Invoice</button>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
+
+    <!-- E-INVOICE -->
+    <div id="sec-einvoice" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-qrcode" style="color:#f59e0b"></i> E-Invoice / IRN Generator</h2></div>
+      <div class="card">
+        <h4><i class="fas fa-info-circle" style="color:#60a5fa"></i> E-Invoice Status — Worlds of Wonder</h4>
+        <div style="background:#0d2b1a;border-radius:8px;padding:14px;margin-bottom:16px;font-size:.82rem;color:#4ade80">
+          ✓ E-Invoice mandatory for turnover &gt; ₹5 Crore (WOW is in scope). Connected to IRP via API.
+        </div>
+        <div class="grid-2">
+          <div>
+            <div class="form-group" style="margin-bottom:12px"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:5px">Select Invoice</label>
+              <select style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:.83rem">
+                <option>WOW-INV-2025-000248</option><option>WOW-INV-2025-000247</option>
+              </select>
+            </div>
+            <button class="btn btn-gold" style="width:100%" onclick="generateIRN()"><i class="fas fa-qrcode"></i> Generate IRN + QR</button>
+          </div>
+          <div style="background:#0f172a;border-radius:10px;padding:14px">
+            <div style="font-size:.78rem;color:#64748b;margin-bottom:8px">E-Invoice Stats (Mar 2025)</div>
+            <div class="gst-result-row"><span class="grk">IRNs Generated</span><span class="grv">142</span></div>
+            <div class="gst-result-row"><span class="grk">IRNs Cancelled</span><span class="grv" style="color:#f87171">3</span></div>
+            <div class="gst-result-row"><span class="grk">Pending Generation</span><span class="grv" style="color:#fbbf24">8</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function computeGST() {
-  const inclusive = parseFloat(document.getElementById('calc-inclusive').value) || 0;
-  const rate      = parseFloat(document.getElementById('calc-rate').value) || 18;
-  const qty       = parseInt(document.getElementById('calc-qty').value) || 1;
+<div class="toast" id="toast"></div>
 
-  const exGst    = inclusive / (1 + rate/100);
-  const gstAmt   = inclusive - exGst;
-  const cgst     = gstAmt / 2;
-  const sgst     = gstAmt / 2;
-  const total    = inclusive * qty;
-  const totalGst = gstAmt * qty;
+<script>
+function showSection(name,el){
+  document.querySelectorAll('[id^="sec-"]').forEach(s=>s.style.display='none');
+  const sec=document.getElementById('sec-'+name);
+  if(sec)sec.style.display='';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
 
-  const f = n => '₹' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+// GST Calculator
+function autoFillGST(){
+  const sel=document.getElementById('gstProduct');
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('gstRate').value=opt.getAttribute('data-rate')||'18';
+  document.getElementById('gstHSN').value=opt.getAttribute('data-hsn')||'9996';
+  calculateGST();
+}
 
-  document.getElementById('gst-breakdown').innerHTML = `
-    <div class="gst-brow"><span class="bl">Inclusive Price per ticket</span><span class="bv">${f(inclusive)}</span></div>
-    <div class="gst-brow"><span class="bl">Ex-GST Price per ticket</span><span class="bv">${f(exGst)}</span></div>
-    <div class="gst-brow"><span class="bl">Total GST per ticket (${rate}%)</span><span class="bv">${f(gstAmt)}</span></div>
-    <div class="gst-brow"><span class="bl">CGST (${rate/2}%) per ticket</span><span class="bv">${f(cgst)}</span></div>
-    <div class="gst-brow"><span class="bl">SGST (${rate/2}%) per ticket</span><span class="bv">${f(sgst)}</span></div>
-    <div class="gst-brow total"><span class="bl">Total Payable (${qty} ticket${qty>1?'s':''})</span><span class="bv" style="color:#60A5FA;">${f(total)}</span></div>
-    <div class="gst-brow"><span class="bl">Total GST Component</span><span class="bv" style="color:#F5D679;">${f(totalGst)}</span></div>
+function calculateGST(){
+  const qty=parseFloat(document.getElementById('gstQty').value)||1;
+  const unitPrice=parseFloat(document.getElementById('gstUnitPrice').value)||0;
+  const discount=parseFloat(document.getElementById('gstDiscount').value)||0;
+  const rate=parseFloat(document.getElementById('gstRate').value)||18;
+  const mode=document.getElementById('gstMode').value;
+  const txType=document.getElementById('txType').value;
+  const base=qty*unitPrice;
+  let taxable,gstAmt;
+  if(mode==='inclusive'){
+    taxable=base/(1+rate/100);
+    gstAmt=base-taxable;
+  }else{
+    taxable=base-discount;
+    gstAmt=taxable*rate/100;
+  }
+  taxable=Math.max(0,taxable-discount);
+  const half=gstAmt/2;
+  const isInter=txType==='inter';
+  document.getElementById('rBase').textContent=fmt(base);
+  document.getElementById('rDiscount').textContent='- '+fmt(discount);
+  document.getElementById('rTaxable').textContent=fmt(taxable);
+  document.getElementById('rCGST').textContent=isInter?'₹0.00':fmt(half)+` (${rate/2}%)`;
+  document.getElementById('rSGST').textContent=isInter?'₹0.00':fmt(half)+` (${rate/2}%)`;
+  document.getElementById('rIGST').textContent=isInter?fmt(gstAmt)+` (${rate}%)`:'₹0.00';
+  document.getElementById('rIGST').style.color=isInter?'#e2e8f0':'#64748b';
+  document.getElementById('rTotal').textContent=fmt(taxable+gstAmt);
+}
+
+function fmt(n){return '₹'+n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+
+// Invoices
+const INVOICES=[
+  {id:'WOW-INV-2025-000248',party:'IndiaTech Solutions Pvt Ltd',gstin:'09AAACI1234A1Z5',date:'28 Mar 2025',product:'Corporate Combo Package ×50',taxable:59322,gst:10678,total:70000,status:'paid'},
+  {id:'WOW-INV-2025-000247',party:'Rajasthan Tours & Travels',gstin:'08AABCR4567B2Z6',date:'27 Mar 2025',product:'School Group — Water Park ×120',taxable:84746,gst:15254,total:100000,status:'pending'},
+  {id:'WOW-INV-2025-000246',party:'Noida Reseller Network',gstin:'09AADNR8901C3Z7',date:'26 Mar 2025',product:'Bulk Ticket Supply — 200 Tickets',taxable:169492,gst:30508,total:200000,status:'paid'},
+  {id:'WOW-INV-2025-000245',party:'Sunshine Events Ltd',gstin:'09AABCS2345D4Z8',date:'25 Mar 2025',product:'Birthday Package + Lawn Rental',taxable:21186,gst:3814,total:25000,status:'draft'},
+  {id:'WOW-INV-2025-000244',party:'Delhi Corporate Tours',gstin:'07AADCD5678E5Z9',date:'24 Mar 2025',product:'Annual Passport Bulk — Legacy ×5',taxable:105932,gst:19068,total:125000,status:'overdue'},
+];
+
+function renderInvoices(){
+  const tbody=document.getElementById('invoiceTableBody');
+  if(!tbody)return;
+  tbody.innerHTML=INVOICES.map(inv=>`
+    <tr>
+      <td style="color:#60a5fa;font-family:'Courier Prime',monospace;font-size:.8rem">${inv.id}</td>
+      <td><div style="font-weight:600">${inv.party}</div><div style="font-size:.72rem;color:#64748b">${inv.gstin}</div></td>
+      <td style="color:#94a3b8">${inv.date}</td>
+      <td>${inv.product}</td>
+      <td style="font-family:'Courier Prime',monospace">₹${inv.taxable.toLocaleString()}</td>
+      <td style="font-family:'Courier Prime',monospace;color:#fbbf24">₹${inv.gst.toLocaleString()}</td>
+      <td style="font-family:'Courier Prime',monospace;color:#4ade80;font-weight:700">₹${inv.total.toLocaleString()}</td>
+      <td><span class="status-pill sp-${inv.status}">${inv.status.toUpperCase()}</span></td>
+      <td>
+        <button class="btn btn-outline" style="padding:4px 8px;font-size:.7rem;margin-right:4px" onclick="previewInvoice('${inv.id}')"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-gold" style="padding:4px 8px;font-size:.7rem" onclick="showToast('Downloading PDF…')"><i class="fas fa-download"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function previewInvoice(id){
+  const inv=INVOICES.find(i=>i.id===id);
+  if(!inv)return;
+  const card=document.getElementById('invoicePreviewCard');
+  const prev=document.getElementById('invoicePreview');
+  prev.innerHTML=`
+    <div class="inv-prev-hdr">
+      <div><div class="inv-prev-title">TAX INVOICE</div><div class="inv-prev-num">${inv.id}</div><div class="inv-prev-num">Date: ${inv.date}</div></div>
+      <div style="text-align:right"><div style="font-weight:700;font-size:1rem">Worlds of Wonder Leisure Ltd</div><div style="font-size:.8rem;color:#555">A-2, Sector 38A, Noida — 201301</div><div style="font-size:.8rem;color:#555">GSTIN: 09AAACW1234F1Z5</div><div style="font-size:.8rem;color:#555">Phone: 080-6909-0000</div></div>
+    </div>
+    <div class="inv-prev-company"><strong>Bill To:</strong> ${inv.party}<br>GSTIN: ${inv.gstin}</div>
+    <table class="inv-prev-table">
+      <thead><tr><th>#</th><th>Description</th><th>HSN</th><th>Qty</th><th>Unit Price</th><th>Taxable</th><th>GST 18%</th><th>Total</th></tr></thead>
+      <tbody><tr><td>1</td><td>${inv.product}</td><td>9996</td><td>1</td><td>₹${inv.taxable.toLocaleString()}</td><td>₹${inv.taxable.toLocaleString()}</td><td>₹${inv.gst.toLocaleString()}</td><td>₹${inv.total.toLocaleString()}</td></tr></tbody>
+    </table>
+    <div class="inv-totals">
+      <div class="inv-total-row"><span class="ik">Taxable Value:</span><span class="iv">₹${inv.taxable.toLocaleString()}</span></div>
+      <div class="inv-total-row"><span class="ik">CGST @ 9%:</span><span class="iv">₹${(inv.gst/2).toLocaleString()}</span></div>
+      <div class="inv-total-row"><span class="ik">SGST @ 9%:</span><span class="iv">₹${(inv.gst/2).toLocaleString()}</span></div>
+      <div class="inv-total-row inv-grand"><span class="ik">Invoice Total:</span><span class="iv" style="color:#16a34a">₹${inv.total.toLocaleString()}</span></div>
+    </div>
+    <div class="inv-footer">This is a computer-generated invoice and does not require a physical signature.<br>Subject to Noida / UP jurisdiction. E&OE.</div>
   `;
+  card.style.display='';
+  card.scrollIntoView({behavior:'smooth'});
 }
 
-function splitRates(input) {
-  const rate = parseFloat(input.value) || 18;
-  const row = input.closest('tr');
-  const inputs = row.querySelectorAll('.gst-rate-input');
-  if (inputs[1]) inputs[1].value = (rate / 2).toString();
-  if (inputs[2]) inputs[2].value = (rate / 2).toString();
-  if (inputs[3]) inputs[3].value = rate.toString();
+function generateInvoice(){showToast('New invoice form opened!');document.getElementById('invoicePreviewCard').style.display='none';}
+function generateGSTR(){showToast('GSTR-1 data prepared — ready for NIC portal upload!');}
+function generateIRN(){showToast('IRN generated! QR code attached to invoice.');}
+function simulateBulkUpload(){document.getElementById('bulkResult').style.display='';showToast('142 invoices generated successfully!');}
+function downloadTemplate(){showToast('CSV template downloaded!');}
+function handleDrop(e){e.preventDefault();showToast('File uploaded! Processing…');}
+
+function initCharts(){
+  const pc=document.getElementById('gstPieChart');
+  if(pc){new Chart(pc.getContext('2d'),{type:'doughnut',data:{labels:['Tickets @18%','Passport @18%','F&B @5%','Merch @12%','Others'],datasets:[{data:[48,28,12,8,4],backgroundColor:['#3b82f6','#f59e0b','#22c55e','#a78bfa','#64748b'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}},position:'right'}}}})}
+  const bc=document.getElementById('gstBarChart');
+  if(bc){new Chart(bc.getContext('2d'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'GST Collected',data:[3200000,3800000,5100000,3400000,3900000,4280000],backgroundColor:'#f59e0b88'},{label:'ITC',data:[1100000,1200000,1500000,1000000,1400000,1470000],backgroundColor:'#4ade8088'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b'}}}}})}
 }
 
-function saveGST() {
-  const btn = event.target;
-  btn.textContent = '✅ GST Config Saved!';
-  setTimeout(() => btn.textContent = 'Save GST Config', 2000);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<i class="fas fa-check-circle" style="color:#4ade80"></i> ${msg}`;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// Set invoice date
-document.getElementById('inv-date').textContent = new Date().toLocaleDateString('en-IN');
-
-// Initial compute
-computeGST();
+document.addEventListener('DOMContentLoaded',()=>{renderInvoices();setTimeout(initCharts,100);calculateGST();});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
