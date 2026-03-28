@@ -6,183 +6,477 @@
 <title>My WOW Passport — Worlds of Wonder</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700;800;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --gold:#C9A84C;--gold2:#F0D080;--gold3:#8B6914;
-  --explore-navy:#003366;--explore-mid:#004488;
-  --together-wine:#5B0A0A;--together-mid:#7A1212;
-  --legacy-maroon:#3A0000;--legacy-mid:#600000;
-  --cream:#F5EDD8;--cream2:#EDE0C4;--cream3:#D4C49E;
-  --ink:#1a1207;--ink2:#3a2e14;
-  --stamp-red:rgba(160,20,20,0.82);
-  --stamp-blue:rgba(15,50,130,0.80);
-  --stamp-green:rgba(0,100,0,0.78);
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#8B6914;--gold4:#D4A840;--gold5:#FFE099;
+  /* Explore = Navy Blue (Indian passport style) */
+  --e-bg1:#001433;--e-bg2:#002266;--e-bg3:#003399;--e-acc:#60a5fa;
+  /* Together = Deep Burgundy/Wine */
+  --t-bg1:#1a0000;--t-bg2:#3d0010;--t-bg3:#660020;--t-acc:#f87171;
+  /* Legacy = Forest Green */
+  --l-bg1:#001a00;--l-bg2:#003300;--l-bg3:#004d00;--l-acc:#86efac;
+  /* Passport paper — warm cream */
+  --pp:#fdf8ed;--pp2:#f5eccc;--pp3:#ebe0aa;--pp4:#d9c880;--pp5:#c8b068;
+  /* Ink */
+  --ink:#12100a;--ink2:#2a2416;--ink3:#5a4a30;--ink4:#8a7a60;
+  /* Stamps */
+  --stamp-r:rgba(180,20,20,0.85);--stamp-b:rgba(10,40,140,0.82);
+  --stamp-g:rgba(0,100,30,0.80);--stamp-p:rgba(100,20,130,0.78);
+  --stamp-o:rgba(180,90,10,0.80);
 }
-html,body{min-height:100vh;background:#111008;font-family:'Nunito',sans-serif;color:#f0f0f0;}
+html,body{min-height:100vh;background:#0a0806;font-family:'Nunito',sans-serif;color:#f0f0f0;}
 
 /* ── TOP NAV ── */
-.topnav{background:#060b14;border-bottom:1px solid rgba(201,168,76,.18);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
-.topnav-brand img{height:40px;width:auto;object-fit:contain;filter:none!important;}
-.topnav-links{display:flex;gap:20px;align-items:center;}
-.topnav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:13px;font-weight:600;transition:color .2s;}
+.topnav{
+  background:#060503;
+  border-bottom:1px solid rgba(201,168,76,.18);
+  padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:300;
+}
+.topnav-left{display:flex;align-items:center;gap:16px;}
+.topnav-left img{
+  height:38px;width:auto;
+  filter:none!important;opacity:1!important;
+  object-fit:contain;visibility:visible!important;
+}
+.topnav-links{display:flex;gap:14px;align-items:center;}
+.topnav-links a{color:rgba(255,255,255,.5);text-decoration:none;font-size:12px;font-weight:600;transition:color .2s;}
 .topnav-links a:hover,.topnav-links a.active{color:var(--gold);}
-.btn-logout{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;}
-.btn-logout:hover{background:rgba(239,68,68,.22);}
+.btn-logout{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);color:#ef4444;padding:5px 13px;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;text-decoration:none;}
 
 /* ── PAGE WRAPPER ── */
-.page{max-width:560px;margin:0 auto;padding:24px 12px 80px;}
+.outer{max-width:600px;margin:0 auto;padding:28px 12px 120px;}
 
-/* ── TIER TABS ── */
-.tier-tabs{display:flex;border-radius:12px;overflow:hidden;border:2px solid rgba(201,168,76,.22);margin-bottom:28px;}
-.tier-tab{flex:1;padding:13px 8px;text-align:center;cursor:pointer;font-weight:800;font-size:13px;letter-spacing:.5px;transition:all .25s;background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);border:none;font-family:'Nunito',sans-serif;}
-.tier-tab.active-e{background:var(--explore-navy);color:#fff;}
-.tier-tab.active-t{background:var(--together-wine);color:#fff;}
-.tier-tab.active-l{background:var(--legacy-maroon);color:#fff;}
-.tier-tab .pip{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-.tier-tab.explore .pip{background:#3B82F6;}
-.tier-tab.together .pip{background:#9CA3AF;}
-.tier-tab.legacy .pip{background:#F59E0B;}
+/* ── TIER SELECTOR ── */
+.tier-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:14px;text-transform:uppercase;}
+.tier-pick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px;}
+.tp-card{
+  border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;
+  border:2px solid transparent;transition:all .25s;
+}
+.tp-card.e{background:rgba(0,20,51,.35);border-color:rgba(0,34,102,.5);}
+.tp-card.t{background:rgba(26,0,0,.35);border-color:rgba(61,0,16,.5);}
+.tp-card.l{background:rgba(0,26,0,.35);border-color:rgba(0,51,0,.5);}
+.tp-card.active.e{border-color:var(--e-acc);box-shadow:0 0 0 3px rgba(96,165,250,.18);}
+.tp-card.active.t{border-color:var(--t-acc);box-shadow:0 0 0 3px rgba(248,113,113,.18);}
+.tp-card.active.l{border-color:var(--l-acc);box-shadow:0 0 0 3px rgba(134,239,172,.18);}
+.tier-icon{font-size:22px;margin-bottom:5px;}
+.tp-name{font-family:'Cinzel',serif;font-size:10.5px;font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:3px;text-transform:uppercase;}
+.tp-price{font-size:13px;font-weight:800;color:var(--gold2);}
+.tp-sub{font-size:9px;color:rgba(255,255,255,.38);margin-top:2px;}
+.tp-badge{display:inline-block;background:var(--gold);color:#060503;font-size:8px;font-weight:800;padding:2px 6px;border-radius:10px;margin-top:4px;text-transform:uppercase;letter-spacing:1px;}
 
-/* ── PASSPORT BOOK ── */
-.passport-book{width:100%;border-radius:8px;overflow:hidden;
-  box-shadow:0 40px 100px rgba(0,0,0,.85),0 0 0 2px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.04);
-  position:relative;background:var(--cream);}
+/* ── ACTION ROW ── */
+.action-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.btn-act{
+  flex:1;min-width:120px;padding:10px 12px;border-radius:9px;
+  border:1.5px solid rgba(201,168,76,.25);background:rgba(201,168,76,.07);
+  color:var(--gold2);font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Nunito',sans-serif;transition:all .2s;text-decoration:none;
+}
+.btn-act:hover{background:rgba(201,168,76,.15);border-color:var(--gold);}
+.btn-act.primary{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#060503;border:none;}
+.btn-act.primary:hover{box-shadow:0 6px 20px rgba(201,168,76,.35);}
 
-/* ── PASSPORT COVER ── */
-.pc{padding:38px 26px 28px;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden;min-height:340px;}
-.pc.explore{background:linear-gradient(165deg,#001c44 0%,#003366 45%,#004080 100%);}
-.pc.together{background:linear-gradient(165deg,#2e0505 0%,#5B0A0A 45%,#7A1212 100%);}
-.pc.legacy{background:linear-gradient(165deg,#1a0000 0%,#3A0000 45%,#5a0000 100%);}
+/* ════════════════════════════════════════════════════════
+   PASSPORT BOOK — exact Indian passport proportions
+   Real: 125mm x 88mm per page. We render at web scale.
+   Aspect ratio maintained: ~1.42:1 (width:height)
+═══════════════════════════════════════════════════════ */
+.pp-book{
+  width:100%;
+  background:var(--pp);
+  border-radius:4px 14px 14px 4px;
+  position:relative;
+  box-shadow:
+    -10px 0 30px rgba(0,0,0,.7),
+    0 24px 80px rgba(0,0,0,.8),
+    inset -3px 0 8px rgba(0,0,0,.12);
+  overflow:hidden;
+  margin-bottom:20px;
+}
+/* Gold spine */
+.pp-spine{
+  position:absolute;left:0;top:0;bottom:0;width:16px;z-index:20;
+  background:linear-gradient(180deg,var(--gold4) 0%,var(--gold3) 20%,var(--gold2) 40%,var(--gold5) 50%,var(--gold2) 60%,var(--gold3) 80%,var(--gold4) 100%);
+  box-shadow:2px 0 6px rgba(0,0,0,.3);
+}
+/* Inner content area (offset for spine) */
+.pp-content{margin-left:16px;}
 
-/* Embossed guilloché background */
-.pc::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.025) 18px,rgba(255,255,255,.025) 19px),repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(255,255,255,.025) 18px,rgba(255,255,255,.025) 19px);pointer-events:none;}
-.pc::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 100%,rgba(201,168,76,.08) 0%,transparent 60%);pointer-events:none;}
+/* ── COVER PAGE ── */
+.pp-cover{
+  min-height:380px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:32px 28px 24px;
+  position:relative;overflow:hidden;
+}
+.pp-cover.e{background:linear-gradient(170deg,var(--e-bg1) 0%,var(--e-bg2) 45%,var(--e-bg3) 100%);}
+.pp-cover.t{background:linear-gradient(170deg,var(--t-bg1) 0%,var(--t-bg2) 45%,var(--t-bg3) 100%);}
+.pp-cover.l{background:linear-gradient(170deg,var(--l-bg1) 0%,var(--l-bg2) 45%,var(--l-bg3) 100%);}
 
-.cover-emblem{width:80px;height:80px;border-radius:50%;border:3px solid rgba(201,168,76,.5);display:flex;align-items:center;justify-content:center;margin-bottom:14px;background:rgba(255,255,255,.06);position:relative;z-index:1;}
-.cover-emblem img{width:58px;height:auto;object-fit:contain;filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(2deg);}
+/* Guilloché security pattern */
+.pp-cover::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent,transparent 16px,rgba(255,255,255,.022) 16px,rgba(255,255,255,.022) 17px),
+    repeating-linear-gradient(90deg, transparent,transparent 16px,rgba(255,255,255,.022) 16px,rgba(255,255,255,.022) 17px),
+    repeating-linear-gradient(45deg, transparent,transparent 22px,rgba(255,255,255,.014) 22px,rgba(255,255,255,.014) 23px),
+    repeating-linear-gradient(-45deg,transparent,transparent 22px,rgba(255,255,255,.014) 22px,rgba(255,255,255,.014) 23px);
+}
+/* Radial glow */
+.pp-cover::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(255,255,255,.07) 0%,transparent 70%);
+}
 
-.cover-country{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold2);text-align:center;margin-bottom:4px;position:relative;z-index:1;}
-.cover-title{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#fff;text-align:center;letter-spacing:2px;position:relative;z-index:1;line-height:1.2;}
-.cover-subtitle{font-family:'Cinzel',serif;font-size:9px;letter-spacing:6px;color:rgba(255,255,255,.5);text-align:center;margin-top:4px;position:relative;z-index:1;}
-.cover-tier-badge{margin-top:18px;border:1.5px solid var(--gold);border-radius:6px;padding:7px 22px;font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--gold2);letter-spacing:3px;position:relative;z-index:1;background:rgba(255,255,255,.05);}
+.cover-top{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2;}
+.cover-issuer{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3.5px;color:rgba(255,255,255,.55);text-transform:uppercase;text-align:center;}
+.cover-country{font-family:'Cinzel',serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;text-align:center;margin-top:2px;}
+.cover-hindi{font-size:13px;color:rgba(255,255,255,.65);font-style:italic;margin-top:1px;}
+.cover-line{width:120px;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);margin:8px 0;}
 
-/* gold bar accent */
-.cover-bar{position:absolute;bottom:0;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold),var(--gold2),var(--gold3));}
+/* Ashoka Chakra mimic for WOW */
+.cover-emblem{z-index:2;margin:6px 0;}
+.cover-emblem img{
+  height:90px;width:auto;
+  filter:brightness(0) invert(1) sepia(1) saturate(3) hue-rotate(5deg) brightness(1.1)!important;
+  object-fit:contain;
+  opacity:0.92;
+}
+.cover-emblem-ring{
+  width:96px;height:96px;
+  border-radius:50%;
+  border:2px solid rgba(201,168,76,.45);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(201,168,76,.15);
+  position:relative;
+}
+.cover-emblem-ring::before{
+  content:'';position:absolute;inset:4px;border-radius:50%;
+  border:1px solid rgba(201,168,76,.25);
+}
 
-/* ── INNER PAGE ── */
-.inner-page{background:var(--cream);position:relative;overflow:hidden;}
-.inner-page::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 50% 50%,rgba(201,168,76,.06) 0%,transparent 65%),repeating-linear-gradient(45deg,transparent,transparent 24px,rgba(201,168,76,.03) 24px,rgba(201,168,76,.03) 25px);pointer-events:none;}
-.page-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-family:'Cinzel',serif;font-size:72px;font-weight:900;color:rgba(201,168,76,.04);pointer-events:none;white-space:nowrap;letter-spacing:8px;}
+.cover-mid{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:2;}
+.cover-type{font-family:'Cinzel',serif;font-size:24px;font-weight:700;letter-spacing:4px;color:var(--gold2);margin-top:4px;}
+.cover-type-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.5);}
+.cover-tier-name{font-family:'Cinzel',serif;font-size:13px;letter-spacing:3px;color:var(--gold);margin-top:4px;font-weight:700;}
 
-/* Bio page */
-.bio-page{padding:24px 22px;}
-.bio-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:1.5px solid var(--cream3);}
-.bio-flag{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--ink2);}
-.bio-flag strong{display:block;font-size:12px;color:var(--ink);letter-spacing:2px;}
-.bio-type{font-family:'Courier Prime',monospace;font-size:10px;color:var(--ink2);text-align:right;}
-.bio-photo-area{display:flex;gap:18px;align-items:flex-start;margin-bottom:18px;}
-.bio-photo{width:90px;height:108px;border:2px solid var(--cream3);background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--cream3);flex-shrink:0;border-radius:4px;overflow:hidden;}
+.cover-bottom{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:2;}
+.cover-org{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:2.5px;color:rgba(255,255,255,.45);text-align:center;}
+.cover-year{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;}
+
+/* Border decorative */
+.cover-border{
+  position:absolute;inset:8px;border-radius:8px;
+  border:1.5px solid rgba(201,168,76,.22);pointer-events:none;z-index:1;
+}
+.cover-border::before{
+  content:'';position:absolute;inset:4px;border-radius:5px;
+  border:0.5px solid rgba(201,168,76,.12);
+}
+
+/* ── PAGE HEADER (all inner pages) ── */
+.pp-page{
+  background:var(--pp);
+  min-height:340px;
+  padding:18px 28px 18px 28px;
+  position:relative;
+  border-top:1px solid var(--pp2);
+}
+.pp-page-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1.5px solid var(--pp3);
+}
+.pp-page-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2.5px;color:var(--ink3);text-transform:uppercase;}
+.pp-page-num{font-family:'Courier Prime',monospace;font-size:10px;color:var(--ink4);}
+
+/* Subtle page watermark */
+.pp-page::before{
+  content:'WOW';
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);
+  font-family:'Cinzel',serif;font-size:80px;font-weight:900;
+  color:rgba(0,0,0,.04);pointer-events:none;letter-spacing:20px;
+}
+
+/* ── BIO DATA PAGE ── */
+.bio-section{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+.bio-photo-col{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.bio-photo{
+  width:88px;height:110px;
+  border:2px solid var(--pp3);
+  background:var(--pp2);
+  border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
 .bio-photo img{width:100%;height:100%;object-fit:cover;}
-.bio-fields{flex:1;}
-.bio-row{margin-bottom:10px;}
-.bio-row label{display:block;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--ink2);margin-bottom:3px;text-transform:uppercase;}
-.bio-row .val{font-family:'Courier Prime',monospace;font-size:13px;color:var(--ink);font-weight:700;border-bottom:1px solid var(--cream3);padding-bottom:4px;}
-.bio-passport-no{background:rgba(0,51,102,.07);border-radius:4px;padding:10px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
-.bio-passport-no .pn-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--ink2);}
-.bio-passport-no .pn-val{font-family:'Courier Prime',monospace;font-size:18px;font-weight:700;color:var(--explore-navy);letter-spacing:3px;}
-.bio-passport-no .pn-val.together{color:var(--together-wine);}
-.bio-passport-no .pn-val.legacy{color:var(--legacy-mid);}
-.bio-mrz{background:#fff;border:1px solid var(--cream3);border-radius:4px;padding:10px 12px;font-family:'Courier Prime',monospace;font-size:10px;color:var(--ink);letter-spacing:3px;line-height:1.8;word-break:break-all;}
-.bio-mrz-label{font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;color:var(--ink2);margin-bottom:4px;}
+.bio-photo-placeholder{font-size:36px;color:var(--pp4);}
+.bio-photo-label{font-family:'Courier Prime',monospace;font-size:7.5px;color:var(--ink4);text-align:center;letter-spacing:0.5px;}
 
-/* ── STAMPS & VOUCHERS SECTION ── */
-.stamps-header{padding:18px 22px 12px;border-bottom:1.5px solid var(--cream3);display:flex;justify-content:space-between;align-items:center;}
-.stamps-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--ink2);}
-.stamps-count{font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink2);background:rgba(0,0,0,.07);padding:2px 8px;border-radius:4px;}
+.bio-fields{display:flex;flex-direction:column;gap:8px;}
+.bio-field{display:flex;flex-direction:column;gap:1px;}
+.bio-field-label{font-family:'Courier Prime',monospace;font-size:7px;color:var(--ink4);letter-spacing:1px;text-transform:uppercase;}
+.bio-field-value{font-family:'Courier Prime',monospace;font-size:11.5px;color:var(--ink);font-weight:700;letter-spacing:0.5px;border-bottom:1px solid var(--pp3);padding-bottom:2px;}
+.bio-field-value.large{font-size:13px;}
 
-/* ── VISA STAMP PAGE ── */
-.voucher-pages{padding:14px 16px 22px;}
-.voucher-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.voucher-stamp{position:relative;background:var(--cream2);border:1px solid var(--cream3);border-radius:6px;padding:12px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
-.voucher-stamp:hover{box-shadow:0 6px 20px rgba(0,0,0,.15);}
-.voucher-stamp::before{content:'';position:absolute;inset:0;border:2px solid transparent;border-radius:5px;background:linear-gradient(135deg,rgba(201,168,76,.2),transparent,rgba(201,168,76,.15)) border-box;-webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;pointer-events:none;}
-.stamp-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
-.stamp-park{font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;color:var(--ink2);text-transform:uppercase;}
-.stamp-type{font-family:'Courier Prime',monospace;font-size:7px;color:#fff;background:var(--stamp-red);padding:2px 6px;border-radius:2px;letter-spacing:1px;}
-.stamp-type.water{background:var(--stamp-blue);}
-.stamp-type.combo{background:var(--stamp-green);}
-.stamp-title{font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--ink);margin-bottom:6px;line-height:1.3;}
-.stamp-qr{width:52px;height:52px;margin:0 auto 8px;display:block;}
-.stamp-qr canvas{width:52px!important;height:52px!important;}
-.stamp-validity{font-family:'Courier Prime',monospace;font-size:7.5px;color:var(--ink2);text-align:center;}
-.stamp-ref{font-family:'Courier Prime',monospace;font-size:6.5px;color:rgba(0,0,0,.35);text-align:center;margin-top:2px;}
-.stamp-used{position:absolute;inset:0;background:rgba(255,255,255,.65);display:flex;align-items:center;justify-content:center;border-radius:5px;}
-.stamp-used-text{font-family:'Cinzel',serif;font-size:22px;font-weight:900;color:rgba(200,0,0,.6);border:4px solid rgba(200,0,0,.5);border-radius:4px;padding:2px 8px;transform:rotate(-15deg);letter-spacing:4px;}
-.stamp-active{border:2px solid rgba(0,150,0,.3);}
+/* Top banner on bio page */
+.bio-banner{
+  display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(90deg,rgba(0,20,60,.06),rgba(0,20,60,.03));
+  border:1px solid rgba(0,20,60,.1);
+  border-radius:6px;padding:8px 12px;margin-bottom:12px;
+}
+.bio-banner-left{display:flex;align-items:center;gap:8px;}
+.bio-banner-logo img{
+  height:28px;width:auto;
+  filter:none!important;opacity:1!important;
+  object-fit:contain;
+}
+.bio-banner-text{font-family:'Cinzel',serif;font-size:9.5px;color:var(--ink2);line-height:1.5;}
+.bio-banner-text strong{font-size:11px;display:block;letter-spacing:1px;}
+.bio-tier-badge{
+  font-family:'Cinzel',serif;font-size:8px;font-weight:700;
+  padding:4px 10px;border-radius:12px;letter-spacing:2px;
+  text-transform:uppercase;
+}
+.bio-tier-badge.e{background:var(--e-bg2);color:#90c4ff;border:1px solid rgba(96,165,250,.3);}
+.bio-tier-badge.t{background:var(--t-bg2);color:#fca5a5;border:1px solid rgba(248,113,113,.3);}
+.bio-tier-badge.l{background:var(--l-bg2);color:#a7f3d0;border:1px solid rgba(134,239,172,.3);}
 
-/* ── PERKS / BENEFITS PAGE ── */
-.perks-page{padding:20px 22px;}
-.perks-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;color:var(--ink2);margin-bottom:14px;text-align:center;}
-.perk-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(0,0,0,.04);border-radius:6px;margin-bottom:6px;border:1px solid var(--cream3);}
-.perk-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-.perk-text{font-family:'Libre Baskerville',serif;font-size:10px;color:var(--ink);line-height:1.4;}
-.perk-text strong{display:block;font-size:11px;color:var(--ink);}
+/* Observations / notes row */
+.bio-obs{
+  font-family:'Courier Prime',monospace;font-size:8px;
+  color:var(--ink3);border-top:1px solid var(--pp3);
+  padding-top:6px;margin-top:4px;line-height:1.6;
+}
+
+/* MRZ Zone */
+.pp-mrz{
+  background:var(--pp2);
+  border-top:2px solid var(--pp3);
+  padding:8px 10px;
+  font-family:'Courier Prime',monospace;
+  font-size:11px;color:var(--ink);
+  letter-spacing:2.5px;
+  line-height:1.7;
+  word-break:break-all;
+  border-radius:0 0 10px 0;
+}
+.mrz-label{font-size:7px;color:var(--ink4);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
 
 /* ── VALIDITY STAMP ── */
-.validity-page{padding:18px 22px;text-align:center;}
-.validity-circle{width:130px;height:130px;border-radius:50%;border:3px solid;margin:0 auto 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
-.validity-circle.explore{border-color:var(--explore-navy);background:rgba(0,51,102,.06);}
-.validity-circle.together{border-color:var(--together-wine);background:rgba(91,10,10,.06);}
-.validity-circle.legacy{border-color:var(--legacy-mid);background:rgba(58,0,0,.06);}
-.vc-inner{font-family:'Cinzel',serif;}
-.vc-days{font-size:28px;font-weight:900;color:var(--ink);line-height:1;}
-.vc-unit{font-size:9px;letter-spacing:3px;color:var(--ink2);}
-.vc-label{font-size:7px;letter-spacing:2px;color:var(--ink2);margin-top:4px;}
-.validity-meta{font-family:'Courier Prime',monospace;font-size:10px;color:var(--ink2);line-height:1.9;}
-.validity-meta span{color:var(--ink);font-weight:700;}
+.validity-stamp{
+  position:relative;
+  border:2.5px solid var(--ink);
+  border-radius:8px;
+  padding:12px 16px;
+  margin:14px 0;
+  text-align:center;
+  background:rgba(0,0,0,.02);
+}
+.validity-stamp::before{
+  content:'ISSUED';
+  position:absolute;top:-9px;left:50%;transform:translateX(-50%);
+  background:var(--pp);
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;
+  color:var(--ink3);padding:0 8px;
+}
+.vs-date-row{display:flex;justify-content:space-around;gap:10px;}
+.vs-date-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.vs-label{font-family:'Courier Prime',monospace;font-size:7px;color:var(--ink4);letter-spacing:1px;text-transform:uppercase;}
+.vs-val{font-family:'Courier Prime',monospace;font-size:12px;color:var(--ink);font-weight:700;}
 
-/* ── SECTION DIVIDER (like passport page separator) ── */
-.pp-divider{height:8px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold),var(--gold2),var(--gold3));position:relative;}
-.pp-divider::before{content:'WORLDS OF WONDER · NOIDA · INDIA';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cinzel',serif;font-size:7px;letter-spacing:3px;color:rgba(255,255,255,.7);white-space:nowrap;}
+/* Auth signature */
+.auth-section{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;}
+.auth-sig{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.auth-sig-line{width:120px;height:1px;background:var(--ink3);}
+.auth-sig-label{font-family:'Courier Prime',monospace;font-size:7.5px;color:var(--ink4);letter-spacing:0.5px;}
+.auth-qr-mini{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.auth-qr-mini canvas,.auth-qr-mini img{width:48px!important;height:48px!important;}
+.auth-qr-label{font-family:'Courier Prime',monospace;font-size:6.5px;color:var(--ink4);text-align:center;}
+
+/* ── PRIVILEGES PAGE ── */
+.priv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.priv-item{
+  background:rgba(0,0,0,.03);
+  border:1px solid var(--pp3);
+  border-radius:6px;padding:8px 10px;
+  display:flex;align-items:flex-start;gap:7px;
+}
+.priv-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.priv-text{display:flex;flex-direction:column;gap:1px;}
+.priv-title{font-family:'Cinzel',serif;font-size:8.5px;color:var(--ink);font-weight:700;letter-spacing:0.5px;}
+.priv-desc{font-size:9px;color:var(--ink3);line-height:1.4;}
+
+/* ── VOUCHER / VISA PAGE ── */
+.voucher-page{
+  background:var(--pp);
+  padding:16px 28px;
+  border-top:1px solid var(--pp2);
+  position:relative;
+  overflow:hidden;
+}
+.voucher-page::before{
+  content:'WOW';
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);
+  font-family:'Cinzel',serif;font-size:70px;font-weight:900;
+  color:rgba(0,0,0,.035);pointer-events:none;letter-spacing:15px;
+}
+.vp-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid var(--pp3);
+}
+.vp-page-title{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;}
+.vp-page-num{font-family:'Courier Prime',monospace;font-size:9px;color:var(--ink4);}
+
+/* Stamp on voucher */
+.visa-stamp{
+  position:absolute;
+  top:50%;right:18px;
+  transform:translateY(-55%) rotate(12deg);
+  width:100px;height:100px;
+  border-radius:50%;
+  border:3px solid;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  z-index:3;
+  pointer-events:none;
+}
+.visa-stamp.used{
+  border-color:var(--stamp-r);
+  box-shadow:inset 0 0 0 1px var(--stamp-r),0 0 8px rgba(180,20,20,.3);
+}
+.visa-stamp.valid{
+  border-color:var(--stamp-g);
+  box-shadow:inset 0 0 0 1px var(--stamp-g),0 0 8px rgba(0,100,30,.3);
+}
+.visa-stamp.entry{
+  border-color:var(--stamp-b);
+  box-shadow:inset 0 0 0 1px var(--stamp-b),0 0 8px rgba(10,40,140,.3);
+}
+.vs-text{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:1.5px;line-height:1.3;}
+.vs-text.used{color:var(--stamp-r);}
+.vs-text.valid{color:var(--stamp-g);}
+.vs-text.entry{color:var(--stamp-b);}
+.vs-sub{font-family:'Courier Prime',monospace;font-size:7px;letter-spacing:1px;line-height:1.3;}
+.vs-sub.used{color:var(--stamp-r);}
+.vs-sub.valid{color:var(--stamp-g);}
+.vs-sub.entry{color:var(--stamp-b);}
+
+/* Voucher content */
+.vc-grid{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;}
+.vc-info{display:flex;flex-direction:column;gap:6px;}
+.vc-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--ink);letter-spacing:0.5px;}
+.vc-sub{font-size:10px;color:var(--ink3);font-weight:600;}
+.vc-fields{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
+.vc-field{display:flex;gap:6px;align-items:baseline;}
+.vc-field-label{font-family:'Courier Prime',monospace;font-size:7.5px;color:var(--ink4);letter-spacing:1px;min-width:60px;text-transform:uppercase;}
+.vc-field-value{font-family:'Courier Prime',monospace;font-size:10px;color:var(--ink);font-weight:700;}
+.vc-barcode{
+  width:72px;height:72px;
+  border:1px solid var(--pp3);
+  border-radius:4px;
+  background:white;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.vc-barcode canvas,.vc-barcode img{width:68px!important;height:68px!important;}
+.vc-barcode-label{font-family:'Courier Prime',monospace;font-size:6.5px;color:var(--ink4);text-align:center;margin-top:4px;}
+
+/* Perforation line between voucher sections */
+.perforation{
+  border:none;
+  border-top:1.5px dashed var(--pp3);
+  margin:12px 0;
+  position:relative;
+}
 
 /* ── BACK COVER ── */
-.back-cover{padding:22px;text-align:center;position:relative;overflow:hidden;min-height:120px;}
-.back-cover.explore{background:linear-gradient(165deg,#001c44,#003366,#004080);}
-.back-cover.together{background:linear-gradient(165deg,#2e0505,#5B0A0A,#7A1212);}
-.back-cover.legacy{background:linear-gradient(165deg,#1a0000,#3A0000,#5a0000);}
-.back-cover::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.02) 18px,rgba(255,255,255,.02) 19px),repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(255,255,255,.02) 18px,rgba(255,255,255,.02) 19px);pointer-events:none;}
-.back-text{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.4);position:relative;z-index:1;}
-.back-qr-main{margin:10px auto;display:block;}
+.pp-back{
+  min-height:340px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:32px 24px 24px;
+  position:relative;overflow:hidden;
+}
+.pp-back.e{background:linear-gradient(170deg,var(--e-bg3) 0%,var(--e-bg2) 60%,var(--e-bg1) 100%);}
+.pp-back.t{background:linear-gradient(170deg,var(--t-bg3) 0%,var(--t-bg2) 60%,var(--t-bg1) 100%);}
+.pp-back.l{background:linear-gradient(170deg,var(--l-bg3) 0%,var(--l-bg2) 60%,var(--l-bg1) 100%);}
+.pp-back::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,  transparent,transparent 16px,rgba(255,255,255,.022) 16px,rgba(255,255,255,.022) 17px),
+    repeating-linear-gradient(90deg, transparent,transparent 16px,rgba(255,255,255,.022) 16px,rgba(255,255,255,.022) 17px);
+}
+.back-qr-box{
+  background:rgba(255,255,255,.95);
+  border-radius:10px;padding:16px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  z-index:2;box-shadow:0 8px 30px rgba(0,0,0,.3);
+}
+.back-qr-box canvas,.back-qr-box img{width:110px!important;height:110px!important;}
+.back-qr-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--ink);text-align:center;}
+.back-qr-id{font-family:'Courier Prime',monospace;font-size:8px;color:var(--ink3);text-align:center;}
 
-/* ── DOWNLOAD / ACTIONS ── */
-.actions-bar{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap;}
-.btn-action{flex:1;min-width:120px;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08);color:var(--gold2);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Nunito',sans-serif;transition:all .2s;text-decoration:none;}
-.btn-action:hover{background:rgba(201,168,76,.18);border-color:var(--gold);}
-.btn-primary{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#060b14;border:none;}
-.btn-primary:hover{box-shadow:0 6px 20px rgba(201,168,76,.3);}
+.back-info{text-align:center;z-index:2;}
+.back-info-main{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.6);margin-bottom:4px;}
+.back-info-small{font-size:9px;color:rgba(255,255,255,.4);line-height:1.5;}
+.back-logo{z-index:2;}
+.back-logo img{
+  height:32px;width:auto;
+  filter:brightness(0) invert(1) sepia(1) saturate(2) hue-rotate(5deg)!important;
+  opacity:0.7;
+  object-fit:contain;
+}
 
-/* ── TIER LEGEND ── */
-.tier-legend{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
-.tl-card{border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;}
-.tl-card.explore{background:rgba(0,51,102,.15);border-color:rgba(0,51,102,.4);}
-.tl-card.together{background:rgba(91,10,10,.15);border-color:rgba(91,10,10,.4);}
-.tl-card.legacy{background:rgba(58,0,0,.15);border-color:rgba(58,0,0,.4);}
-.tl-card.sel-e{border-color:#3B82F6;box-shadow:0 0 0 2px rgba(59,130,246,.25);}
-.tl-card.sel-t{border-color:#9CA3AF;box-shadow:0 0 0 2px rgba(156,163,175,.25);}
-.tl-card.sel-l{border-color:#F59E0B;box-shadow:0 0 0 2px rgba(245,158,11,.25);}
-.tl-name{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#fff;margin-bottom:4px;}
-.tl-price{font-size:12px;font-weight:800;color:var(--gold2);}
-.tl-visits{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;}
+/* ── SECTION DIVIDER (between pages) ── */
+.page-divider{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 0;border-top:1px solid rgba(255,255,255,.06);
+}
+.page-divider-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;}
+.page-divider-line{flex:1;height:1px;background:rgba(255,255,255,.06);}
 
-/* ── SPINE (book effect) ── */
-.book-spine{width:12px;background:linear-gradient(180deg,var(--gold3),var(--gold),var(--gold3));position:absolute;left:0;top:0;bottom:0;opacity:.7;}
+/* ── INFO CARDS below the passport ── */
+.info-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+.info-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;}
+.info-card-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold2);margin-bottom:8px;text-transform:uppercase;}
+.info-card-body{font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;}
 
-/* ── RESPONSIVE ── */
+/* ── UPGRADE BANNER ── */
+.upgrade-banner{
+  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.06));
+  border:1px solid rgba(201,168,76,.25);
+  border-radius:12px;padding:18px 20px;margin-top:20px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.upgrade-text{flex:1;}
+.upgrade-title{font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);margin-bottom:4px;font-weight:700;}
+.upgrade-sub{font-size:11px;color:rgba(255,255,255,.55);}
+.btn-upgrade{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));
+  color:#060503;font-weight:800;font-size:12px;
+  padding:10px 20px;border-radius:8px;border:none;cursor:pointer;
+  white-space:nowrap;font-family:'Nunito',sans-serif;
+  text-decoration:none;display:inline-block;
+}
+
+/* ── MOBILE RESPONSIVE ── */
 @media(max-width:480px){
-  .voucher-grid{grid-template-columns:1fr;}
-  .tier-legend{grid-template-columns:1fr;}
+  .bio-section{grid-template-columns:1fr;}
+  .bio-photo-col{flex-direction:row;align-items:flex-start;gap:12px;}
+  .bio-photo{width:72px;height:90px;}
+  .priv-grid{grid-template-columns:1fr;}
+  .info-cards{grid-template-columns:1fr;}
+  .pp-cover{min-height:320px;padding:24px 18px 18px;}
+  .cover-country{font-size:15px;}
+  .cover-type{font-size:20px;}
 }
 </style>
 </head>
@@ -190,455 +484,533 @@ html,body{min-height:100vh;background:#111008;font-family:'Nunito',sans-serif;co
 
 <!-- TOP NAV -->
 <nav class="topnav">
-  <a href="../index.html" class="topnav-brand">
-    <img src="../images/logo.png" alt="Worlds of Wonder"/>
-  </a>
+  <div class="topnav-left">
+    <img src="../images/logo.png" alt="Worlds of Wonder" style="height:38px;width:auto;filter:none!important;opacity:1!important;object-fit:contain;visibility:visible!important;"/>
+    <span style="font-family:'Cinzel',serif;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;">My WOW Passport</span>
+  </div>
   <div class="topnav-links">
     <a href="dashboard.html">Dashboard</a>
-    <a href="wow-passport.html" class="active">My Passport</a>
-    <a href="my-bookings.html">Bookings</a>
+    <a href="tickets.html">Tickets</a>
     <a href="loyalty.html">Loyalty</a>
-    <a href="login.html" class="btn-logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    <a href="wow-passport.html" class="active">Passport</a>
+    <a href="profile.html">Profile</a>
+    <a href="../index.html">Home</a>
+    <a href="login.html" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 </nav>
 
-<!-- PAGE -->
-<div class="page">
+<div class="outer">
 
-  <h2 style="font-family:'Cinzel',serif;font-size:17px;letter-spacing:2px;color:var(--gold2);text-align:center;margin-bottom:6px;">YOUR WOW PASSPORT</h2>
-  <p style="font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-bottom:22px;font-family:'Courier Prime',monospace;letter-spacing:1px;">WORLDS OF WONDER · NOIDA · INDIA</p>
-
-  <!-- TIER LEGEND / SELECTOR -->
-  <div class="tier-legend">
-    <div class="tl-card explore sel-e" onclick="switchTier('explore')">
-      <div class="tl-name">EXPLORE</div>
-      <div class="tl-price">&#8377;1,999</div>
-      <div class="tl-visits">5 Visits</div>
+  <!-- TIER SELECTOR -->
+  <p class="tier-title">Select Your Tier</p>
+  <div class="tier-pick">
+    <div class="tp-card e active" onclick="setTier('e')">
+      <div class="tier-icon">🌊</div>
+      <div class="tp-name">Explore</div>
+      <div class="tp-price">Rs 4,999</div>
+      <div class="tp-sub">Individual Annual</div>
+      <div class="tp-badge">Base</div>
     </div>
-    <div class="tl-card together" onclick="switchTier('together')">
-      <div class="tl-name">TOGETHER</div>
-      <div class="tl-price">&#8377;3,499</div>
-      <div class="tl-visits">10 Visits (4 pax)</div>
+    <div class="tp-card t" onclick="setTier('t')">
+      <div class="tier-icon">👨‍👩‍👧‍👦</div>
+      <div class="tp-name">Together</div>
+      <div class="tp-price">Rs 12,999</div>
+      <div class="tp-sub">Family of 4</div>
+      <div class="tp-badge">Popular</div>
     </div>
-    <div class="tl-card legacy" onclick="switchTier('legacy')">
-      <div class="tl-name">LEGACY</div>
-      <div class="tl-price">&#8377;5,999</div>
-      <div class="tl-visits">Unlimited · 1 Year</div>
+    <div class="tp-card l" onclick="setTier('l')">
+      <div class="tier-icon">👑</div>
+      <div class="tp-name">Legacy</div>
+      <div class="tp-price">Rs 24,999</div>
+      <div class="tp-sub">Premium Family</div>
+      <div class="tp-badge">Elite</div>
     </div>
   </div>
 
   <!-- ACTION BUTTONS -->
-  <div class="actions-bar">
-    <button class="btn-action btn-primary" onclick="printPassport()"><i class="fa fa-download"></i> Download PDF</button>
-    <button class="btn-action" onclick="sharePassport()"><i class="fa fa-share-alt"></i> Share</button>
-    <button class="btn-action" onclick="openScanner()"><i class="fa fa-qrcode"></i> Scan at Gate</button>
+  <div class="action-row">
+    <button class="btn-act" onclick="window.print()"><i class="fas fa-print"></i> Print Passport</button>
+    <button class="btn-act" onclick="downloadPassport()"><i class="fas fa-download"></i> Save PDF</button>
+    <button class="btn-act primary" onclick="location.href='../passport.html'"><i class="fas fa-plus-circle"></i> Get Passport</button>
   </div>
 
-  <!-- ============================================================
-       THE PASSPORT BOOK
-  ============================================================ -->
-  <div class="passport-book" id="passportBook">
+  <!-- ════ THE PASSPORT BOOK ════ -->
+  <div class="pp-book" id="passportBook">
+    <div class="pp-spine"></div>
+    <div class="pp-content">
 
-    <!-- ── COVER ── -->
-    <div class="pc explore" id="cover">
-      <div class="cover-country">REPUBLIC OF WONDERS</div>
-      <div class="cover-emblem">
-        <img src="../images/logo.png" alt="WOW"/>
+      <!-- ══ PAGE 1: FRONT COVER ══ -->
+      <div class="pp-cover e" id="ppCover">
+        <div class="cover-border"></div>
+        <div class="cover-top">
+          <div class="cover-issuer">Worlds of Wonder Entertainment</div>
+          <div class="cover-country" id="coverCountry">WORLDS OF WONDER</div>
+          <div class="cover-hindi">विश्व का अजूबा</div>
+          <div class="cover-line"></div>
+        </div>
+
+        <div class="cover-emblem">
+          <div class="cover-emblem-ring">
+            <img src="../images/logo.png" alt="WOW"
+                 style="height:72px;width:auto;filter:none!important;opacity:1!important;object-fit:contain;"/>
+          </div>
+        </div>
+
+        <div class="cover-mid">
+          <div class="cover-type">PASSPORT</div>
+          <div class="cover-type-sub">Annual Membership</div>
+          <div class="cover-tier-name" id="coverTierName">EXPLORE TIER</div>
+        </div>
+
+        <div class="cover-bottom">
+          <div class="cover-org">Issued by: WOW Passport Authority, Noida</div>
+          <div class="cover-year" id="coverYear">2025</div>
+        </div>
       </div>
-      <div class="cover-title">WORLDS OF WONDER</div>
-      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;color:rgba(255,255,255,.45);margin-top:2px;position:relative;z-index:1;">NOIDA · INDIA</div>
-      <div class="cover-tier-badge" id="coverBadge">EXPLORE</div>
-      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,.3);margin-top:8px;position:relative;z-index:1;">PASSPORT OF ADVENTURES</div>
-      <div class="cover-bar"></div>
-    </div>
 
-    <div class="pp-divider"></div>
-
-    <!-- ── BIOGRAPHICAL DATA PAGE ── -->
-    <div class="inner-page">
-      <div class="page-watermark">WOW</div>
-      <div class="bio-page">
-        <div class="bio-header">
-          <div class="bio-flag">
-            WORLDS OF WONDER<br/>
-            <strong>PASSPORT OF ADVENTURES</strong>
-          </div>
-          <div class="bio-type">
-            TYPE: P<br/>
-            CODE: WOW<br/>
-            INDIA
-          </div>
+      <!-- ══ PAGE 2: PERSONAL DATA / BIO PAGE ══ -->
+      <div class="pp-page" id="ppBioPage">
+        <div class="pp-page-header">
+          <div class="pp-page-title">Personal Data / व्यक्तिगत विवरण</div>
+          <div class="pp-page-num">Page 2 of 14</div>
         </div>
 
-        <div class="bio-passport-no">
-          <div>
-            <div class="pn-label">PASSPORT NUMBER</div>
-            <div class="pn-val explore" id="passportNum">WOW-E-2024-00847</div>
+        <!-- Top banner -->
+        <div class="bio-banner">
+          <div class="bio-banner-left">
+            <div class="bio-banner-logo">
+              <img src="../images/logo.png" alt="WOW"
+                   style="height:28px;width:auto;filter:none!important;opacity:1!important;object-fit:contain;"/>
+            </div>
+            <div class="bio-banner-text">
+              <strong>WOW PASSPORT</strong>
+              A-2, Sector 38A, Noida &mdash; worldsofwonder.in
+            </div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(26,18,7,.5);margin-bottom:4px;">TIER</div>
-            <div id="passportTierBadge" style="font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--explore-navy);">EXPLORE</div>
-          </div>
+          <div class="bio-tier-badge e" id="bioTierBadge">EXPLORE</div>
         </div>
 
-        <div class="bio-photo-area">
-          <div class="bio-photo">
-            <i class="fa fa-user"></i>
+        <!-- Bio data -->
+        <div class="bio-section">
+          <div class="bio-photo-col">
+            <div class="bio-photo">
+              <span class="bio-photo-placeholder"><i class="fas fa-user"></i></span>
+            </div>
+            <div class="bio-photo-label">PHOTOGRAPH</div>
           </div>
           <div class="bio-fields">
-            <div class="bio-row">
-              <label>Surname</label>
-              <div class="val">SHARMA</div>
+            <div class="bio-field">
+              <span class="bio-field-label">Surname / उपनाम</span>
+              <span class="bio-field-value large" id="bioSurname">SHARMA</span>
             </div>
-            <div class="bio-row">
-              <label>Given Names</label>
-              <div class="val">ARJUN KUMAR</div>
+            <div class="bio-field">
+              <span class="bio-field-label">Given Names / नाम</span>
+              <span class="bio-field-value large" id="bioGiven">RAHUL KUMAR</span>
             </div>
-            <div class="bio-row">
-              <label>Date of Birth</label>
-              <div class="val">12 MAR 1992</div>
+            <div class="bio-field">
+              <span class="bio-field-label">Nationality</span>
+              <span class="bio-field-value">INDIAN</span>
             </div>
-            <div class="bio-row">
-              <label>Mobile</label>
-              <div class="val">+91 98765 43210</div>
+            <div class="bio-field">
+              <span class="bio-field-label">Date of Birth</span>
+              <span class="bio-field-value" id="bioDOB">15 MAR 1990</span>
+            </div>
+            <div class="bio-field">
+              <span class="bio-field-label">Gender</span>
+              <span class="bio-field-value" id="bioGender">MALE</span>
             </div>
           </div>
         </div>
 
-        <div class="bio-row">
-          <label>Date of Issue</label>
-          <div class="val">28 MAR 2025</div>
-        </div>
-        <div class="bio-row">
-          <label>Date of Expiry</label>
-          <div class="val" id="expiryDate">28 MAR 2026</div>
-        </div>
-
-        <div style="margin-top:14px;">
-          <div class="bio-mrz-label">MACHINE READABLE ZONE</div>
-          <div class="bio-mrz" id="mrzLine">
-            P&lt;WOW&lt;SHARMA&lt;&lt;ARJUN&lt;KUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br/>
-            WE20240008475IND9203121M260328&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;6
+        <!-- More fields in a row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div class="bio-field">
+            <span class="bio-field-label">Passport No.</span>
+            <span class="bio-field-value" id="bioPassNo">WOW-2025-004817</span>
+          </div>
+          <div class="bio-field">
+            <span class="bio-field-label">Issued On</span>
+            <span class="bio-field-value" id="bioIssued">01 APR 2025</span>
+          </div>
+          <div class="bio-field">
+            <span class="bio-field-label">Valid Until</span>
+            <span class="bio-field-value" id="bioExpiry">31 MAR 2026</span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <div class="pp-divider"></div>
-
-    <!-- ── VALIDITY STAMP PAGE ── -->
-    <div class="inner-page">
-      <div class="page-watermark">WOW</div>
-      <div class="validity-page">
-        <p style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--ink2);margin-bottom:16px;">VALIDITY</p>
-        <div class="validity-circle explore" id="validityCircle">
-          <div class="vc-inner">
-            <div class="vc-days" id="vcDays">365</div>
-            <div class="vc-unit">DAYS</div>
-            <div class="vc-label">VALID</div>
+        <!-- Validity stamp -->
+        <div class="validity-stamp">
+          <div class="vs-date-row">
+            <div class="vs-date-item">
+              <span class="vs-label">Issue Date</span>
+              <span class="vs-val" id="vsIssued">01 APR 2025</span>
+            </div>
+            <div class="vs-date-item">
+              <span class="vs-label">Expiry Date</span>
+              <span class="vs-val" id="vsExpiry">31 MAR 2026</span>
+            </div>
+            <div class="vs-date-item">
+              <span class="vs-label">Visits Used</span>
+              <span class="vs-val" id="vsVisits">03 / UNL</span>
+            </div>
           </div>
         </div>
-        <div style="height:14px;"></div>
-        <div class="validity-meta">
-          ISSUED ON: <span>28 MARCH 2025</span><br/>
-          EXPIRES: <span id="expiryText">28 MARCH 2026</span><br/>
-          TIER: <span id="tierText">EXPLORE</span><br/>
-          VISITS REMAINING: <span id="visitsLeft">3 of 5</span><br/>
-          STATUS: <span style="color:green;">ACTIVE</span>
+
+        <!-- Signature and QR -->
+        <div class="auth-section">
+          <div class="auth-sig">
+            <div class="auth-sig-line"></div>
+            <div class="auth-sig-label">Holder's Signature</div>
+          </div>
+          <div class="auth-qr-mini">
+            <div id="bioQR"></div>
+            <div class="auth-qr-label">Scan to verify</div>
+          </div>
+        </div>
+
+        <div class="bio-obs">
+          HOLDER IS ENTITLED TO UNLIMITED ENTRY TO WORLDS OF WONDER WATER PARK &amp; AMUSEMENT PARK, NOIDA.
+          ALL RIDES INCLUDED. SEE CONDITIONS ON PAGE 14. &bull; ISSUED BY WOW PASSPORT AUTHORITY.
+        </div>
+
+        <!-- MRZ Zone (Machine Readable Zone — exact Indian passport style) -->
+        <div class="pp-mrz">
+          <div class="mrz-label">Machine Readable Zone (MRZ)</div>
+          <div id="mrzLine1">P&lt;INDSHARMAXRAHULXKUMARXXXXXXXXXXXXXXXXXX&lt;X</div>
+          <div id="mrzLine2">WOW2025004817IND9003151M2603319XXXXXXXXX&lt;6</div>
         </div>
       </div>
-    </div>
 
-    <div class="pp-divider"></div>
+      <!-- ══ PAGE 3: PRIVILEGES / ENTITLEMENTS ══ -->
+      <div class="pp-page" id="ppPrivPage">
+        <div class="pp-page-header">
+          <div class="pp-page-title">Privileges &amp; Entitlements</div>
+          <div class="pp-page-num">Page 3 of 14</div>
+        </div>
 
-    <!-- ── VOUCHER / VISA STAMP PAGES ── -->
-    <div class="inner-page">
-      <div class="page-watermark">WOW</div>
-      <div class="stamps-header">
-        <div class="stamps-title">VISIT VOUCHERS / ENTRY STAMPS</div>
-        <div class="stamps-count" id="stampsCount">5 STAMPS</div>
-      </div>
-      <div class="voucher-pages">
-        <div class="voucher-grid" id="voucherGrid">
-          <!-- Vouchers injected by JS -->
+        <div style="font-family:'Cinzel',serif;font-size:10px;color:var(--ink);margin-bottom:10px;letter-spacing:1px;">
+          THIS PASSPORT GRANTS THE FOLLOWING BENEFITS DURING THE PERIOD OF VALIDITY:
+        </div>
+
+        <div class="priv-grid" id="privGrid">
+          <!-- Populated by JS based on tier -->
+        </div>
+
+        <div class="perforation"></div>
+
+        <div style="font-family:'Courier Prime',monospace;font-size:8.5px;color:var(--ink3);line-height:1.7;margin-top:8px;">
+          CONDITIONS: This passport is non-transferable. Valid for one named individual only (Explore Tier) or named family members (Together / Legacy Tier).
+          Entry subject to park operating hours. Lost or stolen passport must be reported immediately. Replacement fee Rs 499.
+          WOW reserves the right to revoke this passport in case of misuse. Contact: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8dfef8fdfde2fff9cdfae2ffe1e9fee2ebfae2e3e9e8ffa3e4e3">[email&#160;protected]</a>
         </div>
       </div>
-    </div>
 
-    <div class="pp-divider"></div>
+      <!-- ══ VOUCHER PAGES (Pages 4-13) ══ -->
+      <div id="voucherPages">
+        <!-- Populated by JS -->
+      </div>
 
-    <!-- ── PERKS PAGE ── -->
-    <div class="inner-page">
-      <div class="page-watermark">WOW</div>
-      <div class="perks-page">
-        <div class="perks-title">PASSPORT PRIVILEGES</div>
-        <div id="perksList"></div>
+      <!-- ══ PAGE 14: BACK COVER ══ -->
+      <div class="pp-back e" id="ppBackCover">
+        <div class="back-info">
+          <div class="back-info-main">WORLDS OF WONDER — NOIDA</div>
+          <div class="back-info-small">A-2, Sector 38A, Noida, Uttar Pradesh 201301<br/>Tel: 080-6909-0000 &nbsp;|&nbsp; worldsofwonder.in</div>
+        </div>
+
+        <div class="back-qr-box">
+          <div id="backQR"></div>
+          <div class="back-qr-title">MASTER PASSPORT QR</div>
+          <div class="back-qr-id" id="backQRId">WOW-2025-004817</div>
+        </div>
+
+        <div class="back-logo">
+          <img src="../images/logo.png" alt="Worlds of Wonder"
+               style="height:36px;width:auto;filter:none!important;opacity:1!important;object-fit:contain;"/>
+        </div>
+      </div>
+
+    </div><!-- /pp-content -->
+  </div><!-- /pp-book -->
+
+  <!-- INFO CARDS -->
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="info-card-title"><i class="fas fa-calendar-check"></i> Next Visit</div>
+      <div class="info-card-body">
+        Park is open today<br/>
+        10:00 AM to 6:00 PM<br/>
+        <strong style="color:var(--gold2);">Great weather expected!</strong>
       </div>
     </div>
-
-    <div class="pp-divider"></div>
-
-    <!-- ── BACK COVER ── -->
-    <div class="back-cover explore" id="backCover">
-      <div class="back-text">SCAN THIS PASSPORT AT ENTRY GATE</div>
-      <div style="width:80px;height:80px;margin:10px auto;position:relative;z-index:1;" id="mainQR"></div>
-      <div class="back-text" style="margin-top:6px;">WOW-E-2024-00847 · ARJUN KUMAR SHARMA</div>
+    <div class="info-card">
+      <div class="info-card-title"><i class="fas fa-star"></i> Loyalty Points</div>
+      <div class="info-card-body">
+        <strong style="color:var(--gold2);font-size:20px;" id="loyaltyPoints">1,250</strong> WOW Points<br/>
+        <a href="loyalty.html" style="color:var(--gold);font-size:10px;">Redeem now &rarr;</a>
+      </div>
     </div>
+    <div class="info-card">
+      <div class="info-card-title"><i class="fas fa-phone-alt"></i> Support</div>
+      <div class="info-card-body">
+        080-6909-0000<br/>
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="86f5f3f6f6e9f4f2c6f1e9f4eae2f5e9e0f1e9e8e2e3f4a8efe8">[email&#160;protected]</a><br/>
+        Mon to Sun, 9 AM to 8 PM
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title"><i class="fas fa-history"></i> Visit History</div>
+      <div class="info-card-body">
+        Total visits: <strong style="color:var(--gold2);" id="visitCount">3</strong><br/>
+        Last visit: <span id="lastVisit">22 Mar 2025</span><br/>
+        <a href="my-bookings.html" style="color:var(--gold);font-size:10px;">All bookings &rarr;</a>
+      </div>
+    </div>
+  </div>
 
-  </div><!-- /passport-book -->
+  <!-- UPGRADE BANNER (shown only for non-Legacy tiers) -->
+  <div class="upgrade-banner" id="upgradeBanner">
+    <div class="upgrade-text">
+      <div class="upgrade-title"><i class="fas fa-crown"></i> Upgrade to Legacy Tier</div>
+      <div class="upgrade-sub">Get premium family access, lounge entry, priority queuing, F&amp;B discounts and more for Rs 24,999.</div>
+    </div>
+    <a href="../passport.html" class="btn-upgrade">Upgrade Now</a>
+  </div>
 
-</div><!-- /page -->
+</div><!-- /outer -->
 
-<script>
-/* =========================================================
-   WOW PASSPORT — Full Tier Logic
-   ========================================================= */
-const TIERS = {
-  explore: {
-    name: 'EXPLORE',
-    price: '₹1,999',
-    color: '#003366',
-    accent: '#1a56db',
-    passportClass: 'explore',
-    passportNum: 'WOW-E-2024-00847',
-    days: 365,
-    visits: 5,
-    expiry: '28 MARCH 2026',
-    expiryShort: '28 MAR 2026',
-    mrzCode: 'E',
-    vouchers: [
-      {id:'WV001',park:'WATER PARK',type:'WATER',title:'Water Park Day Pass',used:true,date:'12 Apr 2025',ref:'WVR-WP-001'},
-      {id:'WV002',park:'AMUSEMENT PARK',type:'AMUSE',title:'Amusement Park Day Pass',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-AP-002'},
-      {id:'WV003',park:'WATER PARK',type:'WATER',title:'Water Park Day Pass',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-WP-003'},
-      {id:'WV004',park:'COMBO PASS',type:'COMBO',title:'Combo Day Pass',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-CB-004'},
-      {id:'WV005',park:'AMUSEMENT PARK',type:'AMUSE',title:'Amusement Park Day Pass',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-AP-005'},
-    ],
-    perks:[
-      {icon:'fa-swimmer',color:'#3B82F6',title:'5 Park Visits',desc:'Mix and match Water Park + Amusement Park visits across the year.'},
-      {icon:'fa-percentage',color:'#F59E0B',title:'15% F&B Discount',desc:'Get 15% off on food and beverage across all WOW outlets.'},
-      {icon:'fa-tag',color:'#10B981',title:'Priority Booking',desc:'Book without waiting in queues on peak days.'},
-      {icon:'fa-gift',color:'#8B5CF6',title:'Birthday Bonus Visit',desc:'One free entry on your birthday month.'},
-    ]
-  },
-  together: {
-    name: 'TOGETHER',
-    price: '₹3,499',
-    color: '#5B0A0A',
-    accent: '#8B1A1A',
-    passportClass: 'together',
-    passportNum: 'WOW-T-2024-01234',
-    days: 365,
-    visits: 10,
-    expiry: '28 MARCH 2026',
-    expiryShort: '28 MAR 2026',
-    mrzCode: 'T',
-    vouchers: [
-      {id:'WV101',park:'WATER PARK',type:'WATER',title:'Family Water Park Pass (4 pax)',used:true,date:'15 Apr 2025',ref:'WVR-WP-101'},
-      {id:'WV102',park:'AMUSEMENT PARK',type:'AMUSE',title:'Family Amusement Pass (4 pax)',used:true,date:'22 Apr 2025',ref:'WVR-AP-102'},
-      {id:'WV103',park:'WATER PARK',type:'WATER',title:'Family Water Park Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-WP-103'},
-      {id:'WV104',park:'COMBO PASS',type:'COMBO',title:'Family Combo Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-CB-104'},
-      {id:'WV105',park:'AMUSEMENT PARK',type:'AMUSE',title:'Family Amusement Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-AP-105'},
-      {id:'WV106',park:'WATER PARK',type:'WATER',title:'Family Water Park Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-WP-106'},
-      {id:'WV107',park:'COMBO PASS',type:'COMBO',title:'Family Combo Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-CB-107'},
-      {id:'WV108',park:'AMUSEMENT PARK',type:'AMUSE',title:'Family Amusement Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-AP-108'},
-      {id:'WV109',park:'WATER PARK',type:'WATER',title:'Family Water Park Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-WP-109'},
-      {id:'WV110',park:'COMBO PASS',type:'COMBO',title:'Family Combo Pass (4 pax)',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-CB-110'},
-    ],
-    perks:[
-      {icon:'fa-users',color:'#9CA3AF',title:'10 Family Visits (up to 4 pax each)',desc:'Share visits with up to 4 family members per entry.'},
-      {icon:'fa-percentage',color:'#F59E0B',title:'20% F&B Discount',desc:'Bigger savings on food across all WOW outlets.'},
-      {icon:'fa-camera',color:'#EC4899',title:'Free Photo Package',desc:'Complimentary digital photo package on every visit.'},
-      {icon:'fa-parking',color:'#06B6D4',title:'Free Parking',desc:'Complimentary parking on all visit days.'},
-      {icon:'fa-gift',color:'#8B5CF6',title:'Birthday Surprise',desc:'Special birthday experience + complementary cake slice.'},
-    ]
-  },
-  legacy: {
-    name: 'LEGACY',
-    price: '₹5,999',
-    color: '#3A0000',
-    accent: '#600000',
-    passportClass: 'legacy',
-    passportNum: 'WOW-L-2024-00421',
-    days: 365,
-    visits: 999,
-    expiry: '28 MARCH 2026',
-    expiryShort: '28 MAR 2026',
-    mrzCode: 'L',
-    vouchers: [
-      {id:'WV201',park:'ALL PARKS',type:'COMBO',title:'Unlimited All-Access Pass',used:false,date:'Valid till 28 Mar 2026 · UNLIMITED',ref:'WVR-UL-201'},
-      {id:'WV202',park:'WATER PARK',type:'WATER',title:'VIP Water Park Access',used:false,date:'Valid till 28 Mar 2026 · UNLIMITED',ref:'WVR-VIP-202'},
-      {id:'WV203',park:'AMUSEMENT PARK',type:'AMUSE',title:'VIP Amusement Access',used:false,date:'Valid till 28 Mar 2026 · UNLIMITED',ref:'WVR-VIP-203'},
-      {id:'WV204',park:'FASTPASS',type:'COMBO',title:'Fastpass — Skip Queues All Year',used:false,date:'Valid till 28 Mar 2026',ref:'WVR-FP-204'},
-    ],
-    perks:[
-      {icon:'fa-infinity',color:'#F59E0B',title:'Unlimited Visits — 365 Days',desc:'Walk in any day, any time, no booking needed.'},
-      {icon:'fa-crown',color:'#EF4444',title:'VIP Lounge Access',desc:'Exclusive Legacy Lounge with seating, AC, and complimentary refreshments.'},
-      {icon:'fa-percentage',color:'#F59E0B',title:'30% F&B Discount',desc:'Maximum savings on all food and beverages.'},
-      {icon:'fa-car',color:'#06B6D4',title:'Priority Parking',desc:'Reserved parking closest to the gate.'},
-      {icon:'fa-headset',color:'#A855F7',title:'Concierge Support',desc:'Dedicated WhatsApp concierge for your visit days.'},
-      {icon:'fa-camera',color:'#EC4899',title:'Unlimited Photo Package',desc:'Complimentary photos on every single visit.'},
-      {icon:'fa-birthday-cake',color:'#10B981',title:'Premium Birthday Package',desc:'Full birthday experience with cake, decor, photos and 4 guest passes.'},
-    ]
-  }
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const PASSPORT = {
+  number: 'WOW-2025-004817',
+  holder: { surname: 'SHARMA', given: 'RAHUL KUMAR', dob: '15 MAR 1990', gender: 'MALE' },
+  issued: '01 APR 2025',
+  expiry: '31 MAR 2026',
+  tier: 'e',
+  visits: 3,
+  maxVisits: 'UNL',
+  loyaltyPoints: 1250,
+  lastVisit: '22 Mar 2025',
 };
 
-let currentTier = 'explore';
+const TIERS = {
+  e: {
+    name: 'EXPLORE',
+    price: 'Rs 4,999',
+    color: 'e',
+    accent: '#60a5fa',
+    country: 'WORLDS OF WONDER',
+    privileges: [
+      { icon: '🌊', title: 'Water Park', desc: 'Unlimited entry, all 20+ rides' },
+      { icon: '🎢', title: 'Amusement Park', desc: 'Unlimited entry, all 30+ rides' },
+      { icon: '🎟', title: 'No Queue Booking', desc: 'Priority online booking lane' },
+      { icon: '💰', title: '10% F&B Discount', desc: 'All food courts & kiosks' },
+      { icon: '🅿', title: 'Free Parking', desc: '1 vehicle per visit' },
+      { icon: '⭐', title: 'Loyalty Points', desc: '2x points on every visit' },
+    ],
+    vouchers: [
+      { id: 'WP-V-001', title: 'Water Park Entry', park: 'Water Park', status: 'used',   date: '22 MAR 2025', ref: 'WP-ENTRY-20250322-001' },
+      { id: 'WP-V-002', title: 'Amusement Park Entry', park: 'Amusement Park', status: 'used', date: '22 MAR 2025', ref: 'AP-ENTRY-20250322-001' },
+      { id: 'WP-V-003', title: 'Water Park Entry', park: 'Water Park', status: 'valid',  date: '—',            ref: 'WP-ENTRY-OPEN-003' },
+      { id: 'WP-V-004', title: 'F&B Voucher 10%', park: 'Both Parks', status: 'valid',  date: '—',            ref: 'FNB-DISC-OPEN-004' },
+      { id: 'WP-V-005', title: 'Amusement Park Entry', park: 'Amusement Park', status: 'valid', date: '—', ref: 'AP-ENTRY-OPEN-005' },
+    ],
+  },
+  t: {
+    name: 'TOGETHER',
+    price: 'Rs 12,999',
+    color: 't',
+    accent: '#f87171',
+    country: 'WORLDS OF WONDER',
+    privileges: [
+      { icon: '🌊', title: 'Water Park x4', desc: 'Unlimited family entry' },
+      { icon: '🎢', title: 'Amusement Park x4', desc: 'Unlimited family entry' },
+      { icon: '🎁', title: 'Birthday Benefit', desc: 'Free cake & 20% F&B discount on birthday' },
+      { icon: '💰', title: '15% F&B Discount', desc: 'All food courts & kiosks' },
+      { icon: '🅿', title: 'Free Parking', desc: '1 vehicle per visit' },
+      { icon: '⭐', title: 'Loyalty Points', desc: '3x points for the family' },
+      { icon: '🎡', title: 'Priority Queuing', desc: 'Jump to the front on 5 rides' },
+      { icon: '🛍', title: 'Merch Discount', desc: '10% off at WOW stores' },
+    ],
+    vouchers: [
+      { id: 'WT-V-001', title: 'Family Water Park Entry', park: 'Water Park', status: 'valid', date: '—', ref: 'WP-FAM-OPEN-001' },
+      { id: 'WT-V-002', title: 'Family Amusement Park Entry', park: 'Amusement Park', status: 'valid', date: '—', ref: 'AP-FAM-OPEN-002' },
+      { id: 'WT-V-003', title: 'Birthday Celebration Pack', park: 'Both Parks', status: 'valid', date: '—', ref: 'BDAY-PACK-OPEN-003' },
+      { id: 'WT-V-004', title: 'F&B Voucher 15%', park: 'Both Parks', status: 'valid', date: '—', ref: 'FNB-DISC-15-004' },
+      { id: 'WT-V-005', title: 'Priority Queue x5 Rides', park: 'Both Parks', status: 'valid', date: '—', ref: 'PQ-RIDES-OPEN-005' },
+    ],
+  },
+  l: {
+    name: 'LEGACY',
+    price: 'Rs 24,999',
+    color: 'l',
+    accent: '#86efac',
+    country: 'WORLDS OF WONDER',
+    privileges: [
+      { icon: '🌊', title: 'Water Park x6', desc: 'Unlimited premium family entry' },
+      { icon: '🎢', title: 'Amusement Park x6', desc: 'Unlimited premium family entry' },
+      { icon: '🏖', title: 'Premium Lounge', desc: 'Exclusive lounge access both parks' },
+      { icon: '💰', title: '25% F&B Discount', desc: 'All restaurants + VIP dining' },
+      { icon: '🚗', title: 'VIP Parking', desc: 'Reserved front-row parking slot' },
+      { icon: '👑', title: 'VIP Fast Track', desc: 'Skip queues on ALL rides' },
+      { icon: '⭐', title: 'Loyalty Points', desc: '5x points — fastest gold status' },
+      { icon: '🎁', title: 'Birthday Pack', desc: 'Full birthday event package' },
+      { icon: '🛍', title: 'Merch Allowance', desc: 'Rs 1,000 merch credit per year' },
+      { icon: '📞', title: 'Concierge Line', desc: 'Dedicated phone number' },
+    ],
+    vouchers: [
+      { id: 'WL-V-001', title: 'VIP Family Water Park Entry', park: 'Water Park', status: 'valid', date: '—', ref: 'WP-VIP-OPEN-001' },
+      { id: 'WL-V-002', title: 'VIP Family Amusement Park Entry', park: 'Amusement Park', status: 'valid', date: '—', ref: 'AP-VIP-OPEN-002' },
+      { id: 'WL-V-003', title: 'Premium Lounge Access', park: 'Both Parks', status: 'valid', date: '—', ref: 'LOUNGE-VIP-003' },
+      { id: 'WL-V-004', title: 'Birthday Grand Package', park: 'Both Parks', status: 'valid', date: '—', ref: 'BDAY-GRAND-004' },
+      { id: 'WL-V-005', title: 'F&B Voucher 25%', park: 'Both Parks', status: 'valid', date: '—', ref: 'FNB-DISC-25-005' },
+      { id: 'WL-V-006', title: 'Merch Credit Rs 1,000', park: 'WOW Store', status: 'valid', date: '—', ref: 'MERCH-CREDIT-006' },
+    ],
+  },
+};
 
-function switchTier(t) {
+let currentTier = 'e';
+
+// ── SET TIER ──────────────────────────────────────────────────────────
+function setTier(t) {
   currentTier = t;
-  const td = TIERS[t];
+  // Update tab highlighting
+  document.querySelectorAll('.tp-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tp-card.' + t)[0].classList.add('active');
+  // Re-render passport
+  renderPassport(t);
+}
 
-  // Legend selection
-  document.querySelectorAll('.tl-card').forEach(c => {
-    c.classList.remove('sel-e','sel-t','sel-l');
-  });
-  const map = {explore:'sel-e',together:'sel-t',legacy:'sel-l'};
-  document.querySelector('.tl-card.'+t).classList.add(map[t]);
+// ── RENDER PASSPORT ───────────────────────────────────────────────────
+function renderPassport(t) {
+  const tier = TIERS[t];
+  const color = tier.color;
 
-  // Cover
-  const cover = document.getElementById('cover');
-  cover.className = 'pc '+td.passportClass;
-  document.getElementById('coverBadge').textContent = td.name;
+  // COVER
+  const cover = document.getElementById('ppCover');
+  cover.className = `pp-cover ${color}`;
+  document.getElementById('coverCountry').textContent = tier.country;
+  document.getElementById('coverTierName').textContent = tier.name + ' TIER';
+  document.getElementById('coverYear').textContent = new Date().getFullYear();
 
-  // Passport number color
-  const pn = document.getElementById('passportNum');
-  pn.textContent = td.passportNum;
-  pn.className = 'pn-val '+td.passportClass;
-  document.getElementById('passportTierBadge').textContent = td.name;
-  document.getElementById('passportTierBadge').style.color = td.color;
+  // BIO PAGE
+  const bioBadge = document.getElementById('bioTierBadge');
+  bioBadge.className = `bio-tier-badge ${color}`;
+  bioBadge.textContent = tier.name;
 
-  // Expiry
-  document.getElementById('expiryDate').textContent = td.expiryShort;
-  document.getElementById('expiryText').textContent = td.expiry;
-  document.getElementById('tierText').textContent = td.name;
-  document.getElementById('visitsLeft').textContent =
-    td.visits === 999 ? 'Unlimited' : (td.visits - td.vouchers.filter(v=>v.used).length)+' of '+td.visits;
+  // BIO DATA
+  document.getElementById('bioSurname').textContent  = PASSPORT.holder.surname;
+  document.getElementById('bioGiven').textContent    = PASSPORT.holder.given;
+  document.getElementById('bioDOB').textContent      = PASSPORT.holder.dob;
+  document.getElementById('bioGender').textContent   = PASSPORT.holder.gender;
+  document.getElementById('bioPassNo').textContent   = PASSPORT.number;
+  document.getElementById('bioIssued').textContent   = PASSPORT.issued;
+  document.getElementById('bioExpiry').textContent   = PASSPORT.expiry;
+  document.getElementById('vsIssued').textContent    = PASSPORT.issued;
+  document.getElementById('vsExpiry').textContent    = PASSPORT.expiry;
+  document.getElementById('vsVisits').textContent    = PASSPORT.visits + ' / ' + PASSPORT.maxVisits;
 
   // MRZ
-  const mrz = `P<WOW<${currentTier.toUpperCase()}<<ARJUN<KUMAR<SHARMA<<<<<<<<<<<<<<<<<<<<<<\nWE${td.mrzCode}2024000475IND9203121M260328<<<<<<<<<<<<<<<6`;
-  document.getElementById('mrzLine').innerHTML = mrz.replace('\n','<br/>');
+  const mrz1 = 'P<INDSHARMAXRAHULXKUMARXXXXXXXXXXXXXXXXXXXXXXXXXX';
+  const mrz2 = PASSPORT.number.replace(/-/g,'') + 'IND' + '9003151M2603319XXXXXXXXX<6';
+  document.getElementById('mrzLine1').textContent = mrz1.substring(0,44);
+  document.getElementById('mrzLine2').textContent = mrz2.substring(0,44);
 
-  // Validity circle
-  const vc = document.getElementById('validityCircle');
-  vc.className = 'validity-circle '+td.passportClass;
-  document.getElementById('vcDays').textContent = td.days;
+  // BIO QR
+  const bioQREl = document.getElementById('bioQR');
+  bioQREl.innerHTML = '';
+  new QRCode(bioQREl, { text: 'WOW:' + PASSPORT.number + ':BIO:' + t.toUpperCase(), width:48, height:48, correctLevel: QRCode.CorrectLevel.M });
 
-  // Back cover
-  const bc = document.getElementById('backCover');
-  bc.className = 'back-cover '+td.passportClass;
+  // PRIVILEGES
+  const privGrid = document.getElementById('privGrid');
+  privGrid.innerHTML = tier.privileges.map(p =>
+    `<div class="priv-item"><span class="priv-icon">${p.icon}</span><div class="priv-text"><div class="priv-title">${p.title}</div><div class="priv-desc">${p.desc}</div></div></div>`
+  ).join('');
 
-  // Stamps count
-  document.getElementById('stampsCount').textContent =
-    td.visits === 999 ? 'UNLIMITED' : td.vouchers.length+' STAMPS';
+  // VOUCHER PAGES
+  const voucherPages = document.getElementById('voucherPages');
+  voucherPages.innerHTML = '';
+  tier.vouchers.forEach((v, i) => {
+    const page = document.createElement('div');
+    page.className = 'voucher-page';
+    const stampClass = v.status === 'used' ? 'used' : (v.status === 'valid' ? 'valid' : 'entry');
+    const stampText  = v.status === 'used' ? 'ADMITTED' : 'VALID';
+    const stampSub   = v.status === 'used' ? v.date : 'READY TO USE';
 
-  // Build vouchers
-  buildVouchers(td);
-
-  // Build perks
-  buildPerks(td);
-
-  // Main QR
-  buildMainQR(td);
-}
-
-function buildVouchers(td) {
-  const grid = document.getElementById('voucherGrid');
-  grid.innerHTML = '';
-  td.vouchers.forEach((v,i) => {
-    const div = document.createElement('div');
-    div.className = 'voucher-stamp' + (v.used ? '' : ' stamp-active');
-    div.innerHTML = `
-      <div class="stamp-top">
-        <div class="stamp-park">${v.park}</div>
-        <div class="stamp-type ${v.type==='WATER'?'water':v.type==='COMBO'?'combo':''}">${v.type}</div>
+    page.innerHTML = `
+      <div class="vp-header">
+        <div class="vp-page-title">Voucher / Entry Permit</div>
+        <div class="vp-page-num">Page ${4+i} of 14</div>
       </div>
-      <div class="stamp-title">${v.title}</div>
-      <div class="stamp-qr" id="sqr_${v.id}"></div>
-      <div class="stamp-validity">${v.date}</div>
-      <div class="stamp-ref">${v.ref}</div>
-      ${v.used ? '<div class="stamp-used"><div class="stamp-used-text">USED</div></div>' : ''}
+      <div class="visa-stamp ${stampClass}">
+        <div class="vs-text ${stampClass}">${stampText}</div>
+        <div class="vs-sub ${stampClass}">${stampSub}</div>
+      </div>
+      <div class="vc-grid">
+        <div class="vc-info">
+          <div class="vc-title">${v.title}</div>
+          <div class="vc-sub">${v.park}</div>
+          <div class="vc-fields">
+            <div class="vc-field"><span class="vc-field-label">Voucher ID</span><span class="vc-field-value">${v.id}</span></div>
+            <div class="vc-field"><span class="vc-field-label">Passport No</span><span class="vc-field-value">${PASSPORT.number}</span></div>
+            <div class="vc-field"><span class="vc-field-label">Valid For</span><span class="vc-field-value">${PASSPORT.holder.given} ${PASSPORT.holder.surname}</span></div>
+            <div class="vc-field"><span class="vc-field-label">Used On</span><span class="vc-field-value">${v.status === 'used' ? v.date : 'Not Yet Used'}</span></div>
+            <div class="vc-field"><span class="vc-field-label">Reference</span><span class="vc-field-value">${v.ref}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <div class="vc-barcode" id="qr_${v.id}"></div>
+          <div class="vc-barcode-label">Scan at Gate</div>
+        </div>
+      </div>
+      <div class="perforation"></div>
     `;
-    grid.appendChild(div);
+    voucherPages.appendChild(page);
 
-    // Generate QR
-    if (!v.used) {
-      setTimeout(() => {
-        const el = document.getElementById('sqr_'+v.id);
-        if (el && typeof QRCode !== 'undefined') {
-          el.innerHTML = '';
-          QRCode.toCanvas(document.createElement('canvas'),
-            `WOW|${v.id}|${td.passportNum}|${v.ref}`,
-            {width:52,margin:1,color:{dark:'#1a1207',light:'#EDE0C4'}},
-            (err,canvas) => { if(!err) el.appendChild(canvas); }
-          );
-        }
-      }, 100);
-    } else {
-      const el2 = document.getElementById('sqr_'+v.id);
-      if (el2) {
-        setTimeout(() => {
-          el2.innerHTML = '';
-          QRCode.toCanvas(document.createElement('canvas'),
-            `WOW|${v.id}|USED`,
-            {width:52,margin:1,color:{dark:'rgba(26,18,7,0.3)',light:'#EDE0C4'}},
-            (err,canvas) => { if(!err) el2.appendChild(canvas); }
-          );
-        }, 100);
+    // Generate QR for this voucher
+    setTimeout(() => {
+      const container = document.getElementById('qr_' + v.id);
+      if (container) {
+        container.innerHTML = '';
+        new QRCode(container, {
+          text: JSON.stringify({ pass: PASSPORT.number, voucher: v.id, ref: v.ref, status: v.status, tier: t }),
+          width: 68, height: 68,
+          correctLevel: QRCode.CorrectLevel.M
+        });
       }
-    }
+    }, 50);
   });
-}
 
-function buildPerks(td) {
-  const list = document.getElementById('perksList');
-  list.innerHTML = '';
-  const colors = {
-    'fa-swimmer':'#3B82F6','fa-users':'#9CA3AF','fa-infinity':'#F59E0B',
-    'fa-percentage':'#F59E0B','fa-camera':'#EC4899','fa-parking':'#06B6D4',
-    'fa-headset':'#A855F7','fa-crown':'#EF4444','fa-car':'#06B6D4',
-    'fa-gift':'#8B5CF6','fa-birthday-cake':'#10B981','fa-tag':'#10B981'
-  };
-  td.perks.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'perk-row';
-    el.innerHTML = `
-      <div class="perk-icon" style="background:${p.color}22;color:${p.color};"><i class="fa ${p.icon}"></i></div>
-      <div class="perk-text"><strong>${p.title}</strong>${p.desc}</div>
-    `;
-    list.appendChild(el);
+  // BACK COVER
+  const back = document.getElementById('ppBackCover');
+  back.className = `pp-back ${color}`;
+  document.getElementById('backQRId').textContent = PASSPORT.number;
+
+  // BACK QR (master)
+  const backQREl = document.getElementById('backQR');
+  backQREl.innerHTML = '';
+  new QRCode(backQREl, {
+    text: JSON.stringify({ passportNo: PASSPORT.number, tier: t, holder: PASSPORT.holder.surname + ' ' + PASSPORT.holder.given }),
+    width: 110, height: 110,
+    correctLevel: QRCode.CorrectLevel.M
   });
+
+  // UPGRADE BANNER
+  document.getElementById('upgradeBanner').style.display = t === 'l' ? 'none' : 'flex';
+
+  // LOYALTY & VISITS
+  document.getElementById('loyaltyPoints').textContent = PASSPORT.loyaltyPoints.toLocaleString('en-IN');
+  document.getElementById('visitCount').textContent    = PASSPORT.visits;
+  document.getElementById('lastVisit').textContent     = PASSPORT.lastVisit;
 }
 
-function buildMainQR(td) {
-  const el = document.getElementById('mainQR');
-  if (!el || typeof QRCode === 'undefined') return;
-  el.innerHTML = '';
-  QRCode.toCanvas(document.createElement('canvas'),
-    `WOW-PASSPORT|${td.passportNum}|ARJUN-KUMAR-SHARMA|${td.name}`,
-    {width:80,margin:1,color:{dark:'#fff',light:'rgba(0,0,0,0)'}},
-    (err,canvas) => { if(!err) el.appendChild(canvas); }
-  );
+function downloadPassport() {
+  alert('PDF download will be available once your passport is active. Please visit a WOW counter or call 080-6909-0000.');
 }
 
-function printPassport() {
-  window.print();
-}
-
-function sharePassport() {
-  if (navigator.share) {
-    navigator.share({title:'My WOW Passport',text:'Check out my WOW Passport!',url:window.location.href});
-  } else {
-    navigator.clipboard.writeText(window.location.href);
-    alert('Link copied! Share your WOW Passport.');
-  }
-}
-
-function openScanner() {
-  alert('Please show this QR code at the WOW entry gate for instant scanning.');
-}
-
-// Init
-window.addEventListener('load', () => { switchTier('explore'); });
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  renderPassport('e');
+});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
