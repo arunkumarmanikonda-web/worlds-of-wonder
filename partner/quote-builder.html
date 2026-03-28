@@ -12,7 +12,7 @@ body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;display:fle
 /* Sidebar (identical trim) */
 .sidebar{width:216px;background:linear-gradient(180deg,#0d1220,#080c18);border-right:1px solid rgba(255,215,0,.1);display:flex;flex-direction:column;flex-shrink:0;}
 .sidebar-brand{padding:16px;border-bottom:1px solid rgba(255,215,0,.08);display:flex;align-items:center;gap:10px;}
-.sb-logo{width:34px;height:34px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0a0e1a;flex-shrink:0;}
+.sb-logo{height:40px;width:auto;object-fit:contain;display:block;flex-shrink:0;}
 .sb-name{font-size:12px;font-weight:700;color:#ffd700;}
 .sb-role{font-size:10px;color:#8899aa;}
 .nav-section{padding:12px 10px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;}
@@ -102,7 +102,7 @@ body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;display:fle
 </head>
 <body>
 <div class="sidebar">
-  <div class="sidebar-brand"><div class="sb-logo">WW</div><div><div class="sb-name">WOW Partner Portal</div><div class="sb-role">Quote Builder</div></div></div>
+  <div class="sidebar-brand"><a href="../index.html"><img class="sb-logo" src="../images/logo.png" alt="Worlds of Wonder" style="height:40px;width:auto;object-fit:contain;filter:none!important;" /></a><div><div class="sb-name">WOW Partner Portal</div><div class="sb-role">Quote Builder</div></div></div>
   <div class="nav-section">Main</div>
   <a class="nav-item" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
   <a class="nav-item active" href="quote-builder.html"><i class="fas fa-file-invoice"></i> Quote Builder <span class="nav-badge">3</span></a>
