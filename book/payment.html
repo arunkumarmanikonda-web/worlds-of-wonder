@@ -161,7 +161,7 @@ input:focus{outline:none;border-color:var(--brand);}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
         <div><span style="color:var(--muted);font-size:11px;">PRIMARY GUEST</span><div style="font-weight:700;margin-top:2px;">Rajesh Kumar</div></div>
         <div><span style="color:var(--muted);font-size:11px;">MOBILE</span><div style="font-weight:700;margin-top:2px;">+91 98765 43210</div></div>
-        <div><span style="color:var(--muted);font-size:11px;">EMAIL</span><div style="font-weight:700;margin-top:2px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3b1a2a9a6b0ab83a6aea2aaafeda0acae">[email&#160;protected]</a></div></div>
+        <div><span style="color:var(--muted);font-size:11px;">EMAIL</span><div style="font-weight:700;margin-top:2px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4d3f2c27283e250d28202c2421632e2220">[email&#160;protected]</a></div></div>
         <div><span style="color:var(--muted);font-size:11px;">VISIT DATE</span><div style="font-weight:700;margin-top:2px;">28 Mar 2025</div></div>
       </div>
     </div>
@@ -179,17 +179,19 @@ input:focus{outline:none;border-color:var(--brand);}
         </div>
 
         <!-- CARD -->
+        <form autocomplete="off" onsubmit="return false;">
         <div class="pay-section show" id="section-card">
           <div class="form-group"><label>Card Number</label>
-            <div class="card-number-wrap"><input type="text" id="card-num" placeholder="1234  5678  9012  3456" maxlength="19" oninput="formatCard(this)"/><i class="fa fa-credit-card card-brand-icon" id="card-brand-icon"></i></div>
+            <div class="card-number-wrap"><input type="text" id="card-num" placeholder="1234  5678  9012  3456" maxlength="19" oninput="formatCard(this)" autocomplete="cc-number"/><i class="fa fa-credit-card card-brand-icon" id="card-brand-icon"></i></div>
           </div>
-          <div class="form-group"><label>Name on Card</label><input type="text" placeholder="RAJESH KUMAR"/></div>
+          <div class="form-group"><label>Name on Card</label><input type="text" placeholder="RAJESH KUMAR" autocomplete="cc-name"/></div>
           <div class="card-row">
-            <div class="form-group" style="margin:0;"><label>Expiry MM / YY</label><input type="text" placeholder="03 / 28" maxlength="7" oninput="formatExpiry(this)"/></div>
-            <div class="form-group" style="margin:0;"><label>CVV</label><input type="password" placeholder="•••" maxlength="4"/></div>
+            <div class="form-group" style="margin:0;"><label>Expiry MM / YY</label><input type="text" placeholder="03 / 28" maxlength="7" oninput="formatExpiry(this)" autocomplete="cc-exp"/></div>
+            <div class="form-group" style="margin:0;"><label>CVV</label><input type="password" placeholder="•••" maxlength="4" autocomplete="cc-csc"/></div>
           </div>
           <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;margin-bottom:16px;"><input type="checkbox" checked/> Save card for future payments</label>
         </div>
+        </form>
 
         <!-- UPI -->
         <div class="pay-section" id="section-upi">
@@ -283,7 +285,7 @@ input:focus{outline:none;border-color:var(--brand);}
       <button class="btn btn-brand" style="flex:1;" onclick="alert('📄 Downloading PDF tickets...')"><i class="fa fa-download"></i> Download Tickets (PDF)</button>
       <button class="btn btn-outline" style="flex:1;" onclick="alert('📱 Sharing via WhatsApp...')"><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp</button>
     </div>
-    <div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;background:#f8fafc;border-radius:8px;">📧 Confirmation sent to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2351424946504b63464e424a4f0d404c4e">[email&#160;protected]</a></strong> · 📱 SMS to <strong>+91 98765 43210</strong></div>
+    <div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;background:#f8fafc;border-radius:8px;">📧 Confirmation sent to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1664777c73657e56737b777f7a3875797b">[email&#160;protected]</a></strong> · 📱 SMS to <strong>+91 98765 43210</strong></div>
     <div style="text-align:center;"><a href="../index.html" class="btn btn-brand" style="display:inline-flex;margin-top:4px;"><i class="fa fa-home"></i> Back to Home</a></div>
   </div>
 </div>
