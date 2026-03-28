@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My WOW Passport — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Nunito:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+/* ── Reset & Base ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--gold-dk:#7A5020;
+  --bg-page:#080C1A;
+  --card-dark:#1A0F05;
+  --card-dark2:#120B03;
+  --passport-bg:linear-gradient(145deg,#1A0F05 0%,#2C1A08 40%,#1A0F05 70%,#0D0802 100%);
+  --explore:#3B82F6;--explore-lt:#DBEAFE;
+  --together:#9CA3AF;--together-lt:#F3F4F6;
+  --legacy:#EF4444;--legacy-lt:#FEF2F2;
+  --cream:#F5EDD8;--cream2:#EDE0C4;
+}
+html,body{min-height:100vh;background:var(--bg-page);font-family:'Nunito',sans-serif;color:#fff;}
+
+/* ── Page Layout ── */
+.page-wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px;}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+.page-title{font-family:'Cinzel',serif;font-size:20px;color:var(--gold2);letter-spacing:2px;}
+.page-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;}
+
+/* ── Tier Selector ── */
+.tier-selector{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;}
+.tier-btn{padding:10px 20px;border-radius:30px;cursor:pointer;font-size:13px;font-weight:800;border:2px solid transparent;transition:all .25s;letter-spacing:.5px;}
+.tier-btn.explore{background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#93C5FD;}
+.tier-btn.explore.active{background:var(--explore);border-color:var(--explore);color:#fff;box-shadow:0 4px 20px rgba(59,130,246,.4);}
+.tier-btn.together{background:rgba(156,163,175,.15);border-color:rgba(156,163,175,.4);color:#D1D5DB;}
+.tier-btn.together.active{background:#9CA3AF;border-color:#9CA3AF;color:#111;box-shadow:0 4px 20px rgba(156,163,175,.4);}
+.tier-btn.legacy{background:rgba(220,38,38,.15);border-color:rgba(220,38,38,.4);color:#FCA5A5;}
+.tier-btn.legacy.active{background:var(--legacy);border-color:var(--legacy);color:#fff;box-shadow:0 4px 20px rgba(239,68,68,.4);}
+
+/* ══════════════════════════════════════
+   PASSPORT CARD FRONT
+══════════════════════════════════════ */
+.passport-front{
+  width:100%;max-width:780px;margin:0 auto;
+  border-radius:20px;
+  background:var(--passport-bg);
+  border:1.5px solid rgba(201,168,76,.35);
+  box-shadow:0 0 0 1px rgba(201,168,76,.12),0 24px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(201,168,76,.2);
+  position:relative;overflow:hidden;
+  padding:36px 40px 32px;
+}
+/* Diagonal line pattern */
+.passport-front::before{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(45deg,rgba(201,168,76,.04) 0px,rgba(201,168,76,.04) 1px,transparent 1px,transparent 24px);
+  pointer-events:none;
+}
+/* Tier-specific accent stripe */
+.passport-front::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  border-radius:20px 20px 0 0;
+}
+.tier-explore .passport-front::after{background:linear-gradient(90deg,#1D4ED8,#3B82F6,#60A5FA);}
+.tier-together .passport-front::after{background:linear-gradient(90deg,#6B7280,#9CA3AF,#D1D5DB);}
+.tier-legacy .passport-front::after{background:linear-gradient(90deg,#991B1B,#EF4444,#FCA5A5);}
+
+/* Corner ornaments */
+.corner{position:absolute;font-size:18px;opacity:.35;filter:sepia(1) saturate(2) hue-rotate(5deg);}
+.corner-tl{top:14px;left:14px;}
+.corner-tr{top:14px;right:14px;}
+.corner-bl{bottom:14px;left:14px;}
+.corner-br{bottom:14px;right:14px;}
+
+/* Top header area */
+.pf-header{text-align:center;margin-bottom:24px;}
+.pf-republic{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:rgba(201,168,76,.7);text-transform:uppercase;margin-bottom:4px;}
+.pf-wow-name{font-family:'Cinzel',serif;font-size:22px;font-weight:900;color:var(--gold2);letter-spacing:4px;text-shadow:0 0 30px rgba(201,168,76,.5);}
+.pf-subtitle{font-size:9px;letter-spacing:3px;color:rgba(201,168,76,.6);margin-top:3px;}
+
+/* Emblem */
+.pf-emblem{
+  width:88px;height:88px;border-radius:50%;
+  border:2px solid var(--gold3);
+  background:radial-gradient(circle at 35% 35%,#3D2008,#1A0F05);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  margin:18px auto;
+  box-shadow:0 0 0 1px rgba(201,168,76,.2),0 0 20px rgba(201,168,76,.15),inset 0 1px 0 rgba(201,168,76,.3);
+  position:relative;
+}
+.pf-emblem::before{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(201,168,76,.2);
+}
+.pf-star{font-size:28px;line-height:1;filter:drop-shadow(0 0 8px rgba(240,208,128,.8));}
+.pf-emblem-wow{font-family:'Cinzel',serif;font-size:13px;font-weight:900;color:var(--gold2);margin-top:2px;letter-spacing:2px;}
+.pf-emblem-est{font-size:7px;color:rgba(201,168,76,.6);letter-spacing:2px;margin-top:1px;}
+
+/* Passport word */
+.pf-passport-word{
+  text-align:center;
+  font-family:'Cinzel',serif;font-size:36px;font-weight:900;
+  color:var(--gold2);letter-spacing:8px;
+  text-shadow:0 0 40px rgba(201,168,76,.4);
+  margin-bottom:4px;
+}
+.pf-passport-word-hi{
+  text-align:center;font-size:11px;color:rgba(201,168,76,.6);letter-spacing:3px;margin-bottom:16px;
+}
+
+/* Tier badge */
+.pf-tier-badge{
+  display:flex;align-items:center;justify-content:center;
+  width:fit-content;margin:0 auto 20px;
+  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);
+  border-radius:30px;padding:6px 20px;gap:8px;
+}
+.pf-tier-name{font-size:11px;font-weight:800;color:var(--gold2);letter-spacing:2px;text-transform:uppercase;}
+
+/* Holder info row */
+.pf-holder-row{
+  display:grid;grid-template-columns:auto 1fr auto;
+  align-items:center;gap:16px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.12);
+  border-radius:12px;padding:14px 16px;margin-bottom:16px;
+}
+.pf-photo{
+  width:56px;height:56px;border-radius:8px;
+  background:linear-gradient(135deg,#2C1A08,#1A0F05);
+  border:1.5px solid rgba(201,168,76,.3);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;
+}
+.pf-photo img{width:100%;height:100%;object-fit:cover;}
+.pf-name{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold2);letter-spacing:1px;}
+.pf-phone{font-size:12px;color:rgba(201,168,76,.6);margin-top:3px;}
+.pf-id{font-size:10px;color:rgba(201,168,76,.5);letter-spacing:1px;}
+.pf-qr-wrap{flex-shrink:0;}
+.pf-qr-wrap canvas{border-radius:6px;border:2px solid rgba(201,168,76,.3);display:block;}
+
+/* Footer strip */
+.pf-footer{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-top:16px;padding-top:14px;
+  border-top:1px solid rgba(201,168,76,.15);
+}
+.pf-footer-left{font-size:10px;color:rgba(201,168,76,.5);}
+.pf-footer-left span{display:block;color:rgba(201,168,76,.8);font-weight:700;font-size:12px;margin-top:2px;}
+.pf-footer-right{font-size:10px;color:rgba(201,168,76,.5);text-align:right;}
+.pf-footer-right span{display:block;color:var(--gold2);font-weight:900;font-size:16px;font-family:'Cinzel',serif;margin-top:2px;letter-spacing:1px;}
+.pf-moons{display:flex;align-items:center;gap:8px;justify-content:center;}
+.pf-moons span{font-size:14px;opacity:.5;}
+.pf-moons .dot{width:6px;height:6px;background:rgba(201,168,76,.4);border-radius:50%;}
+
+/* ══════════════════════════════════════
+   PASSPORT BACK / DETAILS PANEL
+══════════════════════════════════════ */
+.passport-back{
+  width:100%;max-width:780px;margin:20px auto 0;
+  border-radius:20px;
+  background:var(--cream);
+  border:1.5px solid var(--cream2);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  overflow:hidden;
+  color:#1A0F05;
+}
+
+/* Back header */
+.pb-header{
+  background:linear-gradient(135deg,#1A0F05,#2C1A08);
+  padding:16px 24px;
+  display:flex;align-items:center;gap:14px;
+}
+.pb-header-logo{font-family:'Cinzel',serif;font-size:16px;font-weight:900;color:var(--gold2);letter-spacing:3px;}
+.pb-header-sub{font-size:10px;color:rgba(201,168,76,.6);letter-spacing:2px;}
+
+/* Holder section */
+.pb-holder{
+  display:grid;grid-template-columns:80px 1fr 1fr;
+  gap:16px;align-items:center;padding:20px 24px;
+  border-bottom:1px solid var(--cream2);
+}
+.pb-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,#C9A84C,#7A5020);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:900;color:#fff;font-family:'Cinzel',serif;
+  border:3px solid var(--cream2);
+  overflow:hidden;flex-shrink:0;
+}
+.pb-avatar img{width:100%;height:100%;object-fit:cover;}
+.pb-name-block{grid-column:2/-1;}
+.pb-full-name{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#1A0F05;}
+.pb-meta{font-size:12px;color:#6B7280;margin-top:4px;}
+.pb-passport-id{font-size:13px;font-weight:800;color:#C9A84C;margin-top:6px;letter-spacing:1px;}
+
+/* Date-validity strip */
+.pb-dates{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;
+  background:var(--cream2);
+  border-bottom:2px solid var(--cream2);
+}
+.pb-date-cell{
+  background:var(--cream);padding:16px 20px;
+}
+.pb-date-lbl{font-size:9px;font-weight:800;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.pb-date-val{font-size:17px;font-weight:900;color:#1A0F05;font-family:'Nunito',sans-serif;}
+.pb-days-val{color:#C9A84C;}
+.pb-progress-wrap{padding:0 20px 14px;border-bottom:1px solid var(--cream2);}
+.pb-progress-bar{height:6px;background:var(--cream2);border-radius:6px;margin-bottom:6px;overflow:hidden;}
+.pb-progress-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold3),var(--gold2));transition:width .6s ease;}
+.pb-progress-lbl{font-size:10px;color:#9CA3AF;text-align:right;}
+
+/* Visit counter */
+.pb-visits{
+  display:flex;gap:8px;padding:16px 24px;border-bottom:1px solid var(--cream2);flex-wrap:wrap;align-items:center;
+}
+.pb-visit-label{font-size:12px;font-weight:800;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;}
+.pb-visit-dot{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;
+  transition:all .3s;
+}
+.pb-visit-dot.used{background:#1A0F05;color:var(--gold2);}
+.pb-visit-dot.available{background:var(--cream2);color:#9CA3AF;border:2px dashed #D1D5DB;}
+
+/* Benefits */
+.pb-benefits{padding:16px 24px;border-bottom:1px solid var(--cream2);}
+.pb-section-title{font-size:10px;font-weight:900;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.pb-section-title::after{content:'';flex:1;height:1px;background:var(--cream2);}
+.pb-benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.pb-benefit-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;font-weight:600;}
+.pb-benefit-icon{font-size:14px;width:20px;text-align:center;}
+
+/* Vouchers */
+.pb-vouchers{padding:16px 24px;border-bottom:1px solid var(--cream2);}
+.voucher-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.voucher-card{
+  background:#1A0F05;border-radius:10px;padding:12px 14px;
+  min-width:110px;text-align:center;cursor:pointer;
+  border:1.5px solid rgba(201,168,76,.25);
+  transition:all .25s;position:relative;overflow:hidden;
+  flex-shrink:0;
+}
+.voucher-card:hover:not(.redeemed){transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3),0 0 0 1px rgba(201,168,76,.4);}
+.voucher-card.redeemed{opacity:.45;cursor:not-allowed;}
+.voucher-card.redeemed::after{
+  content:'REDEEMED';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(26,15,5,.7);font-size:9px;font-weight:900;color:var(--gold3);letter-spacing:2px;
+}
+.voucher-qty{font-size:22px;font-weight:900;color:var(--gold2);font-family:'Nunito',sans-serif;line-height:1;}
+.voucher-type{font-size:10px;color:rgba(201,168,76,.7);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+.voucher-qr-area{margin-top:8px;}
+.voucher-qr-area canvas{width:60px!important;height:60px!important;border-radius:4px;border:1px solid rgba(201,168,76,.2);}
+.voucher-scan-btn{
+  margin-top:8px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);
+  color:var(--gold2);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;
+  cursor:pointer;transition:all .2s;width:100%;
+}
+.voucher-scan-btn:hover{background:rgba(201,168,76,.25);}
+
+/* MRZ zone */
+.pb-mrz{
+  background:#1A0F05;padding:14px 24px;
+}
+.pb-mrz-label{font-size:9px;color:rgba(201,168,76,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+.pb-mrz-text{font-family:'Courier New',monospace;font-size:11px;color:rgba(201,168,76,.7);line-height:1.6;letter-spacing:1px;word-break:break-all;}
+
+/* Verified banner */
+.pb-verified{
+  background:linear-gradient(90deg,#1A0F05,#2C1A08,#1A0F05);
+  padding:8px 0;overflow:hidden;position:relative;
+}
+.pb-verified-scroll{
+  white-space:nowrap;font-size:10px;font-weight:800;color:rgba(201,168,76,.6);
+  letter-spacing:3px;text-transform:uppercase;
+  animation:marquee 20s linear infinite;
+  display:inline-block;padding:0 24px;
+}
+@keyframes marquee{0%{transform:translateX(100vw);}100%{transform:translateX(-100%);}}
+
+/* Agent strip */
+.pb-agent-strip{
+  background:var(--cream2);display:flex;justify-content:space-between;align-items:center;
+  padding:10px 24px;font-size:11px;color:#6B7280;flex-wrap:wrap;gap:8px;
+}
+.pb-agent-strip strong{color:#1A0F05;}
+
+/* ── Download & Action Buttons ── */
+.action-bar{
+  display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center;
+}
+.action-btn{
+  padding:12px 24px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;
+  border:none;transition:all .25s;display:flex;align-items:center;gap:8px;
+  font-family:'Nunito',sans-serif;letter-spacing:.5px;
+}
+.btn-download{
+  background:linear-gradient(135deg,var(--gold3),var(--gold));color:#1A0F05;
+  box-shadow:0 4px 20px rgba(201,168,76,.3);
+}
+.btn-download:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.4);}
+.btn-share{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.btn-share:hover{background:rgba(255,255,255,.15);}
+.btn-wallet{background:rgba(0,0,0,.8);color:#fff;border:1px solid rgba(255,255,255,.1);}
+
+/* ── Redemption Modal ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;
+}
+.modal-overlay.show{display:flex;}
+.modal-box{
+  background:#1A0F05;border:1.5px solid rgba(201,168,76,.3);
+  border-radius:20px;padding:28px;width:100%;max-width:420px;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+}
+.modal-title{font-family:'Cinzel',serif;font-size:18px;color:var(--gold2);margin-bottom:4px;}
+.modal-sub{font-size:12px;color:rgba(201,168,76,.6);margin-bottom:20px;}
+.modal-qr-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.modal-qr-wrap canvas{border-radius:10px;border:3px solid rgba(201,168,76,.3);width:180px!important;height:180px!important;}
+.modal-voucher-id{text-align:center;font-family:'Courier New',monospace;font-size:12px;color:rgba(201,168,76,.7);margin-bottom:16px;letter-spacing:1px;}
+.modal-info{background:rgba(255,255,255,.05);border-radius:10px;padding:14px;margin-bottom:16px;}
+.modal-info-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;}
+.modal-info-row span:first-child{color:rgba(255,255,255,.5);}
+.modal-info-row span:last-child{color:#fff;font-weight:700;}
+.modal-redeem-btn{
+  width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:800;
+  font-family:'Nunito',sans-serif;transition:all .2s;
+}
+.modal-redeem-btn.active{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#1A0F05;}
+.modal-redeem-btn.done{background:#374151;color:#9CA3AF;cursor:not-allowed;}
+.modal-close-btn{
+  width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);
+  background:transparent;color:rgba(255,255,255,.5);cursor:pointer;font-size:13px;font-weight:700;
+  font-family:'Nunito',sans-serif;
+}
+
+/* Success animation */
+.success-flash{
+  position:fixed;inset:0;background:rgba(10,155,95,.15);pointer-events:none;z-index:9999;
+  animation:flashGreen .6s ease forwards;
+}
+@keyframes flashGreen{0%{opacity:1;}100%{opacity:0;}}
+
+/* Tier color overrides */
+.tier-explore .pf-tier-badge,.tier-explore .pf-star{color:#93C5FD;}
+.tier-together .pf-tier-badge{border-color:rgba(156,163,175,.5);}
+.tier-together .pf-wow-name,.tier-together .pf-passport-word,.tier-together .pf-name{color:#E5E7EB;}
+.tier-legacy .pf-tier-badge,.tier-legacy .pf-star{color:#FCA5A5;}
+
+/* Responsive */
+@media(max-width:600px){
+  .passport-front{padding:24px 20px 20px;}
+  .pf-passport-word{font-size:26px;letter-spacing:5px;}
+  .pb-holder{grid-template-columns:60px 1fr;}.pb-name-block{grid-column:2;}
+  .pb-dates{grid-template-columns:1fr 1fr;}.pb-date-cell:last-child{grid-column:1/-1;}
+  .pb-benefits-grid{grid-template-columns:1fr;}
+  .pf-holder-row{grid-template-columns:auto 1fr;}
+  .pf-qr-wrap{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap" id="page-wrap">
+  <div class="page-header">
+    <div>
+      <div class="page-title">MY WOW PASSPORT</div>
+      <div class="page-sub">Digital Membership Card · Worlds of Wonder, Noida</div>
+    </div>
+    <a href="dashboard.html" style="color:rgba(255,255,255,.5);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;">
+      <i class="fa fa-arrow-left"></i> Back
+    </a>
+  </div>
+
+  <!-- Tier Selector -->
+  <div class="tier-selector" id="tier-selector">
+    <div class="tier-btn explore active" onclick="switchTier('explore')">🔵 WOW Explore Pass</div>
+    <div class="tier-btn together" onclick="switchTier('together')">⚪ WOW Together Pass</div>
+    <div class="tier-btn legacy" onclick="switchTier('legacy')">🔴 WOW Legacy Pass</div>
+  </div>
+
+  <!-- Passport Wrapper -->
+  <div id="passport-wrapper" class="tier-explore">
+
+    <!-- ═══ FRONT CARD ═══ -->
+    <div class="passport-front" id="passport-front">
+      <!-- Corner ornaments -->
+      <div class="corner corner-tl">✦</div>
+      <div class="corner corner-tr">✦</div>
+      <div class="corner corner-bl">✦</div>
+      <div class="corner corner-br">✦</div>
+
+      <div class="pf-header">
+        <div class="pf-republic">Republic of Entertainment</div>
+        <div class="pf-wow-name">WORLDS OF WONDER</div>
+        <div class="pf-subtitle">ANNUAL MEMBERSHIP PASSPORT</div>
+      </div>
+
+      <div class="pf-emblem">
+        <div class="pf-star" id="pf-star">⭐</div>
+        <div class="pf-emblem-wow">WOW</div>
+        <div class="pf-emblem-est">EST. 2004 · DELHI</div>
+      </div>
+
+      <div class="pf-passport-word">PASSPORT</div>
+      <div class="pf-passport-word-hi">पासपोर्ट / ANNUAL MEMBERSHIP</div>
+
+      <div class="pf-tier-badge">
+        <span id="pf-tier-icon">🔵</span>
+        <span class="pf-tier-name" id="pf-tier-name">WATER PARK · ANNUAL</span>
+      </div>
+
+      <div class="pf-holder-row">
+        <div class="pf-photo" id="pf-photo">
+          <span style="font-size:26px;">👤</span>
+        </div>
+        <div>
+          <div class="pf-name" id="pf-holder-name">ARUN MANIKONDA</div>
+          <div class="pf-phone" id="pf-holder-phone">📞 9810889134</div>
+          <div class="pf-id" id="pf-passport-id">WOW-PASS-2025-0001</div>
+        </div>
+        <div class="pf-qr-wrap">
+          <canvas id="front-qr"></canvas>
+        </div>
+      </div>
+
+      <div class="pf-footer">
+        <div class="pf-footer-left">
+          ISSUED BY
+          <span>WOW Sales Portal</span>
+        </div>
+        <div class="pf-moons">
+          <span>☽</span><span class="dot"></span><span>✦</span><span class="dot"></span><span>☾</span>
+        </div>
+        <div class="pf-footer-right">
+          VALID FOR
+          <span id="pf-validity">365 DAYS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BACK / DETAILS ═══ -->
+    <div class="passport-back" id="passport-back">
+
+      <!-- Back header -->
+      <div class="pb-header">
+        <div>
+          <div class="pb-header-logo">WOW PASSPORT</div>
+          <div class="pb-header-sub">MEMBER DETAILS &amp; BENEFITS</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <div style="font-size:10px;color:rgba(201,168,76,.5);letter-spacing:1px;">PASSPORT ID</div>
+          <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold2);font-weight:700;" id="pb-passport-id">WOW-PASS-2025-0001</div>
+        </div>
+      </div>
+
+      <!-- Holder row -->
+      <div class="pb-holder">
+        <div class="pb-avatar" id="pb-avatar">AR</div>
+        <div class="pb-name-block">
+          <div class="pb-full-name" id="pb-full-name">Arun Manikonda</div>
+          <div class="pb-meta" id="pb-meta">📞 9810889134 &nbsp;|&nbsp; ✉️ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89e8fbfce7c9ecf1e8e4f9e5eca7eae6e4">[email&#160;protected]</a></div>
+          <div class="pb-passport-id" id="pb-passport-id-2">WOW-PASS-2025-0001 &nbsp;·&nbsp; <span id="pb-tier-label" style="color:#3B82F6;">🔵 WOW Explore Pass</span></div>
+        </div>
+      </div>
+
+      <!-- Dates + validity -->
+      <div class="pb-dates">
+        <div class="pb-date-cell">
+          <div class="pb-date-lbl">Issue Date</div>
+          <div class="pb-date-val" id="pb-issue-date">28 Mar 2025</div>
+        </div>
+        <div class="pb-date-cell">
+          <div class="pb-date-lbl">Expiry Date</div>
+          <div class="pb-date-val" id="pb-expiry-date">27 Sep 2025</div>
+        </div>
+        <div class="pb-date-cell">
+          <div class="pb-date-lbl">Days Remaining</div>
+          <div class="pb-date-val pb-days-val" id="pb-days-remaining">184</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="pb-progress-wrap">
+        <div class="pb-progress-bar">
+          <div class="pb-progress-fill" id="pb-progress-fill" style="width:100%;"></div>
+        </div>
+        <div class="pb-progress-lbl" id="pb-progress-lbl">184 of 184 days remaining</div>
+      </div>
+
+      <!-- Visit counter -->
+      <div class="pb-visits">
+        <span class="pb-visit-label">Visits:</span>
+        <div id="pb-visit-dots"><!-- populated by JS --></div>
+        <span style="margin-left:8px;font-size:12px;color:#9CA3AF;" id="pb-visits-lbl">0 of 4 used</span>
+      </div>
+
+      <!-- Benefits -->
+      <div class="pb-benefits">
+        <div class="pb-section-title">★ Plan Benefits</div>
+        <div class="pb-benefits-grid" id="pb-benefits-grid"><!-- populated by JS --></div>
+      </div>
+
+      <!-- Vouchers -->
+      <div class="pb-vouchers">
+        <div class="pb-section-title">🎟 Included Vouchers</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-bottom:10px;">Tap any voucher to view its scannable QR code. Each voucher can be redeemed once only.</div>
+        <div class="voucher-grid" id="voucher-grid"><!-- populated by JS --></div>
+      </div>
+
+      <!-- Verified banner -->
+      <div class="pb-verified">
+        <div class="pb-verified-scroll" id="pb-verified-scroll">
+          • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER •
+        </div>
+      </div>
+
+      <!-- MRZ -->
+      <div class="pb-mrz">
+        <div class="pb-mrz-label">Machine Readable Zone (MRZ)</div>
+        <div class="pb-mrz-text" id="pb-mrz">
+          P&lt;WOWARUN&lt;MANIKONDA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br/>
+          WOWPAX9EC&lt;840826&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;0
+        </div>
+      </div>
+
+      <!-- Agent strip -->
+      <div class="pb-agent-strip">
+        <span>Agent: <strong id="pb-agent">Demo Agent</strong></span>
+        <span>Login: <strong id="pb-login">9810889134</strong></span>
+        <span>Issued: <strong id="pb-issued-short">28/3/2025</strong></span>
+      </div>
+
+    </div>
+  </div><!-- /passport-wrapper -->
+
+  <!-- Action Buttons -->
+  <div class="action-bar">
+    <button class="action-btn btn-download" onclick="downloadPassport()">
+      <i class="fa fa-download"></i> Download Passport
+    </button>
+    <button class="action-btn btn-share" onclick="sharePassport()">
+      <i class="fa fa-share-alt"></i> Share
+    </button>
+    <button class="action-btn btn-wallet" onclick="addToWallet()">
+      <span>📱</span> Add to Mobile Wallet
+    </button>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<!-- ═══ VOUCHER REDEMPTION MODAL ═══ -->
+<div class="modal-overlay" id="voucher-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="m-title">🎟 Redeem Voucher</div>
+    <div class="modal-sub" id="m-sub">Show this QR to the cashier / gate staff for scanning</div>
+    <div class="modal-qr-wrap">
+      <canvas id="modal-qr-canvas"></canvas>
+    </div>
+    <div class="modal-voucher-id" id="m-voucher-id">VCH-XXXXX</div>
+    <div class="modal-info">
+      <div class="modal-info-row"><span>Voucher Type</span><span id="m-type">—</span></div>
+      <div class="modal-info-row"><span>Value</span><span id="m-value">—</span></div>
+      <div class="modal-info-row"><span>Passport ID</span><span id="m-passport">—</span></div>
+      <div class="modal-info-row"><span>Holder</span><span id="m-holder">—</span></div>
+      <div class="modal-info-row"><span>Expires</span><span id="m-expiry">—</span></div>
+      <div class="modal-info-row"><span>Status</span><span id="m-status" style="color:#4ADE80;">Valid ✓</span></div>
+    </div>
+    <button class="modal-redeem-btn active" id="modal-redeem-btn" onclick="confirmRedemption()">
+      ✓ Mark as Redeemed (Self-service)
+    </button>
+    <button class="modal-close-btn" onclick="closeVoucherModal()">Close</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ═══════════════════════════════════════════
+   PASSPORT DATA
+═══════════════════════════════════════════ */
+const HOLDER = {
+  name: 'Arun Manikonda',
+  nameDisplay: 'ARUN MANIKONDA',
+  phone: '9810889134',
+  email: 'arun@example.com',
+  initials: 'AR',
+  agent: 'Demo Agent',
+  issueDate: new Date('2025-03-28')
+};
+
+const PLANS = {
+  explore: {
+    id: 'EXPLORE', name: 'WOW Explore Pass', icon: '🔵',
+    label: '🔵 WOW Explore Pass', color: '#3B82F6',
+    validity: 6, visits: 4, adults: 1, children: 0,
+    benefits: [
+      {icon:'🎢','text':'Access to both Amusement + Water Park'},
+      {icon:'📅','text':'Weekday priority entry'},
+      {icon:'🍔','text':'10% off F&B & merchandise'},
+      {icon:'📸','text':'2 photo coupons included'},
+    ],
+    vouchers: [
+      {type:'photo_coupon', label:'Photo Coupon',    value:'2x', qty:2,  emoji:'📸'},
+      {type:'fnb_discount', label:'F&B Discount',    value:'10%',qty:1,  emoji:'🍔'},
+    ]
+  },
+  together: {
+    id: 'TOGETHER', name: 'WOW Together Pass', icon: '⚪',
+    label: '⚪ WOW Together Pass', color: '#9CA3AF',
+    validity: 9, visits: 4, adults: 1, children: 1,
+    benefits: [
+      {icon:'🎢','text':'All-day access to both parks'},
+      {icon:'🔒','text':'1 locker per visit included'},
+      {icon:'🍔','text':'15% off F&B & merchandise'},
+      {icon:'📸','text':'3 photo coupons included'},
+      {icon:'🎂','text':'Birthday benefit included'},
+    ],
+    vouchers: [
+      {type:'photo_coupon', label:'Photo Coupon',    value:'3x', qty:3,  emoji:'📸'},
+      {type:'fnb_discount', label:'F&B Discount',    value:'15%',qty:1,  emoji:'🍔'},
+      {type:'locker',       label:'Locker Pass',     value:'4x', qty:4,  emoji:'🔒'},
+      {type:'birthday',     label:'Birthday Benefit',value:'1x', qty:1,  emoji:'🎂'},
+    ]
+  },
+  legacy: {
+    id: 'LEGACY', name: 'WOW Legacy Pass', icon: '🔴',
+    label: '🔴 WOW Legacy Pass', color: '#EF4444',
+    validity: 12, visits: 8, adults: 2, children: 2,
+    benefits: [
+      {icon:'⚡','text':'VIP fast-track entry'},
+      {icon:'🔒','text':'Free lockers + costume rental'},
+      {icon:'🍔','text':'20% off F&B & merchandise'},
+      {icon:'📸','text':'4 premium photo coupons'},
+      {icon:'👥','text':'2–4 guest passes included'},
+      {icon:'🎉','text':'Priority access to all events'},
+      {icon:'🎂','text':'Birthday & celebration privileges'},
+    ],
+    vouchers: [
+      {type:'photo_coupon',  label:'Photo Coupon',   value:'4x', qty:4,  emoji:'📸'},
+      {type:'fnb_discount',  label:'F&B Discount',   value:'20%',qty:1,  emoji:'🍔'},
+      {type:'guest_pass',    label:'Guest Pass',      value:'4x', qty:4,  emoji:'🎫'},
+      {type:'locker',        label:'Locker Pass',     value:'8x', qty:8,  emoji:'🔒'},
+      {type:'costume',       label:'Costume Rental',  value:'2x', qty:2,  emoji:'👗'},
+      {type:'meal_voucher',  label:'Meal Voucher',    value:'3x', qty:3,  emoji:'🍽️'},
+    ]
+  }
+};
+
+/* ═══ State ═══ */
+let currentTier = 'explore';
+const passportId = 'WOW-PASS-2025-' + String(Math.floor(Math.random()*9000)+1000).padStart(4,'0');
+let visitsUsed = 1;
+let activeVoucherIdx = null;
+
+// Voucher redemption state (persisted in session)
+let voucherRedemptions = JSON.parse(sessionStorage.getItem('wow_vouchers_'+passportId) || '{}');
+
+/* ═══ Generate unique voucher ID ═══ */
+function makeVoucherId(tier, type, idx) {
+  return `VCH-${tier.toUpperCase()}-${type.toUpperCase().slice(0,3)}-${String(idx).padStart(3,'0')}-${passportId.slice(-4)}`;
+}
+
+/* ═══ Compute dates ═══ */
+function computeDates(validityMonths) {
+  const issue = HOLDER.issueDate;
+  const expiry = new Date(issue);
+  expiry.setMonth(expiry.getMonth() + validityMonths);
+  const today = new Date();
+  const daysTotal = Math.round((expiry - issue) / 86400000);
+  const daysLeft = Math.max(0, Math.round((expiry - today) / 86400000));
+  const pct = Math.round(daysLeft / daysTotal * 100);
+  const fmtOpts = {day:'numeric',month:'short',year:'numeric'};
+  return {
+    issueStr: issue.toLocaleDateString('en-IN', fmtOpts),
+    expiryStr: expiry.toLocaleDateString('en-IN', fmtOpts),
+    expiryShort: `${issue.getDate()}/${issue.getMonth()+1}/${issue.getFullYear()}`,
+    daysLeft, daysTotal, pct
+  };
+}
+
+/* ═══ Render front QR ═══ */
+function renderFrontQR(pid) {
+  QRCode.toCanvas(document.getElementById('front-qr'), JSON.stringify({pid, holder: HOLDER.name, ts: Date.now()}),
+    {width:62, margin:1, color:{dark:'#C9A84C', light:'#1A0F05'}}, ()=>{});
+}
+
+/* ═══ Render voucher grid ═══ */
+function renderVouchers(plan) {
+  const grid = document.getElementById('voucher-grid');
+  grid.innerHTML = '';
+  let idx = 0;
+  plan.vouchers.forEach(v => {
+    for (let i = 0; i < v.qty; i++) {
+      const vId = makeVoucherId(currentTier, v.type, idx);
+      const isRedeemed = !!voucherRedemptions[vId];
+      const card = document.createElement('div');
+      card.className = `voucher-card${isRedeemed ? ' redeemed' : ''}`;
+      card.dataset.voucherId = vId;
+      card.dataset.idx = idx;
+      card.innerHTML = `
+        <div class="voucher-qty">${v.qty > 1 ? (i+1)+'/'+v.qty : v.value}</div>
+        <div class="voucher-type">${v.label}</div>
+        <div class="voucher-qr-area"><canvas id="vqr-${idx}"></canvas></div>
+        ${!isRedeemed ? `<button class="voucher-scan-btn" onclick="openVoucherModal(${idx})">View QR</button>` : '<div style="height:22px;"></div>'}
+      `;
+      grid.appendChild(card);
+      // Generate QR
+      const payload = JSON.stringify({vId, type:v.type, value:v.value, passportId, holder:HOLDER.name, plan:currentTier, expiry:computeDates(plan.validity).expiryStr});
+      QRCode.toCanvas(document.getElementById(`vqr-${idx}`), payload,
+        {width:60, margin:1, color:{dark:'#C9A84C', light:'#1A0F05'}}, ()=>{});
+      idx++;
+    }
+  });
+}
+
+/* ═══ Open voucher modal ═══ */
+const _voucherMap = {};
+function openVoucherModal(idx) {
+  const plan = PLANS[currentTier];
+  let flatIdx = 0, found = null;
+  plan.vouchers.forEach(v => {
+    for (let i = 0; i < v.qty; i++) {
+      if (flatIdx === idx) found = {v, i};
+      flatIdx++;
+    }
+  });
+  if (!found) return;
+  const {v} = found;
+  const vId = makeVoucherId(currentTier, v.type, idx);
+  const isRedeemed = !!voucherRedemptions[vId];
+  const dates = computeDates(plan.validity);
+  activeVoucherIdx = idx;
+  _voucherMap[idx] = {vId, v};
+
+  document.getElementById('m-title').textContent = `${v.emoji || '🎟'} ${v.label}`;
+  document.getElementById('m-sub').textContent = isRedeemed ? '⚠️ This voucher has already been redeemed.' : 'Show this QR to staff at the counter for scanning.';
+  document.getElementById('m-voucher-id').textContent = vId;
+  document.getElementById('m-type').textContent = v.label;
+  document.getElementById('m-value').textContent = v.value;
+  document.getElementById('m-passport').textContent = passportId;
+  document.getElementById('m-holder').textContent = HOLDER.name;
+  document.getElementById('m-expiry').textContent = dates.expiryStr;
+  document.getElementById('m-status').textContent = isRedeemed ? 'Already Redeemed ✗' : 'Valid ✓';
+  document.getElementById('m-status').style.color = isRedeemed ? '#EF4444' : '#4ADE80';
+
+  const btn = document.getElementById('modal-redeem-btn');
+  btn.textContent = isRedeemed ? '✗ Already Redeemed' : '✓ Mark as Redeemed (Self-service)';
+  btn.className = 'modal-redeem-btn ' + (isRedeemed ? 'done' : 'active');
+
+  const payload = JSON.stringify({vId, type:v.type, value:v.value, passportId, holder:HOLDER.name, plan:currentTier, expiry:dates.expiryStr, ts:Date.now()});
+  const canvas = document.getElementById('modal-qr-canvas');
+  QRCode.toCanvas(canvas, payload, {width:180, margin:2, color:{dark:'#C9A84C', light:'#1A0F05'}}, ()=>{});
+
+  document.getElementById('voucher-modal').classList.add('show');
+}
+
+function closeVoucherModal() {
+  document.getElementById('voucher-modal').classList.remove('show');
+  activeVoucherIdx = null;
+}
+
+/* ═══ Confirm Redemption ═══ */
+async function confirmRedemption() {
+  if (activeVoucherIdx === null) return;
+  const {vId, v} = _voucherMap[activeVoucherIdx] || {};
+  if (!vId) return;
+  if (voucherRedemptions[vId]) { alert('This voucher has already been redeemed.'); return; }
+
+  // Mark locally
+  voucherRedemptions[vId] = { redeemedAt: new Date().toISOString(), location: 'Customer Self-service', method: 'manual' };
+  sessionStorage.setItem('wow_vouchers_'+passportId, JSON.stringify(voucherRedemptions));
+
+  // Save to TableAPI
+  try {
+    await fetch('tables/passport_vouchers', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        id: vId, passport_id: passportId, holder_name: HOLDER.name,
+        voucher_type: v.type, voucher_label: v.label, voucher_value: v.value,
+        qr_code: vId, is_redeemed: true,
+        redeemed_at: new Date().toISOString(),
+        redeemed_by: 'Customer self-service',
+        redeemed_location: 'App/Web',
+        plan_tier: currentTier, customer_phone: HOLDER.phone, customer_email: HOLDER.email
+      })
+    });
+    await fetch('tables/passport_redemptions', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        id: 'RDM-'+Date.now(), voucher_id: vId, passport_id: passportId,
+        holder_name: HOLDER.name, voucher_type: v.type, voucher_value: v.value,
+        redeemed_at: new Date().toISOString(),
+        redeemed_by_agent: 'Customer self-service',
+        location: 'App/Web', status: 'success'
+      })
+    });
+  } catch(e) { console.warn('API save failed (offline mode):', e); }
+
+  // Flash success
+  const flash = document.createElement('div');
+  flash.className = 'success-flash';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 700);
+
+  closeVoucherModal();
+  renderVouchers(PLANS[currentTier]);
+  alert(`✅ "${v.label}" redeemed successfully!\nThis voucher can no longer be used again.`);
+}
+
+/* ═══ Render full passport ═══ */
+function renderPassport(tier) {
+  const plan = PLANS[tier];
+  const dates = computeDates(plan.validity);
+  const pw = document.getElementById('passport-wrapper');
+
+  // Tier class
+  pw.className = `tier-${tier}`;
+
+  // Tier selector
+  document.querySelectorAll('.tier-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.classList.contains(tier)) b.classList.add('active');
+  });
+
+  // Front card
+  document.getElementById('pf-tier-icon').textContent = plan.icon;
+  document.getElementById('pf-tier-name').textContent = plan.name.toUpperCase();
+  document.getElementById('pf-holder-name').textContent = HOLDER.nameDisplay;
+  document.getElementById('pf-holder-phone').textContent = '📞 ' + HOLDER.phone;
+  document.getElementById('pf-passport-id').textContent = passportId;
+  document.getElementById('pf-validity').textContent = (plan.validity * 30) + ' DAYS';
+
+  const stars = {explore:'🌟', together:'⭐', legacy:'👑'};
+  document.getElementById('pf-star').textContent = stars[tier];
+
+  renderFrontQR(passportId);
+
+  // Back: dates
+  document.getElementById('pb-passport-id').textContent = passportId;
+  document.getElementById('pb-passport-id-2').innerHTML = passportId + ' &nbsp;·&nbsp; <span id="pb-tier-label" style="color:' + plan.color + ';">' + plan.label + '</span>';
+  document.getElementById('pb-full-name').textContent = HOLDER.name;
+  document.getElementById('pb-meta').textContent = '📞 ' + HOLDER.phone + '  |  ✉️ ' + HOLDER.email;
+  document.getElementById('pb-avatar').textContent = HOLDER.initials;
+  document.getElementById('pb-issue-date').textContent = dates.issueStr;
+  document.getElementById('pb-expiry-date').textContent = dates.expiryStr;
+  document.getElementById('pb-days-remaining').textContent = dates.daysLeft;
+  document.getElementById('pb-progress-fill').style.width = dates.pct + '%';
+  document.getElementById('pb-progress-lbl').textContent = dates.daysLeft + ' of ' + dates.daysTotal + ' days remaining';
+
+  // Visits
+  let dotHtml = '';
+  for (let i = 0; i < plan.visits; i++) {
+    dotHtml += `<div class="pb-visit-dot ${i < visitsUsed ? 'used' : 'available'}">${i < visitsUsed ? '✓' : ''}</div>`;
+  }
+  document.getElementById('pb-visit-dots').innerHTML = dotHtml;
+  document.getElementById('pb-visits-lbl').textContent = visitsUsed + ' of ' + plan.visits + ' used';
+
+  // Benefits
+  document.getElementById('pb-benefits-grid').innerHTML = plan.benefits.map(b =>
+    `<div class="pb-benefit-item"><span class="pb-benefit-icon">${b.icon}</span><span>${b.text}</span></div>`
+  ).join('');
+
+  // MRZ
+  const lastName = HOLDER.name.split(' ').pop().toUpperCase();
+  const firstName = HOLDER.name.split(' ')[0].toUpperCase();
+  const mrzFill = '<'.repeat(26 - lastName.length - firstName.length);
+  const mrzLine2Id = passportId.replace(/-/g,'').slice(-9).padEnd(9,'<');
+  document.getElementById('pb-mrz').innerHTML =
+    `P&lt;WOW${lastName}&lt;${firstName}${mrzFill}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br/>${mrzLine2Id}&lt;${HOLDER.phone.slice(-6)}&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;0`;
+
+  // Agent strip
+  document.getElementById('pb-agent').textContent = HOLDER.agent;
+  document.getElementById('pb-login').textContent = HOLDER.phone;
+  document.getElementById('pb-issued-short').textContent = dates.expiryShort;
+
+  // Vouchers
+  renderVouchers(plan);
+}
+
+/* ═══ Switch tier ═══ */
+function switchTier(tier) {
+  currentTier = tier;
+  visitsUsed = tier === 'legacy' ? 2 : 1;
+  renderPassport(tier);
+}
+
+/* ═══ Download ═══ */
+async function downloadPassport() {
+  const btn = document.querySelector('.btn-download');
+  btn.textContent = '⏳ Generating...';
+  btn.disabled = true;
+  try {
+    const wrapper = document.getElementById('passport-wrapper');
+    const canvas = await html2canvas(wrapper, {
+      backgroundColor: '#080C1A', scale: 2, useCORS: true, logging: false,
+      windowWidth: wrapper.scrollWidth, windowHeight: wrapper.scrollHeight
+    });
+    const link = document.createElement('a');
+    link.download = `WOW-Passport-${passportId}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) { alert('Download ready! (html2canvas error: ' + e.message + ')'); }
+  btn.innerHTML = '<i class="fa fa-download"></i> Download Passport';
+  btn.disabled = false;
+}
+
+function sharePassport() {
+  if (navigator.share) {
+    navigator.share({ title:'My WOW Passport', text:'Check out my Worlds of Wonder Annual Passport!', url: window.location.href });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied to clipboard!'));
+  }
+}
+
+function addToWallet() {
+  alert('📱 Mobile Wallet integration coming soon!\n\nYour passport QR code can be added to Apple Wallet / Google Wallet for quick tap-to-enter access.');
+}
+
+/* ═══ Init ═══ */
+renderPassport('explore');
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
