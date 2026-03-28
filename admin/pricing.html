@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Pricing Rules — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.pricing-tabs { display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px; }
+.pricing-tab { padding:10px 20px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s; }
+.pricing-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+.pricing-table { width:100%;border-collapse:collapse; }
+.pricing-table th { background:var(--bg2);padding:12px 16px;font-size:12px;font-weight:700;color:var(--text2);text-align:center; }
+.pricing-table th:first-child { text-align:left; }
+.pricing-table td { padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;text-align:center; }
+.pricing-table td:first-child { text-align:left;font-weight:700; }
+.pricing-table tr:hover td { background:var(--bg); }
+.price-cell { font-size:15px;font-weight:800;color:var(--ink);font-family:'Nunito',sans-serif; }
+.price-input { width:90px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-weight:700;text-align:center;font-family:'Nunito',sans-serif;outline:none; }
+.price-input:focus { border-color:var(--primary); }
+.rule-row { display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border); }
+.rule-row:hover { background:var(--bg); }
+.season-badge { padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700; }
+.peak { background:var(--red-lt);color:var(--red); }
+.offpeak { background:var(--green-lt);color:var(--green); }
+.weekend { background:var(--amber-lt);color:var(--amber); }
+.holiday { background:var(--purple-lt);color:var(--purple); }
+</style>
+</head>
+<body>
+<div class="adm-layout">
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <a href="tickets.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Tickets Issued</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
+    <a href="pricing.html" class="adm-nav-item active"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="ticketing-engine.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Ticketing Engine</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <div class="adm-nav-section">B2B &amp; Partner</div>
+    <a href="ta-approvals.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> TA/Reseller KYC</a>
+    <a href="reseller-config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> Reseller Config</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
+    <div style="margin-top:auto;"></div>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user"><div class="adm-user-avatar">SA</div><div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div></div>
+  </div>
+</aside>
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div><div class="adm-topbar-title">💲 Pricing Rules Engine</div><div class="adm-topbar-sub">Segment rates · GST · Seasonal · Dynamic pricing</div></div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="addRule()"><i class="fa fa-plus"></i> Add Rule</button>
+      <button class="btn btn-primary btn-sm" onclick="saveAll()"><i class="fa fa-save"></i> Save All Changes</button>
+    </div>
+  </div>
+  <div class="adm-content">
+
+    <!-- Tabs -->
+    <div class="pricing-tabs">
+      <div class="pricing-tab active" onclick="switchTab(this,'segment')">Segment Rates</div>
+      <div class="pricing-tab" onclick="switchTab(this,'seasonal')">Seasonal Rules</div>
+      <div class="pricing-tab" onclick="switchTab(this,'gst')">GST Configuration</div>
+      <div class="pricing-tab" onclick="switchTab(this,'dynamic')">Dynamic Rules</div>
+    </div>
+
+    <!-- Segment Rates Tab -->
+    <div id="tab-segment">
+      <div class="section-title" style="margin-bottom:14px;">Ticket Prices by Segment (₹ Base, excl. GST)</div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px;">
+        <div style="overflow-x:auto;">
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Ticket Type</th>
+                <th>🛒 Retail / Walk-in</th>
+                <th>🤝 TA / Reseller</th>
+                <th>🏫 School Group</th>
+                <th>🏢 Corporate</th>
+                <th>🎂 Birthday</th>
+                <th>🌐 Online</th>
+                <th>Min Qty</th>
+              </tr>
+            </thead>
+            <tbody id="price-tbody"></tbody>
+          </table>
+        </div>
+        <div style="padding:12px 16px;background:var(--bg);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--muted);">GST applies separately (5%–18% depending on category). Click any cell to edit.</span>
+          <button class="btn btn-primary btn-sm" onclick="saveAll()">💾 Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Complimentary Rules -->
+      <div class="section-title" style="margin-bottom:14px;">🎁 Complimentary Rules (School & B2B)</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="rule-row" style="background:var(--bg2);font-size:11px;font-weight:700;color:var(--text2);">
+          <div>Rule Description</div><div>Segment</div><div>Ratio</div><div>Max Comps</div><div>Status</div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Teacher : Student Complimentary</div><div style="font-size:11px;color:var(--muted);">1 teacher free per 10 students</div></div>
+          <div><span class="badge badge-blue" style="font-size:10px;">School</span></div>
+          <div><input class="price-input" value="1:10" style="width:70px;"/></div>
+          <div><input class="price-input" value="5"/></div>
+          <div><label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" checked/> <span style="font-size:12px;">Active</span></label></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Driver Meal Complimentary</div><div style="font-size:11px;color:var(--muted);">1 free meal for driver per group booking ≥20 pax</div></div>
+          <div><span class="badge badge-blue" style="font-size:10px;">School/Group</span></div>
+          <div><input class="price-input" value="1/group" style="width:80px;"/></div>
+          <div><input class="price-input" value="1"/></div>
+          <div><label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" checked/> <span style="font-size:12px;">Active</span></label></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Corporate Escort Complimentary</div><div style="font-size:11px;color:var(--muted);">1 escort free per 20 corporate pax</div></div>
+          <div><span class="badge badge-green" style="font-size:10px;">Corporate</span></div>
+          <div><input class="price-input" value="1:20" style="width:70px;"/></div>
+          <div><input class="price-input" value="3"/></div>
+          <div><label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" checked/> <span style="font-size:12px;">Active</span></label></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Birthday Guest of Honor</div><div style="font-size:11px;color:var(--muted);">Birthday child entry free on birthday date</div></div>
+          <div><span class="badge badge-purple" style="font-size:10px;">Birthday</span></div>
+          <div><input class="price-input" value="1/event" style="width:80px;"/></div>
+          <div><input class="price-input" value="1"/></div>
+          <div><label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" checked/> <span style="font-size:12px;">Active</span></label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seasonal Rules Tab -->
+    <div id="tab-seasonal" style="display:none;">
+      <div class="section-title" style="margin-bottom:14px;">📅 Seasonal Pricing Multipliers</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="rule-row" style="background:var(--bg2);font-size:11px;font-weight:700;color:var(--text2);">
+          <div>Season / Period</div><div>Type</div><div>Multiplier</div><div>Date Range</div><div>Actions</div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Summer Peak</div><div style="font-size:11px;color:var(--muted);">Apr–Jun school holidays</div></div>
+          <div><span class="season-badge peak">Peak</span></div>
+          <div><input class="price-input" value="1.20x"/></div>
+          <div style="font-size:12px;color:var(--muted);">1 Apr – 30 Jun</div>
+          <div><button class="btn btn-ghost btn-sm" style="font-size:11px;">Edit</button></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Weekend Premium</div><div style="font-size:11px;color:var(--muted);">Sat & Sun all year</div></div>
+          <div><span class="season-badge weekend">Weekend</span></div>
+          <div><input class="price-input" value="1.10x"/></div>
+          <div style="font-size:12px;color:var(--muted);">Every Sat–Sun</div>
+          <div><button class="btn btn-ghost btn-sm" style="font-size:11px;">Edit</button></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Off-Peak Discount</div><div style="font-size:11px;color:var(--muted);">Monsoon season</div></div>
+          <div><span class="season-badge offpeak">Off-peak</span></div>
+          <div><input class="price-input" value="0.85x"/></div>
+          <div style="font-size:12px;color:var(--muted);">Jul – Sep</div>
+          <div><button class="btn btn-ghost btn-sm" style="font-size:11px;">Edit</button></div>
+        </div>
+        <div class="rule-row">
+          <div><div style="font-size:13px;font-weight:700;">Holiday Surcharge</div><div style="font-size:11px;color:var(--muted);">National holidays</div></div>
+          <div><span class="season-badge holiday">Holiday</span></div>
+          <div><input class="price-input" value="1.25x"/></div>
+          <div style="font-size:12px;color:var(--muted);">Gazetted holidays</div>
+          <div><button class="btn btn-ghost btn-sm" style="font-size:11px;">Edit</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GST Config Tab -->
+    <div id="tab-gst" style="display:none;">
+      <div class="section-title" style="margin-bottom:14px;">🧾 GST Rates by Category</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="rule-row" style="background:var(--bg2);font-size:11px;font-weight:700;color:var(--text2);">
+          <div>Category</div><div>SAC / HSN Code</div><div>GST Rate</div><div>CGST</div><div>SGST</div>
+        </div>
+        ${[
+          ['Amusement Park Rides','999691','18%','9%','9%'],
+          ['Water Park Rides','999691','18%','9%','9%'],
+          ['F&B (Restaurant)','996331','5%','2.5%','2.5%'],
+          ['F&B (Packaged > ₹500)','996331','12%','6%','6%'],
+          ['Merchandise / Souvenirs','9999','12%','6%','6%'],
+          ['Costumes Rental','997211','18%','9%','9%'],
+          ['Locker Rental','997221','18%','9%','9%'],
+          ['Lawn / Venue Rental','997212','18%','9%','9%'],
+          ['Passport (Annual Pass)','999691','18%','9%','9%'],
+          ['Photography Services','998392','18%','9%','9%'],
+        ].map(([cat,sac,gst,cgst,sgst]) => `
+        <div class="rule-row">
+          <div style="font-size:13px;font-weight:700;">${cat}</div>
+          <div><code style="font-size:11px;background:var(--bg2);padding:2px 6px;border-radius:4px;">${sac}</code></div>
+          <div><input class="price-input" value="${gst}" style="width:70px;"/></div>
+          <div><input class="price-input" value="${cgst}" style="width:60px;"/></div>
+          <div><input class="price-input" value="${sgst}" style="width:60px;"/></div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Dynamic Rules Tab -->
+    <div id="tab-dynamic" style="display:none;">
+      <div class="section-title" style="margin-bottom:14px;">⚡ Dynamic Pricing Rules</div>
+      <div class="card">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="form-group">
+            <label class="form-label">Capacity Threshold Pricing</label>
+            <div style="background:var(--bg);border-radius:var(--r-sm);padding:14px;">
+              <div style="margin-bottom:8px;font-size:13px;">When park capacity &gt; <input class="price-input" value="80" style="width:60px;"/>% → Apply <input class="price-input" value="1.15x" style="width:60px;"/> multiplier</div>
+              <div style="margin-bottom:8px;font-size:13px;">When park capacity &lt; <input class="price-input" value="40" style="width:60px;"/>% → Apply <input class="price-input" value="0.90x" style="width:60px;"/> discount</div>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" checked/> Enable capacity-based pricing</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Advance Booking Discount</label>
+            <div style="background:var(--bg);border-radius:var(--r-sm);padding:14px;">
+              <div style="margin-bottom:8px;font-size:13px;">Book ≥ <input class="price-input" value="7" style="width:60px;"/> days ahead → <input class="price-input" value="-10%" style="width:70px;"/> discount</div>
+              <div style="margin-bottom:8px;font-size:13px;">Book ≥ <input class="price-input" value="30" style="width:60px;"/> days ahead → <input class="price-input" value="-15%" style="width:70px;"/> discount</div>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" checked/> Enable advance booking discount</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Group Size Discounts</label>
+            <div style="background:var(--bg);border-radius:var(--r-sm);padding:14px;">
+              <div style="margin-bottom:8px;font-size:13px;">Group ≥ <input class="price-input" value="20" style="width:60px;"/> → <input class="price-input" value="-5%" style="width:70px;"/></div>
+              <div style="margin-bottom:8px;font-size:13px;">Group ≥ <input class="price-input" value="50" style="width:60px;"/> → <input class="price-input" value="-10%" style="width:70px;"/></div>
+              <div style="font-size:13px;">Group ≥ <input class="price-input" value="100" style="width:60px;"/> → <input class="price-input" value="-15%" style="width:70px;"/></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Re-entry Pricing</label>
+            <div style="background:var(--bg);border-radius:var(--r-sm);padding:14px;">
+              <div style="margin-bottom:8px;font-size:13px;">Same-day re-entry: <input class="price-input" value="50%" style="width:70px;"/> of full price</div>
+              <div style="margin-bottom:8px;font-size:13px;">2-day pass premium: <input class="price-input" value="+30%" style="width:70px;"/></div>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" checked/> Enable re-entry discounts</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+const priceData = [
+  {type:'Water Park — Adult',   retail:699, ta:549, school:399, corp:499, bday:549, online:649, minQty:1},
+  {type:'Water Park — Child',   retail:499, ta:399, school:299, corp:349, bday:399, online:449, minQty:1},
+  {type:'Amusement — Adult',    retail:599, ta:479, school:349, corp:449, bday:499, online:549, minQty:1},
+  {type:'Amusement — Child',    retail:399, ta:319, school:249, corp:299, bday:349, online:349, minQty:1},
+  {type:'Combo (WP+AP) Adult',  retail:999, ta:799, school:599, corp:749, bday:849, online:899, minQty:1},
+  {type:'Combo (WP+AP) Child',  retail:699, ta:549, school:449, corp:549, bday:599, online:649, minQty:1},
+  {type:'School — Bulk (≥20)',  retail:0,   ta:0,   school:349, corp:0,   bday:0,   online:0,   minQty:20},
+  {type:'Corporate — Bulk (≥50)',retail:0,  ta:0,   school:0,   corp:449, bday:0,   online:0,   minQty:50},
+];
+
+document.getElementById('price-tbody').innerHTML = priceData.map(row => `
+  <tr>
+    <td>${row.type}</td>
+    ${['retail','ta','school','corp','bday','online'].map(k => `<td><input class="price-input" value="${row[k]||'—'}" ${!row[k]?'style="color:var(--muted);"':''}/></td>`).join('')}
+    <td><input class="price-input" value="${row.minQty}" style="width:60px;"/></td>
+  </tr>
+`).join('');
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['segment','seasonal','gst','dynamic'].forEach(id => {
+    const el2 = document.getElementById(`tab-${id}`);
+    if(el2) el2.style.display = id === tab ? '' : 'none';
+  });
+}
+
+function addRule() { alert('Opening Add Pricing Rule form...'); }
+function saveAll() { alert('✅ All pricing changes saved and published!'); }
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
