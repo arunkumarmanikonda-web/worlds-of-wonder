@@ -1,201 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In — Worlds of Wonder</title>
-  <meta name="description" content="Sign in to your Worlds of Wonder account to view bookings, manage your passport, and access exclusive member offers." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sign In — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#003D82;--blue2:#0055B3;--gold:#C9A84C;--gold2:#F0D080;
+  --bg:#f4f6fa;--card:#fff;--border:#DDE3EE;--muted:#6B7280;
+  --text:#080E1E;--green:#16a34a;--red:#dc2626;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);}
+
+/* HEADER */
+.topnav{background:var(--blue);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+.topnav img{height:40px;filter:none!important;width:auto;object-fit:contain;}
+.topnav a{color:rgba(255,255,255,.7);text-decoration:none;font-size:13px;font-weight:600;}
+.topnav a:hover{color:#fff;}
+
+/* LAYOUT */
+.page{display:flex;min-height:calc(100vh - 66px);}
+.left-panel{flex:1;background:linear-gradient(145deg,#001c44 0%,#003D82 55%,#004A99 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;position:relative;overflow:hidden;}
+.left-panel::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 22px,rgba(255,255,255,.02) 22px,rgba(255,255,255,.02) 23px),repeating-linear-gradient(90deg,transparent,transparent 22px,rgba(255,255,255,.02) 22px,rgba(255,255,255,.02) 23px);pointer-events:none;}
+.lp-logo img{height:64px;filter:none!important;margin-bottom:28px;display:block;}
+.lp-title{font-family:'Poppins',sans-serif;font-size:28px;font-weight:800;color:#fff;text-align:center;margin-bottom:10px;line-height:1.2;}
+.lp-sub{font-size:14px;color:rgba(255,255,255,.55);text-align:center;max-width:300px;line-height:1.7;margin-bottom:32px;}
+.lp-perks{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;}
+.lp-perk{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border-radius:10px;padding:10px 14px;}
+.lp-perk .icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.lp-perk .text{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.4;}
+.lp-perk .text strong{display:block;color:#fff;font-size:13px;}
+
+/* FORM PANEL */
+.right-panel{width:460px;display:flex;align-items:center;justify-content:center;padding:40px 28px;background:#fff;}
+.form-wrap{width:100%;max-width:380px;}
+.form-title{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+
+/* TYPE TABS */
+.type-tabs{display:flex;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px;}
+.type-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;transition:all .2s;font-family:'Nunito',sans-serif;}
+.type-tab.active{background:var(--blue);color:#fff;}
+
+/* METHOD TABS */
+.method-tabs{display:flex;gap:6px;margin-bottom:18px;}
+.method-tab{flex:1;padding:9px 6px;text-align:center;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;font-size:12px;font-weight:700;color:var(--muted);background:none;transition:all .2s;font-family:'Nunito',sans-serif;}
+.method-tab.active{border-color:var(--blue2);color:var(--blue2);background:rgba(0,85,179,.05);}
+
+/* FORM */
+.flabel{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:block;}
+.finput{width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;margin-bottom:14px;}
+.finput:focus{border-color:var(--blue2);}
+.finput-row{display:flex;gap:10px;}
+.finput-row .finput{margin-bottom:0;}
+.otp-group{display:flex;gap:8px;margin-bottom:14px;}
+.otp-digit{width:44px;height:48px;border:1.5px solid var(--border);border-radius:8px;text-align:center;font-size:20px;font-weight:800;color:var(--text);outline:none;background:#fff;transition:border-color .2s;}
+.otp-digit:focus{border-color:var(--blue2);}
+.btn-primary{width:100%;padding:13px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Poppins',sans-serif;margin-bottom:14px;transition:all .2s;}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(0,61,130,.3);transform:translateY(-1px);}
+.btn-google{width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Nunito',sans-serif;margin-bottom:14px;transition:all .2s;}
+.btn-google:hover{border-color:#4285F4;background:rgba(66,133,244,.04);}
+.btn-google img{width:18px;height:18px;}
+.divider{display:flex;align-items:center;gap:10px;margin:4px 0 14px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider span{font-size:11px;color:var(--muted);font-weight:600;}
+.form-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
+.form-note a{color:var(--blue2);text-decoration:none;font-weight:700;}
+.err{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--red);margin-bottom:12px;display:none;}
+.success{background:rgba(22,163,74,.07);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--green);margin-bottom:12px;display:none;}
+.send-otp-btn{background:none;border:none;color:var(--blue2);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px;display:block;}
+.countdown{font-size:11px;color:var(--muted);margin-bottom:14px;display:none;}
+.pass-toggle{position:relative;}
+.pass-toggle .finput{padding-right:42px;margin-bottom:0;}
+.pass-toggle-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;}
+.section-hidden{display:none;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page{flex-direction:column;}
+  .left-panel{padding:32px 24px;min-height:240px;}
+  .right-panel{width:100%;padding:28px 20px;}
+}
+</style>
 </head>
 <body>
-<div id="app">
 
-  <div class="portal-page">
+<nav class="topnav">
+  <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder"/></a>
+  <a href="../index.html"><i class="fa fa-arrow-left"></i> Back to site</a>
+</nav>
 
-    <!-- Left panel — brand -->
-    <div class="portal-brand">
-      <div class="portal-brand-inner">
-        <a href="../index.html" class="portal-brand-logo">
-          <img src="../images/logo.png" alt="Worlds of Wonder" class="portal-logo-img" style="filter:none!important;" />
-        </a>
-        <h1 class="portal-brand-title">Welcome back to<br><span class="portal-brand-accent">WOW!</span></h1>
-        <p class="portal-brand-sub">Sign in to view your bookings, manage your Passport, and unlock exclusive member offers.</p>
-        <div class="portal-brand-perks">
-          <div class="portal-perk">
-            <span class="portal-perk-icon">🎟</span>
-            <span>Instant e-tickets in your account</span>
+<div class="page">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="lp-logo"><img src="../images/logo.png" alt="Worlds of Wonder"/></div>
+    <div class="lp-title">Welcome Back to WOW</div>
+    <div class="lp-sub">Sign in to access your tickets, passport, loyalty points and exclusive member offers.</div>
+    <div class="lp-perks">
+      <div class="lp-perk"><div class="icon">🎟</div><div class="text"><strong>Your Tickets</strong>All bookings in one place</div></div>
+      <div class="lp-perk"><div class="icon">🪪</div><div class="text"><strong>WOW Passport</strong>View and redeem your passport</div></div>
+      <div class="lp-perk"><div class="icon">⭐</div><div class="text"><strong>Loyalty Points</strong>Earn and redeem WOW points</div></div>
+      <div class="lp-perk"><div class="icon">🎁</div><div class="text"><strong>Exclusive Offers</strong>Member-only deals and early access</div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-wrap">
+
+      <!-- TYPE SWITCH -->
+      <div class="type-tabs" id="typeTabs">
+        <button class="type-tab active" onclick="switchType('individual')">&#128100; Individual</button>
+        <button class="type-tab" onclick="switchType('business')">&#127970; Business</button>
+      </div>
+
+      <!-- ══ INDIVIDUAL LOGIN ══ -->
+      <div id="sect-individual">
+        <div class="form-title">Sign In</div>
+        <div class="form-sub">Use your mobile number, email, or Google account.</div>
+
+        <div class="method-tabs">
+          <button class="method-tab active" onclick="switchMethod('mobile')">&#128241; Mobile OTP</button>
+          <button class="method-tab" onclick="switchMethod('email')">&#9993; Email</button>
+        </div>
+
+        <div id="mErr" class="err"></div>
+        <div id="mSuccess" class="success"></div>
+
+        <!-- Mobile OTP flow -->
+        <div id="method-mobile">
+          <div id="step-mobile">
+            <label class="flabel">Mobile Number</label>
+            <div class="finput-row" style="margin-bottom:14px;">
+              <input class="finput" style="width:70px;flex-shrink:0;" value="+91" readonly/>
+              <input class="finput" id="mobile-num" type="tel" placeholder="98765 43210" maxlength="10"/>
+            </div>
+            <button class="btn-primary" onclick="sendOTP()"><i class="fa fa-paper-plane"></i> Send OTP</button>
           </div>
-          <div class="portal-perk">
-            <span class="portal-perk-icon">📅</span>
-            <span>View & manage all bookings</span>
-          </div>
-          <div class="portal-perk">
-            <span class="portal-perk-icon">🪪</span>
-            <span>Passport status & renewal</span>
-          </div>
-          <div class="portal-perk">
-            <span class="portal-perk-icon">💰</span>
-            <span>Member-only pricing & early access</span>
+          <div id="step-otp" class="section-hidden">
+            <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">OTP sent to <strong id="otp-mobile-display"></strong></div>
+            <label class="flabel">Enter 4-Digit OTP</label>
+            <div class="otp-group">
+              <input class="otp-digit" maxlength="1" oninput="otpNext(this,0)" id="o0"/>
+              <input class="otp-digit" maxlength="1" oninput="otpNext(this,1)" id="o1"/>
+              <input class="otp-digit" maxlength="1" oninput="otpNext(this,2)" id="o2"/>
+              <input class="otp-digit" maxlength="1" oninput="otpNext(this,3)" id="o3"/>
+            </div>
+            <button class="btn-primary" onclick="verifyOTP()"><i class="fa fa-check"></i> Verify &amp; Sign In</button>
+            <button class="send-otp-btn" onclick="resendOTP()">Resend OTP</button>
+            <div class="countdown" id="otp-countdown"></div>
           </div>
         </div>
-      </div>
-      <div class="portal-brand-bg"></div>
-    </div>
 
-    <!-- Right panel — form -->
-    <div class="portal-form-panel">
-      <div class="portal-form-wrap">
+        <!-- Email flow -->
+        <div id="method-email" class="section-hidden">
+          <label class="flabel">Email Address</label>
+          <input class="finput" id="email-addr" type="email" placeholder="your@email.com"/>
+          <label class="flabel">Password</label>
+          <div class="pass-toggle">
+            <input class="finput" id="email-pass" type="password" placeholder="Your password"/>
+            <button class="pass-toggle-btn" onclick="togglePass('email-pass',this)" type="button"><i class="fa fa-eye"></i></button>
+          </div>
+          <div style="height:14px;"></div>
+          <button class="btn-primary" onclick="emailLogin()"><i class="fa fa-sign-in-alt"></i> Sign In</button>
+          <div style="text-align:right;margin:-8px 0 14px;"><a href="forgot-password.html" style="font-size:12px;color:var(--blue2);text-decoration:none;font-weight:700;">Forgot password?</a></div>
+        </div>
 
-        <!-- Google Sign-in -->
-        <button class="portal-google-btn" id="google-signin-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        <div class="divider"><span>or</span></div>
+
+        <!-- Google -->
+        <button class="btn-google" onclick="googleLogin()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
           Continue with Google
         </button>
 
-        <div class="portal-divider"><span>or sign in with email</span></div>
-
-        <!-- Email/password form -->
-        <form id="login-form" autocomplete="on" novalidate>
-          <div class="portal-field">
-            <label class="portal-label" for="login-email">Email address</label>
-            <input class="portal-input" id="login-email" type="email"
-                   placeholder="you@example.com" autocomplete="email" required />
-            <div class="portal-field-err hidden" id="login-email-err"></div>
-          </div>
-          <div class="portal-field">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <label class="portal-label" for="login-password" style="margin-bottom:0;">Password</label>
-              <a href="forgot-password.html" class="portal-link" style="font-size:13px;">Forgot password?</a>
-            </div>
-            <div class="portal-input-wrap">
-              <input class="portal-input" id="login-password" type="password"
-                     placeholder="Your password" autocomplete="current-password" required />
-              <button type="button" class="portal-eye-btn" id="toggle-pw" aria-label="Show/hide password">
-                <svg id="eye-show" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg id="eye-hide" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-              </button>
-            </div>
-            <div class="portal-field-err hidden" id="login-password-err"></div>
-          </div>
-
-          <div class="portal-field" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:24px;">
-            <input type="checkbox" id="remember-me" class="portal-checkbox" />
-            <label for="remember-me" class="portal-checkbox-label">Keep me signed in</label>
-          </div>
-
-          <button type="submit" class="portal-submit-btn portal-submit-btn--blue" id="login-submit">
-            Sign In →
-          </button>
-
-          <div class="portal-error-banner hidden" id="login-error-banner"></div>
-        </form>
-
-        <p class="portal-switch">
-          New to Worlds of Wonder? <a href="register.html" class="portal-link">Create an account →</a>
-        </p>
-
+        <div class="form-note">
+          New to WOW? <a href="register.html">Create a free account</a><br>
+          <span style="margin-top:6px;display:block;">Are you a business? <a href="javascript:void(0)" onclick="switchType('business')">Sign in as Business</a></span>
+        </div>
       </div>
+
+      <!-- ══ BUSINESS LOGIN ══ -->
+      <div id="sect-business" class="section-hidden">
+        <div class="form-title">Business Sign In</div>
+        <div class="form-sub">For corporate clients, resellers, and travel agents. Accounts must be pre-approved by WOW admin.</div>
+
+        <div id="bErr" class="err"></div>
+        <label class="flabel">Business Email</label>
+        <input class="finput" id="biz-email" type="email" placeholder="company@business.com"/>
+        <label class="flabel">Password</label>
+        <div class="pass-toggle">
+          <input class="finput" id="biz-pass" type="password" placeholder="Your password"/>
+          <button class="pass-toggle-btn" onclick="togglePass('biz-pass',this)" type="button"><i class="fa fa-eye"></i></button>
+        </div>
+        <div style="height:14px;"></div>
+        <button class="btn-primary" onclick="bizLogin()"><i class="fa fa-building"></i> Sign In as Business</button>
+
+        <div class="form-note" style="margin-top:14px;">
+          New business? <a href="../partner/onboarding-kyc.html">Complete KYC &amp; apply for access</a><br>
+          <span style="display:block;margin-top:6px;">Staff / reseller / TA portals: <a href="../internal/index.html">Internal Gateway</a></span>
+        </div>
+      </div>
+
     </div>
-
   </div>
+</div>
 
-</div><!-- #app -->
+<script>
+let currentType = 'individual';
+let currentMethod = 'mobile';
+let otpTimer = null;
 
-<!-- Firebase SDK (CDN) -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
-
-  const app    = initializeApp(WOW_FB_CONFIG);
-  const auth   = getAuth(app);
-  const google = new GoogleAuthProvider();
-
-  const redirect = new URLSearchParams(window.location.search).get('redirect') || '../portal/my-bookings.html';
-
-  function showErr(id, msg) {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = msg; el.classList.remove('hidden'); }
-  }
-  function clearErr(id) {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = ''; el.classList.add('hidden'); }
-  }
-  function setBusy(busy) {
-    const btn = document.getElementById('login-submit');
-    if (btn) { btn.disabled = busy; btn.textContent = busy ? 'Signing in…' : 'Sign In →'; }
-  }
-  function mapFirebaseError(code) {
-    const map = {
-      'auth/user-not-found':     'No account found with this email. Please register.',
-      'auth/wrong-password':     'Incorrect password. Try again or reset it.',
-      'auth/invalid-email':      'Please enter a valid email address.',
-      'auth/invalid-credential': 'Email or password is incorrect.',
-      'auth/too-many-requests':  'Too many failed attempts. Please wait a few minutes.',
-      'auth/user-disabled':      'This account has been suspended. Contact support.',
-      'auth/network-request-failed': 'Network error. Check your connection.',
-    };
-    return map[code] || 'Sign-in failed. Please try again.';
-  }
-
-  // Password visibility toggle
-  document.getElementById('toggle-pw')?.addEventListener('click', () => {
-    const inp = document.getElementById('login-password');
-    const show = document.getElementById('eye-show');
-    const hide = document.getElementById('eye-hide');
-    if (inp.type === 'password') {
-      inp.type = 'text'; show.style.display = 'none'; hide.style.display = 'block';
-    } else {
-      inp.type = 'password'; show.style.display = 'block'; hide.style.display = 'none';
-    }
+function switchType(t) {
+  currentType = t;
+  document.getElementById('sect-individual').style.display = t === 'individual' ? '' : 'none';
+  document.getElementById('sect-business').style.display = t === 'business' ? '' : 'none';
+  document.querySelectorAll('.type-tab').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && t==='individual') || (i===1 && t==='business'));
   });
+  // If URL says business
+  if (t === 'business') document.querySelector('.form-title').textContent = 'Business Sign In';
+}
 
-  // Email/password login
-  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearErr('login-email-err');
-    clearErr('login-password-err');
-    document.getElementById('login-error-banner')?.classList.add('hidden');
-
-    const email    = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    const remember = document.getElementById('remember-me')?.checked;
-
-    if (!email)    { showErr('login-email-err', 'Please enter your email'); return; }
-    if (!password) { showErr('login-password-err', 'Please enter your password'); return; }
-
-    setBusy(true);
-    try {
-      const persistence = remember ? browserLocalPersistence : browserSessionPersistence;
-      await setPersistence(auth, persistence);
-      await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = redirect;
-    } catch (err) {
-      const banner = document.getElementById('login-error-banner');
-      if (banner) { banner.textContent = mapFirebaseError(err.code); banner.classList.remove('hidden'); }
-    } finally {
-      setBusy(false);
-    }
+function switchMethod(m) {
+  currentMethod = m;
+  document.getElementById('method-mobile').style.display = m === 'mobile' ? '' : 'none';
+  document.getElementById('method-email').style.display = m === 'email' ? '' : 'none';
+  document.querySelectorAll('.method-tab').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && m==='mobile') || (i===1 && m==='email'));
   });
+}
 
-  // Google sign-in
-  document.getElementById('google-signin-btn')?.addEventListener('click', async () => {
-    try {
-      await signInWithPopup(auth, google);
-      window.location.href = redirect;
-    } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        const banner = document.getElementById('login-error-banner');
-        if (banner) { banner.textContent = mapFirebaseError(err.code); banner.classList.remove('hidden'); }
-      }
-    }
-  });
+function sendOTP() {
+  const num = document.getElementById('mobile-num').value.replace(/\s/g,'');
+  if (num.length !== 10 || isNaN(num)) { showErr('mErr','Please enter a valid 10-digit mobile number.'); return; }
+  document.getElementById('otp-mobile-display').textContent = '+91 ' + num;
+  document.getElementById('step-mobile').style.display = 'none';
+  document.getElementById('step-otp').classList.remove('section-hidden');
+  startCountdown();
+  showSuccess('mSuccess','OTP sent! Use 1234 for this demo.');
+}
+
+function otpNext(el, idx) {
+  if (el.value.length === 1 && idx < 3) document.getElementById('o'+(idx+1)).focus();
+}
+
+function verifyOTP() {
+  const otp = ['o0','o1','o2','o3'].map(id => document.getElementById(id).value).join('');
+  if (otp.length !== 4) { showErr('mErr','Please enter the 4-digit OTP.'); return; }
+  // Demo: any 4-digit OTP passes
+  window.location.href = 'dashboard.html';
+}
+
+function resendOTP() {
+  showSuccess('mSuccess','OTP resent!'); startCountdown();
+}
+
+function startCountdown() {
+  let secs = 30;
+  const el = document.getElementById('otp-countdown');
+  el.style.display = 'block';
+  el.textContent = 'Resend in '+secs+'s';
+  if (otpTimer) clearInterval(otpTimer);
+  otpTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) { clearInterval(otpTimer); el.style.display = 'none'; }
+    else el.textContent = 'Resend in '+secs+'s';
+  }, 1000);
+}
+
+function emailLogin() {
+  const email = document.getElementById('email-addr').value.trim();
+  const pass = document.getElementById('email-pass').value;
+  if (!email || !pass) { showErr('mErr','Please enter your email and password.'); return; }
+  if (!email.includes('@')) { showErr('mErr','Please enter a valid email address.'); return; }
+  window.location.href = 'dashboard.html';
+}
+
+function googleLogin() {
+  // In production: initiate OAuth flow
+  window.location.href = 'dashboard.html';
+}
+
+function bizLogin() {
+  const email = document.getElementById('biz-email').value.trim();
+  const pass = document.getElementById('biz-pass').value;
+  if (!email || !pass) { showErr('bErr','Please enter your business email and password.'); return; }
+  // In production: check against B2B accounts
+  window.location.href = '../partner/dashboard.html';
+}
+
+function togglePass(id, btn) {
+  const el = document.getElementById(id);
+  if (el.type === 'password') { el.type = 'text'; btn.innerHTML = '<i class="fa fa-eye-slash"></i>'; }
+  else { el.type = 'password'; btn.innerHTML = '<i class="fa fa-eye"></i>'; }
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+function showSuccess(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// Check URL param for type
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('type') === 'business') switchType('business');
+});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
