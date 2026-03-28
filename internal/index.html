@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WOW Internal Portal — Staff Access Gateway</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --bg:#060912;--card:#0e1220;--card2:#111928;--border:rgba(255,255,255,.08);
+  --text:#f0f0f0;--muted:rgba(255,255,255,.45);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--orange:#f97316;--teal:#14b8a6;--pink:#ec4899;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,.05) 0%,transparent 65%);pointer-events:none;}
+
+/* HEADER */
+.header{padding:16px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(6,9,18,.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.header-logo img{height:38px;filter:none!important;width:auto;object-fit:contain;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.header-badge{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:1.5px;font-family:'Courier Prime',monospace;}
+.btn-pub{border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px;background:none;transition:all .2s;}
+.btn-pub:hover{border-color:var(--gold);color:var(--gold);}
+
+/* HERO */
+.hero{text-align:center;padding:44px 20px 28px;}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.18);border-radius:99px;padding:5px 16px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:16px;font-family:'Courier Prime',monospace;}
+.hero h1{font-family:'Poppins',sans-serif;font-size:clamp(22px,4vw,38px);font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;}
+.hero p{font-size:14px;color:var(--muted);max-width:500px;margin:0 auto;line-height:1.8;}
+
+/* CONTENT */
+.content{max-width:1120px;margin:0 auto;padding:0 20px 80px;}
+
+/* SUPER ADMIN BAR */
+.sa-bar{background:linear-gradient(90deg,rgba(168,85,247,.08),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.18);border-radius:12px;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:gap;}
+.sa-info{display:flex;align-items:center;gap:12px;}
+.sa-icon{width:36px;height:36px;background:linear-gradient(135deg,rgba(168,85,247,.3),rgba(201,168,76,.2));border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gold2);font-size:14px;}
+.sa-text strong{display:block;font-size:13px;color:var(--gold2);font-family:'Poppins',sans-serif;}
+.sa-text span{font-size:11px;color:var(--muted);}
+.btn-sa{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(201,168,76,.1));border:1px solid rgba(201,168,76,.25);color:var(--gold2);padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;transition:all .2s;}
+.btn-sa:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(201,168,76,.15);}
+
+/* SECTION LABEL */
+.sec-label{font-size:9.5px;font-weight:700;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-family:'Courier Prime',monospace;margin-bottom:14px;padding-left:10px;border-left:2px solid var(--gold);}
+
+/* PORTAL GRID */
+.portal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px;margin-bottom:36px;}
+.portal-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;text-decoration:none;display:block;}
+.portal-card:hover{transform:translateY(-3px);box-shadow:0 18px 50px rgba(0,0,0,.5);border-color:rgba(255,255,255,.16);}
+.portal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
+.card-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:14px;}
+.card-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:6px;}
+.card-desc{font-size:11.5px;color:var(--muted);line-height:1.65;margin-bottom:12px;}
+.card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);}
+.card-roles{display:flex;gap:4px;flex-wrap:wrap;}
+.role-chip{font-size:8.5px;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);font-family:'Courier Prime',monospace;}
+.card-arrow{color:var(--muted);font-size:13px;transition:all .2s;}
+.portal-card:hover .card-arrow{color:var(--gold);transform:translateX(4px);}
+.access-badge{position:absolute;top:12px;right:12px;font-size:8px;padding:2px 8px;border-radius:10px;font-family:'Courier Prime',monospace;font-weight:700;}
+
+/* AUTHORITY MATRIX */
+.matrix-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:32px;}
+.matrix-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.matrix-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;}
+.matrix-scroll{overflow-x:auto;}
+table.matrix{width:100%;border-collapse:collapse;font-size:11px;}
+table.matrix th{padding:10px 14px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;background:rgba(255,255,255,.02);}
+table.matrix td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.7);vertical-align:middle;white-space:nowrap;}
+table.matrix tr:last-child td{border-bottom:none;}
+table.matrix tr:hover td{background:rgba(255,255,255,.02);}
+.m-yes{color:var(--green);font-size:14px;}
+.m-no{color:rgba(255,255,255,.15);font-size:14px;}
+.m-partial{color:var(--orange);font-size:14px;}
+.m-role{font-weight:700;font-family:'Poppins',sans-serif;font-size:12px;}
+
+/* LOGIN MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:#0d1120;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:36px;width:100%;max-width:400px;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7);}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.modal-icon{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;}
+.modal-title{font-family:'Poppins',sans-serif;font-size:19px;font-weight:800;text-align:center;margin-bottom:3px;}
+.modal-sub{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:22px;line-height:1.6;}
+.flabel{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:block;font-family:'Courier Prime',monospace;}
+.finput{width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:14px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;margin-bottom:14px;}
+.finput:focus{border-color:var(--gold);}
+.btn-login{width:100%;padding:13px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--gold3),var(--gold));color:#060912;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;font-family:'Poppins',sans-serif;}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,168,76,.3);}
+.modal-note{font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6;}
+.modal-note a{color:var(--gold);text-decoration:none;font-weight:700;}
+.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);border-radius:7px;padding:9px 12px;font-size:11.5px;color:#ef4444;margin-bottom:12px;display:none;}
+.divider-or{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider-or span{font-size:10px;color:var(--muted);font-family:'Courier Prime',monospace;letter-spacing:1px;}
+
+/* FOOTER */
+.int-footer{border-top:1px solid var(--border);padding:20px 28px;text-align:center;font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a href="../index.html" class="header-logo">
+    <img src="../images/logo.png" alt="Worlds of Wonder"/>
+  </a>
+  <div class="header-right">
+    <div class="header-badge">INTERNAL PORTAL</div>
+    <a href="../index.html" class="btn-pub"><i class="fa fa-globe"></i> Public Site</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><i class="fa fa-lock"></i> AUTHORIZED PERSONNEL ONLY</div>
+  <h1>WOW Staff &amp; Partner Gateway</h1>
+  <p>Select your portal below. All access is logged and audited. Unauthorized use is strictly prohibited.</p>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- SUPER ADMIN BAR -->
+  <div class="sa-bar">
+    <div class="sa-info">
+      <div class="sa-icon"><i class="fa fa-shield-alt"></i></div>
+      <div class="sa-text">
+        <strong>Super Admin Access</strong>
+        <span>Full system control · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="85e4eee8c5ecebe1ece4e2f0e9e9fcabe6eae8">[email&#160;protected]</a> · All portals + module toggle</span>
+      </div>
+    </div>
+    <a href="javascript:void(0)" class="btn-sa" onclick="openModal('superadmin')"><i class="fa fa-user-shield"></i> Super Admin Login</a>
+  </div>
+
+  <!-- INTERNAL PORTALS -->
+  <div class="sec-label" style="margin-bottom:14px;">INTERNAL PORTALS</div>
+  <div class="portal-grid">
+
+    <!-- ADMIN ERP -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('admin')" style="--accent:#3b82f6;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa;">ADMIN</div>
+      <div class="card-icon" style="background:rgba(59,130,246,.12);color:#60a5fa;"><i class="fa fa-cogs"></i></div>
+      <div class="card-title">Admin &amp; Operations ERP</div>
+      <div class="card-desc">Full park operations — bookings, ticketing, CRM, GST, audit logs, pricing, offers, CMS, finance, and all system controls.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Super Admin</span>
+          <span class="role-chip">Park Admin</span>
+          <span class="role-chip">Ops Manager</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+    <!-- SALES ERP -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('sales')" style="--accent:#f97316;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f97316,#fb923c);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#fb923c;">SALES</div>
+      <div class="card-icon" style="background:rgba(249,115,22,.12);color:#fb923c;"><i class="fa fa-chart-line"></i></div>
+      <div class="card-title">Sales Force ERP</div>
+      <div class="card-desc">CRM, leads pipeline, agent management, passport sales, quote builder, and sales performance reporting.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Sales Manager</span>
+          <span class="role-chip">Sales Agent</span>
+          <span class="role-chip">Passport Sales</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+    <!-- PASSPORT SALES -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('passport')" style="--accent:#C9A84C;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C9A84C,#F0D080);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#F0D080;">PASSPORT</div>
+      <div class="card-icon" style="background:rgba(201,168,76,.12);color:#F0D080;"><i class="fa fa-passport"></i></div>
+      <div class="card-title">Passport Sales Portal</div>
+      <div class="card-desc">Issue WOW Passports (Explore, Together, Legacy), collect KYC, process payments, generate passport books with QR codes.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Passport Agent</span>
+          <span class="role-chip">Sales Lead</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+    <!-- CALL CENTRE CRM -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('callcenter'))" style="--accent:#14b8a6;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#14b8a6,#2dd4bf);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.3);color:#2dd4bf;">CRM</div>
+      <div class="card-icon" style="background:rgba(20,184,166,.12);color:#2dd4bf;"><i class="fa fa-headset"></i></div>
+      <div class="card-title">Call Centre CRM</div>
+      <div class="card-desc">Inbound and outbound call management, ticket lookup, complaint resolution, weather and offer advisories.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Call Centre Agent</span>
+          <span class="role-chip">Supervisor</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- PARTNER PORTALS -->
+  <div class="sec-label" style="margin-bottom:14px;">PARTNER PORTALS</div>
+  <div class="portal-grid">
+
+    <!-- RESELLER ERP -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('reseller')" style="--accent:#a855f7;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#a855f7,#c084fc);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);color:#c084fc;">RESELLER</div>
+      <div class="card-icon" style="background:rgba(168,85,247,.12);color:#c084fc;"><i class="fa fa-store"></i></div>
+      <div class="card-title">Reseller ERP</div>
+      <div class="card-desc">Bulk ticket creation, inventory allocation, team management, commission tracking, GST invoices, and sub-account creation.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Reseller Owner</span>
+          <span class="role-chip">Reseller Agent</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+    <!-- TRAVEL AGENT -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('travelagent')" style="--accent:#ec4899;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ec4899,#f472b6);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#f472b6;">TRAVEL AGENT</div>
+      <div class="card-icon" style="background:rgba(236,72,153,.12);color:#f472b6;"><i class="fa fa-suitcase-rolling"></i></div>
+      <div class="card-title">Travel Agent Portal</div>
+      <div class="card-desc">Mini-ERP with leads, bookings, team creation, rights assignment, commission tracking, and dedicated manager support.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">TA Admin</span>
+          <span class="role-chip">TA Agent</span>
+          <span class="role-chip">Sub-Agent</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+    <!-- CORPORATE -->
+    <a href="javascript:void(0)" class="portal-card" onclick="openModal('corporate')" style="--accent:#22c55e;">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:16px 16px 0 0;"></div>
+      <div class="access-badge" style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;">CORPORATE</div>
+      <div class="card-icon" style="background:rgba(34,197,94,.12);color:#4ade80;"><i class="fa fa-building"></i></div>
+      <div class="card-title">Corporate &amp; School Portal</div>
+      <div class="card-desc">Group booking management, bulk purchase, employee benefits program, school trip coordination, and GST invoicing.</div>
+      <div class="card-foot">
+        <div class="card-roles">
+          <span class="role-chip">Corporate HR</span>
+          <span class="role-chip">School Admin</span>
+        </div>
+        <i class="fa fa-arrow-right card-arrow"></i>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- AUTHORITY MATRIX -->
+  <div class="sec-label" style="margin-bottom:14px;">AUTHORITY &amp; ACCESS MATRIX</div>
+  <div class="matrix-wrap">
+    <div class="matrix-head">
+      <div class="matrix-title">Role Permissions &amp; Escalation Matrix</div>
+      <span style="font-size:10px;color:var(--muted);font-family:'Courier Prime',monospace;">&#9989; Full &nbsp; &#9898; Partial &nbsp; &#8211; None</span>
+    </div>
+    <div class="matrix-scroll">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>ROLE</th>
+            <th>Dashboard</th>
+            <th>Bookings</th>
+            <th>Ticketing</th>
+            <th>Passport</th>
+            <th>CRM</th>
+            <th>Finance</th>
+            <th>Reports</th>
+            <th>Users</th>
+            <th>Modules</th>
+            <th>Config</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="m-role" style="color:var(--gold2);">Super Admin</td>
+            <td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#60a5fa;">Park Admin</td>
+            <td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#fb923c;">Sales Manager</td>
+            <td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#fb923c;">Sales Agent</td>
+            <td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#F0D080;">Passport Agent</td>
+            <td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#2dd4bf;">Call Centre</td>
+            <td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#c084fc;">Reseller</td>
+            <td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#f472b6;">Travel Agent</td>
+            <td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+          <tr>
+            <td class="m-role" style="color:#4ade80;">Corporate</td>
+            <td class="m-partial">&#9898;</td><td class="m-yes">&#9989;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-partial">&#9898;</td><td class="m-partial">&#9898;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td><td class="m-no">&#8211;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- FOOTER -->
+<footer class="int-footer">
+  <span style="color:var(--gold);font-weight:700;">Worlds of Wonder</span> &nbsp;&bull;&nbsp; Internal Staff Portal &nbsp;&bull;&nbsp; All access is logged &nbsp;&bull;&nbsp; &copy; 2025 India Gully Technologies
+</footer>
+
+<!-- ============================================================
+     LOGIN MODAL
+============================================================ -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fa fa-times"></i></button>
+    <div class="modal-icon" id="mIcon"></div>
+    <div class="modal-title" id="mTitle">Login</div>
+    <div class="modal-sub" id="mSub"></div>
+    <div class="err" id="mErr"></div>
+    <label class="flabel">Email Address</label>
+    <input class="finput" id="mEmail" type="email" placeholder="your@email.com" autocomplete="username"/>
+    <label class="flabel">Password</label>
+    <input class="finput" id="mPass" type="password" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-login" onclick="doLogin()"><i class="fa fa-sign-in-alt"></i> <span id="mBtnText">Sign In</span></button>
+    <div class="modal-note" id="mNote"></div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const PORTALS = {
+  superadmin:{
+    title:'Super Admin',icon:'fa-user-shield',iconBg:'linear-gradient(135deg,#7c3aed,#9A6F2A)',
+    note:'Credentials: akm@indiagully.com / India@5327',
+    dest:'../admin/super-admin.html',
+    email:'akm@indiagully.com',pass:'India@5327',
+    sub:'Full system control — users, modules, rights, all portals.'
+  },
+  admin:{
+    title:'Admin & Operations ERP',icon:'fa-cogs',iconBg:'linear-gradient(135deg,#1d4ed8,#3b82f6)',
+    note:'Admin accounts are created by Super Admin.',
+    dest:'../admin/index.html',
+    email:'admin@wow.com',pass:'admin123',
+    sub:'Park operations, CRM, ticketing, finance, GST, audit.'
+  },
+  sales:{
+    title:'Sales Force ERP',icon:'fa-chart-line',iconBg:'linear-gradient(135deg,#c2410c,#f97316)',
+    note:'Sales accounts are provisioned by Admin.',
+    dest:'../sales/erp-dashboard.html',
+    email:'sales@wow.com',pass:'sales123',
+    sub:'CRM, leads, passport sales, agents, reports.'
+  },
+  passport:{
+    title:'Passport Sales Portal',icon:'fa-passport',iconBg:'linear-gradient(135deg,#92400e,#C9A84C)',
+    note:'Passport agents are created by Sales Manager.',
+    dest:'../sales/passport-login.html',
+    email:'passport@wow.com',pass:'passport123',
+    sub:'Issue WOW Passports, KYC, payments, QR passport books.'
+  },
+  callcenter:{
+    title:'Call Centre CRM',icon:'fa-headset',iconBg:'linear-gradient(135deg,#0f766e,#14b8a6)',
+    note:'Call centre accounts provisioned by Admin.',
+    dest:'../admin/call-center.html',
+    email:'callcenter@wow.com',pass:'cc123',
+    sub:'Calls, complaints, ticket lookup, advisories.'
+  },
+  reseller:{
+    title:'Reseller ERP',icon:'fa-store',iconBg:'linear-gradient(135deg,#7e22ce,#a855f7)',
+    note:'Reseller accounts are created by Super Admin after KYC approval.',
+    dest:'../reseller/index.html',
+    email:'reseller@wow.com',pass:'reseller123',
+    sub:'Bulk tickets, inventory, team, commissions, GST invoices.'
+  },
+  travelagent:{
+    title:'Travel Agent Portal',icon:'fa-suitcase-rolling',iconBg:'linear-gradient(135deg,#9d174d,#ec4899)',
+    note:'TA accounts are created by Admin after KYC approval.',
+    dest:'../ta/index.html',
+    email:'ta@wow.com',pass:'ta123',
+    sub:'Mini-ERP: leads, bookings, team, commissions.'
+  },
+  corporate:{
+    title:'Corporate Portal',icon:'fa-building',iconBg:'linear-gradient(135deg,#14532d,#22c55e)',
+    note:'Corporate accounts are created after KYC verification.',
+    dest:'../groups/corporate.html',
+    email:'corporate@wow.com',pass:'corp123',
+    sub:'Group bookings, bulk purchase, GST, employee benefits.'
+  }
+};
+
+let currentPortal = null;
+
+function openModal(key) {
+  currentPortal = key;
+  const p = PORTALS[key];
+  document.getElementById('mIcon').style.background = p.iconBg;
+  document.getElementById('mIcon').innerHTML = `<i class="fa ${p.icon}" style="color:#fff;font-size:22px;"></i>`;
+  document.getElementById('mTitle').textContent = p.title;
+  document.getElementById('mSub').textContent = p.sub;
+  document.getElementById('mNote').innerHTML = `<i class="fa fa-info-circle"></i> ${p.note}`;
+  document.getElementById('mEmail').value = '';
+  document.getElementById('mPass').value = '';
+  document.getElementById('mErr').style.display = 'none';
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('mEmail').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+function doLogin() {
+  const email = document.getElementById('mEmail').value.trim();
+  const pass = document.getElementById('mPass').value;
+  const p = PORTALS[currentPortal];
+  const err = document.getElementById('mErr');
+  if (!email || !pass) { showErr('Please enter your email and password.'); return; }
+  // Super admin check
+  if (email === 'akm@indiagully.com' && pass === 'India@5327') {
+    window.location.href = PORTALS.superadmin.dest; return;
+  }
+  // Demo credentials check
+  if (email === p.email && pass === p.pass) {
+    window.location.href = p.dest; return;
+  }
+  // Generic demo allow for non-empty
+  if (email.includes('@') && pass.length >= 4) {
+    window.location.href = p.dest; return;
+  }
+  showErr('Invalid credentials. Contact your administrator.');
+}
+
+function showErr(msg) {
+  const el = document.getElementById('mErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
