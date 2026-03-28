@@ -1,241 +1,278 @@
-# 🎢 Worlds of Wonder — Full-Stack Static Web Platform
+# Worlds of Wonder — EALCPL Digital Platform
+### Complete Static Website · 100+ Pages · Full ERP Stack
 
-**Live URL**: Deployed via Netlify/GitHub Pages  
-**Admin Credentials**: akm@indiagully.com / India@5327  
-**Status**: ✅ All 40+ pages fully delivered
+**Status: Production-Ready Static Site** | Last Updated: March 2026
 
 ---
 
-## 🗂 Project Structure
+## 🎯 Project Overview
+
+Worlds of Wonder (WOW), Noida — India's premier dual-park theme park destination (Water Park + Amusement Park). This is the complete digital platform covering the public website, customer portal, booking engine, admin ERP suite, and B2B partner portals — all as a static HTML/CSS/JS site.
+
+- **Location**: Sector 38A, Noida, Uttar Pradesh
+- **Parks**: Water Park (20+ rides) + Amusement Park (30+ rides)
+- **Ticketing**: ₹1,299 (Water Park) · ₹1,199 (Amusement Park) · ₹1,999 (Combo) · ₹4,999 (Annual Passport)
+- **GST**: 18% (CGST 9% + SGST 9%) on all B2C ticket sales
+
+---
+
+## 📁 Full File Tree
 
 ```
-/
-├── index.html                    # Public homepage
-├── water-park.html               # Water Park info page
-├── amusement-park.html           # Amusement Park info page
-├── combo.html                    # Combo ticket info page
-├── passport.html                 # WOW Passport product page (3 tiers)
-├── offers.html                   # Offers & promotions
-├── plan-your-visit.html          # Visit planning guide
-├── rides-attractions.html        # Rides & attractions
-├── safety-guidelines.html        # Safety guidelines
-├── gallery.html                  # Photo gallery
-├── faq.html                      # FAQ page
-├── contact.html                  # Contact page
-│
-├── book/
-│   ├── water-park.html           # Water Park booking engine
-│   ├── amusement-park.html       # Amusement Park booking engine
-│   ├── combo.html                # Combo booking engine
-│   └── payment.html              # ✅ Payment page (Razorpay flow, GST, QR tickets)
-│
-├── portal/                       # Customer portal
-│   ├── login.html                # Login (OTP / email / social / business KYC)
-│   ├── register.html             # ✅ Fan registration (social/OTP/email)
-│   ├── dashboard.html            # Customer dashboard
-│   ├── tickets.html              # My tickets
-│   ├── my-bookings.html          # Booking history
-│   ├── wow-passport.html         # Indian-style e-Passport with MRZ + QR vouchers
-│   ├── passport-card.html        # Passport card view
-│   ├── loyalty.html              # WOW Loyalty programme
-│   ├── notifications.html        # Notification centre
-│   ├── wallet.html               # WOW Wallet
-│   ├── offers.html               # Personalised offers
-│   └── profile.html              # Profile management
-│
-├── admin/                        # Internal admin portals
-│   ├── index.html                # Selector (role-based cards + login modal)
-│   ├── call-center.html          # ✅ Call Centre CRM (escalation, refund, WhatsApp/SMS)
-│   ├── gate.html                 # ✅ Gate Manager (QR scanner, capacity dashboard)
-│   ├── notifications.html        # ✅ Hinglish Notifications Engine (email/WhatsApp/SMS)
-│   ├── gst-engine.html           # ✅ GST Engine (auto-reverse, B2B invoicing, reconciliation)
-│   └── fnb-packages.html         # ✅ F&B Package Manager (CSV upload, quote builder, inventory)
-│
-├── book/
-│   └── payment.html              # ✅ Full Razorpay payment flow
-│
-├── groups/                       # B2B group pages
-│   ├── index.html
-│   ├── corporate.html
-│   ├── schools.html
-│   └── birthdays.html
-│
-├── partner/                      # Partner onboarding
-│   ├── onboarding.html
-│   ├── onboarding-kyc.html       # ✅ Complete B2B KYC
-│   ├── login.html
-│   └── dashboard.html
-│
-├── reseller/
-│   └── index.html                # ✅ Reseller ERP (inventory, bulk QR, team, commission ledger)
-│
-├── ta/
-│   └── index.html                # ✅ Travel Agent Portal (Kanban leads, bookings, commission, team)
-│
-├── sales/
-│   └── erp-dashboard.html        # ✅ Salesforce-like CRM (pipeline, accounts, contacts, targets)
-│
-├── internal/                     # Internal selector portal
-│   └── index.html
-│
-├── css/                          # Shared CSS (nav shell v4.0)
-├── js/                           # Shared JS (nav, weather chip, ticker)
-├── images/                       # Static assets
-├── data/                         # Static JSON data
-│
-├── _redirects                    # Netlify SPA redirects
-├── _headers                      # Netlify security headers
-├── sync-to-github.bat/.sh        # GitHub push scripts
-└── README.md                     # This file
+index.html                          # Homepage — Hero carousel, quick-book widget, park explorer
+water-park.html                     # Water park landing page
+amusement-park.html                 # Amusement park landing page
+combo.html                          # Combo ticket page
+offers.html                         # Offers & deals catalogue
+passport.html                       # WOW Passport purchase page
+contact.html                        # Contact form & info
+plan-your-visit.html                # Visitor guide
+rides-attractions.html              # Rides & attractions listing
+safety-guidelines.html              # Safety rules
+gallery.html                        # Photo gallery
+faq.html                            # FAQ (searchable + filterable by category)
+
+├── book/                           # BOOKING ENGINE
+│   ├── water-park.html             # Water Park booking flow
+│   ├── amusement-park.html         # Amusement Park booking flow
+│   ├── combo.html                  # Combo booking flow
+│   ├── group.html                  # ✅ Group booking (5-step: type → tickets → details → pay → confirm)
+│   ├── passport.html               # Passport purchase booking
+│   ├── payment.html                # ✅ Razorpay payment UI (cards, UPI, wallets, net-banking, GST split)
+│   └── confirmation.html           # Booking confirmation + QR ticket
+
+├── portal/                         # CUSTOMER PORTAL
+│   ├── login.html                  # Login (OTP / email / Google / Facebook / Business KYC)
+│   ├── register.html               # Customer & business registration
+│   ├── forgot-password.html        # Password reset
+│   ├── dashboard.html              # ✅ UPGRADED: Rich dashboard (countdown, wallet, loyalty, QR, offers, charts)
+│   ├── guest-details.html          # ✅ NEW: Booking step 2 — guest info, OTP verify, coins/promo, payment bridge
+│   ├── tickets.html                # My tickets (active, past, QR codes)
+│   ├── my-bookings.html            # Booking history & management
+│   ├── wow-passport.html           # ✅ Indian-style e-Passport (3 tiers: Explore/Together/Legacy, MRZ, QR vouchers)
+│   ├── passport-card.html          # Passport wallet card view
+│   ├── loyalty.html                # Loyalty coins history & redemption
+│   ├── wallet.html                 # WOW Wallet (top-up, history, auto-reload)
+│   ├── offers.html                 # Personalised offers
+│   ├── profile.html                # Account profile & settings
+│   └── notifications.html          # Notification centre
+
+├── admin/                          # ADMIN ERP (50+ pages)
+│   ├── index.html                  # Admin dashboard (KPIs, activity feed)
+│   ├── bookings.html               # All bookings management
+│   ├── tickets.html                # Tickets issued
+│   ├── inventory.html              # Inventory management
+│   ├── pricing.html                # Dynamic pricing rules
+│   ├── offers.html                 # Offers & campaign management
+│   ├── banners.html                # CMS banner management
+│   ├── cms.html                    # Content management system
+│   ├── crm.html                    # CRM & lead pipeline
+│   ├── call-center.html            # Call centre ERP (Hinglish AI agent, escalation, refunds)
+│   ├── gate.html                   # Gate QR scanner & capacity monitoring
+│   ├── ops-dashboard.html          # ✅ UPGRADED: Live Ops Command Centre (ticker, capacity rings, weather, incidents)
+│   ├── revenue-analytics.html      # ✅ NEW: Full BI dashboard (trend, channel, hourly, forecast, 28-day table)
+│   ├── finance.html                # Finance & P&L
+│   ├── gst-engine.html             # GST filing engine
+│   ├── invoices.html               # Invoice management
+│   ├── fnb-packages.html           # ✅ F&B Package Manager (CSV upload, quote builder, inventory)
+│   ├── ticketing-engine.html       # Ticket configuration & allocation engine
+│   ├── passport-engine.html        # Passport issuance & management engine
+│   ├── passport-redemptions.html   # Passport voucher redemption log
+│   ├── passport-products.html      # Passport plan configuration
+│   ├── passport.html               # Passport admin view
+│   ├── loyalty-engine.html         # Loyalty engine rules
+│   ├── notifications.html          # Push notification engine (Hinglish templates)
+│   ├── b2b-approvals.html          # B2B group booking approvals
+│   ├── ta-approvals.html           # Travel agent / reseller KYC approvals
+│   ├── reseller-config.html        # Reseller configuration
+│   ├── partners.html               # Partner management
+│   ├── users.html                  # User & role management (KYC, 2FA, audit)
+│   ├── user-management.html        # Extended user management
+│   ├── super-admin.html            # ✅ QA'd: Super Admin (KYC queue, role matrix, audit-log links, module toggles)
+│   ├── module-control.html         # Module on/off control
+│   ├── api-secrets.html            # API secrets management
+│   ├── config.html                 # System configuration
+│   ├── settings.html               # Admin settings
+│   ├── reporting.html              # Reports centre
+│   ├── reports.html                # Report summaries
+│   ├── audit-logs.html             # Full audit trail
+│   ├── advisories.html             # Park advisories management
+│   └── ops-dashboard.html          # See above
+
+├── groups/                         # GROUP LANDING PAGES
+│   ├── index.html                  # Groups hub
+│   ├── corporate.html              # Corporate events & team outings
+│   ├── schools.html                # School & college trips
+│   └── birthdays.html              # Birthday party packages
+
+├── partner/                        # PARTNER / TRAVEL AGENT PORTAL
+│   ├── login.html                  # Partner login
+│   ├── dashboard.html              # Partner dashboard (KPIs, commissions, quick actions)
+│   ├── onboarding.html             # Partner onboarding flow
+│   ├── onboarding-kyc.html         # Full B2B KYC (GST, PAN, bank, digital signature)
+│   ├── buy-tickets.html            # Bulk ticket purchase
+│   ├── bulk-tickets.html           # Bulk QR ticket generator
+│   ├── quote-builder.html          # Quote builder (GST invoice preview)
+│   ├── invoice-gst.html            # GST invoice generation
+│   ├── statements.html             # Commission statements
+│   ├── invoices.html               # Invoice list
+│   ├── ticket-batches.html         # Ticket batch management
+│   ├── reports.html                # Partner reports
+│   └── support.html                # Support tickets
+
+├── passport/                       # PASSPORT HOLDER MINI-PORTAL
+│   ├── login.html                  # PIN / OTP passport login
+│   ├── register.html               # Register + KYC + payment
+│   └── my-passport.html            # Passport holder dashboard + vouchers
+
+├── ta/                             # TRAVEL AGENT MINI-ERP
+│   └── index.html                  # ✅ Leads Kanban, bookings, team, commission ledger, charts
+
+├── sales/                          # SALES ERP (PASSPORT SALES TEAM)
+│   ├── passport-login.html         # Sales agent login
+│   ├── erp-dashboard.html          # ✅ Salesforce-like CRM/ERP dashboard
+│   ├── erp-crm.html                # CRM & leads
+│   ├── erp-agents.html             # Agent performance
+│   ├── erp-products.html           # Products catalogue
+│   ├── erp-reports.html            # Sales ERP reports
+│   ├── leads.html                  # Lead management
+│   ├── passport-dashboard.html     # Agent passport dashboard
+│   ├── passport-kyc.html           # KYC onboarding flow
+│   ├── passport-payment.html       # Payment collection
+│   ├── passport-issued.html        # Issued passport confirmation
+│   ├── quote-builder.html          # Quote builder
+│   └── bulk-tickets.html           # Bulk ticket generation
+
+├── reseller/                       # RESELLER ERP
+│   └── index.html                  # ✅ Inventory cards, bulk QR (200 max), commission ledger (TDS 2%), team mgmt
+
+├── internal/                       # INTERNAL STAFF PORTAL
+│   └── index.html                  # Internal dashboard with role-based login
+
+├── css/                            # STYLESHEETS
+│   ├── style.css                   # Main public site styles
+│   ├── wow-design-system.css       # Admin ERP design system
+│   ├── booking-page.css            # Booking flow styles
+│   └── forms.css                   # Form component styles
+
+├── js/                             # JAVASCRIPT
+│   ├── shell.js                    # Global header/footer injector (shell architecture)
+│   ├── main.js                     # Public site JS
+│   ├── wow-modules.js              # Module feature flags
+│   └── banner-engine.js            # Banner/offer engine
+
+├── images/                         # ASSETS
+│   ├── logo.png                    # WOW Logo (white — hard adopted, no modifications)
+│   └── [hero, ride images]
+
+├── data/                           # STATIC DATA
+├── _redirects                      # Netlify redirects
+├── _headers                        # Security headers (CSP, HSTS)
+├── github-push.html                # GitHub sync utility
+└── README.md                       # This file
 ```
 
 ---
 
-## ✅ Completed Features
+## 🌐 Key URLs & Entry Points
 
-### 🌐 Public Website
-| Page | Description |
-|------|-------------|
-| `index.html` | Full homepage with mega-nav, hero, attractions, offers, testimonials |
-| `water-park.html` | Water Park information with slides, pricing |
-| `amusement-park.html` | Amusement Park info, rides, pricing |
-| `combo.html` | Combo ticket info & value proposition |
-| `passport.html` | WOW Passport 3-tier product page (Bronze/Silver/Gold) |
-| `offers.html` | Seasonal offers, promo codes, flash deals |
-| `plan-your-visit.html` | Getting there, FAQs, tips |
-| `rides-attractions.html` | Full rides catalogue with category filters |
-| `safety-guidelines.html` | Park safety rules & health guidelines |
-| `gallery.html` | Responsive photo gallery with lightbox |
-| `faq.html` | Accordion FAQ with category search |
-| `contact.html` | Contact form, map, social links |
-
-### 🎟 Booking Engine
-| Page | Description |
-|------|-------------|
-| `book/water-park.html` | Water Park ticket booking flow |
-| `book/amusement-park.html` | Amusement Park booking flow |
-| `book/combo.html` | Combo ticket booking |
-| `book/payment.html` | ✅ Full Razorpay-style payment: Card/UPI/Wallet/Netbanking + GST breakdown + QR ticket generation |
-
-### 👤 Customer Portal
-| Page | Description |
-|------|-------------|
-| `portal/login.html` | OTP, email, Google/FB social, business KYC login |
-| `portal/register.html` | ✅ Fan registration with mobile OTP, social login |
-| `portal/dashboard.html` | Personalised dashboard with upcoming bookings |
-| `portal/tickets.html` | Active QR tickets with download |
-| `portal/my-bookings.html` | Booking history with filters |
-| `portal/wow-passport.html` | Indian e-Passport (3 tiers, MRZ, individual QR vouchers) |
-| `portal/passport-card.html` | Passport card view/download |
-| `portal/loyalty.html` | WOW Coins loyalty with tier progression |
-| `portal/wallet.html` | WOW Wallet — top up, transactions |
-| `portal/offers.html` | Personalised promotional offers |
-| `portal/profile.html` | Profile management |
-
-### 🏢 Admin Back-Office
-| Page | Description |
-|------|-------------|
-| `admin/index.html` | Role-based selector with login modal & authority matrix |
-| `admin/call-center.html` | ✅ Full CRM: tickets, escalation matrix, refund workflow, WhatsApp/SMS/email comms, agent management |
-| `admin/gate.html` | ✅ QR Scanner (camera simulation), real-time capacity dials, entry/exit live counters |
-| `admin/notifications.html` | ✅ Hinglish automated communications engine — weather/holiday/offer triggers for email/WhatsApp/SMS with template builder |
-| `admin/gst-engine.html` | ✅ GST auto-reverse, B2B invoice generation, GSTR-1 reconciliation dashboard, state-wise reports |
-| `admin/fnb-packages.html` | ✅ F&B: CSV bulk upload (PapaParse), package catalogue, event quote builder (tickets + meal + venue + security + lockers + costumes + entertainment), inventory management |
-
-### 🤝 Partner & Reseller
-| Page | Description |
-|------|-------------|
-| `partner/onboarding.html` | Partner onboarding wizard |
-| `partner/onboarding-kyc.html` | ✅ Full B2B KYC: company docs, PAN/GST verification, bank details, digital signature |
-| `partner/login.html` | Partner login |
-| `partner/dashboard.html` | Partner performance dashboard |
-| `reseller/index.html` | ✅ Reseller ERP: ticket inventory cards, bulk QR generator (QRCode.js), purchase orders, commission ledger (Bronze→Platinum), team management with region/role |
-| `ta/index.html` | ✅ Travel Agent Portal: Kanban leads pipeline (drag-drop), confirmed bookings, commission ledger with tier calculator, team management |
-
-### 💼 Sales ERP
-| Page | Description |
-|------|-------------|
-| `sales/erp-dashboard.html` | ✅ Salesforce-like CRM: deal pipeline with stage filters, B2B accounts, contacts with lead scoring, activities (tasks + feed), CRM bookings view, team targets with progress, win/loss reports |
-
-### 👥 Groups / B2B
-| Page | Description |
-|------|-------------|
-| `groups/index.html` | Groups landing page |
-| `groups/corporate.html` | Corporate outings with package builder |
-| `groups/schools.html` | School trips package |
-| `groups/birthdays.html` | Birthday packages |
-
----
-
-## 🔗 Key URLs & Entry Points
-
-### Public
-- `/` — Homepage
-- `/water-park.html` — Water Park
-- `/passport.html` — WOW Passport
-- `/offers.html` — Offers
+### Public Site
+| URL | Description |
+|-----|-------------|
+| `/index.html` | Homepage — hero carousel, quick-book widget, explore parks |
+| `/water-park.html` | Water Park landing page |
+| `/amusement-park.html` | Amusement Park landing page |
+| `/combo.html` | Combo ticket page |
+| `/passport.html` | Annual Passport purchase |
+| `/offers.html` | Current offers catalogue |
+| `/faq.html` | FAQ (searchable, categorised) |
+| `/plan-your-visit.html` | Visitor information |
 
 ### Booking Flow
-- `/book/water-park.html` → `/book/payment.html` → Confirmation with QR tickets
+| URL | Description |
+|-----|-------------|
+| `/book/water-park.html` | Water Park booking (date, guests, add-ons) |
+| `/book/amusement-park.html` | Amusement Park booking |
+| `/book/combo.html` | Combo booking |
+| `/book/group.html` | Group booking (5 steps: type → tickets → details → pay → confirm) |
+| `/portal/guest-details.html` | Step 2 guest info (OTP verify, coins/promo, GST) |
+| `/book/payment.html` | Payment (Razorpay: cards/UPI/wallets/net-banking) |
+| `/book/confirmation.html` | Booking confirmation + QR ticket |
 
 ### Customer Portal
-- `/portal/login.html` — Login
-- `/portal/dashboard.html` — Dashboard post-login
-- `/portal/wow-passport.html` — WOW Passport viewer
+| URL | Description |
+|-----|-------------|
+| `/portal/login.html` | Sign in (OTP / email / social) |
+| `/portal/dashboard.html` | Customer dashboard (countdown, tickets, wallet, loyalty) |
+| `/portal/wow-passport.html` | WOW Passport (3 tiers, MRZ, QR vouchers) |
+| `/portal/wallet.html` | WOW Wallet |
+| `/portal/loyalty.html` | Loyalty coins |
 
-### Admin
-- `/admin/index.html` — Admin selector (credentials: akm@indiagully.com / India@5327)
-- `/admin/call-center.html` — Call Centre CRM
-- `/admin/gate.html` — Gate & capacity
-- `/admin/notifications.html` — Notifications engine
-- `/admin/gst-engine.html` — GST engine
-- `/admin/fnb-packages.html` — F&B Package Manager
+### Admin ERP
+| URL | Description |
+|-----|-------------|
+| `/admin/index.html` | Admin dashboard |
+| `/admin/ops-dashboard.html` | Live Ops Command Centre |
+| `/admin/revenue-analytics.html` | Full BI / Revenue Analytics Dashboard |
+| `/admin/call-center.html` | Call Centre ERP |
+| `/admin/gate.html` | Gate QR Scanner |
+| `/admin/fnb-packages.html` | F&B Package Manager |
+| `/admin/super-admin.html` | Super Admin (KYC, roles, audit) |
+| `/admin/passport-engine.html` | Passport Engine |
+| `/admin/ticketing-engine.html` | Ticketing Engine |
+| `/admin/notifications.html` | Push Notification Engine |
 
-### Partner Portals
-- `/partner/onboarding.html` — Start onboarding
-- `/reseller/index.html` — Reseller ERP
-- `/ta/index.html` — Travel Agent ERP
-- `/sales/erp-dashboard.html` — Sales CRM
+### B2B / Partner
+| URL | Description |
+|-----|-------------|
+| `/partner/dashboard.html` | Partner portal dashboard |
+| `/partner/onboarding-kyc.html` | Partner KYC onboarding |
+| `/partner/quote-builder.html` | Quote builder |
+| `/ta/index.html` | Travel Agent Mini-ERP |
+| `/sales/erp-dashboard.html` | Sales ERP (Salesforce-style CRM) |
+| `/reseller/index.html` | Reseller ERP |
 
 ---
 
-## 📊 Data Models
+## 💾 Data Models & Pricing
 
-### WOW Passport (3 Tiers)
-```
-Bronze: ₹999/year  — 10% discount, locker, priority queue
-Silver: ₹2,499/year — 20% discount, F&B 15%, 12 free visits
-Gold:   ₹5,999/year — 30% discount, F&B 25%, unlimited, VIP lounge
-```
+### Ticket Pricing (GST inclusive)
+| Type | Adult | Child (90–120cm) | Infant |
+|------|-------|-------------------|--------|
+| Water Park | ₹1,299 | ₹799 | Free |
+| Amusement Park | ₹1,199 | ₹799 | Free |
+| Combo (Both Parks) | ₹1,999 | ₹1,199 | Free |
 
-### Commission Tiers
-**Travel Agents**
-| Tier | Rate | Threshold |
-|------|------|-----------|
-| Bronze | 8% | < ₹50K/year |
-| Silver | 10% | ₹50K–₹1L |
-| Gold | 12% | ₹1L–₹3L |
-| Platinum | 15% | ≥ ₹3L |
+### Group Pricing (GST inclusive)
+| Group Size | Water/Amusement | Combo |
+|------------|-----------------|-------|
+| 20–49 | ₹799 | ₹1,299 |
+| 50–99 | ₹749 | ₹1,199 |
+| 100–199 | ₹699 | ₹1,099 |
+| 200+ | ₹649 | ₹999 |
 
-**Resellers**
-| Tier | Rate | Threshold |
-|------|------|-----------|
-| Bronze | 8% | < ₹5L/year |
-| Silver | 10% | ₹5L–₹10L |
-| Gold | 12% | ₹10L–₹25L |
-| Platinum | 15% | ≥ ₹25L |
+### WOW Passport Tiers
+| Tier | Price | Holders | Key Benefit |
+|------|-------|---------|-------------|
+| Explore | ₹4,999 | 1 | Unlimited both parks, 10% F&B |
+| Together | ₹12,999 | Family of 4 | 15% F&B, birthday pack, 3x loyalty |
+| Legacy | ₹24,999 | Premium family of 6 | 25% F&B, VIP lounge, 5x loyalty, ₹1K merch |
 
-### GST Rates
-- Admission tickets: 18% (CGST 9% + SGST 9%)
-- F&B: 5% (restaurant-style) or 18% (packaged)
-- Corporate venue rental: 18%
+### Commission Structure (B2B)
+| Partner Type | Commission | TDS |
+|-------------|------------|-----|
+| Travel Agent (Bronze) | 8% | 5% on net |
+| Travel Agent (Silver) | 10% | 5% on net |
+| Travel Agent (Gold) | 12% | 5% on net |
+| Travel Agent (Platinum) | 15% | 5% on net |
+| Reseller (Bronze) | 10% | 2% |
+| Reseller (Platinum) | 15% + ₹2L bonus | 2% |
 
-### Ticket Pricing
-| Category | Adult | Child (3–12) |
-|----------|-------|--------------|
-| Water Park | ₹799 | ₹499 |
-| Amusement Park | ₹699 | ₹449 |
-| Combo | ₹1,299 | ₹899 |
+### GST Breakdown
+- B2C Tickets: **18%** (CGST 9% + SGST 9%)
+- F&B: **5%** on group packages
+- Passport: **18%**
+- Services: **18%**
 
 ---
 
@@ -243,66 +280,116 @@ Gold:   ₹5,999/year — 30% discount, F&B 25%, unlimited, VIP lounge
 
 | Layer | Technology |
 |-------|-----------|
-| HTML | HTML5 semantic markup |
-| CSS | Custom CSS3 + CSS variables |
+| HTML | HTML5 Semantic |
+| CSS | Custom CSS + Tailwind (some pages) |
 | JS | Vanilla ES6+ |
-| Charts | Chart.js v4 (CDN) |
-| Icons | Font Awesome 6.4 (CDN) |
-| Fonts | Google Fonts — Inter, Segoe UI |
-| QR Codes | QRCode.js (CDN) |
-| CSV Parsing | PapaParse v5 (CDN) |
-| Avatars | DiceBear Initials API |
-| Payments | Razorpay (UI simulation) |
-| Deployment | Netlify (static hosting) |
-| CI/CD | GitHub Actions + sync scripts |
+| Charts | Chart.js 4.x |
+| QR Codes | QRCode.js |
+| Icons | Font Awesome 6 |
+| Fonts | Google Fonts (Inter, Nunito, Poppins, Cinzel) |
+| Payment UI | Razorpay (frontend flow only — no backend) |
+| Weather | Open-Meteo API (free, no key) |
+| Hosting | Netlify (static) |
+| Data | RESTful Table API (via platform) |
 
 ---
 
-## 🔐 Security & Compliance
+## 🔒 Security & Compliance
 
-- `_headers`: X-Frame-Options, CSP, HSTS, X-Content-Type-Options
-- `_redirects`: SPA catch-all for client-side routing
-- PCI-DSS compliant payment UI (Razorpay integration)
-- GST-compliant invoicing (HSN codes, GSTIN validation)
-- KYC forms for B2B partners (PAN, GST, bank account verification)
+- `_headers` file: CSP, X-Frame-Options, HSTS, XSS protection
+- `_redirects` file: Route normalisation
+- All external API calls: CORS-safe, no API keys in frontend
+- GST: CGST + SGST split on all invoices (Maharashtra: CGST+SGST, others: IGST)
+- KYC: Manual review workflow (no Aadhaar API — frontend simulation only)
 
 ---
 
-## 📱 Responsive Design
+## 📱 Responsive Breakpoints
 
-All pages are fully responsive with breakpoints:
-- Desktop: > 1024px (full sidebar + content)
-- Tablet: 768px–1024px (condensed layouts)
-- Mobile: < 768px (collapsible sidebar, stacked cards)
+| Breakpoint | Layout |
+|------------|--------|
+| > 1200px | Full desktop (sidebar + multi-column) |
+| 900–1200px | Tablet (collapsed columns) |
+| 600–900px | Mobile-L (2-column grids) |
+| < 600px | Mobile (single column, slide-out sidebar) |
+
+---
+
+## ✅ Completed Features (as of March 2026)
+
+### Public Site
+- [x] Homepage with video carousel + quick-book widget + group & passport tabs
+- [x] Water Park, Amusement Park, Combo pages
+- [x] Offers catalogue with promo codes
+- [x] WOW Passport purchase page (3 tiers, benefits, FAQ)
+- [x] Groups landing (corporate / school / birthday)
+- [x] FAQ, Contact, Gallery, Plan Your Visit, Safety Guidelines
+
+### Booking Engine (5-step flow)
+- [x] Individual booking: Water Park, Amusement, Combo
+- [x] Group booking: 5-step flow (type → tickets + F&B addons → contact → payment → confirm)
+- [x] Guest details: Step 2 with OTP verify, promo codes, WOW Coins, GST breakdown
+- [x] Payment: Razorpay UI (cards, UPI, wallets, net-banking), promo codes (WOW20/SPLASH10/FIRST50)
+- [x] Confirmation: QR tickets, WhatsApp share, calendar add
+
+### Customer Portal
+- [x] Login (OTP, email, Google, Facebook, Business KYC)
+- [x] Dashboard: countdown timer, live wallet, loyalty coins, QR ticket, offers, spend chart, visit timeline
+- [x] WOW Passport: 3 tiers (Explore/Together/Legacy), full e-Passport design, MRZ, QR vouchers
+- [x] Loyalty engine (coins, tier progress, redemption)
+- [x] WOW Wallet (top-up, history, auto-reload)
+- [x] Tickets, My Bookings, Profile, Notifications
+
+### Admin ERP
+- [x] Admin dashboard with KPI + booking + revenue overview
+- [x] **Live Ops Command Centre**: live ticker, capacity rings, weather, ride status, gate status, staff deployment, incidents, broadcast
+- [x] **Revenue Analytics BI Dashboard**: trend (daily/weekly/monthly), channel donut, hourly heat, category mix, 28-day daily table, B2B chart, top products table, demand forecasts
+- [x] Call Centre ERP (Hinglish AI, escalation, refunds)
+- [x] Gate QR Scanner (capacity monitoring, fraud detection)
+- [x] F&B Package Manager (CSV upload, 9 packages, quote builder)
+- [x] Ticketing Engine (full configuration)
+- [x] Passport Engine + Redemptions
+- [x] GST Engine (auto reverse-charge, filing)
+- [x] Notifications Engine (Hinglish templates, WhatsApp/SMS/Push)
+- [x] Super Admin: KYC queue (7 pending), role matrix, audit-log links, module toggles
+
+### B2B & Partner
+- [x] Partner Portal (dashboard, KYC, quote builder, bulk tickets, invoices)
+- [x] Travel Agent Mini-ERP (leads Kanban, commission ledger, team management)
+- [x] Sales ERP (Salesforce-style CRM, deal pipeline, agent targets, reports)
+- [x] Reseller ERP (inventory, bulk QR generator max 200, commission, Platinum tier)
+
+---
+
+## 🚧 Not Yet Implemented (Future Roadmap)
+
+- [ ] Real Razorpay backend integration (currently frontend-only UI)
+- [ ] Live OTP verification (currently simulated)
+- [ ] Aadhaar/DigiLocker eKYC API integration
+- [ ] Real-time IoT ride status feed
+- [ ] WhatsApp Business API (currently templated)
+- [ ] Mobile app (React Native)
+- [ ] Multi-language: Hindi full translation
+- [ ] Loyalty points live deduction on checkout
+- [ ] Push notifications via service worker
+- [ ] A/B testing for conversion optimisation
 
 ---
 
 ## 🚀 Deployment
 
-### Via Netlify
-1. Connect GitHub repository
-2. Build command: (none — static files)
-3. Publish directory: `/`
-4. Environment: Node.js 18+
+**To deploy:** Go to the **Publish tab** to publish the site with one click.
 
-### Manual Deploy
-Use `sync-to-github.bat` (Windows) or `sync-to-github.sh` (Unix) to push to GitHub, which triggers Netlify auto-deploy.
+**Environment**: Netlify static hosting  
+**Build command**: None (static files)  
+**Publish directory**: `/` (root)
 
 ---
 
-## 🔮 Future Enhancements
+## 📞 Contact & Credits
 
-- [ ] Real Razorpay SDK integration (replace simulation)
-- [ ] Backend API for live seat/capacity availability
-- [ ] Live weather API integration (replace demo chip)
-- [ ] Push notifications (Web Push API)
-- [ ] Loyalty points real-time calculation
-- [ ] Admin analytics with real booking database
-- [ ] Multi-language support (Hindi/English toggle)
-- [ ] Progressive Web App (PWA) with offline support
-- [ ] WhatsApp Business API real integration (currently templated)
-- [ ] Aadhaar-based KYC verification
-
----
-
-*Last updated: March 2025 | Version: 4.0 | Built by: WOW Digital Team*
+- **Platform**: Worlds of Wonder, EALCPL (Entertainment and Amusement Limited)
+- **Address**: A-2, Sector 38A, Noida — 201 301, Uttar Pradesh
+- **Support**: support@worldsofwonder.in
+- **Groups**: groups@worldsofwonder.in
+- **Corporate**: corporate@worldsofwonder.in
