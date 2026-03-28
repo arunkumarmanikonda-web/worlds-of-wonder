@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products & Inventory — WOW Sales ERP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--bg:#0a0a14;--sidebar:#0e0e22;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+    .sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+    .sb-brand{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .sb-brand .ico{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.9rem}
+    .sb-brand .bt{font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:700;color:var(--gold)}
+    .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
+    .sb-sec{padding:8px 14px 4px;font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .sb-link{display:flex;align-items:center;gap:9px;padding:9px 16px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:600;position:relative;transition:all .2s}
+    .sb-link:hover,.sb-link.active{color:#fff;background:rgba(201,168,76,.08)}
+    .sb-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+    .sb-link.active i{color:var(--gold)}
+    .sb-link i{width:15px;text-align:center;font-size:.82rem}
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar h1{font-size:1.05rem;font-weight:800}
+    .tb-right{display:flex;gap:10px}
+    .btn{padding:7px 14px;border-radius:9px;font-size:.78rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;border:none;text-decoration:none}
+    .btn.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14}
+    .btn.gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
+    .btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+    .btn.outline:hover{border-color:var(--gold);color:var(--gold)}
+    .content{padding:20px 24px;flex:1}
+    /* PRODUCT CARDS */
+    .products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px}
+    .prod-card{background:var(--card);border:2px solid var(--border);border-radius:16px;overflow:hidden;transition:all .2s}
+    .prod-card:hover{border-color:rgba(201,168,76,.3);transform:translateY(-2px)}
+    .prod-card.active-plan{border-color:rgba(201,168,76,.4)}
+    .pc-top{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
+    .pc-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:800;margin-bottom:10px}
+    .pc-badge.water{background:rgba(59,130,246,.15);color:#60a5fa}
+    .pc-badge.amuse{background:rgba(168,85,247,.15);color:#c084fc}
+    .pc-badge.combo{background:rgba(201,168,76,.15);color:var(--gold)}
+    .pc-name{font-size:1rem;font-weight:800;margin-bottom:4px}
+    .pc-price{font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:900;color:var(--gold);line-height:1}
+    .pc-strike{font-size:.8rem;color:var(--muted);text-decoration:line-through;margin-left:6px}
+    .pc-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+    .pc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 18px;border-bottom:1px solid var(--border)}
+    .pc-stat{text-align:center}
+    .pc-stat .sv{font-size:.95rem;font-weight:900;font-family:'Poppins',sans-serif;color:var(--gold)}
+    .pc-stat .sl{font-size:.6rem;color:var(--muted);font-weight:700}
+    .pc-body{padding:14px 18px}
+    .pc-features{list-style:none;margin-bottom:12px}
+    .pc-features li{font-size:.75rem;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+    .pc-features li i{color:var(--gold);font-size:.65rem;flex-shrink:0}
+    .pc-actions{display:flex;gap:8px}
+    .pca{flex:1;padding:8px;border-radius:8px;font-size:.75rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;text-align:center;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted)}
+    .pca:hover{border-color:var(--gold);color:var(--gold)}
+    .pca.primary{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14;border:none}
+    /* TOGGLE */
+    .toggle-wrap{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+    .toggle-sw{position:relative;width:38px;height:20px;flex-shrink:0}
+    .toggle-sw input{opacity:0;width:0;height:0}
+    .toggle-sw .track{position:absolute;inset:0;background:#2a2a4a;border-radius:20px;cursor:pointer;transition:.3s}
+    .toggle-sw .track::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+    .toggle-sw input:checked+.track{background:var(--green)}
+    .toggle-sw input:checked+.track::before{transform:translateX(18px)}
+    /* VOUCHERS TABLE */
+    .sec-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px}
+    .sec-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+    .sec-head i{color:var(--gold);margin-right:7px}
+    .dt{width:100%;border-collapse:collapse}
+    .dt th{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;font-weight:700}
+    .dt td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;vertical-align:middle}
+    .dt tr:last-child td{border-bottom:none}
+    .dt tr:hover td{background:rgba(255,255,255,.02)}
+    .badge{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:.66rem;font-weight:700}
+    .badge.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .badge.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    .badge.purple{background:rgba(168,85,247,.15);color:var(--purple)}
+    @media(max-width:1000px){.products-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.products-grid{grid-template-columns:1fr}.main{margin-left:0}.sidebar{display:none}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="ico"><i class="fas fa-chart-line"></i></div>
+    <div><div class="bt">WOW Sales ERP</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="erp-dashboard.html" class="sb-link"><i class="fas fa-tachometer-alt"></i>ERP Dashboard</a>
+    <a href="erp-crm.html" class="sb-link"><i class="fas fa-users"></i>CRM & Leads</a>
+    <a href="erp-agents.html" class="sb-link"><i class="fas fa-user-tie"></i>Agents</a>
+    <a href="erp-reports.html" class="sb-link"><i class="fas fa-chart-bar"></i>Reports</a>
+    <a href="erp-products.html" class="sb-link active"><i class="fas fa-box"></i>Products</a>
+    <div class="sb-sec">Sales</div>
+    <a href="passport-kyc.html" class="sb-link"><i class="fas fa-user-plus"></i>New Sale</a>
+    <a href="passport-dashboard.html" class="sb-link"><i class="fas fa-passport"></i>Sales Portal</a>
+    <div class="sb-sec">Admin</div>
+    <a href="../admin/passport-products.html" class="sb-link"><i class="fas fa-cog"></i>Product Config</a>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Products & <span style="color:var(--gold)">Inventory</span></h1>
+      <p style="font-size:.72rem;color:var(--muted)">Passport plans, vouchers, pricing & benefits management</p>
+    </div>
+    <div class="tb-right">
+      <a href="../admin/passport-products.html" class="btn outline"><i class="fas fa-cog"></i> Edit Plans</a>
+      <a href="passport-kyc.html" class="btn gold"><i class="fas fa-plus"></i> New Sale</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="products-grid" id="prodGrid"></div>
+
+    <!-- Vouchers -->
+    <div class="sec-card">
+      <div class="sec-head"><div><i class="fas fa-ticket-alt"></i>Vouchers & Inclusions</div><button class="btn outline" style="font-size:.72rem;padding:5px 12px" onclick="alert('Configure vouchers in Admin → Passport Products')"><i class="fas fa-edit"></i> Edit</button></div>
+      <div style="overflow-x:auto">
+        <table class="dt">
+          <thead><tr><th>Voucher Type</th><th>Water Park Plan</th><th>Amusement Plan</th><th>Combo Plan</th><th>Validity</th><th>Redeemable</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:700">🍽️ Meal Vouchers</td><td><span class="badge blue">3x</span></td><td><span class="badge purple">2x</span></td><td><span class="badge gold">5x</span></td><td>Per Year</td><td>At F&B Outlets</td></tr>
+            <tr><td style="font-weight:700">👥 Guest Passes</td><td><span class="badge blue">2x / month</span></td><td><span class="badge purple">1x / month</span></td><td><span class="badge gold">3x / month</span></td><td>Monthly Reset</td><td>Entry Gate</td></tr>
+            <tr><td style="font-weight:700">🔒 Locker Access</td><td><span class="badge green">–</span></td><td><span class="badge green">–</span></td><td><span class="badge gold">FREE / Visit</span></td><td>Per Visit</td><td>Locker Counter</td></tr>
+            <tr><td style="font-weight:700">🏷️ F&B Discount</td><td><span class="badge blue">10%</span></td><td><span class="badge purple">15%</span></td><td><span class="badge gold">20%</span></td><td>Always On</td><td>All F&B Outlets</td></tr>
+            <tr><td style="font-weight:700">⭐ Priority Queue</td><td><span class="badge green">Yes</span></td><td><span class="badge green">Yes</span></td><td><span class="badge gold">VIP</span></td><td>Always On</td><td>Entry Gate</td></tr>
+            <tr><td style="font-weight:700">🎉 F&B Voucher (₹)</td><td><span class="badge blue">₹200</span></td><td><span class="badge purple">₹150</span></td><td><span class="badge gold">₹500</span></td><td>Per Year</td><td>F&B Outlets</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GST Summary -->
+    <div class="sec-card">
+      <div class="sec-head"><div><i class="fas fa-file-invoice"></i>Pricing & GST Breakdown</div></div>
+      <div style="overflow-x:auto">
+        <table class="dt">
+          <thead><tr><th>Plan</th><th>MRP</th><th>Base Price (ex-GST)</th><th>GST @18%</th><th>Total MRP</th><th>Agent Commission</th><th>Net Revenue</th></tr></thead>
+          <tbody id="gstTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PLANS=[
+  {key:'water',name:'Water Park Passport',badge:'water',icon:'fa-water',price:2999,strike:3999,sold:124,rev:370876,commission:3,
+   features:['Unlimited water park (365d)','10% F&B discount','2 guest passes/month','Priority queue','3 meal vouchers','₹200 F&B voucher']},
+  {key:'amuse',name:'Amusement Passport',badge:'amuse',icon:'fa-gamepad',price:2499,strike:3499,sold:76,rev:190000,commission:3,
+   features:['Unlimited amusement (365d)','15% off all rides','1 guest pass/month','Exclusive events','2 meal vouchers','₹150 F&B voucher']},
+  {key:'combo',name:'Combo Passport',badge:'combo',icon:'fa-star',price:4999,strike:6999,sold:168,rev:841000,commission:4,
+   features:['Both parks unlimited','20% F&B & merch discount','3 guest passes/month','VIP lounge','5 meal vouchers','Free locker/visit','₹500 voucher']},
+];
+
+document.getElementById('prodGrid').innerHTML=PLANS.map(p=>{
+  const base=Math.round(p.price/1.18);
+  const gst=p.price-base;
+  const discount=Math.round((1-p.price/p.strike)*100);
+  return `<div class="prod-card active-plan">
+    <div class="pc-top">
+      <div class="pc-badge ${p.badge}"><i class="fas ${p.icon}"></i> ${p.badge.toUpperCase()}</div>
+      <div class="toggle-wrap">
+        <label class="toggle-sw"><input type="checkbox" checked/><div class="track"></div></label>
+        <span style="font-size:.75rem;font-weight:700;color:var(--green)">Active</span>
+        <span style="margin-left:auto;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:2px 8px;font-size:.65rem;font-weight:700;color:var(--green)">${discount}% OFF</span>
+      </div>
+      <div class="pc-name">${p.name}</div>
+      <div>
+        <span class="pc-price">₹${p.price.toLocaleString('en-IN')}</span>
+        <span class="pc-strike">₹${p.strike.toLocaleString('en-IN')}</span>
+      </div>
+      <div class="pc-sub">/ year · incl. 18% GST · Base ₹${base.toLocaleString('en-IN')}</div>
+    </div>
+    <div class="pc-stats">
+      <div class="pc-stat"><div class="sv">${p.sold}</div><div class="sl">Sold (MTD)</div></div>
+      <div class="pc-stat"><div class="sv">₹${(p.rev/100000).toFixed(1)}L</div><div class="sl">Revenue</div></div>
+      <div class="pc-stat"><div class="sv">${p.commission}%</div><div class="sl">Commission</div></div>
+    </div>
+    <div class="pc-body">
+      <ul class="pc-features">
+        ${p.features.map(f=>`<li><i class="fas fa-check"></i>${f}</li>`).join('')}
+      </ul>
+      <div class="pc-actions">
+        <button class="pca" onclick="alert('Edit plan in Admin → Passport Products')"><i class="fas fa-edit"></i> Edit</button>
+        <button class="pca primary" onclick="window.location.href='passport-kyc.html'"><i class="fas fa-plus"></i> Sell</button>
+      </div>
+    </div>
+  </div>`;
+}).join('');
+
+document.getElementById('gstTable').innerHTML=PLANS.map(p=>{
+  const base=Math.round(p.price/1.18);
+  const gst=p.price-base;
+  const comm=Math.round(p.price*p.commission/100);
+  const net=p.price-gst-comm;
+  return `<tr>
+    <td style="font-weight:800">${p.name}</td>
+    <td>₹${p.strike.toLocaleString('en-IN')}</td>
+    <td>₹${base.toLocaleString('en-IN')}</td>
+    <td style="color:var(--muted)">₹${gst.toLocaleString('en-IN')}</td>
+    <td style="font-weight:800;color:var(--gold)">₹${p.price.toLocaleString('en-IN')}</td>
+    <td style="color:var(--green)">₹${comm.toLocaleString('en-IN')} (${p.commission}%)</td>
+    <td style="font-weight:800">₹${net.toLocaleString('en-IN')}</td>
+  </tr>`;
+}).join('');
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
