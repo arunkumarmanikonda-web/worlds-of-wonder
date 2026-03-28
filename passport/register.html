@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get WOW Passport — Register & KYC</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+
+/* Header */
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:16px 32px;display:flex;justify-content:space-between;align-items:center}
+.header-logo{display:flex;align-items:center;gap:12px}
+.header-logo .wow{font-size:22px;font-weight:800;color:#FFD700;letter-spacing:2px}
+.header-logo .divider{width:1px;height:28px;background:rgba(255,255,255,0.3)}
+.header-logo .park{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.3}
+.header-right{font-size:12px;color:rgba(255,255,255,0.5)}
+.header-right a{color:#FFD700;text-decoration:none;font-weight:600}
+
+/* Progress stepper */
+.stepper{background:#fff;padding:20px 32px;border-bottom:1px solid #e8ecf0;display:flex;justify-content:center}
+.steps{display:flex;align-items:center;gap:0}
+.step{display:flex;align-items:center;gap:8px}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid #e8ecf0;color:#aaa;transition:all 0.3s;flex-shrink:0}
+.step-circle.done{background:#22c55e;border-color:#22c55e;color:#fff}
+.step-circle.active{background:#1a6fc4;border-color:#1a6fc4;color:#fff;box-shadow:0 0 0 4px rgba(26,111,196,0.15)}
+.step-label{font-size:11px;font-weight:600;color:#aaa;white-space:nowrap}
+.step-label.active{color:#1a6fc4}
+.step-label.done{color:#22c55e}
+.step-connector{width:40px;height:2px;background:#e8ecf0;margin:0 4px}
+.step-connector.done{background:#22c55e}
+
+/* Main layout */
+.main{max-width:1100px;margin:0 auto;padding:32px;display:grid;grid-template-columns:1fr 320px;gap:24px}
+@media(max-width:900px){.main{grid-template-columns:1fr}}
+
+/* Form card */
+.form-card{background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.form-card-header{padding:24px 28px;border-bottom:1px solid #f0f2f5}
+.form-card-header h2{font-size:20px;font-weight:700}
+.form-card-header p{font-size:13px;color:#888;margin-top:3px}
+.form-card-body{padding:28px}
+
+.step-panel{display:none}
+.step-panel.active{display:block}
+
+/* Tier Selection */
+.tier-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tier-option{border:2px solid #e8ecf0;border-radius:14px;padding:18px;cursor:pointer;transition:all 0.2s;position:relative}
+.tier-option:hover{border-color:#aaa;transform:translateY(-2px)}
+.tier-option.selected{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.1)}
+.tier-option.explore.selected{border-color:#1a6fc4;background:#f0f7ff}
+.tier-option.together.selected{border-color:#6c757d;background:#f8f9fa}
+.tier-option.legacy.selected{border-color:#c0392b;background:#fff5f5}
+.tier-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.tier-option.explore .tier-badge{background:#dbeafe;color:#1d4ed8}
+.tier-option.together .tier-badge{background:#f1f5f9;color:#475569}
+.tier-option.legacy .tier-badge{background:#fee2e2;color:#dc2626}
+.tier-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.tier-price-big{font-size:24px;font-weight:800;margin:8px 0 2px}
+.tier-validity{font-size:11px;color:#888;margin-bottom:10px}
+.tier-perks{list-style:none;font-size:11px;color:#555;line-height:1.6}
+.tier-perks li::before{content:'✓ ';color:#22c55e;font-weight:700}
+.popular-badge{position:absolute;top:-10px;right:12px;background:#FFD700;color:#1a1a2e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px}
+.selected-check{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:12px}
+.tier-option.explore.selected .selected-check{display:flex;background:#1a6fc4}
+.tier-option.together.selected .selected-check{display:flex;background:#6c757d}
+.tier-option.legacy.selected .selected-check{display:flex;background:#c0392b}
+
+/* Form fields */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:18px}
+.form-label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:5px}
+.form-label .req{color:#ef4444}
+.form-input{width:100%;padding:11px 14px;border:1px solid #e8ecf0;border-radius:10px;font-size:14px;color:#1a1a2e;font-family:'Inter',sans-serif;transition:all 0.2s;outline:none}
+.form-input:focus{border-color:#1a6fc4;box-shadow:0 0 0 3px rgba(26,111,196,0.12)}
+.form-input.err{border-color:#ef4444}
+
+/* Photo upload */
+.photo-upload-area{border:2px dashed #e8ecf0;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafbfc}
+.photo-upload-area:hover{border-color:#1a6fc4;background:#f0f7ff}
+.photo-upload-area.has-photo{border-color:#22c55e;background:#f0fdf4}
+.photo-preview{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #22c55e;display:none;margin:0 auto 10px}
+.upload-icon{font-size:36px;color:#ddd;margin-bottom:8px}
+.upload-text{font-size:13px;color:#888}
+.upload-sub{font-size:11px;color:#aaa;margin-top:4px}
+
+/* Document upload row */
+.doc-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.doc-upload{border:1px solid #e8ecf0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:12px;color:#888}
+.doc-upload:hover{border-color:#1a6fc4;color:#1a6fc4;background:#f0f7ff}
+.doc-upload.uploaded{border-color:#22c55e;color:#22c55e;background:#f0fdf4}
+.doc-upload i{font-size:24px;display:block;margin-bottom:6px}
+
+/* Member rows (Together/Legacy) */
+.member-section{border:1px solid #e8ecf0;border-radius:12px;padding:20px;margin-bottom:14px}
+.member-section h4{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* PIN setup */
+.pin-grid{display:flex;gap:12px;justify-content:center;margin:12px 0}
+.pin-input{width:58px;height:58px;border:2px solid #e8ecf0;border-radius:12px;text-align:center;font-size:24px;font-weight:700;color:#1a1a2e;outline:none;transition:all 0.2s;font-family:'Inter',sans-serif}
+.pin-input:focus{border-color:#1a6fc4;box-shadow:0 0 0 3px rgba(26,111,196,0.12)}
+.pin-strength{height:4px;border-radius:4px;margin-top:8px;transition:all 0.3s}
+
+/* Payment section */
+.payment-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.payment-option{border:2px solid #e8ecf0;border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;font-size:12px;font-weight:600;color:#555}
+.payment-option:hover{border-color:#1a6fc4;color:#1a6fc4}
+.payment-option.selected{border-color:#1a6fc4;background:#f0f7ff;color:#1a6fc4}
+.payment-option i{font-size:22px;display:block;margin-bottom:6px}
+.payment-summary{background:#f8fafc;border-radius:12px;padding:18px;margin-bottom:20px}
+.pay-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #e8ecf0}
+.pay-row:last-child{border-bottom:none;font-weight:700;font-size:15px;color:#1a1a2e}
+.pay-label{color:#666}
+
+/* Success screen */
+.success-screen{text-align:center;padding:40px 20px;display:none}
+.success-icon{width:80px;height:80px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;animation:pop 0.5s ease}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.success-title{font-size:26px;font-weight:800;color:#1a1a2e;margin-bottom:8px}
+.success-sub{font-size:14px;color:#666;margin-bottom:24px;line-height:1.6}
+.passport-id-display{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#FFD700;padding:16px 28px;border-radius:12px;font-size:20px;font-weight:800;letter-spacing:3px;display:inline-block;margin-bottom:24px;font-family:monospace}
+
+/* Sidebar */
+.sidebar-card{background:#fff;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:20px}
+.sidebar-card-header{padding:16px 20px;border-bottom:1px solid #f0f2f5}
+.sidebar-card-header h3{font-size:14px;font-weight:700}
+.sidebar-body{padding:16px 20px}
+.selected-plan{padding:16px;border-radius:12px;margin-bottom:16px;color:#fff;min-height:80px}
+.selected-plan.explore{background:linear-gradient(135deg,#1a6fc4,#2980b9)}
+.selected-plan.together{background:linear-gradient(135deg,#6c757d,#495057)}
+.selected-plan.legacy{background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.selected-plan-name{font-size:15px;font-weight:800}
+.selected-plan-price{font-size:22px;font-weight:800;margin-top:4px}
+.selected-plan-detail{font-size:11px;opacity:0.8;margin-top:2px}
+.summary-item{display:flex;justify-content:space-between;font-size:12px;padding:8px 0;border-bottom:1px solid #f0f2f5}
+.summary-item:last-child{border-bottom:none}
+.summary-label{color:#888}
+.summary-value{font-weight:600}
+.trust-badges{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.trust-badge{display:flex;align-items:center;gap:8px;font-size:11px;color:#555}
+.trust-badge i{color:#22c55e;width:14px}
+
+/* Nav buttons */
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:20px;border-top:1px solid #f0f2f5}
+.btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,#1a6fc4,#2980b9);color:#fff}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 6px 18px rgba(26,111,196,0.3)}
+.btn-secondary{background:#f0f2f5;color:#555;border:1px solid #e8ecf0}
+.btn-secondary:hover{background:#e8ecf0}
+.btn-pay{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:14px 32px;font-size:15px}
+.btn-pay:hover{opacity:0.9;box-shadow:0 6px 18px rgba(34,197,94,0.3)}
+.btn-full{width:100%;justify-content:center}
+
+/* Alert */
+.alert{padding:12px 14px;border-radius:8px;font-size:12px;margin-bottom:16px;display:none}
+.alert.error{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    <div class="wow">WOW</div>
+    <div class="divider"></div>
+    <div class="park">Worlds of Wonder<br>Noida · Get Your Passport</div>
+  </div>
+  <div class="header-right">Already have a passport? <a href="login.html">Login →</a></div>
+</div>
+
+<!-- Stepper -->
+<div class="stepper">
+  <div class="steps">
+    <div class="step">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label active" id="sl1">Choose Plan</div>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="step">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label" id="sl2">Your Details</div>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="step">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label" id="sl3">KYC & Photo</div>
+    </div>
+    <div class="step-connector" id="conn3"></div>
+    <div class="step">
+      <div class="step-circle" id="sc4">4</div>
+      <div class="step-label" id="sl4">Set PIN</div>
+    </div>
+    <div class="step-connector" id="conn4"></div>
+    <div class="step">
+      <div class="step-circle" id="sc5">5</div>
+      <div class="step-label" id="sl5">Payment</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Form Card -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <h2 id="stepTitle">Choose Your WOW Passport</h2>
+      <p id="stepSub">Select the plan that's right for you — Explore, Together, or Legacy</p>
+    </div>
+    <div class="form-card-body">
+      <div class="alert error" id="stepAlert"></div>
+
+      <!-- Step 1: Choose Plan -->
+      <div class="step-panel active" id="step1">
+        <div class="tier-select-grid">
+          <!-- Explore -->
+          <div class="tier-option explore" id="opt-explore" onclick="selectTier('explore')">
+            <div class="selected-check"><i class="fas fa-check"></i></div>
+            <div class="tier-badge">🔵 Entry</div>
+            <div class="tier-name">WOW Explore Pass</div>
+            <div class="tier-price-big">₹2,499</div>
+            <div class="tier-validity">6-month validity · 4 visits · 1 person</div>
+            <ul class="tier-perks">
+              <li>Amusement + Water Park</li>
+              <li>Weekday priority entry</li>
+              <li>10% F&B discount</li>
+              <li>2 photo coupons</li>
+            </ul>
+          </div>
+          <!-- Together -->
+          <div class="tier-option together" id="opt-together" onclick="selectTier('together')" style="position:relative">
+            <div class="popular-badge">⭐ Popular</div>
+            <div class="selected-check"><i class="fas fa-check"></i></div>
+            <div class="tier-badge">⚪ Duo</div>
+            <div class="tier-name">WOW Together Pass</div>
+            <div class="tier-price-big">₹4,999</div>
+            <div class="tier-validity">6–9 month validity · 4 visits · 1A+1C</div>
+            <ul class="tier-perks">
+              <li>All-day park access</li>
+              <li>1 locker per visit</li>
+              <li>15% discount</li>
+              <li>3 photos + Birthday benefit</li>
+            </ul>
+          </div>
+          <!-- Legacy -->
+          <div class="tier-option legacy" id="opt-legacy" onclick="selectTier('legacy')">
+            <div class="selected-check"><i class="fas fa-check"></i></div>
+            <div class="tier-badge">🔴 Premium</div>
+            <div class="tier-name">WOW Legacy Pass</div>
+            <div class="tier-price-big">₹9,999</div>
+            <div class="tier-validity">12-month validity · 8 visits · 2A+2C</div>
+            <ul class="tier-perks">
+              <li>VIP fast-track entry</li>
+              <li>Free lockers + costumes</li>
+              <li>20% discount</li>
+              <li>4 photos + 2–4 guest passes</li>
+            </ul>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <div></div>
+          <button class="btn btn-primary" onclick="goTo(2)">Next: Your Details <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Personal Details -->
+      <div class="step-panel" id="step2">
+        <div class="member-section">
+          <h4><span style="background:#1a6fc4;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">1</span> Primary Holder (Adult)</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">First Name <span class="req">*</span></label>
+              <input type="text" class="form-input" id="fname" placeholder="Rajesh">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name <span class="req">*</span></label>
+              <input type="text" class="form-input" id="lname" placeholder="Sharma">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Date of Birth <span class="req">*</span></label>
+              <input type="date" class="form-input" id="dob">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select class="form-input" id="gender">
+                <option value="">Select</option>
+                <option>Male</option><option>Female</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Mobile Number <span class="req">*</span></label>
+              <input type="tel" class="form-input" id="mobile" placeholder="10-digit number" maxlength="10">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" id="email" placeholder="you@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-input" id="address" placeholder="House/Flat, Street, City, PIN">
+          </div>
+        </div>
+
+        <!-- Additional members for Together/Legacy -->
+        <div id="additionalMembers"></div>
+
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" onclick="goTo(1)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn btn-primary" onclick="goTo(3)">Next: KYC & Photo <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3: KYC & Photo -->
+      <div class="step-panel" id="step3">
+        <div class="form-row" style="margin-bottom:24px">
+          <div>
+            <div class="form-label" style="margin-bottom:10px">Passport Photo <span class="req">*</span></div>
+            <div class="photo-upload-area" id="photoArea" onclick="document.getElementById('photoFile').click()">
+              <img class="photo-preview" id="photoPreview" src="">
+              <div id="photoPlaceholder">
+                <div class="upload-icon"><i class="fas fa-camera"></i></div>
+                <div class="upload-text">Upload photo or take selfie</div>
+                <div class="upload-sub">Passport-style · Clear face · White background preferred</div>
+              </div>
+            </div>
+            <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:10px">ID Documents <span class="req">*</span></div>
+            <div class="doc-row">
+              <div class="doc-upload" id="doc-aadhaar" onclick="triggerDocUpload('aadhaar')">
+                <i class="fas fa-id-card"></i>
+                <div>Aadhaar Card</div>
+                <div style="font-size:9px;margin-top:3px;color:#aaa">Front side</div>
+              </div>
+              <div class="doc-upload" id="doc-aadhaarb" onclick="triggerDocUpload('aadhaarb')">
+                <i class="fas fa-id-card"></i>
+                <div>Aadhaar Card</div>
+                <div style="font-size:9px;margin-top:3px;color:#aaa">Back side</div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-upload" id="doc-pan" onclick="triggerDocUpload('pan')">
+                <i class="fas fa-file-alt"></i>
+                <div>PAN Card</div>
+                <div style="font-size:9px;margin-top:3px;color:#aaa">Optional</div>
+              </div>
+              <div class="doc-upload" id="doc-dob" onclick="triggerDocUpload('dob')">
+                <i class="fas fa-file-certificate"></i>
+                <div>Age Proof</div>
+                <div style="font-size:9px;margin-top:3px;color:#aaa">For child members</div>
+              </div>
+            </div>
+            <input type="file" id="docFile" style="display:none" onchange="markDocUploaded()">
+          </div>
+        </div>
+
+        <div style="background:#f0f9ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:12px;color:#1e40af;margin-bottom:20px">
+          <i class="fas fa-shield-check" style="margin-right:6px"></i>
+          <strong>Privacy guarantee:</strong> Your documents are encrypted and stored securely. They are only used for passport verification and never shared with third parties.
+        </div>
+
+        <!-- Aadhaar number field -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Aadhaar Number <span class="req">*</span></label>
+            <input type="text" class="form-input" id="aadhaar" placeholder="XXXX XXXX XXXX" maxlength="14">
+          </div>
+          <div class="form-group">
+            <label class="form-label">PAN Number (optional)</label>
+            <input type="text" class="form-input" id="pan" placeholder="ABCDE1234F" style="text-transform:uppercase" maxlength="10">
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" onclick="goTo(2)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn btn-primary" onclick="goTo(4)">Next: Set PIN <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 4: PIN Setup -->
+      <div class="step-panel" id="step4">
+        <div style="text-align:center;margin-bottom:28px">
+          <div style="font-size:40px;margin-bottom:10px">🔐</div>
+          <div style="font-size:18px;font-weight:700;color:#1a1a2e;margin-bottom:4px">Set Your 4-Digit PIN</div>
+          <div style="font-size:13px;color:#888">This PIN protects your passport. You'll use it to log in with your Passport ID.</div>
+        </div>
+        <div>
+          <div class="form-label" style="text-align:center;margin-bottom:8px">Create PIN</div>
+          <div class="pin-grid">
+            <input type="password" class="pin-input" maxlength="1" id="pin1" oninput="pinNext(this,'pin2')">
+            <input type="password" class="pin-input" maxlength="1" id="pin2" oninput="pinNext(this,'pin3')" onkeydown="pinBack(event,'pin1')">
+            <input type="password" class="pin-input" maxlength="1" id="pin3" oninput="pinNext(this,'pin4')" onkeydown="pinBack(event,'pin2')">
+            <input type="password" class="pin-input" maxlength="1" id="pin4" onkeydown="pinBack(event,'pin3')">
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <div class="form-label" style="text-align:center;margin-bottom:8px">Confirm PIN</div>
+          <div class="pin-grid">
+            <input type="password" class="pin-input" maxlength="1" id="cpin1" oninput="pinNext(this,'cpin2')">
+            <input type="password" class="pin-input" maxlength="1" id="cpin2" oninput="pinNext(this,'cpin3')" onkeydown="pinBack(event,'cpin1')">
+            <input type="password" class="pin-input" maxlength="1" id="cpin3" oninput="pinNext(this,'cpin4')" onkeydown="pinBack(event,'cpin2')">
+            <input type="password" class="pin-input" maxlength="1" id="cpin4" onkeydown="pinBack(event,'cpin3')">
+          </div>
+          <div id="pinMatch" style="text-align:center;font-size:12px;margin-top:8px;color:#aaa">Enter PIN in both fields to confirm</div>
+        </div>
+        <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:14px;font-size:12px;color:#92400e;margin-top:20px">
+          <i class="fas fa-exclamation-triangle" style="margin-right:6px"></i>
+          <strong>Remember your PIN!</strong> You'll need it every time you log in with your Passport ID. PIN cannot be recovered — only reset with OTP verification.
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" onclick="goTo(3)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn btn-primary" onclick="goTo(5)">Proceed to Payment <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 5: Payment -->
+      <div class="step-panel" id="step5">
+        <div class="payment-summary">
+          <div class="pay-row"><span class="pay-label" id="planLabel">WOW Explore Pass</span><span id="planPrice">₹2,499</span></div>
+          <div class="pay-row"><span class="pay-label">GST (18%)</span><span id="gstAmount">₹450</span></div>
+          <div class="pay-row"><span class="pay-label">Convenience Fee</span><span>₹0</span></div>
+          <div class="pay-row"><span>Total Payable</span><span id="totalAmount" style="color:#22c55e">₹2,949</span></div>
+        </div>
+
+        <div class="form-label" style="margin-bottom:10px">Choose Payment Method</div>
+        <div class="payment-options">
+          <div class="payment-option selected" id="pm-upi" onclick="selectPayment('upi')">
+            <i class="fas fa-mobile-alt"></i>UPI / GPay
+          </div>
+          <div class="payment-option" id="pm-card" onclick="selectPayment('card')">
+            <i class="fas fa-credit-card"></i>Debit/Credit Card
+          </div>
+          <div class="payment-option" id="pm-netbanking" onclick="selectPayment('netbanking')">
+            <i class="fas fa-university"></i>Net Banking
+          </div>
+        </div>
+
+        <!-- UPI -->
+        <div id="upi-form">
+          <div class="form-group">
+            <label class="form-label">UPI ID</label>
+            <div style="display:flex;gap:10px">
+              <input type="text" class="form-input" id="upiId" placeholder="name@upi or mobile@paytm">
+              <button class="btn btn-secondary" style="white-space:nowrap" onclick="verifyUPI()">Verify</button>
+            </div>
+            <div id="upiStatus" style="font-size:11px;margin-top:4px;color:#aaa"></div>
+          </div>
+        </div>
+
+        <!-- Card -->
+        <div id="card-form" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input type="text" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expiry (MM/YY)</label>
+              <input type="text" class="form-input" placeholder="12/28" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input type="password" class="form-input" placeholder="•••" maxlength="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Name on Card</label>
+            <input type="text" class="form-input" placeholder="As printed on card">
+          </div>
+        </div>
+
+        <!-- Net Banking -->
+        <div id="netbanking-form" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Select Bank</label>
+            <select class="form-input">
+              <option>HDFC Bank</option><option>ICICI Bank</option><option>SBI</option>
+              <option>Axis Bank</option><option>Kotak Bank</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;font-size:12px;color:#166534;margin-bottom:20px">
+          <i class="fas fa-lock" style="margin-right:6px"></i>
+          <strong>Secure payment</strong> powered by Razorpay · 256-bit SSL encrypted · PCI-DSS compliant
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn btn-secondary" onclick="goTo(4)"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn btn-pay btn-full" onclick="processPayment()">
+            <span id="payBtnText"><i class="fas fa-lock" style="margin-right:6px"></i> Pay <span id="payAmountBtn">₹2,949</span></span>
+            <span id="paySpinner" style="display:none">Processing…</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Success Screen -->
+      <div class="success-screen" id="successScreen">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">Passport Activated!</div>
+        <div class="success-sub">Your WOW Passport is ready. Welcome to the WOW family!</div>
+        <div class="passport-id-display" id="generatedPassportId">WOW-EXP-2025-00001</div>
+        <div id="passportQr" style="margin:0 auto 20px;width:140px"></div>
+        <p style="font-size:13px;color:#888;margin-bottom:24px">Scan the QR code at the gate for entry. Your passport details and vouchers have been sent to your mobile number.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="my-passport.html" class="btn btn-primary">View My Passport →</a>
+          <a href="../index.html" class="btn btn-secondary">Back to WOW</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div>
+    <div class="sidebar-card">
+      <div class="sidebar-card-header">
+        <h3>📋 Your Selection</h3>
+      </div>
+      <div class="sidebar-body">
+        <div class="selected-plan explore" id="sidebarPlan">
+          <div class="selected-plan-name" id="sidebarPlanName">No plan selected</div>
+          <div class="selected-plan-price" id="sidebarPlanPrice">—</div>
+          <div class="selected-plan-detail" id="sidebarPlanDetail">Select a plan to continue</div>
+        </div>
+        <div class="summary-item"><span class="summary-label">Visitors</span><span class="summary-value" id="sidebarVisitors">—</span></div>
+        <div class="summary-item"><span class="summary-label">Validity</span><span class="summary-value" id="sidebarValidity">—</span></div>
+        <div class="summary-item"><span class="summary-label">Visits Included</span><span class="summary-value" id="sidebarVisits">—</span></div>
+        <div class="summary-item"><span class="summary-label">F&B Discount</span><span class="summary-value" id="sidebarDiscount">—</span></div>
+        <div class="summary-item"><span class="summary-label">Step</span><span class="summary-value" id="sidebarStep">1 of 5</span></div>
+        <div class="trust-badges">
+          <div class="trust-badge"><i class="fas fa-shield-alt"></i> KYC secured & encrypted</div>
+          <div class="trust-badge"><i class="fas fa-redo"></i> 7-day cancellation policy</div>
+          <div class="trust-badge"><i class="fas fa-qrcode"></i> Instant digital passport</div>
+          <div class="trust-badge"><i class="fas fa-headset"></i> 24×7 WOW support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const plans = {
+  explore: { name:'WOW Explore Pass', price:2499, validity:'6 months', visits:'4 visits', adults:1, children:0, discount:'10%', tier:'explore', prefix:'EXP' },
+  together:{ name:'WOW Together Pass', price:4999, validity:'6–9 months', visits:'4 visits', adults:1, children:1, discount:'15%', tier:'together', prefix:'TOG' },
+  legacy:  { name:'WOW Legacy Pass', price:9999, validity:'12 months', visits:'8 visits', adults:2, children:2, discount:'20%', tier:'legacy', prefix:'LEG' }
+};
+let selectedPlan = null;
+let currentStep = 1;
+let currentDocTarget = '';
+
+function selectTier(tier) {
+  document.querySelectorAll('.tier-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-'+tier).classList.add('selected');
+  selectedPlan = plans[tier];
+  updateSidebar();
+  updateAdditionalMembers();
+}
+
+function updateSidebar() {
+  if (!selectedPlan) return;
+  const p = selectedPlan;
+  const sc = document.getElementById('sidebarPlan');
+  sc.className = 'selected-plan '+p.tier;
+  document.getElementById('sidebarPlanName').textContent = p.name;
+  document.getElementById('sidebarPlanPrice').textContent = '₹'+p.price.toLocaleString('en-IN');
+  document.getElementById('sidebarPlanDetail').textContent = p.visits+' · '+p.validity;
+  document.getElementById('sidebarVisitors').textContent = p.adults+'A'+(p.children?'+'+p.children+'C':'');
+  document.getElementById('sidebarValidity').textContent = p.validity;
+  document.getElementById('sidebarVisits').textContent = p.visits;
+  document.getElementById('sidebarDiscount').textContent = p.discount+' F&B';
+  updatePaymentSummary();
+}
+
+function updateAdditionalMembers() {
+  if (!selectedPlan) return;
+  const p = selectedPlan;
+  const container = document.getElementById('additionalMembers');
+  let html = '';
+  if (p.tier==='together') {
+    html = `<div class="member-section">
+      <h4><span style="background:#6c757d;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">2</span> Child Member</h4>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Child's Name <span class="req">*</span></label><input type="text" class="form-input" placeholder="Child's full name"></div>
+        <div class="form-group"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+      </div>
+    </div>`;
+  } else if (p.tier==='legacy') {
+    html = `<div class="member-section">
+      <h4><span style="background:#c0392b;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">2</span> Second Adult</h4>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name <span class="req">*</span></label><input type="text" class="form-input" placeholder="Second adult's name"></div>
+        <div class="form-group"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+      </div>
+    </div>
+    <div class="member-section">
+      <h4><span style="background:#c0392b;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">3</span> Child 1</h4>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name <span class="req">*</span></label><input type="text" class="form-input" placeholder="Child's name"></div>
+        <div class="form-group"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+      </div>
+    </div>
+    <div class="member-section">
+      <h4><span style="background:#c0392b;color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px">4</span> Child 2</h4>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Name <span class="req">*</span></label><input type="text" class="form-input" placeholder="Child's name"></div>
+        <div class="form-group"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function updatePaymentSummary() {
+  if (!selectedPlan) return;
+  const price = selectedPlan.price;
+  const gst = Math.round(price * 0.18);
+  const total = price + gst;
+  if(document.getElementById('planLabel')){
+    document.getElementById('planLabel').textContent = selectedPlan.name;
+    document.getElementById('planPrice').textContent = '₹'+price.toLocaleString('en-IN');
+    document.getElementById('gstAmount').textContent = '₹'+gst.toLocaleString('en-IN');
+    document.getElementById('totalAmount').textContent = '₹'+total.toLocaleString('en-IN');
+    document.getElementById('payAmountBtn').textContent = '₹'+total.toLocaleString('en-IN');
+    if(document.getElementById('payBtnText')) document.getElementById('payBtnText').querySelector('span:last-child').textContent='₹'+total.toLocaleString('en-IN');
+  }
+}
+
+function goTo(step) {
+  clearAlert();
+  if (step===1 && currentStep>1) {/*allow back*/}
+  else if (step===2) {
+    if (!selectedPlan) { showAlert('Please select a passport plan to continue.'); return; }
+  } else if (step===3) {
+    const fn=document.getElementById('fname').value.trim();
+    const ln=document.getElementById('lname').value.trim();
+    const mob=document.getElementById('mobile').value.trim();
+    const dob=document.getElementById('dob').value;
+    if(!fn||!ln||!mob||!dob){showAlert('Please fill in all required fields (Name, Mobile, Date of Birth).');return;}
+    if(!/^\d{10}$/.test(mob)){showAlert('Please enter a valid 10-digit mobile number.');return;}
+  } else if (step===4) {
+    // photo check
+  } else if (step===5) {
+    const p1=['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
+    const p2=['cpin1','cpin2','cpin3','cpin4'].map(id=>document.getElementById(id).value).join('');
+    if(p1.length<4){showAlert('Please set a 4-digit PIN.');return;}
+    if(p1!==p2){showAlert('PINs do not match. Please re-enter.');return;}
+    updatePaymentSummary();
+  }
+  
+  currentStep = step;
+  document.querySelectorAll('.step-panel').forEach((p,i)=>{
+    p.classList.toggle('active', i+1===step);
+  });
+  document.getElementById('sidebarStep').textContent = step+' of 5';
+  updateStepper(step);
+  updateStepHeader(step);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateStepper(step){
+  for(let i=1;i<=5;i++){
+    const sc=document.getElementById('sc'+i);
+    const sl=document.getElementById('sl'+i);
+    if(i<step){
+      sc.className='step-circle done';sc.innerHTML='<i class="fas fa-check"></i>';
+      sl.className='step-label done';
+    } else if(i===step){
+      sc.className='step-circle active';sc.textContent=i;
+      sl.className='step-label active';
+    } else {
+      sc.className='step-circle';sc.textContent=i;
+      sl.className='step-label';
+    }
+    if(i<5){
+      const conn=document.getElementById('conn'+i);
+      if(conn) conn.className='step-connector'+(i<step?' done':'');
+    }
+  }
+}
+
+const stepInfo=[
+  {title:'Choose Your WOW Passport',sub:'Select the plan that\'s right for you'},
+  {title:'Your Personal Details',sub:'Tell us about the passport holders'},
+  {title:'KYC Verification & Photo',sub:'Upload your photo and identity documents'},
+  {title:'Set Your Login PIN',sub:'Create a secure 4-digit PIN for your passport'},
+  {title:'Payment',sub:'Complete your passport purchase securely'}
+];
+function updateStepHeader(step){
+  document.getElementById('stepTitle').textContent=stepInfo[step-1].title;
+  document.getElementById('stepSub').textContent=stepInfo[step-1].sub;
+}
+
+function showAlert(msg){
+  const el=document.getElementById('stepAlert');
+  el.textContent=msg;el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function clearAlert(){document.getElementById('stepAlert').style.display='none';}
+
+// Photo preview
+function previewPhoto(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('photoPreview');
+    img.src=e.target.result;img.style.display='block';
+    document.getElementById('photoPlaceholder').style.display='none';
+    document.getElementById('photoArea').classList.add('has-photo');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Doc upload
+function triggerDocUpload(docId){
+  currentDocTarget=docId;
+  document.getElementById('docFile').click();
+}
+function markDocUploaded(){
+  const el=document.getElementById('doc-'+currentDocTarget);
+  if(el){el.classList.add('uploaded');el.querySelector('div:first-of-type').textContent+=' ✓';}
+}
+
+// PIN navigation
+function pinNext(el,nextId){if(el.value&&nextId)document.getElementById(nextId).focus();}
+function pinBack(e,prevId){if(e.key==='Backspace'&&!e.target.value&&prevId)document.getElementById(prevId).focus();}
+
+// Check PIN match
+['cpin1','cpin2','cpin3','cpin4'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    const p1=['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
+    const p2=['cpin1','cpin2','cpin3','cpin4'].map(id=>document.getElementById(id).value).join('');
+    const el=document.getElementById('pinMatch');
+    if(p2.length===4){
+      if(p1===p2){el.textContent='✓ PINs match';el.style.color='#22c55e';}
+      else{el.textContent='✗ PINs do not match';el.style.color='#ef4444';}
+    } else {el.textContent='Enter PIN in both fields to confirm';el.style.color='#aaa';}
+  });
+});
+
+// Payment
+function selectPayment(method){
+  document.querySelectorAll('.payment-option').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('pm-'+method).classList.add('selected');
+  document.getElementById('upi-form').style.display=method==='upi'?'block':'none';
+  document.getElementById('card-form').style.display=method==='card'?'block':'none';
+  document.getElementById('netbanking-form').style.display=method==='netbanking'?'block':'none';
+}
+
+function verifyUPI(){
+  const upi=document.getElementById('upiId').value.trim();
+  const el=document.getElementById('upiStatus');
+  if(!upi){el.textContent='Please enter UPI ID';el.style.color='#ef4444';return;}
+  el.textContent='Verifying…';el.style.color='#888';
+  setTimeout(()=>{el.textContent='✓ UPI ID verified';el.style.color='#22c55e';},1200);
+}
+
+async function processPayment(){
+  clearAlert();
+  document.getElementById('payBtnText').style.display='none';
+  document.getElementById('paySpinner').style.display='inline';
+  
+  try {
+    // Generate passport ID
+    const plan = selectedPlan || plans.explore;
+    const seq = String(Math.floor(Math.random()*90000)+10000);
+    const year = new Date().getFullYear();
+    const passportId = `WOW-${plan.prefix}-${year}-${seq}`;
+    
+    // Create passport holder record
+    const holderName = (document.getElementById('fname').value+' '+document.getElementById('lname').value).trim() || 'Demo User';
+    const pin = ['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('') || '0000';
+    const mobile = document.getElementById('mobile').value || '9999999999';
+    const email = document.getElementById('email').value || '';
+    const dob = document.getElementById('dob').value || '';
+    
+    const issueDate = new Date().toISOString().split('T')[0];
+    const expiryDate = new Date(Date.now() + plan.validity_days_calc*24*60*60*1000);
+    const expiryStr = expiryDate.toISOString().split('T')[0];
+    
+    await fetch('../tables/passport_holders', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        passportId, planCode: plan.prefix, planName: plan.name,
+        holderName, dob, mobile, email,
+        loginPin: pin, issueDate, expiryDate: expiryStr,
+        entriesUsed: 0, entriesAllowed: parseInt(plan.visits),
+        status: 'active', amountPaid: plan.price,
+        paymentMode: 'UPI'
+      })
+    });
+
+    setTimeout(()=>{
+      document.getElementById('payBtnText').style.display='inline';
+      document.getElementById('paySpinner').style.display='none';
+      
+      // Hide steps, show success
+      document.querySelectorAll('.step-panel').forEach(p=>p.style.display='none');
+      document.getElementById('stepTitle').textContent='🎉 Passport Created!';
+      document.getElementById('stepSub').textContent='Your WOW Passport is ready to use';
+      
+      document.getElementById('generatedPassportId').textContent = passportId;
+      document.getElementById('successScreen').style.display='block';
+      
+      // Generate QR
+      QRCode.toCanvas(document.createElement('canvas'),passportId,{width:140},(err,canvas)=>{
+        if(!err) document.getElementById('passportQr').appendChild(canvas);
+      });
+      
+      // Store in session
+      sessionStorage.setItem('new_passport_id', passportId);
+      sessionStorage.setItem('new_passport_name', holderName);
+      
+      window.scrollTo({top:0,behavior:'smooth'});
+      updateStepper(6);
+    }, 2500);
+    
+  } catch(e) {
+    document.getElementById('payBtnText').style.display='inline';
+    document.getElementById('paySpinner').style.display='none';
+    showAlert('Payment processing error. Please try again.');
+  }
+}
+
+// Pre-select Explore on load
+selectTier('explore');
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
