@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales Dashboard — WOW Passport Sales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold-light:#F0D080;--gold-dark:#9A6F2A;--bg:#0a0a14;--sidebar:#0e0e22;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+    .sidebar{width:250px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+    .sidebar-brand{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .brand-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.95rem;color:#0a0a14;flex-shrink:0}
+    .brand-text .b1{font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:700;color:var(--gold)}
+    .brand-text .b2{font-size:.68rem;color:var(--muted)}
+    .sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+    .nav-section{padding:8px 16px 4px;font-size:.63rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--muted);font-size:.85rem;font-weight:600;position:relative}
+    .nav-item:hover,.nav-item.active{color:#fff;background:rgba(201,168,76,.08)}
+    .nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+    .nav-item.active i{color:var(--gold)}
+    .nav-item i{width:16px;text-align:center;font-size:.85rem}
+    .nav-badge{margin-left:auto;background:var(--gold);color:#0a0a14;border-radius:20px;padding:1px 7px;font-size:.66rem;font-weight:800}
+    .sidebar-agent{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .agent-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:#0a0a14;flex-shrink:0}
+    .agent-info .a-name{font-size:.82rem;font-weight:700;color:#fff}
+    .agent-info .a-role{font-size:.68rem;color:var(--muted)}
+    .sidebar-logout{margin-left:auto;cursor:pointer;color:var(--muted);background:none;border:none;font-size:.88rem;transition:color .2s}
+    .sidebar-logout:hover{color:var(--red)}
+    .main{margin-left:250px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar-left h1{font-size:1.1rem;font-weight:800}
+    .topbar-left p{font-size:.75rem;color:var(--muted)}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .tb-btn{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0a0a14;border:none;border-radius:10px;padding:8px 16px;font-size:.82rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;text-decoration:none}
+    .tb-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
+    .tb-btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+    .tb-btn.outline:hover{border-color:var(--gold);color:var(--gold)}
+    .content{padding:22px 24px;flex:1}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:transform .2s}
+    .stat-card:hover{transform:translateY(-2px)}
+    .stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:12px}
+    .stat-icon.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .stat-icon.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .stat-icon.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    .stat-icon.purple{background:rgba(168,85,247,.15);color:var(--purple)}
+    .stat-value{font-size:1.7rem;font-weight:900;font-family:'Poppins',sans-serif;line-height:1}
+    .stat-label{font-size:.75rem;color:var(--muted);margin-top:4px;font-weight:600}
+    .stat-change{margin-top:8px;font-size:.72rem;font-weight:700;display:flex;align-items:center;gap:4px}
+    .stat-change.up{color:var(--green)}
+    .stat-change.neutral{color:var(--muted)}
+    .target-strip{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+    .target-info{flex:1;min-width:200px}
+    .target-label{font-size:.78rem;color:var(--muted);font-weight:700;margin-bottom:6px}
+    .target-bar-wrap{background:#1a1a3e;border-radius:20px;height:10px;overflow:hidden;margin-bottom:4px}
+    .target-bar{height:100%;background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-light));border-radius:20px;transition:width 1s ease}
+    .target-text{font-size:.72rem;color:var(--muted)}
+    .target-cta{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:12px 18px;text-align:center;cursor:pointer;transition:all .2s;min-width:100px}
+    .target-cta:hover{background:rgba(201,168,76,.15)}
+    .target-cta .tc-val{font-size:1.2rem;font-weight:900;color:var(--gold)}
+    .target-cta .tc-label{font-size:.68rem;color:var(--muted)}
+    .target-cta.green-cta{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.25)}
+    .target-cta.green-cta .tc-val{color:var(--green)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+    .grid-3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+    .widget{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .widget-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .widget-head h3{font-size:.9rem;font-weight:700}
+    .widget-head a,.widget-head button{font-size:.75rem;color:var(--gold);text-decoration:none;background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+    .widget-body{padding:14px 18px}
+    .sales-table{width:100%;border-collapse:collapse}
+    .sales-table th{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:700}
+    .sales-table td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;vertical-align:middle}
+    .sales-table tr:last-child td{border-bottom:none}
+    .sales-table tr:hover td{background:rgba(255,255,255,.02)}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+    .badge.gold-b{background:rgba(201,168,76,.15);color:var(--gold)}
+    .badge.green-b{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.blue-b{background:rgba(59,130,246,.15);color:var(--blue)}
+    .badge.purple-b{background:rgba(168,85,247,.15);color:var(--purple)}
+    .badge.red-b{background:rgba(239,68,68,.15);color:var(--red)}
+    .lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .lb-row:last-child{border-bottom:none}
+    .lb-rank{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0}
+    .lb-rank.r1{background:var(--gold);color:#0a0a14}
+    .lb-rank.r2{background:#94a3b8;color:#0a0a14}
+    .lb-rank.r3{background:#c97c5c;color:#0a0a14}
+    .lb-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#0a0a14;flex-shrink:0}
+    .lb-name{flex:1}
+    .lb-name .ln{font-size:.82rem;font-weight:700}
+    .lb-name .lz{font-size:.68rem;color:var(--muted)}
+    .lb-val{font-size:.88rem;font-weight:800;color:var(--gold)}
+    .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .qa-btn{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
+    .qa-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08)}
+    .qa-btn i{font-size:1.2rem;color:var(--gold);display:block;margin-bottom:5px}
+    .qa-btn span{font-size:.74rem;color:var(--text);font-weight:600}
+    .chart-wrap{padding:14px 18px;height:200px;position:relative}
+    .notif-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .notif-item:last-child{border-bottom:none}
+    .notif-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:6px}
+    .notif-dot.gold{background:var(--gold)}
+    .notif-dot.green{background:var(--green)}
+    .notif-dot.blue{background:var(--blue)}
+    .notif-dot.red{background:var(--red)}
+    .notif-text{font-size:.8rem;line-height:1.4}
+    .notif-time{font-size:.7rem;color:var(--muted);margin-top:2px}
+    @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}.main{margin-left:0}.sidebar{display:none}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon"><i class="fas fa-passport"></i></div>
+    <div class="brand-text">
+      <div class="b1">WOW Passport Sales</div>
+      <div class="b2">Field Sales Portal</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Sales</div>
+    <a href="passport-dashboard.html" class="nav-item active"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="passport-kyc.html" class="nav-item"><i class="fas fa-user-plus"></i>New Passport Sale <span class="nav-badge">+</span></a>
+    <a href="#" class="nav-item"><i class="fas fa-list"></i>My Sales <span class="nav-badge" id="salesCountBadge">0</span></a>
+    <a href="#" class="nav-item"><i class="fas fa-qrcode"></i>Scan & Verify</a>
+    <div class="nav-section">Performance</div>
+    <a href="#" class="nav-item"><i class="fas fa-chart-line"></i>My Performance</a>
+    <a href="#" class="nav-item"><i class="fas fa-trophy"></i>Leaderboard</a>
+    <a href="#" class="nav-item"><i class="fas fa-coins"></i>My Incentives</a>
+    <div class="nav-section">ERP</div>
+    <a href="erp-dashboard.html" class="nav-item"><i class="fas fa-building"></i>Sales ERP</a>
+    <a href="erp-crm.html" class="nav-item"><i class="fas fa-users"></i>CRM / Leads</a>
+    <div class="nav-section">Support</div>
+    <a href="#" class="nav-item"><i class="fas fa-life-ring"></i>Help & Support</a>
+  </nav>
+  <div class="sidebar-agent">
+    <div class="agent-avatar" id="sidebarInitials">RS</div>
+    <div class="agent-info">
+      <div class="a-name" id="sidebarName">Agent</div>
+      <div class="a-role" id="sidebarRole">Field Agent</div>
+    </div>
+    <button class="sidebar-logout" onclick="logout()" title="Sign Out"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1 id="greetMsg">Welcome! 👋</h1>
+      <p id="dateStr"></p>
+    </div>
+    <div class="topbar-right">
+      <a href="erp-dashboard.html" class="tb-btn outline"><i class="fas fa-chart-bar"></i> ERP</a>
+      <a href="passport-kyc.html" class="tb-btn"><i class="fas fa-plus"></i> New Sale</a>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon gold"><i class="fas fa-passport"></i></div>
+        <div class="stat-value" id="statSold">0</div>
+        <div class="stat-label">Passports Sold Today</div>
+        <div class="stat-change up"><i class="fas fa-fire"></i> Keep going!</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-rupee-sign"></i></div>
+        <div class="stat-value" id="statRev">₹0</div>
+        <div class="stat-label">Revenue Today</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Total collection</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-bullseye"></i></div>
+        <div class="stat-value" id="statTarget">0%</div>
+        <div class="stat-label">Monthly Target</div>
+        <div class="stat-change neutral"><i class="fas fa-clock"></i> <span id="daysLeft">—</span> days remaining</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-trophy"></i></div>
+        <div class="stat-value" id="statRank">#—</div>
+        <div class="stat-label">Team Rank</div>
+        <div class="stat-change neutral"><i class="fas fa-users"></i> Out of <span id="teamSize">4</span> agents</div>
+      </div>
+    </div>
+
+    <div class="target-strip">
+      <div class="target-info">
+        <div class="target-label">Monthly Target Progress — <span id="targetMonth">March 2026</span></div>
+        <div class="target-bar-wrap"><div class="target-bar" id="targetBar" style="width:0%"></div></div>
+        <div class="target-text" id="targetText">Loading…</div>
+      </div>
+      <div class="target-cta" onclick="window.location.href='passport-kyc.html'">
+        <div class="tc-val" id="targetRemain">—</div>
+        <div class="tc-label">Still needed</div>
+      </div>
+      <div class="target-cta green-cta">
+        <div class="tc-val" id="incentiveEst">₹—</div>
+        <div class="tc-label">Est. Incentive</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="widget">
+        <div class="widget-head">
+          <h3><i class="fas fa-receipt" style="color:var(--gold);margin-right:6px"></i>Recent Sales</h3>
+          <a href="#">View All</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="sales-table">
+            <thead><tr><th>Customer</th><th>Plan</th><th>Amount</th><th>Mode</th><th>Status</th></tr></thead>
+            <tbody id="salesTbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No sales yet — <a href="passport-kyc.html" style="color:var(--gold)">Start your first sale</a></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="widget-head"><h3><i class="fas fa-trophy" style="color:var(--gold);margin-right:6px"></i>Team Leaderboard</h3><span style="font-size:.72rem;color:var(--muted)">This Month</span></div>
+        <div class="widget-body" id="leaderboard"></div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="widget">
+        <div class="widget-head"><h3><i class="fas fa-chart-bar" style="color:var(--gold);margin-right:6px"></i>Sales This Week</h3></div>
+        <div class="chart-wrap"><canvas id="salesChart"></canvas></div>
+      </div>
+      <div class="widget">
+        <div class="widget-head"><h3><i class="fas fa-bolt" style="color:var(--gold);margin-right:6px"></i>Quick Actions</h3></div>
+        <div class="widget-body">
+          <div class="qa-grid">
+            <a href="passport-kyc.html" class="qa-btn"><i class="fas fa-user-plus"></i><span>New Sale</span></a>
+            <a href="#" class="qa-btn"><i class="fas fa-qrcode"></i><span>Scan QR</span></a>
+            <a href="erp-crm.html" class="qa-btn"><i class="fas fa-users"></i><span>Leads</span></a>
+            <a href="erp-dashboard.html" class="qa-btn"><i class="fas fa-chart-pie"></i><span>Analytics</span></a>
+            <a href="#" class="qa-btn"><i class="fas fa-download"></i><span>My Report</span></a>
+            <a href="erp-agents.html" class="qa-btn"><i class="fas fa-medal"></i><span>My Rank</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-head"><h3><i class="fas fa-bell" style="color:var(--gold);margin-right:6px"></i>Team Notifications</h3><button onclick="clearNotifs()">Clear All</button></div>
+      <div class="widget-body" id="notifBody">
+        <div class="notif-item"><div class="notif-dot gold"></div><div><div class="notif-text">🎯 Monthly target updated: <b>50 passports</b> for March 2026</div><div class="notif-time">2 hours ago</div></div></div>
+        <div class="notif-item"><div class="notif-dot green"></div><div><div class="notif-text">✅ New Combo Passport launched at ₹4,999 — includes 5 free F&B vouchers!</div><div class="notif-time">Yesterday</div></div></div>
+        <div class="notif-item"><div class="notif-dot blue"></div><div><div class="notif-text">📣 Sales meet on Friday 10 AM at head office. Attendance mandatory.</div><div class="notif-time">2 days ago</div></div></div>
+        <div class="notif-item"><div class="notif-dot red"></div><div><div class="notif-text">⚠️ KYC upload issue resolved. Please retry any failed submissions.</div><div class="notif-time">3 days ago</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const agent = JSON.parse(sessionStorage.getItem('sales_agent') || '{"name":"Demo Agent","role":"agent","zone":"Demo Zone","target":50,"sold":0}');
+
+function initAgent(){
+  const initials = agent.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sidebarInitials').textContent = initials;
+  document.getElementById('sidebarName').textContent = agent.name;
+  document.getElementById('sidebarRole').textContent = (agent.role==='manager'?'Manager':'Field Agent')+' · '+agent.zone;
+  const h = new Date().getHours();
+  document.getElementById('greetMsg').textContent = (h<12?'Good Morning':h<17?'Good Afternoon':'Good Evening')+', '+agent.name.split(' ')[0]+'! 👋';
+  document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+function loadSales(){
+  const sales = JSON.parse(sessionStorage.getItem('passport_sales')||'[]');
+  document.getElementById('salesCountBadge').textContent = sales.length;
+  const today = new Date().toDateString();
+  const todaySales = sales.filter(s=>new Date(s.timestamp).toDateString()===today);
+  const rev = todaySales.reduce((a,s)=>a+(s.amount||0),0);
+  document.getElementById('statSold').textContent = todaySales.length;
+  document.getElementById('statRev').textContent = '₹'+rev.toLocaleString('en-IN');
+  const now = new Date();
+  const monthSales = sales.filter(s=>{const d=new Date(s.timestamp);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()});
+  const tgt = agent.target||50;
+  const pct = Math.min(100,Math.round(monthSales.length/tgt*100));
+  document.getElementById('statTarget').textContent = pct+'%';
+  document.getElementById('targetBar').style.width = pct+'%';
+  document.getElementById('targetText').textContent = monthSales.length+' of '+tgt+' passports sold this month';
+  document.getElementById('targetRemain').textContent = Math.max(0,tgt-monthSales.length);
+  document.getElementById('incentiveEst').textContent = '₹'+(monthSales.length*300).toLocaleString('en-IN');
+  const daysLeft = new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate();
+  document.getElementById('daysLeft').textContent = daysLeft;
+  document.getElementById('targetMonth').textContent = now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const tbody = document.getElementById('salesTbody');
+  if(sales.length===0){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No sales yet — <a href="passport-kyc.html" style="color:var(--gold)">Start your first sale →</a></td></tr>';return;}
+  tbody.innerHTML = sales.slice().reverse().slice(0,8).map(s=>`
+    <tr>
+      <td><div style="font-weight:700">${s.customerName}</div><div style="font-size:.68rem;color:var(--muted)">${s.phone||''}</div></td>
+      <td><span class="badge ${s.plan==='Combo Passport'?'gold-b':s.plan==='Water Park Passport'?'blue-b':'green-b'}">${(s.plan||'').replace(' Passport','')}</span></td>
+      <td style="font-weight:700">₹${(s.amount||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge ${s.payMode==='Cash'?'green-b':s.payMode==='UPI'?'blue-b':'purple-b'}">${s.payMode||'—'}</span></td>
+      <td><span class="badge green-b"><i class="fas fa-check"></i> Active</span></td>
+    </tr>`).join('');
+}
+
+const TEAM=[
+  {name:'Priya Singh',zone:'Rohini',sold:41,initials:'PS'},
+  {name:'Amit Kumar',zone:'Manager',sold:35,initials:'AK'},
+  {name:'Raj Sharma',zone:'N.Delhi',sold:23,initials:'RS'},
+  {name:'Karan Verma',zone:'Dwarka',sold:18,initials:'KV'},
+];
+function loadLeaderboard(){
+  const sorted=[...TEAM].sort((a,b)=>b.sold-a.sold);
+  document.getElementById('leaderboard').innerHTML=sorted.map((a,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i+1}</div>
+      <div class="lb-avatar">${a.initials}</div>
+      <div class="lb-name"><div class="ln">${a.name}</div><div class="lz">${a.zone}</div></div>
+      <div class="lb-val">${a.sold} sold</div>
+    </div>`).join('');
+  document.getElementById('statRank').textContent = '#'+(TEAM.findIndex(t=>t.name.includes(agent.name.split(' ')[0]))+1||3);
+}
+
+function initChart(){
+  const ctx=document.getElementById('salesChart').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Sold',data:[4,7,5,9,6,12,8],backgroundColor:'rgba(201,168,76,.7)',borderColor:var_gold,borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8888aa',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8888aa',font:{size:11},stepSize:2}}}}});
+}
+const var_gold='rgba(201,168,76,1)';
+
+function logout(){sessionStorage.removeItem('sales_agent');sessionStorage.removeItem('sales_auth');window.location.href='passport-login.html';}
+function clearNotifs(){document.getElementById('notifBody').innerHTML='<div style="text-align:center;color:var(--muted);padding:18px;font-size:.82rem">No notifications</div>';}
+
+initAgent(); loadSales(); loadLeaderboard(); initChart();
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
