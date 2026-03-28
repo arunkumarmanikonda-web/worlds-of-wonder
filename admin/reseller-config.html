@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Reseller Configuration — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;min-height:100vh;}
+.admin-header{background:linear-gradient(135deg,#0d1220,#1a0a2e);border-bottom:1px solid rgba(255,215,0,.15);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.admin-brand{display:flex;align-items:center;gap:10px;}
+.admin-logo{width:34px;height:34px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0a0e1a;}
+.admin-title{font-size:15px;font-weight:700;color:#ffd700;}
+.admin-sub{font-size:11px;color:#8899aa;}
+.admin-nav{display:flex;gap:8px;}
+.anav{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 12px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;}
+.anav:hover{background:rgba(255,215,0,.1);color:#ffd700;}
+.anav.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+.content{max-width:1200px;margin:0 auto;padding:20px;}
+.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px;margin-bottom:18px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:7px 16px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:#8899aa;transition:.2s;}
+.tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;margin-bottom:14px;}
+.section-title{font-size:15px;font-weight:700;color:#ffd700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.field label{font-size:10px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
+.field label .req{color:#ff6b6b;}
+.field input,.field select,.field textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:9px 12px;color:#e0e6f0;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.2s;width:100%;}
+.field input:focus,.field select:focus{border-color:#ffd700;}
+.field select option{background:#1a1f35;}
+.field-hint{font-size:10px;color:#8899aa;}
+/* Slab cards */
+.slab-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+.slab-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:14px;text-align:center;position:relative;cursor:pointer;transition:.3s;}
+.slab-card:hover{border-color:rgba(255,215,0,.25);}
+.slab-card.active{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.06);}
+.slab-badge{position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;font-size:9px;font-weight:700;padding:2px 8px;border-radius:0 11px 0 8px;}
+.slab-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.slab-range{font-size:20px;font-weight:800;color:#ffd700;margin:6px 0;}
+.slab-sub{font-size:10px;color:#8899aa;}
+.slab-perks{font-size:10px;color:#a0aec0;margin-top:8px;text-align:left;}
+.slab-perks li{list-style:none;padding:2px 0;display:flex;align-items:center;gap:5px;}
+.slab-perks li::before{content:'✓';color:#10b981;font-size:11px;}
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-info .t-label{font-size:13px;font-weight:500;}
+.toggle-info .t-sub{font-size:10px;color:#8899aa;margin-top:1px;}
+.toggle{width:40px;height:22px;border-radius:11px;position:relative;cursor:pointer;transition:.3s;background:rgba(255,255,255,.1);flex-shrink:0;}
+.toggle.on{background:linear-gradient(135deg,#10b981,#059669);}
+.toggle-knob{width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s;}
+.toggle.on .toggle-knob{left:21px;}
+/* Matrix table */
+.matrix-table{width:100%;border-collapse:collapse;}
+.matrix-table th{background:rgba(255,215,0,.08);font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#ffd700;padding:9px 12px;text-align:left;}
+.matrix-table td{padding:9px 12px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);}
+.matrix-table tr:hover td{background:rgba(255,255,255,.02);}
+.matrix-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:5px 9px;color:#e0e6f0;font-size:13px;width:70px;text-align:center;outline:none;font-family:'Inter',sans-serif;}
+.matrix-input:focus{border-color:#ffd700;}
+.badge-on{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.2);border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;}
+.badge-off{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2);border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;}
+/* Alert */
+.alert{border-radius:9px;padding:11px 14px;display:flex;gap:9px;margin-bottom:12px;font-size:12px;}
+.alert.info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#93c5fd;}
+.alert.success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7;}
+/* Buttons */
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:6px;transition:.3s;}
+.btn-gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 3px 14px rgba(255,215,0,.4);}
+.btn-ghost{background:rgba(255,255,255,.07);color:#e0e6f0;border:1px solid rgba(255,255,255,.1);}
+.save-strip{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.15);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px;}
+.save-strip span{font-size:12px;color:#8899aa;}
+@media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr;}.slab-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.slab-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="admin-header">
+  <div class="admin-brand">
+    <div class="admin-logo">WW</div>
+    <div><div class="admin-title">Reseller Configuration</div><div class="admin-sub">Commission slabs, student-teacher rules, validity, credit limits &amp; payout cycles</div></div>
+  </div>
+  <div class="admin-nav">
+    <a class="anav" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a class="anav" href="ta-approvals.html"><i class="fas fa-users"></i> TA Approvals</a>
+    <button class="anav gold" onclick="saveAll()"><i class="fas fa-save"></i> Save All</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="tab-bar">
+    <div class="tab active" id="t-slabs" onclick="st('slabs')">💰 Commission Slabs</div>
+    <div class="tab" id="t-school" onclick="st('school')">🏫 School Rules</div>
+    <div class="tab" id="t-validity" onclick="st('validity')">📅 Validity &amp; Limits</div>
+    <div class="tab" id="t-payout" onclick="st('payout')">💳 Payout Settings</div>
+    <div class="tab" id="t-matrix" onclick="st('matrix')">📊 Partner Matrix</div>
+  </div>
+
+  <!-- COMMISSION SLABS -->
+  <div class="tab-panel active" id="panel-slabs">
+    <div class="section-title">💎 Commission Tier Structure</div>
+    <div class="slab-grid">
+      <div class="slab-card" onclick="selectSlab(this)">
+        <div class="slab-name">🥉 Bronze</div>
+        <div class="slab-range">8–10%</div>
+        <div class="slab-sub">New partners, 0–50 tickets/month</div>
+        <ul class="slab-perks"><li>Standard pricing</li><li>Basic support</li><li>7-day credit</li></ul>
+      </div>
+      <div class="slab-card active" onclick="selectSlab(this)">
+        <div class="slab-badge">Default</div>
+        <div class="slab-name">🥈 Silver</div>
+        <div class="slab-range">10–13%</div>
+        <div class="slab-sub">Active partners, 51–200 tickets/month</div>
+        <ul class="slab-perks"><li>Preferred pricing</li><li>Dedicated support</li><li>15-day credit</li><li>F&B discount 5%</li></ul>
+      </div>
+      <div class="slab-card" onclick="selectSlab(this)">
+        <div class="slab-name">🥇 Gold</div>
+        <div class="slab-range">13–16%</div>
+        <div class="slab-sub">High-volume, 201–500 tickets/month</div>
+        <ul class="slab-perks"><li>Gold pricing slab</li><li>Priority support</li><li>30-day credit</li><li>F&B discount 10%</li><li>Co-branding</li></ul>
+      </div>
+      <div class="slab-card" onclick="selectSlab(this)">
+        <div class="slab-name">💎 Platinum</div>
+        <div class="slab-range">16–20%</div>
+        <div class="slab-sub">Strategic partners, 500+ tickets/month</div>
+        <ul class="slab-perks"><li>Platinum pricing</li><li>Account manager</li><li>60-day credit</li><li>F&B 15% off</li><li>API access</li><li>White-label</li></ul>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:10px;">⚙️ Slab Configuration</div>
+        <div class="alert info"><i class="fas fa-info-circle"></i><div>Partner slabs auto-upgrade based on rolling 90-day ticket volume. Manual override available per partner.</div></div>
+        <div class="field"><label>Bronze Min Commission %</label><input type="number" value="8" min="0" max="30"/></div>
+        <div class="field"><label>Bronze Max Commission %</label><input type="number" value="10" min="0" max="30"/></div>
+        <div class="field"><label>Silver Range</label><div style="display:flex;gap:8px;"><input type="number" value="10" style="width:60px;" placeholder="Min"/><span style="align-self:center;color:#8899aa;">to</span><input type="number" value="13" style="width:60px;" placeholder="Max"/><span style="align-self:center;font-size:12px;color:#8899aa;">%</span></div></div>
+        <div class="field"><label>Gold Range</label><div style="display:flex;gap:8px;"><input type="number" value="13" style="width:60px;"/><span style="align-self:center;color:#8899aa;">to</span><input type="number" value="16" style="width:60px;"/><span style="align-self:center;font-size:12px;color:#8899aa;">%</span></div></div>
+        <div class="field"><label>Platinum Range</label><div style="display:flex;gap:8px;"><input type="number" value="16" style="width:60px;"/><span style="align-self:center;color:#8899aa;">to</span><input type="number" value="20" style="width:60px;"/><span style="align-self:center;font-size:12px;color:#8899aa;">%</span></div></div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:10px;">📈 Auto-Upgrade Rules</div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Auto Tier Upgrade</div><div class="t-sub">System auto-upgrades based on volume</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Auto Tier Downgrade</div><div class="t-sub">Downgrade if volume drops below threshold</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="field" style="margin-top:12px;"><label>Review Period (days)</label><input type="number" value="90"/><div class="field-hint">Rolling window for slab evaluation</div></div>
+        <div class="field"><label>Grace Period (days)</label><input type="number" value="15"/><div class="field-hint">Time before downgrade takes effect</div></div>
+        <div class="field"><label>Bronze → Silver Threshold (tickets)</label><input type="number" value="50"/></div>
+        <div class="field"><label>Silver → Gold Threshold</label><input type="number" value="200"/></div>
+        <div class="field"><label>Gold → Platinum Threshold</label><input type="number" value="500"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHOOL RULES -->
+  <div class="tab-panel" id="panel-school">
+    <div class="section-title">🏫 School &amp; Educational Institution Rules</div>
+    <div class="two-col">
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#ffd700;margin-bottom:12px;">📐 Student-Teacher Ratio</div>
+        <div class="alert info"><i class="fas fa-info-circle"></i><div>Based on 10:1 ratio: 1 teacher ticket is complimentary per 10 students. Teachers beyond ratio are charged at teacher rate.</div></div>
+        <div class="field"><label>Student-to-Teacher Ratio <span class="req">*</span></label><input id="ratio-num" type="number" value="10" min="1" max="50" oninput="updateRatioPreview()"/><div class="field-hint">Number of students per 1 free teacher</div></div>
+        <div class="field"><label>Max Complimentary Teachers</label><input type="number" value="20"/><div class="field-hint">Cap on free teacher entries per booking</div></div>
+        <div class="field"><label>Teacher Ticket Rate (₹)</label><input type="number" value="399"/><div class="field-hint">Rate for teachers beyond complimentary limit</div></div>
+        <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:9px;padding:12px;margin-top:6px;font-size:12px;color:#6ee7b7;" id="ratio-preview">
+          Example: 100 students → 10 free teachers. If 15 teachers come, 5 are charged @₹399 = ₹1,995 extra.
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#ffd700;margin-bottom:12px;">🚌 Driver &amp; Support Staff Rules</div>
+        <div class="field"><label>Driver Meal Voucher Rate (₹)</label><input type="number" value="150"/><div class="field-hint">Per driver, includes lunch + snacks</div></div>
+        <div class="field"><label>Max Drivers per Booking</label><input type="number" value="10"/></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Include Driver Voucher in Quote</div><div class="t-sub">Auto-include in school quote calculator</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <hr style="border-color:rgba(255,255,255,.07);margin:12px 0;"/>
+        <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:10px;">📚 School Booking Requirements</div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Mandatory School Letter</div><div class="t-sub">Official letter from principal required</div></div><div class="toggle" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Min Booking Size</div><div class="t-sub">For school discount eligibility</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="field" style="margin-top:8px;"><label>Min Pax for School Rate</label><input type="number" value="50"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;color:#ffd700;margin-bottom:12px;">🎓 Complimentary Rules Matrix</div>
+      <div style="overflow-x:auto;">
+        <table class="matrix-table">
+          <thead><tr><th>Segment</th><th>Ratio (Students:1 Teacher)</th><th>Max Free</th><th>Teacher Rate</th><th>Driver Meal</th><th>Active</th></tr></thead>
+          <tbody>
+            <tr><td><b>Primary School</b></td><td><input class="matrix-input" value="10"/></td><td><input class="matrix-input" value="20"/></td><td>₹<input class="matrix-input" value="299"/></td><td>₹<input class="matrix-input" value="150"/></td><td><span class="badge-on">Active</span></td></tr>
+            <tr><td><b>Secondary / High School</b></td><td><input class="matrix-input" value="10"/></td><td><input class="matrix-input" value="15"/></td><td>₹<input class="matrix-input" value="349"/></td><td>₹<input class="matrix-input" value="150"/></td><td><span class="badge-on">Active</span></td></tr>
+            <tr><td><b>College / University</b></td><td><input class="matrix-input" value="15"/></td><td><input class="matrix-input" value="10"/></td><td>₹<input class="matrix-input" value="399"/></td><td>₹<input class="matrix-input" value="150"/></td><td><span class="badge-on">Active</span></td></tr>
+            <tr><td><b>Special Needs Institution</b></td><td><input class="matrix-input" value="5"/></td><td><input class="matrix-input" value="30"/></td><td>₹<input class="matrix-input" value="0"/></td><td>₹<input class="matrix-input" value="0"/></td><td><span class="badge-on">Active</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDITY & LIMITS -->
+  <div class="tab-panel" id="panel-validity">
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px;">📅 Credit Limit Settings</div>
+        <div class="field"><label>Bronze Credit Limit (₹)</label><input type="number" value="100000"/></div>
+        <div class="field"><label>Silver Credit Limit (₹)</label><input type="number" value="300000"/></div>
+        <div class="field"><label>Gold Credit Limit (₹)</label><input type="number" value="750000"/></div>
+        <div class="field"><label>Platinum Credit Limit (₹)</label><input type="number" value="2000000"/></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Block New Orders on Credit Exceeded</div><div class="t-sub">Auto-block partner if credit limit reached</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Send Credit Warning at 80%</div><div class="t-sub">Email + WhatsApp alert</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px;">⏱ Ticket Validity Rules</div>
+        <div class="field"><label>Default Ticket Validity (days)</label><input type="number" value="1"/><div class="field-hint">Single day by default</div></div>
+        <div class="field"><label>Max Extension Allowed (days)</label><input type="number" value="7"/></div>
+        <div class="field"><label>Extension Fee (₹ per day)</label><input type="number" value="50"/></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Allow Partner Self-Extension</div><div class="t-sub">Partners can extend without admin approval</div></div><div class="toggle" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Auto-Expire at Midnight</div><div class="t-sub">Tickets expire at 23:59 of validity date</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="field" style="margin-top:10px;"><label>Max Tickets per Reseller per Day</label><input type="number" value="5000"/></div>
+        <div class="field"><label>Min Order Quantity</label><input type="number" value="10"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYOUT -->
+  <div class="tab-panel" id="panel-payout">
+    <div class="two-col">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px;">💳 Commission Payout Cycle</div>
+        <div class="field"><label>Payout Frequency</label><select><option>Monthly (1st of every month)</option><option>Bi-Monthly</option><option>Weekly</option><option>On-Demand (min ₹5000)</option></select></div>
+        <div class="field"><label>Payout Mode</label><select><option>NEFT/RTGS</option><option>UPI</option><option>Cheque</option></select></div>
+        <div class="field"><label>TDS Rate (%)</label><input type="number" value="2"/><div class="field-hint">TDS deducted as per IT Act Section 194H</div></div>
+        <div class="field"><label>Minimum Payout Threshold (₹)</label><input type="number" value="1000"/></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Auto-Calculate TDS</div><div class="t-sub">System auto-computes TDS before payout</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Send Payout Statement (Email)</div><div class="t-sub">Monthly statement PDF to partner</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">WhatsApp Payout Notification</div><div class="t-sub">Notify partner on credit</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px;">🧾 Invoice &amp; GST Rules</div>
+        <div class="field"><label>Invoice Prefix Format</label><input type="text" value="{PARTNER_CODE}-WOW-INV-{SERIAL}"/><div class="field-hint">e.g. XYZTA-WOW-INV-0089</div></div>
+        <div class="field"><label>GST on Commission</label><select><option>18% GST on commission (B2B)</option><option>0% Exempt</option></select></div>
+        <div class="field"><label>Default Credit Period (days)</label><input type="number" value="7"/></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">Auto-Generate Invoice on Sale</div><div class="t-sub">Invoice created automatically after booking</div></div><div class="toggle on" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="toggle-info"><div class="t-label">GST Reverse Charge on Commission</div><div class="t-sub">Partner pays GST under reverse charge</div></div><div class="toggle" onclick="this.classList.toggle('on');this.querySelector('.toggle-knob').style.left=this.classList.contains('on')?'21px':'3px'"><div class="toggle-knob"></div></div></div>
+        <div class="field" style="margin-top:10px;"><label>WOW GST Number (supplier)</label><input type="text" value="07AAACW1234M1ZX" readonly style="color:#ffd700;font-weight:700;"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTNER MATRIX -->
+  <div class="tab-panel" id="panel-matrix">
+    <div class="section-title">📊 Active Partner Commission Matrix</div>
+    <div style="overflow-x:auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;">
+      <table class="matrix-table">
+        <thead><tr><th>Partner</th><th>Type</th><th>Slab</th><th>Commission %</th><th>Credit (₹)</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><b>XYZ Tours Pvt Ltd</b><div style="font-size:10px;color:#8899aa;">WOW-TA-0089</div></td><td>Travel Agent</td><td><span style="background:rgba(192,192,192,.15);color:#c0c0c0;border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;">🥈 Silver</span></td><td><input class="matrix-input" value="12"/></td><td><input class="matrix-input" value="500000" style="width:90px;"/></td><td><span class="badge-on">Active</span></td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-edit"></i></button></td></tr>
+          <tr><td><b>MakeMyTrip Corp</b><div style="font-size:10px;color:#8899aa;">WOW-TA-0005</div></td><td>Online Reseller</td><td><span style="background:rgba(212,175,55,.15);color:#d4af37;border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;">💎 Platinum</span></td><td><input class="matrix-input" value="18"/></td><td><input class="matrix-input" value="2000000" style="width:90px;"/></td><td><span class="badge-on">Active</span></td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-edit"></i></button></td></tr>
+          <tr><td><b>DPS Rohini</b><div style="font-size:10px;color:#8899aa;">WOW-TA-0003</div></td><td>School</td><td><span style="background:rgba(184,115,51,.15);color:#b87333;border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;">🥉 Bronze</span></td><td><input class="matrix-input" value="8"/></td><td><input class="matrix-input" value="200000" style="width:90px;"/></td><td><span style="background:rgba(251,191,36,.15);color:#fbbf24;border:1px solid rgba(251,191,36,.2);border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;">Docs Req</span></td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-edit"></i></button></td></tr>
+          <tr><td><b>Infosys BPM</b><div style="font-size:10px;color:#8899aa;">WOW-TA-0004</div></td><td>Corporate</td><td><span style="background:rgba(255,215,0,.15);color:#ffd700;border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;">🥇 Gold</span></td><td><input class="matrix-input" value="15"/></td><td><input class="matrix-input" value="1000000" style="width:90px;"/></td><td><span class="badge-on">Active</span></td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-edit"></i></button></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button class="btn btn-gold" onclick="saveAll()"><i class="fas fa-save"></i> Save Matrix</button>
+      <button class="btn btn-ghost" onclick="exportMatrix()"><i class="fas fa-download"></i> Export CSV</button>
+    </div>
+  </div>
+
+  <div class="save-strip">
+    <span><i class="fas fa-info-circle"></i> Changes take effect immediately for all active partners</span>
+    <button class="btn btn-gold" onclick="saveAll()"><i class="fas fa-save"></i> Save All Configuration</button>
+  </div>
+</div>
+
+<script>
+function st(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('t-'+tab).classList.add('active');document.getElementById('panel-'+tab).classList.add('active');}
+
+function selectSlab(el){document.querySelectorAll('.slab-card').forEach(c=>c.classList.remove('active'));el.classList.add('active');}
+
+function updateRatioPreview(){
+  const ratio=parseInt(document.getElementById('ratio-num').value)||10;
+  const ex=100;
+  const free=Math.floor(ex/ratio);
+  const extra=15-free;
+  document.getElementById('ratio-preview').innerHTML=`Example: ${ex} students → <b style="color:#10b981;">${free} free teachers</b> (1 per ${ratio}). If 15 teachers come, <b style="color:#fbbf24;">${Math.max(0,extra)} are charged</b> @₹399 = ₹${Math.max(0,extra)*399}.`;
+}
+
+function saveAll(){alert('✅ All reseller configuration saved!\nChanges applied to partner portal and commission engine immediately.');}
+
+function exportMatrix(){
+  const csv='Partner,Type,Slab,Commission%,CreditLimit,Status\nXYZ Tours,Travel Agent,Silver,12,500000,Active\nMakeMyTrip,Reseller,Platinum,18,2000000,Active\n';
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='partner-matrix.csv';a.click();
+}
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
