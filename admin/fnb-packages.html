@@ -2,354 +2,619 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>F&B Packages — WOW Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>F&B Package Manager — WOW Admin</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <style>
+:root{
+  --brand:#ff6b35;--brand-dark:#e85a22;--brand-light:#fff3ee;
+  --teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;
+  --navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f8fafc;--white:#ffffff;--sidebar:260px;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;min-height:100vh;}
-.admin-header{background:linear-gradient(135deg,#0d1220,#1a0a2e);border-bottom:1px solid rgba(255,215,0,.15);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;}
-.admin-logo{height:40px;width:auto;object-fit:contain;display:block;}
-.admin-brand{display:flex;align-items:center;gap:10px;}
-.admin-title{font-size:15px;font-weight:700;color:#ffd700;}
-.admin-sub{font-size:11px;color:#8899aa;}
-.admin-nav{display:flex;gap:8px;}
-.anav{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:6px 12px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;}
-.anav:hover{background:rgba(255,215,0,.1);color:#ffd700;}
-.anav.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
-.content{max-width:1300px;margin:0 auto;padding:20px;}
-.tab-bar{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:9px;padding:3px;margin-bottom:18px;width:fit-content;}
-.tab{padding:8px 18px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:#8899aa;transition:.2s;}
-.tab.active{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
+.sidebar-logo .mark{width:38px;height:38px;background:var(--brand);border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:16px;color:#fff;}
+.sidebar-logo span{font-weight:700;font-size:15px;line-height:1.2;}
+.sidebar-logo small{font-size:10px;opacity:.6;display:block;}
+.nav-section{padding:16px 0 8px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);padding:0 18px 6px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--brand);}
+.nav-item i{width:18px;text-align:center;font-size:14px;}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:17px;font-weight:700;color:var(--slate);}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-dark);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.content{padding:24px 28px;}
+.tab-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.tab.active{background:var(--brand);color:#fff;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
-.section-title{font-size:15px;font-weight:700;color:#ffd700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;}
-.upload-zone{border:2px dashed rgba(255,215,0,.25);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:.3s;position:relative;margin-bottom:16px;}
-.upload-zone:hover{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.03);}
-.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
-.upload-icon{font-size:36px;color:#ffd700;margin-bottom:10px;}
-.upload-title{font-size:15px;font-weight:700;margin-bottom:6px;}
-.upload-sub{font-size:12px;color:#8899aa;}
-.csv-format{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:14px;margin-bottom:14px;font-family:monospace;font-size:11px;color:#a78bfa;line-height:1.8;overflow-x:auto;}
-.alert{border-radius:9px;padding:11px 14px;display:flex;gap:9px;margin-bottom:12px;font-size:12px;}
-.alert.info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#93c5fd;}
-.alert.success{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7;}
-.alert.warning{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:#fde68a;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-/* FnB Package Cards */
-.fnb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
-.fnb-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;transition:.3s;}
-.fnb-card:hover{border-color:rgba(255,215,0,.2);}
-.fnb-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
-.fnb-emoji{font-size:26px;}
-.fnb-title{font-size:14px;font-weight:700;margin-top:6px;}
-.fnb-price{font-size:18px;font-weight:800;color:#ffd700;}
-.fnb-sub{font-size:11px;color:#8899aa;}
-.fnb-body{padding:0 16px 14px;}
-.fnb-items{list-style:none;margin-bottom:10px;}
-.fnb-items li{font-size:12px;color:#a0aec0;padding:3px 0;display:flex;align-items:center;gap:6px;}
-.fnb-items li::before{content:'•';color:#ffd700;font-size:14px;}
-.fnb-footer{display:flex;gap:8px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.06);}
-.fnb-btn{flex:1;padding:7px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;text-align:center;transition:.2s;}
-.fnb-btn.edit{background:rgba(108,99,255,.15);color:#a78bfa;}
-.fnb-btn.push{background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,140,0,.15));color:#ffd700;}
-.fnb-btn.push:hover{background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,140,0,.25));}
-.fnb-btn.del{background:rgba(239,68,68,.1);color:#ef4444;}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;}
-.toggle{width:38px;height:20px;border-radius:10px;position:relative;cursor:pointer;transition:.3s;background:rgba(255,255,255,.1);}
-.toggle.on{background:linear-gradient(135deg,#10b981,#059669);}
-.toggle-knob{width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.3s;}
-.toggle.on .toggle-knob{left:21px;}
-/* Table */
-.data-table{width:100%;border-collapse:collapse;}
-.data-table th{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#8899aa;padding:7px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07);}
-.data-table td{padding:9px 10px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
-.data-table tr:hover td{background:rgba(255,255,255,.02);}
-.badge-on{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.2);border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;}
-.badge-off{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.2);border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;}
-.badge-draft{background:rgba(255,255,255,.1);color:#8899aa;border-radius:18px;padding:2px 8px;font-size:10px;font-weight:600;}
-.btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:5px;transition:.3s;}
-.btn-gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 3px 14px rgba(255,215,0,.4);}
-.btn-ghost{background:rgba(255,255,255,.07);color:#e0e6f0;border:1px solid rgba(255,255,255,.1);}
-/* Push notifications */
-.push-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;margin-bottom:10px;}
-.push-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.push-title{font-size:13px;font-weight:700;}
-.push-meta{font-size:10px;color:#8899aa;}
-.channel-tags{display:flex;gap:6px;flex-wrap:wrap;}
-.ch-tag{padding:3px 9px;border-radius:18px;font-size:10px;font-weight:600;}
-.ch-email{background:rgba(59,130,246,.15);color:#60a5fa;}
-.ch-wa{background:rgba(37,211,102,.15);color:#25d366;}
-.ch-sms{background:rgba(251,191,36,.15);color:#fbbf24;}
-.ch-push{background:rgba(147,51,234,.15);color:#c084fc;}
-.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
-.field label{font-size:10px;font-weight:600;color:#9aabb8;text-transform:uppercase;letter-spacing:.5px;}
-.field input,.field select,.field textarea{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:7px;padding:8px 11px;color:#e0e6f0;font-size:13px;font-family:'Inter',sans-serif;outline:none;}
-.field textarea{resize:vertical;min-height:70px;}
-@media(max-width:900px){.fnb-grid,.two-col{grid-template-columns:1fr 1fr;}}
-@media(max-width:600px){.fnb-grid,.two-col{grid-template-columns:1fr;}}
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:700;color:var(--slate);}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:26px;font-weight:800;margin:4px 0 2px;}
+.stat-sub{font-size:11px;color:var(--muted);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border:none;}
+tbody td{padding:11px 14px;vertical-align:middle;}
+tbody tr:hover{background:#f9fafb;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-yellow{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:.2s;background:#fafbfc;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--brand);background:var(--brand-light);}
+.upload-zone i{font-size:36px;color:var(--muted);margin-bottom:12px;display:block;}
+.upload-zone h3{font-size:15px;font-weight:700;margin-bottom:6px;}
+.upload-zone p{font-size:13px;color:var(--muted);}
+.form-grid{display:grid;gap:14px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+label{font-size:12px;font-weight:600;color:var(--slate);}
+input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:100%;transition:.15s;background:var(--white);}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);}
+textarea{resize:vertical;min-height:80px;}
+.section-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.pkg-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s;}
+.pkg-card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(255,107,53,.12);}
+.pkg-card.featured{border-color:var(--brand);}
+.pkg-header-block{padding:16px 18px;background:linear-gradient(135deg,#ff6b35,#e85a22);}
+.pkg-header-block.teal{background:linear-gradient(135deg,#00b4d8,#0096c7);}
+.pkg-header-block.green{background:linear-gradient(135deg,#06d6a0,#05b386);}
+.pkg-title{color:#fff;font-size:16px;font-weight:800;}
+.pkg-subtitle{color:rgba(255,255,255,.8);font-size:11px;margin-top:2px;}
+.pkg-price{color:#fff;font-size:26px;font-weight:900;margin-top:8px;}
+.pkg-price span{font-size:13px;font-weight:400;opacity:.8;}
+.pkg-body{padding:16px 18px;}
+.pkg-items{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.pkg-items li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--slate);}
+.pkg-items li i{color:var(--green);font-size:11px;width:14px;}
+.pkg-actions{display:flex;gap:8px;}
+.quote-section{background:var(--brand-light);border:1.5px solid #ffd8c4;border-radius:12px;padding:20px;margin-top:20px;}
+.quote-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,107,53,.15);font-size:13px;}
+.quote-row:last-child{border:none;font-weight:700;font-size:15px;}
+.quote-total{color:var(--brand);font-size:20px;font-weight:900;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;}
+.modal-overlay.show{display:grid;}
+.modal{background:var(--white);border-radius:16px;width:90%;max-width:700px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+.qty-ctrl{display:flex;align-items:center;gap:6px;}
+.qty-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:14px;font-weight:700;display:grid;place-items:center;}
+.qty-input{width:50px;text-align:center;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;}
+.csv-preview{background:#1e293b;border-radius:10px;padding:16px;overflow-x:auto;margin-top:14px;}
+.csv-preview table{color:#e2e8f0;}
+.csv-preview thead th{color:#94a3b8;border-bottom:1px solid #334155;padding:6px 12px;}
+.csv-preview tbody td{padding:6px 12px;border-bottom:1px solid #2d3f55;}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);}.pkg-grid{grid-template-columns:1fr 1fr;}.form-row,.form-row-3{grid-template-columns:1fr;}}
+@media(max-width:600px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.grid-4,.pkg-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<div class="admin-header">
-  <div class="admin-brand">
-    <a href="index.html"><img class="admin-logo" src="../images/logo.png" alt="Worlds of Wonder" style="height:40px;width:auto;object-fit:contain;filter:none!important;" /></a>
-    <div><div class="admin-title">F&amp;B Packages — Food &amp; Beverage Management</div><div class="admin-sub">Upload via CSV, configure packages &amp; auto-push to customers/partners</div></div>
+<div class="shell">
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="mark">W</div>
+    <div><span>WOW Admin</span><small>F&B Package Manager</small></div>
   </div>
-  <div class="admin-nav">
-    <a class="anav" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
-    <a class="anav" href="ticketing-engine.html"><i class="fas fa-ticket-alt"></i> Ticketing</a>
-    <button class="anav gold" onclick="saveAll()"><i class="fas fa-save"></i> Save All</button>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Admin Portals</div>
+      <a href="index.html" class="nav-item"><i class="fa fa-th-large"></i>Dashboard</a>
+      <a href="gate.html" class="nav-item"><i class="fa fa-qrcode"></i>Gate Manager</a>
+      <a href="call-center.html" class="nav-item"><i class="fa fa-headset"></i>Call Centre CRM</a>
+      <a href="notifications.html" class="nav-item"><i class="fa fa-bell"></i>Notifications Engine</a>
+      <a href="gst-engine.html" class="nav-item"><i class="fa fa-file-invoice"></i>GST Engine</a>
+      <a href="fnb-packages.html" class="nav-item active"><i class="fa fa-utensils"></i>F&B Packages</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Other Portals</div>
+      <a href="../sales/erp-dashboard.html" class="nav-item"><i class="fa fa-chart-line"></i>Sales ERP</a>
+      <a href="../reseller/index.html" class="nav-item"><i class="fa fa-store"></i>Reseller Portal</a>
+      <a href="../ta/index.html" class="nav-item"><i class="fa fa-plane"></i>Travel Agent Portal</a>
+    </div>
+  </nav>
+</aside>
+
+<div class="main">
+<div class="topbar">
+  <div class="topbar-title"><i class="fa fa-utensils" style="color:var(--brand);margin-right:8px;"></i>F&B Package Manager</div>
+  <div class="topbar-right">
+    <button class="btn btn-outline btn-sm" onclick="exportQuote()"><i class="fa fa-file-pdf"></i> Export Quote</button>
+    <button class="btn btn-brand btn-sm" onclick="openPackageModal()"><i class="fa fa-plus"></i> New Package</button>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
+      <img src="https://api.dicebear.com/7.x/initials/svg?seed=FnB" width="26" height="26" style="border-radius:50%;"/>
+      <span style="font-size:12px;font-weight:600;">FnB Manager</span>
+    </div>
   </div>
 </div>
 
 <div class="content">
-  <div class="tab-bar">
-    <div class="tab active" id="t-packages" onclick="st('packages')">🥗 Packages</div>
-    <div class="tab" id="t-upload" onclick="st('upload')">📤 CSV Upload</div>
-    <div class="tab" id="t-push" onclick="st('push')">📣 Push Notifications</div>
-    <div class="tab" id="t-history" onclick="st('history')">📋 Upload History</div>
-  </div>
+<div class="grid-4">
+  <div class="stat-card"><div class="stat-label">Active Packages</div><div class="stat-value" style="color:var(--brand);">24</div><div class="stat-sub">↑ 3 added this month</div></div>
+  <div class="stat-card"><div class="stat-label">Quotes Generated</div><div class="stat-value" style="color:var(--teal);">187</div><div class="stat-sub">₹42.6L pipeline value</div></div>
+  <div class="stat-card"><div class="stat-label">Conversion Rate</div><div class="stat-value" style="color:var(--green);">68%</div><div class="stat-sub">Quotes → confirmed</div></div>
+  <div class="stat-card"><div class="stat-label">Avg. Package Value</div><div class="stat-value" style="color:var(--yellow);">₹2,280</div><div class="stat-sub">Per person incl. GST</div></div>
+</div>
 
-  <!-- PACKAGES -->
-  <div class="tab-panel active" id="panel-packages">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div class="section-title">🥗 Active F&amp;B Packages</div>
-      <button class="btn btn-gold" onclick="addPackage()"><i class="fas fa-plus"></i> Add Package</button>
-    </div>
-    <div class="fnb-grid" id="fnb-grid"></div>
-  </div>
+<div class="tab-bar">
+  <div class="tab active" id="tab-btn-packages" onclick="switchTab('packages',this)"><i class="fa fa-box"></i> Packages</div>
+  <div class="tab" id="tab-btn-csv" onclick="switchTab('csv',this)"><i class="fa fa-upload"></i> CSV Upload</div>
+  <div class="tab" id="tab-btn-quote" onclick="switchTab('quote',this)"><i class="fa fa-calculator"></i> Quote Builder</div>
+  <div class="tab" id="tab-btn-inventory" onclick="switchTab('inventory',this)"><i class="fa fa-warehouse"></i> Inventory</div>
+  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',this)"><i class="fa fa-chart-pie"></i> Reports</div>
+</div>
 
-  <!-- CSV UPLOAD -->
-  <div class="tab-panel" id="panel-upload">
-    <div class="two-col">
-      <div>
-        <div class="section-title">📤 Bulk Upload via CSV</div>
-        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('csv-file').click()">
-          <input type="file" id="csv-file" accept=".csv" onchange="handleCSV(event)"/>
-          <div class="upload-icon">📊</div>
-          <div class="upload-title">Drop CSV File Here</div>
-          <div class="upload-sub">Or click to browse • Max 10 MB</div>
-        </div>
-        <div class="alert info"><i class="fas fa-info-circle"></i><div>Upload F&amp;B packages in bulk. After upload, you can auto-push to all customers and partners with one click.</div></div>
-        <div style="font-size:13px;font-weight:700;color:#ffd700;margin-bottom:8px;">Required CSV Format:</div>
-        <div class="csv-format">package_id,name,category,price,gst_pct,items,min_pax,max_pax,available<br/>FNB-001,"Veg Lunch Pack",meal,350,5,"Dal,Roti,Rice,Salad,Water",1,500,true<br/>FNB-002,"Non-Veg Combo",meal,450,5,"Chicken,Roti,Rice,Salad,Water",1,500,true<br/>FNB-003,"Snack Box",snack,150,5,"Samosa,Kachori,Chai",1,1000,true<br/>FNB-004,"Party Platter",party,1800,5,"Pizza,Burger,Juice,Fries",10,200,true</div>
-        <a href="#" onclick="downloadTemplate()" style="font-size:12px;color:#6c63ff;text-decoration:none;"><i class="fas fa-download"></i> Download Template CSV</a>
-      </div>
-      <div>
-        <div class="section-title">📋 CSV Preview</div>
-        <div id="csv-preview" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;min-height:200px;font-size:12px;color:#8899aa;">
-          Upload a CSV file to preview items here…
-        </div>
-        <div id="csv-actions" style="display:none;margin-top:12px;">
-          <div class="alert success" id="csv-status-msg"><i class="fas fa-check-circle"></i><div id="csv-status-text">Ready to import.</div></div>
-          <div style="display:flex;gap:10px;margin-top:10px;">
-            <button class="btn btn-gold" onclick="importCSV()"><i class="fas fa-upload"></i> Import to Database</button>
-            <button class="btn btn-ghost" onclick="clearCSV()"><i class="fas fa-times"></i> Clear</button>
-          </div>
-        </div>
+<!-- PACKAGES TAB -->
+<div id="tab-packages" class="tab-panel active">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Package Catalogue</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select style="width:auto;padding:7px 12px;font-size:12px;" onchange="filterPackages(this.value)">
+          <option value="all">All Categories</option>
+          <option value="water">Water Park</option>
+          <option value="amusement">Amusement Park</option>
+          <option value="combo">Combo</option>
+          <option value="corporate">Corporate</option>
+          <option value="birthday">Birthday</option>
+          <option value="school">School Trip</option>
+        </select>
+        <input type="search" placeholder="Search packages…" style="width:180px;" oninput="searchPackages(this.value)"/>
       </div>
     </div>
+    <div class="pkg-grid" id="pkg-grid"></div>
   </div>
+</div>
 
-  <!-- PUSH NOTIFICATIONS -->
-  <div class="tab-panel" id="panel-push">
-    <div class="two-col">
-      <div>
-        <div class="section-title">📣 Compose Push Campaign</div>
-        <div class="card">
-          <div class="field"><label>Campaign Title</label><input type="text" id="push-title" placeholder="Weekend Special F&B Offer!" /></div>
-          <div class="field"><label>Package to Promote</label>
-            <select id="push-package"><option value="">Select package…</option><option>FNB-001: Veg Lunch Pack ₹350</option><option>FNB-002: Non-Veg Combo ₹450</option><option>FNB-003: Snack Box ₹150</option><option>FNB-004: Party Platter ₹1800</option></select>
-          </div>
-          <div class="field"><label>Target Audience</label>
-            <select id="push-audience"><option>All Customers</option><option>Partner Portal Users</option><option>School Bookings</option><option>Corporate Clients</option><option>Birthday Packages</option><option>WOW Passport Holders</option></select>
-          </div>
-          <div class="field"><label>Message</label><textarea id="push-msg" placeholder="🍽️ Book your F&B package in advance and save 15%! Valid this weekend at Worlds of Wonder."></textarea></div>
-          <div style="font-size:11px;font-weight:700;color:#ffd700;margin-bottom:8px;">Send Via:</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="ch-email" checked/> <span class="ch-tag ch-email">📧 Email</span></label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="ch-wa" checked/> <span class="ch-tag ch-wa">💬 WhatsApp</span></label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="ch-sms"/> <span class="ch-tag ch-sms">📱 SMS</span></label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;"><input type="checkbox" id="ch-push"/> <span class="ch-tag ch-push">🔔 App Push</span></label>
-          </div>
-          <div class="field"><label>Schedule (leave blank for immediate)</label><input type="datetime-local"/></div>
-          <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="sendPush()"><i class="fas fa-paper-plane"></i> Send Campaign</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-title">📊 Recent Campaigns</div>
-        <div id="campaigns-list">
-          <div class="push-card">
-            <div class="push-header"><div class="push-title">Weekend BBQ Special</div><span class="badge-on">Sent</span></div>
-            <div class="push-meta">Sent: 12 Apr 2026 · Audience: All · Opens: 2,841 (67%)</div>
-            <div class="channel-tags" style="margin-top:8px;"><span class="ch-tag ch-email">Email</span><span class="ch-tag ch-wa">WhatsApp</span></div>
-          </div>
-          <div class="push-card">
-            <div class="push-header"><div class="push-title">School Lunch Offer — Pre-book</div><span class="badge-on">Sent</span></div>
-            <div class="push-meta">Sent: 08 Apr 2026 · Audience: Schools · Opens: 1,120 (78%)</div>
-            <div class="channel-tags" style="margin-top:8px;"><span class="ch-tag ch-email">Email</span><span class="ch-tag ch-sms">SMS</span></div>
-          </div>
-          <div class="push-card">
-            <div class="push-header"><div class="push-title">Party Platter Launch</div><span class="badge-draft">Draft</span></div>
-            <div class="push-meta">Not sent yet · Created: 14 Apr 2026</div>
-            <div style="display:flex;gap:8px;margin-top:10px;"><button class="btn btn-gold" style="font-size:11px;padding:6px 12px;" onclick="sendPush()"><i class="fas fa-paper-plane"></i> Send Now</button><button class="btn btn-ghost" style="font-size:11px;padding:6px 12px;"><i class="fas fa-edit"></i> Edit</button></div>
-          </div>
-        </div>
-      </div>
+<!-- CSV TAB -->
+<div id="tab-csv" class="tab-panel">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Bulk Upload via CSV</span>
+      <button onclick="downloadTemplate()" class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Download Template</button>
     </div>
-  </div>
-
-  <!-- HISTORY -->
-  <div class="tab-panel" id="panel-history">
-    <div class="section-title">📋 CSV Upload History</div>
-    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;">
-      <table class="data-table">
-        <thead><tr><th>Upload ID</th><th>File Name</th><th>Items</th><th>Status</th><th>Uploaded By</th><th>Date</th><th>Actions</th></tr></thead>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('csv-file').click()" ondragover="handleDragOver(event)" ondragleave="document.getElementById('drop-zone').classList.remove('dragover')" ondrop="handleDrop(event)">
+      <i class="fa fa-file-csv"></i>
+      <h3>Drop CSV file here or click to browse</h3>
+      <p>Supports: Items, Packages, Pricing — Max 10 MB</p>
+      <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSVFile(event)"/>
+    </div>
+    <div id="csv-status" style="display:none;margin-top:16px;padding:12px 16px;border-radius:8px;font-size:13px;"></div>
+    <div id="csv-preview-wrap" style="display:none;margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:600;">Preview (first 10 rows)</span>
+        <button class="btn btn-brand btn-sm" onclick="importCSVData()"><i class="fa fa-check"></i> Import Data</button>
+      </div>
+      <div class="csv-preview"><table id="csv-preview-table"></table></div>
+    </div>
+    <hr class="section-divider"/>
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:14px;">Upload History</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>File</th><th>Uploaded By</th><th>Date</th><th>Records</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>
-          <tr><td>UPL-001</td><td>fnb-packages-april.csv</td><td>24 items</td><td><span class="badge-on">Imported</span></td><td>Admin</td><td>10 Apr 2026</td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-eye"></i> View</button></td></tr>
-          <tr><td>UPL-002</td><td>snacks-menu-v2.csv</td><td>12 items</td><td><span class="badge-on">Imported</span></td><td>Admin</td><td>08 Apr 2026</td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-eye"></i> View</button></td></tr>
-          <tr><td>UPL-003</td><td>party-packages.csv</td><td>6 items</td><td><span class="badge-draft">Pending Review</span></td><td>Ops Manager</td><td>07 Apr 2026</td><td><button class="btn btn-gold" style="font-size:11px;padding:5px 10px;"><i class="fas fa-check"></i> Approve</button></td></tr>
-          <tr><td>UPL-004</td><td>error-test.csv</td><td>0 items</td><td><span class="badge-off">Failed</span></td><td>Admin</td><td>06 Apr 2026</td><td><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;"><i class="fas fa-redo"></i> Retry</button></td></tr>
+          <tr><td>fnb_menu_mar2025.csv</td><td>Priya S.</td><td>15 Mar 2025</td><td>142</td><td><span class="badge badge-green">✓ Imported</span></td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
+          <tr><td>packages_q1.csv</td><td>Arjun K.</td><td>02 Mar 2025</td><td>28</td><td><span class="badge badge-green">✓ Imported</span></td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
+          <tr><td>seasonal_offers.csv</td><td>Sneha M.</td><td>20 Feb 2025</td><td>15</td><td><span class="badge badge-yellow">⚠ Partial</span></td><td><button class="btn btn-outline btn-sm">View</button></td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<script>
-function st(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.getElementById('t-'+tab).classList.add('active');document.getElementById('panel-'+tab).classList.add('active');}
-
-const fnbPackages = [
-  {id:'FNB-001',name:'Veg Lunch Pack',category:'meal',emoji:'🥗',price:350,gst:5,items:['Dal Tadka','Roti (3pcs)','Steamed Rice','Salad','Mineral Water'],min_pax:1,active:true},
-  {id:'FNB-002',name:'Non-Veg Combo',category:'meal',emoji:'🍗',price:450,gst:5,items:['Chicken Curry','Roti (3pcs)','Fried Rice','Salad','Mineral Water'],min_pax:1,active:true},
-  {id:'FNB-003',name:'Snack Box',category:'snack',emoji:'🍟',price:150,gst:5,items:['Samosa (2)','Kachori (2)','Masala Chai','Sauce'],min_pax:1,active:true},
-  {id:'FNB-004',name:'Party Platter (10 pax)',category:'party',emoji:'🎉',price:1800,gst:5,items:['Paneer Pizza (2)','Veg Burger (5)','French Fries','Cold Drinks (10)','Cake Slice'],min_pax:10,active:true},
-  {id:'FNB-005',name:'School Tiffin',category:'school',emoji:'🏫',price:120,gst:0,items:['2 Rotis','Sabzi','Curd','Pickle','Water'],min_pax:50,active:true},
-  {id:'FNB-006',name:'Corporate BBQ',category:'corporate',emoji:'🔥',price:750,gst:5,items:['BBQ Chicken','Paneer Tikka','Naan','Raita','Dessert','Drinks'],min_pax:20,active:false},
-];
-
-function renderFnb() {
-  const el = document.getElementById('fnb-grid');
-  el.innerHTML = '';
-  fnbPackages.forEach((p,i) => {
-    const card = document.createElement('div');
-    card.className = 'fnb-card';
-    card.innerHTML = `
-      <div class="fnb-header" style="background:rgba(255,255,255,.03);">
-        <div><div class="fnb-emoji">${p.emoji}</div><div class="fnb-title">${p.name}</div><div class="fnb-sub">${p.id} · Min ${p.min_pax} pax · GST ${p.gst}%</div></div>
-        <div style="text-align:right;"><div class="fnb-price">₹${p.price}</div><div style="font-size:10px;color:#8899aa;">per pax</div></div>
-      </div>
-      <div class="fnb-body">
-        <ul class="fnb-items">${p.items.map(it=>`<li>${it}</li>`).join('')}</ul>
-        <div class="toggle-row">
-          <span style="font-size:12px;color:#8899aa;">Available</span>
-          <div class="toggle ${p.active?'on':''}" onclick="toggleFnb(${i},this)"><div class="toggle-knob"></div></div>
+<!-- QUOTE BUILDER TAB -->
+<div id="tab-quote" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:18px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Build Event Quote</span></div>
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-group"><label>Client / Group Name</label><input type="text" id="q-client" placeholder="e.g. TCS Corporate Outing" oninput="updateQuote()"/></div>
+          <div class="form-group"><label>Event Date</label><input type="date" id="q-date" oninput="updateQuote()"/></div>
+        </div>
+        <div class="form-row-3">
+          <div class="form-group"><label>Adults</label><input type="number" id="q-adults" value="50" min="1" oninput="updateQuote()"/></div>
+          <div class="form-group"><label>Children (3–12)</label><input type="number" id="q-children" value="10" min="0" oninput="updateQuote()"/></div>
+          <div class="form-group"><label>Infants (0–2)</label><input type="number" id="q-infants" value="0" min="0" oninput="updateQuote()"/></div>
+        </div>
+        <hr class="section-divider"/>
+        <h4 style="font-size:13px;font-weight:700;">🎟 Tickets</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Ticket Type</label>
+            <select id="q-ticket" onchange="updateQuote()">
+              <option value="water">Water Park – ₹799/adult</option>
+              <option value="amusement">Amusement Park – ₹699/adult</option>
+              <option value="combo">Combo – ₹1,299/adult</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Group Discount</label>
+            <select id="q-gdiscount" onchange="updateQuote()">
+              <option value="0">No Discount</option>
+              <option value="5">5% (30–49 pax)</option>
+              <option value="10">10% (50–99 pax)</option>
+              <option value="15">15% (100+ pax)</option>
+            </select>
+          </div>
+        </div>
+        <hr class="section-divider"/>
+        <h4 style="font-size:13px;font-weight:700;">🍽 F&B Package</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Meal Package</label>
+            <select id="q-meal" onchange="updateQuote()">
+              <option value="0">No Meal</option>
+              <option value="299">Basic – ₹299/pax</option>
+              <option value="499">Standard – ₹499/pax (Lunch Buffet)</option>
+              <option value="799">Premium – ₹799/pax (Unlimited)</option>
+              <option value="1299">Deluxe – ₹1,299/pax (Multi-course)</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Beverages Add-on</label>
+            <select id="q-beverage" onchange="updateQuote()">
+              <option value="0">None</option>
+              <option value="99">Welcome Drink – ₹99/pax</option>
+              <option value="199">Mocktail Bar – ₹199/pax</option>
+              <option value="299">Cocktail Pkg – ₹299/pax</option>
+            </select>
+          </div>
+        </div>
+        <hr class="section-divider"/>
+        <h4 style="font-size:13px;font-weight:700;">🏕 Venue & Services</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Lawn / Hall</label>
+            <select id="q-venue" onchange="updateQuote()">
+              <option value="0">No Venue</option>
+              <option value="15000">Lawn A – ₹15,000 (100 pax)</option>
+              <option value="25000">Lawn B – ₹25,000 (250 pax)</option>
+              <option value="40000">Banquet Hall – ₹40,000 (400 pax)</option>
+              <option value="60000">Premium Pavilion – ₹60,000</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Security</label>
+            <select id="q-security" onchange="updateQuote()">
+              <option value="0">Standard (included)</option>
+              <option value="5000">Dedicated – ₹5,000</option>
+              <option value="12000">Premium – ₹12,000</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Lockers</label>
+            <select id="q-lockers" onchange="updateQuote()">
+              <option value="0">No Lockers</option>
+              <option value="50">Small – ₹50/pax</option>
+              <option value="100">Large – ₹100/pax</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Costumes / Kits</label>
+            <select id="q-costumes" onchange="updateQuote()">
+              <option value="0">None</option>
+              <option value="150">Wristband – ₹150/pax</option>
+              <option value="300">T-shirt + Band – ₹300/pax</option>
+              <option value="500">Full Kit – ₹500/pax</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Entertainment</label>
+            <select id="q-entertainment" onchange="updateQuote()">
+              <option value="0">None</option>
+              <option value="8000">DJ + Sound – ₹8,000</option>
+              <option value="15000">Live Band – ₹15,000</option>
+              <option value="25000">Full Pkg – ₹25,000</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Special Notes</label><textarea id="q-notes" placeholder="Dietary needs, theme, decorations…" style="min-height:60px;"></textarea></div>
         </div>
       </div>
-      <div class="fnb-footer">
-        <button class="fnb-btn edit" onclick="editPackage(${i})">✏️ Edit</button>
-        <button class="fnb-btn push" onclick="pushPackage('${p.name}')">📣 Push</button>
-        <button class="fnb-btn del" onclick="delPackage(${i})">🗑</button>
-      </div>`;
-    el.appendChild(card);
-  });
+    </div>
+    <div>
+      <div class="card" style="position:sticky;top:80px;">
+        <div class="card-header"><span class="card-title">📋 Quote Summary</span><button class="btn btn-sm btn-brand" onclick="sendQuote()"><i class="fa fa-paper-plane"></i> Send</button></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;" id="q-client-display">— No client name —</div>
+        <div class="quote-section" id="quote-breakdown"></div>
+        <div style="margin-top:14px;display:flex;gap:8px;">
+          <button class="btn btn-outline" style="flex:1;font-size:12px;" onclick="exportQuote()"><i class="fa fa-file-pdf"></i> PDF</button>
+          <button class="btn btn-outline" style="flex:1;font-size:12px;" onclick="whatsappQuote()"><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp</button>
+          <button class="btn btn-outline" style="flex:1;font-size:12px;" onclick="emailQuote()"><i class="fa fa-envelope"></i> Email</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INVENTORY TAB -->
+<div id="tab-inventory" class="tab-panel">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">F&B Inventory Management</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm"><i class="fa fa-sync"></i> Sync POS</button>
+        <button class="btn btn-brand btn-sm"><i class="fa fa-plus"></i> Add Item</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;">
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;"><div style="font-size:11px;font-weight:700;color:#15803d;">IN STOCK</div><div style="font-size:22px;font-weight:800;color:#15803d;">284</div></div>
+      <div style="background:#fef9c3;border-radius:10px;padding:14px;"><div style="font-size:11px;font-weight:700;color:#854d0e;">LOW STOCK</div><div style="font-size:22px;font-weight:800;color:#854d0e;">18</div></div>
+      <div style="background:#fee2e2;border-radius:10px;padding:14px;"><div style="font-size:11px;font-weight:700;color:#991b1b;">OUT OF STOCK</div><div style="font-size:22px;font-weight:800;color:#991b1b;">5</div></div>
+      <div style="background:#dbeafe;border-radius:10px;padding:14px;"><div style="font-size:11px;font-weight:700;color:#1e40af;">ON ORDER</div><div style="font-size:22px;font-weight:800;color:#1e40af;">12</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Item</th><th>Category</th><th>Unit</th><th>In Stock</th><th>Reorder Lvl</th><th>Unit ₹</th><th>Status</th><th>Adjust</th></tr></thead>
+        <tbody id="inventory-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- REPORTS TAB -->
+<div id="tab-reports" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Revenue by Package Type</span></div>
+      <div style="height:280px;"><canvas id="pkg-revenue-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Top Selling Items</span></div>
+      <div style="height:280px;"><canvas id="top-items-chart"></canvas></div>
+    </div>
+    <div class="card" style="grid-column:span 2;">
+      <div class="card-header"><span class="card-title">Monthly F&B Revenue Trend</span></div>
+      <div style="height:250px;"><canvas id="revenue-trend-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+</div></div></div>
+
+<!-- PACKAGE MODAL -->
+<div class="modal-overlay" id="package-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Create / Edit Package</div><button class="modal-close" onclick="closeModal('package-modal')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="form-group"><label>Package Name</label><input type="text" id="pm-name" placeholder="e.g. Corporate Splash Day"/></div>
+        <div class="form-group"><label>Category</label><select id="pm-cat"><option>Water Park</option><option>Amusement Park</option><option>Combo</option><option>Corporate</option><option>Birthday</option><option>School Trip</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price per Adult (₹)</label><input type="number" id="pm-adult" placeholder="1299"/></div>
+        <div class="form-group"><label>Price per Child (₹)</label><input type="number" id="pm-child" placeholder="899"/></div>
+      </div>
+      <div class="form-group"><label>Includes (one item per line)</label><textarea id="pm-includes" placeholder="Admission ticket&#10;Lunch buffet&#10;Welcome drink&#10;Locker access"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Min Pax</label><input type="number" id="pm-min" value="20"/></div>
+        <div class="form-group"><label>Max Pax</label><input type="number" id="pm-max" value="500"/></div>
+      </div>
+      <div class="form-group"><label>Color Theme</label><select id="pm-theme"><option value="brand">Orange (Brand)</option><option value="teal">Teal</option><option value="green">Green</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn btn-outline" onclick="closeModal('package-modal')">Cancel</button>
+      <button class="btn btn-brand" onclick="savePackage()"><i class="fa fa-save"></i> Save Package</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── DATA ── */
+const packages=[
+  {id:1,name:'Splash Fiesta Basic',cat:'water',theme:'teal',priceAdult:799,priceChild:499,minPax:1,includes:['Water park admission','Locker (small)','Welcome drink','Parking']},
+  {id:2,name:'Splash Fiesta Premium',cat:'water',theme:'brand',priceAdult:1299,priceChild:799,minPax:1,featured:true,includes:['Water park admission','Lunch buffet','Locker (large)','Welcome drink','Priority entry']},
+  {id:3,name:'Thrill Seeker Pack',cat:'amusement',theme:'green',priceAdult:699,priceChild:449,minPax:1,includes:['Amusement park admission','Snack voucher ₹150','Locker access','Photo opportunity']},
+  {id:4,name:'Ultimate WOW Combo',cat:'combo',theme:'brand',priceAdult:1499,priceChild:999,minPax:1,featured:true,includes:['Water + Amusement admission','Unlimited buffet lunch','2 welcome mocktails','Large locker','Priority lanes']},
+  {id:5,name:'Corporate Day Out',cat:'corporate',theme:'teal',priceAdult:1899,priceChild:1199,minPax:50,includes:['Both park admissions','Lawn rental','3-course lunch','Team-building activities','Branded wristbands','Dedicated host']},
+  {id:6,name:'Birthday Splash Party',cat:'birthday',theme:'green',priceAdult:1599,priceChild:999,minPax:20,includes:['Water park + Fun zones','Birthday cake','Decorations','Dedicated server','Printed invites','Return gift per child']},
+  {id:7,name:'School Trip Explorer',cat:'school',theme:'brand',priceAdult:599,priceChild:399,minPax:30,includes:['Both park admissions','Packed lunch','Safety briefing','Teacher complimentary (1:10)','Activity badge']},
+  {id:8,name:'MICE Grand Package',cat:'corporate',theme:'teal',priceAdult:2499,priceChild:0,minPax:100,includes:['Full-day venue rental','All-inclusive buffet x3','AV setup','Branded merchandise','Security team','Event manager']},
+  {id:9,name:'Weekend Family Bundle',cat:'combo',theme:'green',priceAdult:1199,priceChild:799,minPax:1,includes:['Both parks admission','Poolside snack hamper','Family locker plan','Children activity kit']},
+];
+const inventory=[
+  {name:'Mineral Water 500ml',cat:'Beverages',unit:'Bottles',stock:1200,reorder:300,price:15,status:'ok'},
+  {name:'Coca-Cola 500ml',cat:'Beverages',unit:'Cans',stock:850,reorder:200,price:40,status:'ok'},
+  {name:'Veg Sandwich',cat:'Snacks',unit:'Pieces',stock:320,reorder:100,price:80,status:'ok'},
+  {name:'French Fries (Lg)',cat:'Fast Food',unit:'Portions',stock:45,reorder:50,price:120,status:'low'},
+  {name:'Pizza (Veg)',cat:'Fast Food',unit:'Pieces',stock:28,reorder:30,price:180,status:'low'},
+  {name:'Ice Cream Cup',cat:'Desserts',unit:'Cups',stock:600,reorder:150,price:60,status:'ok'},
+  {name:'Mango Lassi',cat:'Beverages',unit:'Glasses',stock:0,reorder:50,price:90,status:'out'},
+  {name:'Butter Chicken',cat:'Main Course',unit:'Portions',stock:12,reorder:20,price:250,status:'low'},
+  {name:'Paneer Tikka',cat:'Starters',unit:'Portions',stock:180,reorder:60,price:220,status:'ok'},
+  {name:'Gulab Jamun',cat:'Desserts',unit:'Pieces',stock:0,reorder:100,price:30,status:'out'},
+];
+
+/* ── RENDER PACKAGES ── */
+function renderPackages(list){
+  const g=document.getElementById('pkg-grid');
+  if(!list.length){g.innerHTML='<p style="color:var(--muted);padding:20px;">No packages found.</p>';return;}
+  g.innerHTML=list.map(p=>`
+  <div class="pkg-card${p.featured?' featured':''}">
+    <div class="pkg-header-block ${p.theme}">
+      <div class="pkg-title">${p.name}</div>
+      <div class="pkg-subtitle">${p.cat.charAt(0).toUpperCase()+p.cat.slice(1)} | Min ${p.minPax} pax</div>
+      <div class="pkg-price">₹${p.priceAdult.toLocaleString('en-IN')}<span>/adult</span></div>
+    </div>
+    <div class="pkg-body">
+      <ul class="pkg-items">${p.includes.map(i=>`<li><i class="fa fa-check-circle"></i>${i}</li>`).join('')}</ul>
+      ${p.priceChild?`<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Child: ₹${p.priceChild.toLocaleString('en-IN')}/pax</div>`:''}
+      <div class="pkg-actions">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="quickQuote(${p.id})"><i class="fa fa-calculator"></i> Quote</button>
+        <button class="btn btn-brand btn-sm" style="flex:1;" onclick="editPackage(${p.id})"><i class="fa fa-edit"></i> Edit</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+renderPackages(packages);
+function filterPackages(c){renderPackages(c==='all'?packages:packages.filter(p=>p.cat===c));}
+function searchPackages(q){const s=q.toLowerCase();renderPackages(packages.filter(p=>p.name.toLowerCase().includes(s)||p.cat.includes(s)));}
+
+/* ── TABS ── */
+function switchTab(id,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='reports')setTimeout(initCharts,100);
 }
 
-function toggleFnb(idx, el) {
-  el.classList.toggle('on');
-  fnbPackages[idx].active = el.classList.contains('on');
+/* ── CSV UPLOAD ── */
+let parsedCSV=[];
+function handleDragOver(e){e.preventDefault();document.getElementById('drop-zone').classList.add('dragover');}
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)parseCSV(f);}
+function handleCSVFile(e){parseCSV(e.target.files[0]);}
+function parseCSV(file){
+  const s=document.getElementById('csv-status');
+  s.style.display='block';s.style.background='#dbeafe';s.style.color='#1e40af';
+  s.innerHTML='<i class="fa fa-spinner fa-spin"></i> Parsing '+file.name+'…';
+  Papa.parse(file,{header:true,skipEmptyLines:true,complete(r){
+    parsedCSV=r.data;
+    s.style.background='#d1fae5';s.style.color='#065f46';
+    s.innerHTML=`<i class="fa fa-check-circle"></i> Found <strong>${r.data.length} rows</strong> in <strong>${r.meta.fields.length} columns</strong>. Review below and click Import.`;
+    renderCSVPreview(r.data.slice(0,10),r.meta.fields);
+  },error(err){s.style.background='#fee2e2';s.style.color='#991b1b';s.innerHTML='<i class="fa fa-times-circle"></i> '+err.message;}});
+}
+function renderCSVPreview(rows,cols){
+  document.getElementById('csv-preview-wrap').style.display='block';
+  document.getElementById('csv-preview-table').innerHTML=
+    `<thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${r[c]||''}</td>`).join('')}</tr>`).join('')}</tbody>`;
+}
+function importCSVData(){if(!parsedCSV.length){alert('No data to import.');return;}alert(`✅ ${parsedCSV.length} records imported!`);}
+function downloadTemplate(){
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('Name,Category,PriceAdult,PriceChild,MinPax,MaxPax,Includes\nSample Package,water,799,499,1,500,"Ticket,Locker,Drink"');
+  a.download='wow_fnb_template.csv';a.click();
 }
 
-function editPackage(idx) {
-  const p = fnbPackages[idx];
-  const name = prompt('Package name:', p.name);
-  if (name) { p.name = name; renderFnb(); }
+/* ── QUOTE BUILDER ── */
+const tkP={water:{a:799,c:499},amusement:{a:699,c:449},combo:{a:1299,c:899}};
+function updateQuote(){
+  const ad=+document.getElementById('q-adults').value||0;
+  const ch=+document.getElementById('q-children').value||0;
+  const px=ad+ch;
+  const tkt=document.getElementById('q-ticket').value;
+  const gd=+document.getElementById('q-gdiscount').value||0;
+  const meal=+document.getElementById('q-meal').value||0;
+  const bev=+document.getElementById('q-beverage').value||0;
+  const venue=+document.getElementById('q-venue').value||0;
+  const sec=+document.getElementById('q-security').value||0;
+  const lck=+document.getElementById('q-lockers').value||0;
+  const cos=+document.getElementById('q-costumes').value||0;
+  const ent=+document.getElementById('q-entertainment').value||0;
+  const tA=tkP[tkt].a*ad*(1-gd/100);
+  const tC=tkP[tkt].c*ch*(1-gd/100);
+  const sub=tA+tC+meal*px+bev*px+venue+sec+lck*px+cos*px+ent;
+  const gst=sub*0.18;
+  const total=sub+gst;
+  const fmt=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+  const rows=[['Tickets Adults ×'+ad,fmt(tA)],['Tickets Children ×'+ch,fmt(tC)],
+    ...(meal?[['Meal ('+px+' pax)',fmt(meal*px)]]:[]),
+    ...(bev?[['Beverages ('+px+' pax)',fmt(bev*px)]]:[]),
+    ...(venue?[['Venue',fmt(venue)]]:[]),
+    ...(sec?[['Security',fmt(sec)]]:[]),
+    ...(lck?[['Lockers ('+px+' pax)',fmt(lck*px)]]:[]),
+    ...(cos?[['Costumes ('+px+' pax)',fmt(cos*px)]]:[]),
+    ...(ent?[['Entertainment',fmt(ent)]]:[]),
+    ['Subtotal',fmt(sub)],['GST @ 18%',fmt(gst)]];
+  const cl=document.getElementById('q-client').value||'— No client name —';
+  const dt=document.getElementById('q-date').value;
+  document.getElementById('q-client-display').textContent=cl+(dt?' | '+dt:'');
+  document.getElementById('quote-breakdown').innerHTML=
+    rows.map(([l,v])=>`<div class="quote-row"><span>${l}</span><span>${v}</span></div>`).join('')+
+    `<div class="quote-row"><span>TOTAL (incl. GST)</span><span class="quote-total">${fmt(total)}</span></div>`;
+}
+updateQuote();
+function quickQuote(id){
+  const p=packages.find(x=>x.id===id);if(!p)return;
+  document.getElementById('tab-btn-quote').click();
+  document.getElementById('q-ticket').value=p.cat==='amusement'?'amusement':p.cat==='combo'?'combo':'water';
+  updateQuote();
+}
+function sendQuote(){alert('📧 Quote sent to client via email + WhatsApp!');}
+function exportQuote(){alert('📄 PDF quote generation triggered (Razorpay print).');}
+function whatsappQuote(){alert('📱 Opening WhatsApp quote sender…');}
+function emailQuote(){alert('📧 Opening email with attached PDF quote…');}
+
+/* ── INVENTORY ── */
+function renderInventory(){
+  document.getElementById('inventory-body').innerHTML=inventory.map((it,i)=>`
+  <tr>
+    <td><strong>${it.name}</strong></td>
+    <td><span class="badge badge-blue">${it.cat}</span></td>
+    <td>${it.unit}</td>
+    <td id="is${i}" style="font-weight:700;color:${it.status==='out'?'var(--red)':it.status==='low'?'#d97706':'var(--green)'}">${it.stock}</td>
+    <td style="color:var(--muted);">${it.reorder}</td>
+    <td>₹${it.price}</td>
+    <td><span class="badge ${it.status==='ok'?'badge-green':it.status==='low'?'badge-yellow':'badge-red'}">${it.status==='ok'?'✓ In Stock':it.status==='low'?'⚠ Low':'✗ Out'}</span></td>
+    <td>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="adjStock(${i},-1)">−</button>
+        <input class="qty-input" type="number" value="10" id="aq${i}"/>
+        <button class="qty-btn" onclick="adjStock(${i},1)">+</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+renderInventory();
+function adjStock(i,dir){const q=+document.getElementById('aq'+i).value||10;inventory[i].stock=Math.max(0,inventory[i].stock+dir*q);const c=document.getElementById('is'+i);if(c)c.textContent=inventory[i].stock;}
+
+/* ── CHARTS ── */
+let chartsInited=false;
+function initCharts(){
+  if(chartsInited)return;chartsInited=true;
+  new Chart(document.getElementById('pkg-revenue-chart'),{type:'doughnut',data:{
+    labels:['Water Park','Amusement','Combo','Corporate','Birthday','School'],
+    datasets:[{data:[28,18,24,15,10,5],backgroundColor:['#0096c7','#ff6b35','#06d6a0','#ffd60a','#7c3aed','#ec4899']}]
+  },options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
+  new Chart(document.getElementById('top-items-chart'),{type:'bar',data:{
+    labels:['Mineral Water','Ice Cream','French Fries','Veg Sandwich','Lassi'],
+    datasets:[{label:'Units Sold',data:[4200,2800,2100,1800,1500],backgroundColor:'#ff6b35'}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('revenue-trend-chart'),{type:'line',data:{
+    labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+    datasets:[{label:'F&B Revenue (₹L)',data:[8.2,10.1,14.5,9.8,11.3,13.7],borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.1)',tension:.4,fill:true}]
+  },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
 }
 
-function delPackage(idx) {
-  if (confirm('Delete this F&B package?')) { fnbPackages.splice(idx, 1); renderFnb(); }
+/* ── MODALS ── */
+function openPackageModal(){document.getElementById('package-modal').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function savePackage(){
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name){alert('Package name required.');return;}
+  packages.push({id:packages.length+1,name,cat:document.getElementById('pm-cat').value.toLowerCase().replace(' park','').replace(' ',''),
+    theme:document.getElementById('pm-theme').value,priceAdult:+document.getElementById('pm-adult').value||999,
+    priceChild:+document.getElementById('pm-child').value||699,minPax:+document.getElementById('pm-min').value||1,
+    includes:document.getElementById('pm-includes').value.split('\n').filter(Boolean)});
+  renderPackages(packages);closeModal('package-modal');alert('✅ Package "'+name+'" created!');
 }
-
-function addPackage() {
-  const name = prompt('Package name:'); if (!name) return;
-  const price = parseFloat(prompt('Price per pax (₹):')) || 0;
-  fnbPackages.push({id:'FNB-'+String(fnbPackages.length+1).padStart(3,'0'),name,category:'meal',emoji:'🍽',price,gst:5,items:['Item 1','Item 2'],min_pax:1,active:true});
-  renderFnb();
+function editPackage(id){
+  const p=packages.find(x=>x.id===id);if(!p)return;
+  document.getElementById('pm-name').value=p.name;document.getElementById('pm-adult').value=p.priceAdult;
+  document.getElementById('pm-child').value=p.priceChild;document.getElementById('pm-includes').value=p.includes.join('\n');
+  document.getElementById('pm-min').value=p.minPax;openPackageModal();
 }
-
-function pushPackage(name) {
-  document.getElementById('push-title').value = 'Special Offer: ' + name;
-  st('push');
-}
-
-// CSV Handler
-let parsedRows = [];
-function handleCSV(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const text = ev.target.result;
-    const lines = text.split('\n').filter(l => l.trim());
-    const headers = lines[0].split(',');
-    parsedRows = lines.slice(1).map(l => {
-      const vals = l.split(',');
-      const obj = {};
-      headers.forEach((h,i) => obj[h.trim()] = (vals[i]||'').trim().replace(/"/g,''));
-      return obj;
-    });
-    const preview = document.getElementById('csv-preview');
-    preview.innerHTML = `<div style="font-size:13px;font-weight:700;color:#10b981;margin-bottom:8px;">✓ ${parsedRows.length} items parsed</div>` +
-      parsedRows.map(r => `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;"><b style="color:#ffd700;">${r.name||r.package_id||'—'}</b> · ₹${r.price||0} · ${r.category||'—'}</div>`).join('');
-    document.getElementById('csv-actions').style.display = 'block';
-    document.getElementById('csv-status-text').textContent = `${parsedRows.length} F&B items ready to import. Review above then click Import.`;
-    document.getElementById('upload-zone').style.borderColor = 'rgba(16,185,129,.5)';
-  };
-  reader.readAsText(file);
-}
-
-async function importCSV() {
-  for (const row of parsedRows) {
-    try {
-      await fetch('tables/fnb_packages', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(row) });
-    } catch(e) {}
-  }
-  alert(`✅ ${parsedRows.length} F&B packages imported successfully!\nThey are now available in the partner quote builder and customer booking flow.`);
-  clearCSV();
-}
-
-function clearCSV() {
-  document.getElementById('csv-preview').innerHTML = 'Upload a CSV file to preview items here…';
-  document.getElementById('csv-actions').style.display = 'none';
-  document.getElementById('upload-zone').style.borderColor = 'rgba(255,215,0,.25)';
-  document.getElementById('csv-file').value = '';
-  parsedRows = [];
-}
-
-function downloadTemplate() {
-  const tmpl = 'package_id,name,category,price,gst_pct,items,min_pax,max_pax,available\nFNB-001,"Veg Lunch Pack",meal,350,5,"Dal,Roti,Rice,Salad,Water",1,500,true\n';
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(tmpl);
-  a.download = 'fnb-packages-template.csv';
-  a.click();
-}
-
-function sendPush() {
-  const title = document.getElementById('push-title').value || 'New F&B Offer';
-  const channels = [];
-  if (document.getElementById('ch-email').checked) channels.push('Email');
-  if (document.getElementById('ch-wa').checked) channels.push('WhatsApp');
-  if (document.getElementById('ch-sms')?.checked) channels.push('SMS');
-  if (document.getElementById('ch-push')?.checked) channels.push('Push');
-  alert(`📣 Campaign "${title}" sent via: ${channels.join(', ')}!\nDelivery report will be available in Campaigns history.`);
-}
-
-function saveAll() { alert('✅ All F&B configurations saved successfully!'); }
-
-renderFnb();
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
