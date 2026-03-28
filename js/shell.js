@@ -3,12 +3,17 @@
 'use strict';
 
 const BASE = (function () {
-  return window.location.pathname.includes('/book/') ||
-         window.location.pathname.includes('/admin/') ||
-         window.location.pathname.includes('/groups/') ||
-         window.location.pathname.includes('/sales/') ||
-         window.location.pathname.includes('/portal/') ||
-         window.location.pathname.includes('/partner/') ? '../' : '';
+  const p = window.location.pathname;
+  return p.includes('/book/') ||
+         p.includes('/admin/') ||
+         p.includes('/groups/') ||
+         p.includes('/sales/') ||
+         p.includes('/portal/') ||
+         p.includes('/partner/') ||
+         p.includes('/internal/') ||
+         p.includes('/reseller/') ||
+         p.includes('/ta/') ||
+         p.includes('/passport/') ? '../' : '';
 })();
 
 // Flat nav items (no dropdowns) — used for active-state detection
@@ -335,9 +340,9 @@ function buildFooter() {
         <a href="${BASE}admin/call-center.html">&#127911; Call Centre CRM</a>
         <div style="margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;">
           <div style="font-size:10px;color:rgba(255,255,255,.25);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Partner Portals</div>
-          <a href="${BASE}partner/dashboard.html">&#128722; Reseller ERP</a>
-          <a href="${BASE}partner/dashboard.html">&#9992;&#65039; Travel Agent Portal</a>
-          <a href="${BASE}partner/onboarding-kyc.html">Reseller / TA Onboarding</a>
+          <a href="${BASE}reseller/index.html">&#128722; Reseller ERP</a>
+          <a href="${BASE}ta/index.html">&#9992;&#65039; Travel Agent Portal</a>
+          <a href="${BASE}partner/onboarding.html">Reseller / TA Onboarding</a>
           <a href="${BASE}groups/corporate.html">&#127970; Corporate Portal</a>
         </div>
       </div>
