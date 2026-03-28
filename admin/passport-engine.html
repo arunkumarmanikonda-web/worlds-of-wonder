@@ -13,7 +13,7 @@
 body{font-family:'Inter',sans-serif;background:#f0f2f5;color:#1a1a2e;display:flex;min-height:100vh}
 /* Sidebar */
 .sidebar{width:240px;background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%);color:#fff;flex-shrink:0;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;z-index:100}
-.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:block;}
 .sidebar-logo .brand{font-size:18px;font-weight:800;color:#FFD700;letter-spacing:1px}
 .sidebar-logo .sub{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:2px}
 .sidebar-section{padding:16px 12px 4px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1.5px}
@@ -142,8 +142,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <!-- Sidebar -->
 <nav class="sidebar">
   <div class="sidebar-logo">
-    <div class="brand">⚡ WOW ADMIN</div>
-    <div class="sub">Worlds of Wonder · Noida</div>
+    <a href="index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;display:block;" /></a>
   </div>
   <div class="sidebar-section">Overview</div>
   <a href="index.html"><i class="fas fa-th-large"></i> Dashboard</a>
