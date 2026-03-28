@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales ERP Dashboard — Worlds of Wonder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--bg:#0a0a14;--sidebar:#0e0e22;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--orange:#f97316}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+    /* SIDEBAR */
+    .sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+    .sb-brand{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .sb-brand .ico{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.9rem;flex-shrink:0}
+    .sb-brand .bt{font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:700;color:var(--gold);line-height:1.2}
+    .sb-brand .bs{font-size:.65rem;color:var(--muted)}
+    .sb-nav{flex:1;padding:10px 0;overflow-y:auto}
+    .sb-sec{padding:8px 14px 4px;font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .sb-link{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;transition:all .2s;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:600;position:relative}
+    .sb-link:hover,.sb-link.active{color:#fff;background:rgba(201,168,76,.08)}
+    .sb-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+    .sb-link.active i{color:var(--gold)}
+    .sb-link i{width:15px;text-align:center;font-size:.82rem}
+    .sb-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px;font-size:.62rem;font-weight:800}
+    .sb-badge.gold{background:var(--gold);color:#0a0a14}
+    .sb-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#0a0a14;flex-shrink:0}
+    .sb-user .su-name{font-size:.78rem;font-weight:700}
+    .sb-user .su-role{font-size:.65rem;color:var(--muted)}
+    /* MAIN */
+    .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+    .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .topbar h1{font-size:1.05rem;font-weight:800}
+    .topbar p{font-size:.72rem;color:var(--muted)}
+    .tb-right{display:flex;align-items:center;gap:10px}
+    .tb-btn{padding:7px 14px;border-radius:9px;font-size:.78rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;border:none;text-decoration:none}
+    .tb-btn.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14}
+    .tb-btn.gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
+    .tb-btn.outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+    .tb-btn.outline:hover{border-color:var(--gold);color:var(--gold)}
+    .content{padding:20px 24px;flex:1;overflow-y:auto}
+    /* KPI STRIP */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+    .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:transform .2s;position:relative;overflow:hidden}
+    .kpi:hover{transform:translateY(-2px)}
+    .kpi::after{content:'';position:absolute;top:0;right:0;width:3px;height:100%}
+    .kpi.gold-k::after{background:var(--gold)}
+    .kpi.green-k::after{background:var(--green)}
+    .kpi.blue-k::after{background:var(--blue)}
+    .kpi.red-k::after{background:var(--red)}
+    .kpi.purple-k::after{background:var(--purple)}
+    .kpi-icon{font-size:.9rem;margin-bottom:8px}
+    .kpi-icon.gold{color:var(--gold)}
+    .kpi-icon.green{color:var(--green)}
+    .kpi-icon.blue{color:var(--blue)}
+    .kpi-icon.red{color:var(--red)}
+    .kpi-icon.purple{color:var(--purple)}
+    .kpi-val{font-size:1.5rem;font-weight:900;font-family:'Poppins',sans-serif;line-height:1}
+    .kpi-lbl{font-size:.68rem;color:var(--muted);font-weight:700;margin-top:3px}
+    .kpi-chg{font-size:.68rem;margin-top:6px;display:flex;align-items:center;gap:3px;font-weight:700}
+    .kpi-chg.up{color:var(--green)}
+    .kpi-chg.down{color:var(--red)}
+    /* GRID LAYOUTS */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .g3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+    .g-full{margin-bottom:16px}
+    /* WIDGET */
+    .w{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .wh{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .wh h3{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:7px}
+    .wh h3 i{color:var(--gold);font-size:.82rem}
+    .wh a,.wh button{font-size:.72rem;color:var(--gold);text-decoration:none;background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700}
+    .wb{padding:14px 18px}
+    /* CHART */
+    .chart-box{height:240px}
+    /* TABLE */
+    .dt{width:100%;border-collapse:collapse}
+    .dt th{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:700}
+    .dt td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.78rem;vertical-align:middle}
+    .dt tr:last-child td{border-bottom:none}
+    .dt tr:hover td{background:rgba(255,255,255,.02)}
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:.66rem;font-weight:700}
+    .badge.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .badge.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .badge.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    .badge.purple{background:rgba(168,85,247,.15);color:var(--purple)}
+    .badge.red{background:rgba(239,68,68,.15);color:var(--red)}
+    .badge.orange{background:rgba(249,115,22,.15);color:var(--orange)}
+    /* PIPELINE */
+    .pipeline-cols{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+    .pipe-col{min-width:140px;background:rgba(255,255,255,.03);border-radius:10px;padding:10px}
+    .pipe-col-head{font-size:.68rem;font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+    .pipe-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:6px;font-size:.72rem}
+    .pipe-card .pc-name{font-weight:700;margin-bottom:2px}
+    .pipe-card .pc-amt{color:var(--gold);font-weight:800;font-family:'Poppins',sans-serif;font-size:.75rem}
+    /* PROGRESS */
+    .progress-row{margin-bottom:10px}
+    .progress-label{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:4px}
+    .progress-label span:first-child{color:var(--muted)}
+    .progress-label span:last-child{font-weight:700}
+    .progress-bar{background:#1a1a3e;border-radius:20px;height:7px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:20px;transition:width 1s ease}
+    /* ACTIVITY */
+    .act-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .act-item:last-child{border-bottom:none}
+    .act-ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+    .act-ico.gold{background:rgba(201,168,76,.15);color:var(--gold)}
+    .act-ico.green{background:rgba(34,197,94,.15);color:var(--green)}
+    .act-ico.blue{background:rgba(59,130,246,.15);color:var(--blue)}
+    .act-ico.red{background:rgba(239,68,68,.15);color:var(--red)}
+    .act-text{font-size:.78rem;line-height:1.4;flex:1}
+    .act-time{font-size:.65rem;color:var(--muted);margin-top:2px}
+    @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.g2,.g3{grid-template-columns:1fr}.main{margin-left:0}.sidebar{display:none}}
+  </style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="ico"><i class="fas fa-chart-line"></i></div>
+    <div>
+      <div class="bt">WOW Sales ERP</div>
+      <div class="bs">Enterprise Resource Planning</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Overview</div>
+    <a href="erp-dashboard.html" class="sb-link active"><i class="fas fa-tachometer-alt"></i>ERP Dashboard</a>
+    <a href="erp-crm.html" class="sb-link"><i class="fas fa-users"></i>CRM & Leads<span class="sb-badge">12</span></a>
+    <a href="erp-agents.html" class="sb-link"><i class="fas fa-user-tie"></i>Agents</a>
+    <a href="erp-reports.html" class="sb-link"><i class="fas fa-chart-bar"></i>Reports</a>
+    <a href="erp-products.html" class="sb-link"><i class="fas fa-box"></i>Products</a>
+    <div class="sb-sec">Sales</div>
+    <a href="passport-kyc.html" class="sb-link"><i class="fas fa-user-plus"></i>New Sale</a>
+    <a href="passport-dashboard.html" class="sb-link"><i class="fas fa-passport"></i>Sales Portal</a>
+    <div class="sb-sec">Admin</div>
+    <a href="../admin/passport-products.html" class="sb-link"><i class="fas fa-cog"></i>Product Config</a>
+    <a href="../admin/index.html" class="sb-link"><i class="fas fa-shield-alt"></i>Admin Panel</a>
+    <div class="sb-sec">Account</div>
+    <a href="#" class="sb-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-avatar" id="sbInit">RS</div>
+    <div class="sb-user">
+      <div class="su-name" id="sbName">Agent</div>
+      <div class="su-role" id="sbRole">Field Agent</div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Sales <span style="color:var(--gold)">ERP</span> Dashboard</h1>
+      <p id="dateStr">Loading…</p>
+    </div>
+    <div class="tb-right">
+      <a href="erp-reports.html" class="tb-btn outline"><i class="fas fa-download"></i> Export</a>
+      <a href="erp-crm.html" class="tb-btn outline"><i class="fas fa-users"></i> CRM</a>
+      <a href="passport-kyc.html" class="tb-btn gold"><i class="fas fa-plus"></i> New Sale</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- KPI Strip -->
+    <div class="kpi-grid">
+      <div class="kpi gold-k">
+        <div class="kpi-icon gold"><i class="fas fa-rupee-sign"></i></div>
+        <div class="kpi-val">₹18.4L</div>
+        <div class="kpi-lbl">Total Revenue (MTD)</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +22% vs last month</div>
+      </div>
+      <div class="kpi green-k">
+        <div class="kpi-icon green"><i class="fas fa-passport"></i></div>
+        <div class="kpi-val">368</div>
+        <div class="kpi-lbl">Passports Sold (MTD)</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +31 vs target</div>
+      </div>
+      <div class="kpi blue-k">
+        <div class="kpi-icon blue"><i class="fas fa-user-tie"></i></div>
+        <div class="kpi-val">4</div>
+        <div class="kpi-lbl">Active Agents</div>
+        <div class="kpi-chg up"><i class="fas fa-check"></i> All on target</div>
+      </div>
+      <div class="kpi red-k">
+        <div class="kpi-icon red"><i class="fas fa-funnel-dollar"></i></div>
+        <div class="kpi-val">₹6.2L</div>
+        <div class="kpi-lbl">Pipeline Value</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> 28 open leads</div>
+      </div>
+      <div class="kpi purple-k">
+        <div class="kpi-icon purple"><i class="fas fa-percentage"></i></div>
+        <div class="kpi-val">78%</div>
+        <div class="kpi-lbl">Conversion Rate</div>
+        <div class="kpi-chg up"><i class="fas fa-arrow-up"></i> +5% vs last</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="g3">
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-chart-bar"></i>Monthly Revenue & Sales</h3><a href="erp-reports.html">Full Report</a></div>
+        <div class="chart-box" id="revenueChart"></div>
+      </div>
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-chart-pie"></i>Sales by Plan</h3></div>
+        <div class="chart-box" id="planChart"></div>
+      </div>
+    </div>
+
+    <!-- Agent Performance + Pipeline -->
+    <div class="g2">
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-users"></i>Agent Performance</h3><a href="erp-agents.html">View All</a></div>
+        <div class="wb">
+          <div id="agentPerf"></div>
+        </div>
+      </div>
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-funnel-dollar"></i>Sales Pipeline</h3><a href="erp-crm.html">Open CRM</a></div>
+        <div class="wb" style="padding:14px">
+          <div class="pipeline-cols" id="pipelineCols"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions + Activity Feed -->
+    <div class="g2">
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-receipt"></i>Recent Transactions</h3><a href="#">Export</a></div>
+        <div style="overflow-x:auto">
+          <table class="dt" id="txTable">
+            <thead><tr><th>Customer</th><th>Plan</th><th>Agent</th><th>Amount</th><th>Mode</th><th>Date</th></tr></thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="w">
+        <div class="wh"><h3><i class="fas fa-stream"></i>Activity Feed</h3><button onclick="document.getElementById('actFeed').innerHTML='<div style=\'padding:14px;font-size:.78rem;color:var(--muted)\'>Cleared</div>'">Clear</button></div>
+        <div class="wb" id="actFeed"></div>
+      </div>
+    </div>
+
+    <!-- Zone Performance Map -->
+    <div class="w g-full">
+      <div class="wh"><h3><i class="fas fa-map-marked-alt"></i>Zone-wise Performance</h3><a href="erp-reports.html">Detailed Report</a></div>
+      <div class="wb">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" id="zoneGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const agent = JSON.parse(sessionStorage.getItem('sales_agent') || '{"name":"Demo Manager","role":"manager","zone":"All Zones"}');
+document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+const init = agent.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+document.getElementById('sbInit').textContent = init;
+document.getElementById('sbName').textContent = agent.name;
+document.getElementById('sbRole').textContent = agent.role==='manager'?'Team Manager':'Field Agent';
+
+// Revenue Chart
+const rChart = echarts.init(document.getElementById('revenueChart'));
+rChart.setOption({
+  tooltip:{trigger:'axis',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},
+  legend:{data:['Revenue','Passports'],textStyle:{color:'#8888aa'},bottom:0},
+  grid:{top:20,bottom:40,left:50,right:20},
+  xAxis:{type:'category',data:['Oct','Nov','Dec','Jan','Feb','Mar'],axisLine:{lineStyle:{color:'#2a2a4a'}},axisLabel:{color:'#8888aa',fontSize:11}},
+  yAxis:[
+    {type:'value',name:'₹L',axisLabel:{color:'#8888aa',fontSize:10,formatter:v=>v/100000+'L'},splitLine:{lineStyle:{color:'#1a1a3e'}}},
+    {type:'value',name:'Qty',axisLabel:{color:'#8888aa',fontSize:10},splitLine:{show:false}}
+  ],
+  series:[
+    {name:'Revenue',type:'bar',data:[850000,1020000,1380000,1560000,1720000,1840000],itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(201,168,76,.9)'},{offset:1,color:'rgba(154,111,42,.4)'}]}},barMaxWidth:36,borderRadius:[4,4,0,0]},
+    {name:'Passports',type:'line',yAxisIndex:1,data:[178,214,289,312,341,368],smooth:true,lineStyle:{color:'#22c55e',width:2},itemStyle:{color:'#22c55e'},symbol:'circle',symbolSize:6}
+  ]
+});
+
+// Plan Chart
+const pChart = echarts.init(document.getElementById('planChart'));
+pChart.setOption({
+  tooltip:{trigger:'item',backgroundColor:'#12122a',borderColor:'#2a2a4a',textStyle:{color:'#f0f0f0'}},
+  legend:{bottom:0,textStyle:{color:'#8888aa'},data:['Combo','Water Park','Amusement']},
+  series:[{type:'pie',radius:['45%','75%'],center:['50%','45%'],
+    data:[
+      {value:168,name:'Combo',itemStyle:{color:'#C9A84C'}},
+      {value:124,name:'Water Park',itemStyle:{color:'#3b82f6'}},
+      {value:76,name:'Amusement',itemStyle:{color:'#a855f7'}},
+    ],
+    label:{color:'#f0f0f0',fontSize:11},
+    emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.5)'}}
+  }]
+});
+
+// Agent Performance
+const AGENTS=[
+  {name:'Priya Singh',zone:'Rohini',target:60,sold:41,rev:1848000,initials:'PS'},
+  {name:'Amit Kumar',zone:'Manager',target:200,sold:142,rev:6390000,initials:'AK'},
+  {name:'Raj Sharma',zone:'N.Delhi',target:50,sold:23,rev:1035000,initials:'RS'},
+  {name:'Karan Verma',zone:'Dwarka',target:45,sold:18,rev:810000,initials:'KV'},
+];
+document.getElementById('agentPerf').innerHTML = AGENTS.map(a=>{
+  const pct=Math.round(a.sold/a.target*100);
+  return `<div class="progress-row">
+    <div class="progress-label">
+      <span><b style="color:#fff">${a.name}</b> <span style="color:var(--muted);font-size:.68rem">${a.zone}</span></span>
+      <span>${a.sold}/${a.target} <span style="color:var(--gold)">${pct}%</span></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':pct>=70?'var(--gold)':'var(--blue)'}"></div></div>
+  </div>`;
+}).join('');
+
+// Pipeline
+const PIPELINE=[
+  {stage:'New',color:'#3b82f6',items:[{name:'Suresh M.',amt:'₹4,999'},{name:'Neha P.',amt:'₹2,999'}]},
+  {stage:'Contacted',color:'#a855f7',items:[{name:'Rohit K.',amt:'₹4,999'},{name:'Anita S.',amt:'₹2,499'}]},
+  {stage:'Demo',color:'#f97316',items:[{name:'Vikram T.',amt:'₹4,999'}]},
+  {stage:'Proposal',color:'#C9A84C',items:[{name:'Pooja D.',amt:'₹4,999'},{name:'Arun B.',amt:'₹2,999'}]},
+  {stage:'Won',color:'#22c55e',items:[{name:'Kavita R.',amt:'₹4,999'},{name:'Manish L.',amt:'₹2,499'}]},
+];
+document.getElementById('pipelineCols').innerHTML = PIPELINE.map(p=>`
+  <div class="pipe-col">
+    <div class="pipe-col-head" style="color:${p.color}">${p.stage} (${p.items.length})</div>
+    ${p.items.map(i=>`<div class="pipe-card"><div class="pc-name">${i.name}</div><div class="pc-amt">${i.amt}</div></div>`).join('')}
+  </div>`).join('');
+
+// Transactions
+const txData=[
+  {name:'Rahul Sharma',plan:'Combo',agent:'Raj S.',amt:'₹4,999',mode:'UPI',date:'Today 14:32'},
+  {name:'Priya Mehta',plan:'Water Park',agent:'Priya S.',amt:'₹2,999',mode:'Cash',date:'Today 12:18'},
+  {name:'Amit Verma',plan:'Amusement',agent:'Karan V.',amt:'₹2,499',mode:'Card',date:'Today 11:05'},
+  {name:'Sunita Rao',plan:'Combo',agent:'Priya S.',amt:'₹4,999',mode:'UPI',date:'Yesterday'},
+  {name:'Karan Singh',plan:'Water Park',agent:'Raj S.',amt:'₹2,999',mode:'Cash',date:'Yesterday'},
+];
+document.getElementById('txBody').innerHTML = txData.map(t=>`
+  <tr>
+    <td style="font-weight:700">${t.name}</td>
+    <td><span class="badge ${t.plan==='Combo'?'gold':t.plan==='Water Park'?'blue':'purple'}">${t.plan}</span></td>
+    <td style="color:var(--muted)">${t.agent}</td>
+    <td style="font-weight:800;color:var(--gold)">${t.amt}</td>
+    <td><span class="badge ${t.mode==='Cash'?'green':t.mode==='UPI'?'blue':'purple'}">${t.mode}</span></td>
+    <td style="color:var(--muted);font-size:.72rem">${t.date}</td>
+  </tr>`).join('');
+
+// Activity Feed
+const activities=[
+  {type:'green',icon:'fa-passport',text:'<b>Rahul Sharma</b> purchased Combo Passport via UPI',time:'2 mins ago'},
+  {type:'blue',icon:'fa-user-plus',text:'New lead <b>Meena Kapoor</b> added to pipeline by Priya S.',time:'18 mins ago'},
+  {type:'gold',icon:'fa-star',text:'<b>Priya Singh</b> hit 68% of monthly target 🎯',time:'1 hr ago'},
+  {type:'red',icon:'fa-phone-slash',text:'Lead <b>Aman Gupta</b> moved to Lost — budget constraint',time:'2 hrs ago'},
+  {type:'blue',icon:'fa-passport',text:'<b>Sunita Rao</b> purchased Combo Passport via UPI',time:'Yesterday'},
+  {type:'green',icon:'fa-coins',text:'Incentive ₹1,800 credited to <b>Raj Sharma</b>',time:'Yesterday'},
+];
+document.getElementById('actFeed').innerHTML = activities.map(a=>`
+  <div class="act-item">
+    <div class="act-ico ${a.type}"><i class="fas ${a.icon}"></i></div>
+    <div>
+      <div class="act-text">${a.text}</div>
+      <div class="act-time">${a.time}</div>
+    </div>
+  </div>`).join('');
+
+// Zone Grid
+const zones=[
+  {name:'North Delhi',agent:'Raj Sharma',sold:23,target:50,rev:'₹1.04L'},
+  {name:'Rohini',agent:'Priya Singh',sold:41,target:60,rev:'₹1.85L'},
+  {name:'Dwarka',agent:'Karan Verma',sold:18,target:45,rev:'₹81K'},
+  {name:'Head Office',agent:'Amit Kumar',sold:35,target:100,rev:'₹1.58L'},
+];
+document.getElementById('zoneGrid').innerHTML = zones.map(z=>{
+  const pct=Math.round(z.sold/z.target*100);
+  return `<div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px">
+    <div style="font-size:.78rem;font-weight:800;color:#fff;margin-bottom:2px">${z.name}</div>
+    <div style="font-size:.68rem;color:var(--muted);margin-bottom:10px">${z.agent}</div>
+    <div style="font-size:1.4rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif;margin-bottom:2px">${z.rev}</div>
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px">${z.sold}/${z.target} passports</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':pct>=70?'var(--gold)':'var(--blue)'}"></div></div>
+  </div>`;
+}).join('');
+
+function logout(){sessionStorage.removeItem('sales_agent');window.location.href='passport-login.html';}
+window.addEventListener('resize',()=>{rChart.resize();pChart.resize();});
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
