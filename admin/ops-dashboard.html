@@ -3,51 +3,108 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Operations Dashboard — WOW Admin</title>
+<title>Live Ops Dashboard — WOW Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-.ops-kpi-grid { display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px; }
-.ops-kpi { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;position:relative;overflow:hidden; }
-.ops-kpi::after { content:'';position:absolute;bottom:0;left:0;right:0;height:3px; }
-.ops-kpi.open::after { background:var(--green); }
-.ops-kpi.warn::after { background:var(--amber); }
-.ops-kpi.closed::after { background:var(--red); }
-.ops-kpi-val { font-size:32px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--ink);line-height:1; }
-.ops-kpi-lbl { font-size:11px;color:var(--muted);font-weight:600;margin-top:4px; }
+/* ── TICKER ── */
+.revenue-ticker{background:var(--navy,#0a1628);color:#fff;padding:0;overflow:hidden;height:36px;display:flex;align-items:center;}
+.ticker-label{background:var(--brand,#ff6b35);color:#fff;font-size:11px;font-weight:800;padding:0 14px;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;letter-spacing:.5px;}
+.ticker-track{display:flex;gap:0;white-space:nowrap;animation:ticker-scroll 30s linear infinite;}
+@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ticker-item{font-size:12px;font-weight:600;padding:0 32px;border-right:1px solid rgba(255,255,255,.1);}
+.ticker-up{color:#06d6a0;} .ticker-warn{color:#ffd60a;} .ticker-red{color:#ef233c;}
 
-.ride-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px; }
-.ride-card { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px;position:relative; }
-.ride-status-bar { height:4px;border-radius:4px;margin-bottom:10px; }
-.ride-open .ride-status-bar { background:var(--green); }
-.ride-maint .ride-status-bar { background:var(--amber); }
-.ride-closed .ride-status-bar { background:var(--red); }
-.ride-name { font-size:13px;font-weight:800;color:var(--ink);margin-bottom:3px; }
-.ride-park { font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block; }
-.ride-park.wp { background:var(--teal-lt);color:var(--teal); }
-.ride-park.ap { background:var(--purple-lt);color:var(--purple); }
-.ride-meta { display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px; }
-.ride-meta-item { text-align:center; }
-.ride-meta-val { font-size:16px;font-weight:800;color:var(--ink);font-family:'Nunito',sans-serif; }
-.ride-meta-lbl { font-size:10px;color:var(--muted); }
-.ride-status-badge { font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px; }
-.rsb-open { background:var(--green-lt);color:var(--green); }
-.rsb-maint { background:var(--amber-lt);color:var(--amber); }
-.rsb-closed { background:var(--red-lt);color:var(--red); }
+/* ── TOPBAR ── */
+.ops-topbar{background:#fff;border-bottom:1px solid var(--border,#e2e8f0);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.ops-title{font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;}
+.ops-sub{font-size:11px;color:#64748b;margin-top:1px;}
+.ops-status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;}
+.pill-open{background:#d1fae5;color:#065f46;}
+.pill-closed{background:#fee2e2;color:#991b1b;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse-dot 1.5s ease-in-out infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.3;}}
 
-.gate-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px; }
-.gate-card { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px; }
-.gate-status-circle { width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px; }
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
+.kpi-box{background:#fff;border:1.5px solid var(--border,#e2e8f0);border-radius:12px;padding:14px 16px;text-align:center;position:relative;overflow:hidden;}
+.kpi-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.kpi-box.green::after{background:#06d6a0;} .kpi-box.amber::after{background:#f59e0b;} .kpi-box.red::after{background:#ef233c;} .kpi-box.blue::after{background:#3b82f6;}
+.kpi-val{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;line-height:1.1;}
+.kpi-lbl{font-size:10px;color:#64748b;font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-delta{font-size:10px;font-weight:700;margin-top:4px;}
+.delta-up{color:#06d6a0;} .delta-down{color:#ef233c;} .delta-warn{color:#f59e0b;}
 
-.staff-table { width:100%;border-collapse:collapse; }
-.staff-table th { background:var(--bg2);padding:9px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left; }
-.staff-table td { padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px; }
+/* ── CAPACITY RING SECTION ── */
+.capacity-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.cap-card{background:#fff;border:1.5px solid var(--border,#e2e8f0);border-radius:12px;padding:16px;text-align:center;}
+.cap-ring-wrap{width:100px;height:100px;margin:0 auto 10px;}
+.cap-label{font-size:13px;font-weight:800;color:#1e293b;}
+.cap-sub{font-size:11px;color:#64748b;margin-top:2px;}
+.cap-pct{font-size:18px;font-weight:900;color:#1e293b;margin-top:4px;}
 
-.incident-item { display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border); }
-.incident-item:last-child { border-bottom:none; }
+/* ── WEATHER CARD ── */
+.weather-card{background:linear-gradient(135deg,#0ea5e9,#0284c7);border-radius:12px;padding:18px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;}
+.weather-temp{font-size:44px;font-weight:900;font-family:'Nunito',sans-serif;line-height:1;}
+.weather-icon{font-size:36px;}
+.weather-detail{font-size:11px;opacity:.8;margin-top:4px;}
+
+/* ── RIDE STATUS ── */
+.ride-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.ride-card{background:#fff;border:1.5px solid var(--border,#e2e8f0);border-radius:10px;padding:12px;position:relative;}
+.ride-status-bar{height:3px;border-radius:3px;margin-bottom:8px;}
+.ride-open .ride-status-bar{background:#06d6a0;}
+.ride-maint .ride-status-bar{background:#f59e0b;}
+.ride-closed .ride-status-bar{background:#ef233c;}
+.ride-name{font-size:12px;font-weight:800;color:#1e293b;margin-bottom:3px;}
+.ride-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;}
+.tag-wp{background:#dbeafe;color:#1d4ed8;} .tag-ap{background:#ede9fe;color:#6d28d9;}
+.ride-meta{display:flex;gap:8px;margin-top:8px;}
+.rm-item{flex:1;text-align:center;background:#f8fafc;border-radius:6px;padding:4px;}
+.rm-val{font-size:14px;font-weight:800;color:#1e293b;}
+.rm-lbl{font-size:9px;color:#64748b;text-transform:uppercase;}
+.rsb{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;float:right;}
+.rsb-open{background:#d1fae5;color:#065f46;} .rsb-maint{background:#fef9c3;color:#854d0e;} .rsb-closed{background:#fee2e2;color:#991b1b;}
+
+/* ── GATES ── */
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.gate-card{background:#fff;border:1.5px solid var(--border,#e2e8f0);border-radius:10px;padding:12px;}
+
+/* ── STAFF TABLE ── */
+.staff-table{width:100%;border-collapse:collapse;}
+.staff-table th{background:#f8fafc;padding:8px 12px;font-size:11px;font-weight:700;color:#64748b;text-align:left;text-transform:uppercase;letter-spacing:.4px;}
+.staff-table td{padding:9px 12px;border-bottom:1px solid #f1f5f9;font-size:12px;}
+.staff-table tr:last-child td{border-bottom:none;}
+
+/* ── INCIDENTS ── */
+.incident-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9;}
+.incident-item:last-child{border-bottom:none;}
+
+/* ── REUSABLE ── */
+.section-card{background:#fff;border:1.5px solid var(--border,#e2e8f0);border-radius:12px;padding:18px;margin-bottom:16px;}
+.sec-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.sec-title{font-size:13px;font-weight:800;color:#1e293b;}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;text-decoration:none;}
+.btn-ghost{background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;}
+.btn-ghost:hover{border-color:#94a3b8;}
+.btn-danger{background:#ef233c;color:#fff;}
+.btn-danger:hover{background:#dc2626;}
+.btn-primary{background:#ff6b35;color:#fff;}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-amber{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+
+/* ── LAYOUT ── */
+.ops-content{padding:20px 24px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.three-col{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(3,1fr);}.capacity-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:900px){.two-col{grid-template-columns:1fr;}.three-col{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -56,7 +113,7 @@
 <!-- SIDEBAR -->
 <aside class="adm-sidebar">
   <div class="adm-sidebar-logo">
-    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
+    <a href="../index.html"><div style="width:34px;height:34px;background:#ff6b35;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;">W</div></a>
     <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
   </div>
   <nav class="adm-nav">
@@ -68,23 +125,6 @@
     <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
     <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
     <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
-    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
-    <a href="loyalty-admin.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
-    <div class="adm-nav-section">B2B &amp; Partner</div>
-    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
-    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
-    <a href="ta-approvals.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> TA/Reseller KYC</a>
-    <a href="reseller-config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> Reseller Config</a>
-    <a href="partners.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Partners</a>
-    <div class="adm-nav-section">Passport Sales ERP</div>
-    <a href="passport-products.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Plans Config</a>
-    <a href="../sales/passport-login.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> Agent Sales Portal</a>
-    <a href="../sales/erp-dashboard.html" class="adm-nav-item"><span class="nav-icon">📈</span> Sales ERP Dashboard</a>
-    <a href="../sales/erp-crm.html" class="adm-nav-item"><span class="nav-icon">👥</span> ERP CRM &amp; Leads</a>
-    <a href="../sales/erp-agents.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Agent Performance</a>
-    <a href="../sales/erp-reports.html" class="adm-nav-item"><span class="nav-icon">📊</span> ERP Reports</a>
-    <div class="adm-nav-section">Ticketing &amp; F&amp;B</div>
-    <a href="ticketing-engine.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Ticketing Engine</a>
     <a href="fnb-packages.html" class="adm-nav-item"><span class="nav-icon">🥗</span> F&amp;B Packages</a>
     <div class="adm-nav-section">Operations</div>
     <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
@@ -93,127 +133,232 @@
     <div class="adm-nav-section">Finance</div>
     <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
     <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="revenue-analytics.html" class="adm-nav-item"><span class="nav-icon">📈</span> Revenue Analytics</a>
+    <div class="adm-nav-section">B2B &amp; Partner</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
+    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
+    <a href="ta-approvals.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> TA/Reseller KYC</a>
+    <div class="adm-nav-section">Passport &amp; Loyalty</div>
+    <a href="passport-engine.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <a href="loyalty-engine.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
     <div class="adm-nav-section">Content &amp; System</div>
     <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
     <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
-    <a href="module-control.html" class="adm-nav-item"><span class="nav-icon">🔧</span> Module Control</a>
-    <a href="api-secrets.html" class="adm-nav-item"><span class="nav-icon">🔑</span> API Secrets</a>
-    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
     <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
-    <a href="advisories.html" class="adm-nav-item"><span class="nav-icon">📢</span> Advisories</a>
-    <div class="adm-nav-section">Reports</div>
-    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
-    <div style="margin-top:auto;"></div>
-    <div class="adm-nav-section">Quick Links</div>
-    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
-    <a href="../partner/dashboard.html" class="adm-nav-item"><span class="nav-icon">🤝</span> Partner Portal</a>
+    <a href="notifications.html" class="adm-nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+    <a href="super-admin.html" class="adm-nav-item"><span class="nav-icon">🛡</span> Super Admin</a>
   </nav>
   <div class="adm-sidebar-footer">
     <div class="adm-sidebar-user">
       <div class="adm-user-avatar">SA</div>
-      <div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div>
+      <div><div class="adm-user-name">Ops Manager</div><div class="adm-user-role">EALCPL · Live View</div></div>
     </div>
   </div>
 </aside>
 
 <!-- MAIN -->
-<main class="adm-main">
-  <div class="adm-topbar">
-    <div>
-      <div class="adm-topbar-title">🎡 Operations Dashboard</div>
-      <div class="adm-topbar-sub">Live · 27 Mar 2025 · Park Open 10:00 AM – 7:00 PM</div>
-    </div>
-    <div class="adm-topbar-actions">
-      <span class="badge badge-green" style="padding:6px 12px;"><i class="fa fa-circle" style="font-size:8px;"></i> PARK OPEN</span>
-      <button class="btn btn-ghost btn-sm" onclick="refreshAll()"><i class="fa fa-sync"></i> Refresh</button>
-      <button class="btn btn-primary btn-sm" style="background:var(--red);" onclick="emergencyClose()">🚨 Emergency Close</button>
+<main class="adm-main" style="background:#f0f4f8;">
+
+  <!-- LIVE REVENUE TICKER -->
+  <div class="revenue-ticker">
+    <div class="ticker-label">⚡ LIVE</div>
+    <div style="overflow:hidden;flex:1;">
+      <div class="ticker-track" id="tickerTrack">
+        <!-- filled by JS -->
+      </div>
     </div>
   </div>
-  <div class="adm-content">
 
-    <!-- Ops KPI Strip -->
-    <div class="ops-kpi-grid">
-      <div class="ops-kpi open"><div class="ops-kpi-val" id="ok-footfall">4,218</div><div class="ops-kpi-lbl">Today's Footfall</div></div>
-      <div class="ops-kpi open"><div class="ops-kpi-val" id="ok-rides-open">18</div><div class="ops-kpi-lbl">Rides Operational</div></div>
-      <div class="ops-kpi warn"><div class="ops-kpi-val" id="ok-rides-maint">3</div><div class="ops-kpi-lbl">Under Maintenance</div></div>
-      <div class="ops-kpi closed"><div class="ops-kpi-val" id="ok-rides-closed">1</div><div class="ops-kpi-lbl">Closed Today</div></div>
-      <div class="ops-kpi open"><div class="ops-kpi-val" id="ok-staff">284</div><div class="ops-kpi-lbl">Staff On-Duty</div></div>
+  <!-- TOPBAR -->
+  <div class="ops-topbar">
+    <div>
+      <div class="ops-title">🎡 Live Operations Command Centre</div>
+      <div class="ops-sub" id="liveTime">Updating…</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="ops-status-pill pill-open"><div class="live-dot"></div> PARK OPEN · 10:00 AM – 7:00 PM</div>
+      <div style="display:flex;align-items:center;gap:6px;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:#c2410c;">☀️ 38°C · Sunny · High Humidity</div>
+      <button class="btn btn-ghost" onclick="refreshAll()"><i class="fa fa-sync"></i> Refresh</button>
+      <button class="btn btn-danger" onclick="emergencyClose()">🚨 Emergency</button>
+    </div>
+  </div>
+
+  <div class="ops-content">
+
+    <!-- KPI STRIP -->
+    <div class="kpi-strip">
+      <div class="kpi-box green">
+        <div class="kpi-val" id="kpi-footfall">4,218</div>
+        <div class="kpi-lbl">Today's Footfall</div>
+        <div class="kpi-delta delta-up">↑ 12% vs last Sat</div>
+      </div>
+      <div class="kpi-box blue">
+        <div class="kpi-val" id="kpi-revenue">₹38.4L</div>
+        <div class="kpi-lbl">Revenue Today</div>
+        <div class="kpi-delta delta-up">↑ 8% vs last Sat</div>
+      </div>
+      <div class="kpi-box green">
+        <div class="kpi-val" id="kpi-rides-open">18</div>
+        <div class="kpi-lbl">Rides Open</div>
+        <div class="kpi-delta delta-warn">⚠ 3 under maint</div>
+      </div>
+      <div class="kpi-box amber">
+        <div class="kpi-val" id="kpi-capacity">68%</div>
+        <div class="kpi-lbl">Park Capacity</div>
+        <div class="kpi-delta delta-warn">4,218 / 6,200 pax</div>
+      </div>
+      <div class="kpi-box green">
+        <div class="kpi-val" id="kpi-staff">284</div>
+        <div class="kpi-lbl">Staff On-Duty</div>
+        <div class="kpi-delta delta-up">↑ 14 vs yesterday</div>
+      </div>
+      <div class="kpi-box amber">
+        <div class="kpi-val" id="kpi-incidents">5</div>
+        <div class="kpi-lbl">Incidents Today</div>
+        <div class="kpi-delta delta-warn">1 Active · 4 Resolved</div>
+      </div>
     </div>
 
-    <!-- Park Map + Ride Status Side-by-Side -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+    <!-- CAPACITY RINGS ROW -->
+    <div class="capacity-grid">
+      <div class="cap-card">
+        <div class="cap-ring-wrap"><canvas id="ring-total"></canvas></div>
+        <div class="cap-label">Total Park</div>
+        <div class="cap-pct" id="ring-total-txt">68%</div>
+        <div class="cap-sub">4,218 / 6,200</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-ring-wrap"><canvas id="ring-wp"></canvas></div>
+        <div class="cap-label">Water Park</div>
+        <div class="cap-pct" id="ring-wp-txt">71%</div>
+        <div class="cap-sub">2,120 / 3,000</div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-ring-wrap"><canvas id="ring-ap"></canvas></div>
+        <div class="cap-label">Amusement Park</div>
+        <div class="cap-pct" id="ring-ap-txt">64%</div>
+        <div class="cap-sub">2,098 / 3,200</div>
+      </div>
+      <div class="weather-card">
+        <div>
+          <div style="font-size:11px;font-weight:700;opacity:.8;letter-spacing:1px;text-transform:uppercase;">Weather · Noida</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px;">
+            <div class="weather-icon">☀️</div>
+            <div class="weather-temp">38°C</div>
+          </div>
+        </div>
+        <div>
+          <div class="weather-detail">🌬 Wind: 12 km/h · 💧 Humidity: 64%</div>
+          <div class="weather-detail">🌅 Sunrise 06:11 · Sunset 18:42</div>
+          <div style="margin-top:8px;display:flex;gap:6px;">
+            <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:11px;text-align:center;flex:1;"><div style="font-weight:800;">36°C</div><div style="opacity:.7;">Afternoon</div></div>
+            <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:11px;text-align:center;flex:1;"><div style="font-weight:800;">29°C</div><div style="opacity:.7;">Evening</div></div>
+            <div style="background:rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;font-size:11px;text-align:center;flex:1;"><div style="font-weight:800;">🌙</div><div style="opacity:.7;">Clear</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      <!-- Water Park Rides -->
-      <div>
-        <div class="section-title" style="margin-bottom:12px;">🌊 Water Park — Ride Status</div>
+    <!-- RIDE STATUS GRID -->
+    <div class="two-col" style="margin-bottom:16px;">
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head">
+          <div class="sec-title">🌊 Water Park — Ride Status</div>
+          <div style="display:flex;gap:6px;">
+            <span class="badge badge-green" id="wp-open-count">6 Open</span>
+            <span class="badge badge-amber" id="wp-maint-count">1 Maint</span>
+            <span class="badge badge-red" id="wp-closed-count">1 Closed</span>
+          </div>
+        </div>
         <div class="ride-grid" id="wp-rides"></div>
       </div>
-
-      <!-- Amusement Park Rides -->
-      <div>
-        <div class="section-title" style="margin-bottom:12px;">🎢 Amusement Park — Ride Status</div>
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head">
+          <div class="sec-title">🎢 Amusement Park — Ride Status</div>
+          <div style="display:flex;gap:6px;">
+            <span class="badge badge-green" id="ap-open-count">8 Open</span>
+            <span class="badge badge-amber" id="ap-maint-count">2 Maint</span>
+            <span class="badge badge-red" id="ap-closed-count">0 Closed</span>
+          </div>
+        </div>
         <div class="ride-grid" id="ap-rides"></div>
       </div>
     </div>
 
-    <!-- Gates + Hourly Chart -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-
-      <!-- Entry Gates -->
-      <div class="card">
-        <div class="card-header"><span class="section-title" style="margin:0;">🔐 Entry Gate Status</span></div>
-        <div class="gate-grid" id="gates-grid"></div>
+    <!-- HOURLY FOOTFALL + GATE STATUS -->
+    <div class="two-col" style="margin-bottom:16px;">
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head">
+          <div class="sec-title">📈 Hourly Footfall &amp; Revenue</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" onclick="switchHourly('footfall')" id="btnFF">Footfall</button>
+            <button class="btn btn-ghost" onclick="switchHourly('revenue')" id="btnRev">Revenue</button>
+          </div>
+        </div>
+        <div style="height:240px;"><canvas id="hourlyChart"></canvas></div>
       </div>
-
-      <!-- Hourly Footfall -->
-      <div class="card">
-        <div class="card-header"><span class="section-title" style="margin:0;">📈 Hourly Footfall Today</span></div>
-        <div style="height:240px;"><canvas id="footfallChart"></canvas></div>
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head"><div class="sec-title">🔐 Entry Gate Status</div></div>
+        <div class="gate-grid" id="gates-grid"></div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;display:flex;gap:16px;font-size:12px;font-weight:700;color:#64748b;">
+          <span>Total Scanned Today: <strong style="color:#1e293b;" id="gates-total">3,630</strong></span>
+          <span>Total Exits: <strong style="color:#1e293b;">3,218</strong></span>
+          <span>Currently Inside: <strong style="color:#ff6b35;" id="inside-count">4,218</strong></span>
+        </div>
       </div>
     </div>
 
-    <!-- Staff + Incidents -->
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;margin-bottom:24px;">
-
-      <!-- Staff Deployment -->
-      <div class="card">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="section-title" style="margin:0;">👔 Staff Deployment</span>
-          <button class="btn btn-primary btn-sm" onclick="exportStaff()"><i class="fa fa-download"></i> Export</button>
+    <!-- STAFF + INCIDENTS -->
+    <div class="three-col" style="margin-bottom:16px;">
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head">
+          <div class="sec-title">👔 Staff Deployment — Live</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" onclick="exportStaff()"><i class="fa fa-download"></i> Export</button>
+            <button class="btn btn-primary" onclick="addStaff()"><i class="fa fa-plus"></i> Deploy</button>
+          </div>
         </div>
         <table class="staff-table">
-          <thead><tr><th>Zone</th><th>Department</th><th>Scheduled</th><th>Present</th><th>Absent</th><th>Status</th></tr></thead>
+          <thead><tr><th>Zone</th><th>Department</th><th>Sched</th><th>Present</th><th>Status</th></tr></thead>
           <tbody id="staff-tbody"></tbody>
         </table>
-      </div>
-
-      <!-- Incidents -->
-      <div class="card">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="section-title" style="margin:0;font-size:13px;">⚠️ Incidents Today</span>
-          <button class="btn btn-ghost btn-sm" onclick="logIncident()"><i class="fa fa-plus"></i> Log</button>
+        <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#065f46;">273</div><div style="font-size:10px;color:#64748b;">Present</div></div>
+          <div style="background:#fff3ee;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#c2410c;">14</div><div style="font-size:10px;color:#64748b;">Absent</div></div>
+          <div style="background:#f5f3ff;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#5b21b6;">95.1%</div><div style="font-size:10px;color:#64748b;">Attendance</div></div>
         </div>
-        <div id="incidents-list">
-          <div class="incident-item">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:5px;flex-shrink:0;"></div>
-            <div><div style="font-size:12px;font-weight:700;">Wave Pool — Technical stoppage</div><div style="font-size:11px;color:var(--muted);">10:28 AM · Under repair · ETA 2 PM</div></div>
-          </div>
-          <div class="incident-item">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:5px;flex-shrink:0;"></div>
-            <div><div style="font-size:12px;font-weight:700;">Food Court — Long wait (F&B)</div><div style="font-size:11px;color:var(--muted);">11:15 AM · Extra staff deployed</div></div>
-          </div>
-          <div class="incident-item">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:5px;flex-shrink:0;"></div>
-            <div><div style="font-size:12px;font-weight:700;">Gate 3 — Scanner offline</div><div style="font-size:11px;color:var(--muted);">09:55 AM · IT on-site · resolved 10:10 AM</div></div>
-          </div>
-          <div class="incident-item">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0;"></div>
-            <div><div style="font-size:12px;font-weight:700;">Lost child — Reunited</div><div style="font-size:11px;color:var(--muted);">10:05 AM · Reunited with family 10:22 AM ✅</div></div>
-          </div>
-          <div class="incident-item">
-            <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);margin-top:5px;flex-shrink:0;"></div>
-            <div><div style="font-size:12px;font-weight:700;">School group late arrival — DPS Noida</div><div style="font-size:11px;color:var(--muted);">11:30 AM · 420 students · Entry staggered</div></div>
-          </div>
+      </div>
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head">
+          <div class="sec-title">⚠️ Incidents &amp; Alerts</div>
+          <button class="btn btn-ghost" onclick="logIncident()"><i class="fa fa-plus"></i> Log</button>
+        </div>
+        <div id="incidents-list"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center;font-size:11px;" onclick="alert('Broadcast sent to all staff radios and app!')"><i class="fa fa-broadcast-tower"></i> Broadcast Alert</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE BREAKDOWN -->
+    <div class="two-col">
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head"><div class="sec-title">💰 Revenue Breakdown Today</div><a href="revenue-analytics.html" class="btn btn-ghost">Full Analytics →</a></div>
+        <div style="height:220px;"><canvas id="revenueBreakdown"></canvas></div>
+      </div>
+      <div class="section-card" style="margin-bottom:0;">
+        <div class="sec-head"><div class="sec-title">🎯 Quick Actions &amp; Alerts</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="alert('Sending push notification to all guests…')"><i class="fa fa-bell" style="font-size:18px;"></i><span style="font-size:11px;">Push Notification</span></button>
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="alert('Park announcement broadcast…')"><i class="fa fa-volume-up" style="font-size:18px;"></i><span style="font-size:11px;">PA Announcement</span></button>
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="alert('Digital boards updated!')"><i class="fa fa-tv" style="font-size:18px;"></i><span style="font-size:11px;">Update Boards</span></button>
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="window.location='gate.html'"><i class="fa fa-qrcode" style="font-size:18px;"></i><span style="font-size:11px;">Gate Scanner</span></button>
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="alert('Medical team alerted!')"><i class="fa fa-first-aid" style="font-size:18px;"></i><span style="font-size:11px;">Alert Medical</span></button>
+          <button class="btn btn-ghost" style="justify-content:center;flex-direction:column;height:64px;gap:4px;" onclick="alert('Security patrol dispatched!')"><i class="fa fa-shield-alt" style="font-size:18px;"></i><span style="font-size:11px;">Dispatch Security</span></button>
+        </div>
+        <div style="margin-top:12px;background:#fff3ee;border:1.5px solid #fed7aa;border-radius:8px;padding:12px;">
+          <div style="font-size:12px;font-weight:800;color:#c2410c;margin-bottom:4px;">⚠️ Active Alert</div>
+          <div style="font-size:12px;color:#c2410c;">Wave Pool offline — approx 230 guests redirected to Lazy River. ETA: 2:00 PM</div>
         </div>
       </div>
     </div>
@@ -223,161 +368,218 @@
 </div>
 
 <script>
-/* ── Rides Data ── */
+/* ─── DATA ─── */
 const wpRides = [
-  { name:'Wave Pool',         status:'maint',  queue:0,   cap:500, uptime:84 },
-  { name:'Lazy River',        status:'open',   queue:28,  cap:200, uptime:99 },
-  { name:'Speed Slides',      status:'open',   queue:45,  cap:100, uptime:97 },
-  { name:'Kids Pool',         status:'open',   queue:12,  cap:150, uptime:100 },
-  { name:'Thunder Falls',     status:'open',   queue:62,  cap:120, uptime:96 },
-  { name:'Multi-Slide Tower', status:'open',   queue:38,  cap:160, uptime:98 },
-  { name:'Boomerang',         status:'closed', queue:0,   cap:80,  uptime:0 },
-  { name:'Racer Slides',      status:'open',   queue:22,  cap:100, uptime:99 },
+  {name:'Wave Pool',       status:'maint',  queue:0,   cap:500, uptime:84},
+  {name:'Lazy River',      status:'open',   queue:28,  cap:200, uptime:99},
+  {name:'Speed Slides',    status:'open',   queue:45,  cap:100, uptime:97},
+  {name:'Kids Pool',       status:'open',   queue:12,  cap:150, uptime:100},
+  {name:'Thunder Falls',   status:'open',   queue:62,  cap:120, uptime:96},
+  {name:'Multi-Slide',     status:'open',   queue:38,  cap:160, uptime:98},
+  {name:'Boomerang',       status:'closed', queue:0,   cap:80,  uptime:0},
+  {name:'Racer Slides',    status:'open',   queue:22,  cap:100, uptime:99},
 ];
-
 const apRides = [
-  { name:'Roller Coaster',    status:'open',  queue:82,  cap:200, uptime:99 },
-  { name:'Giant Wheel',       status:'open',  queue:18,  cap:120, uptime:98 },
-  { name:'Pirate Ship',       status:'open',  queue:24,  cap:60,  uptime:100 },
-  { name:'Merry-Go-Round',    status:'open',  queue:8,   cap:40,  uptime:100 },
-  { name:'Bumper Cars',       status:'maint', queue:0,   cap:40,  uptime:76 },
-  { name:'Mini Train',        status:'open',  queue:15,  cap:30,  uptime:100 },
-  { name:'Free Fall',         status:'open',  queue:55,  cap:40,  uptime:97 },
-  { name:'Haunted House',     status:'maint', queue:0,   cap:20,  uptime:62 },
-  { name:'Go-Karts',          status:'open',  queue:44,  cap:12,  uptime:95 },
-  { name:'Rock Climbing',     status:'open',  queue:6,   cap:8,   uptime:100 },
+  {name:'Roller Coaster',  status:'open',  queue:82, cap:200, uptime:99},
+  {name:'Giant Wheel',     status:'open',  queue:18, cap:120, uptime:98},
+  {name:'Pirate Ship',     status:'open',  queue:24, cap:60,  uptime:100},
+  {name:'Merry-Go-Round',  status:'open',  queue:8,  cap:40,  uptime:100},
+  {name:'Bumper Cars',     status:'maint', queue:0,  cap:40,  uptime:76},
+  {name:'Mini Train',      status:'open',  queue:15, cap:30,  uptime:100},
+  {name:'Free Fall',       status:'open',  queue:55, cap:40,  uptime:97},
+  {name:'Haunted House',   status:'maint', queue:0,  cap:20,  uptime:62},
+  {name:'Go-Karts',        status:'open',  queue:44, cap:12,  uptime:95},
+  {name:'Rock Climbing',   status:'open',  queue:6,  cap:8,   uptime:100},
+];
+const incidents = [
+  {sev:'red',   desc:'Wave Pool — Technical stoppage',      time:'10:28 AM', note:'Under repair · ETA 2 PM', active:true},
+  {sev:'amber', desc:'Food Court — Long wait (F&B)',         time:'11:15 AM', note:'Extra staff deployed', active:true},
+  {sev:'amber', desc:'Gate 3 — Scanner offline',             time:'09:55 AM', note:'Resolved 10:10 AM ✅', active:false},
+  {sev:'green', desc:'Lost child — Reunited',                time:'10:05 AM', note:'Reunited with family ✅', active:false},
+  {sev:'blue',  desc:'School group — DPS Noida 420 pax',     time:'11:30 AM', note:'Entry staggered', active:false},
+];
+const staffData = [
+  {zone:'Main Entrance',   dept:'Security',       sched:20, present:18, absent:2},
+  {zone:'Water Park',      dept:'Ride Operators', sched:45, present:43, absent:2},
+  {zone:'Water Park',      dept:'Lifeguards',     sched:18, present:18, absent:0},
+  {zone:'Amusement Park',  dept:'Ride Operators', sched:38, present:36, absent:2},
+  {zone:'F&B Outlets',     dept:'Food Service',   sched:52, present:48, absent:4},
+  {zone:'All Zones',       dept:'Housekeeping',   sched:35, present:34, absent:1},
+  {zone:'First Aid',       dept:'Medical',        sched:8,  present:8,  absent:0},
+  {zone:'Admin / Office',  dept:'Management',     sched:24, present:22, absent:2},
+  {zone:'Parking',         dept:'Traffic Mgmt',   sched:15, present:15, absent:0},
+  {zone:'Guest Relations', dept:'Service',        sched:18, present:17, absent:1},
 ];
 
-function queueColor(q, cap) {
-  const pct = q/cap;
-  if (pct < 0.3) return 'var(--green)';
-  if (pct < 0.6) return 'var(--amber)';
-  return 'var(--red)';
+/* ─── TICKER ─── */
+const tickerItems = [
+  '🎟 Tickets sold today: <b>4,218</b>','💰 Revenue MTD: <b>₹2.3 Cr</b>','🌊 Water Park today: <b>2,120 pax</b>',
+  '🎢 Amusement Park today: <b>2,098 pax</b>','⭐ Passport activations: <b>38</b>','🥗 F&B revenue: <b>₹6.2L</b>',
+  '🏷 Offers redeemed: <b>312</b>','👔 Staff on duty: <b>284</b>','📞 Call center open tickets: <b>14</b>',
+  '🚗 Parking occupied: <b>68%</b>','🏫 School groups today: <b>3</b> (420 students)','💳 Wallet transactions: <b>1,840</b>',
+];
+function buildTicker(){
+  const t = document.getElementById('tickerTrack');
+  const all = [...tickerItems,...tickerItems];
+  t.innerHTML = all.map(i=>`<span class="ticker-item">${i}</span>`).join('');
 }
+buildTicker();
 
-function renderRides(rides, containerId, parkClass) {
-  document.getElementById(containerId).innerHTML = rides.map(r => `
-    <div class="ride-card ride-${r.status}">
+/* ─── CLOCK ─── */
+function updateClock(){
+  document.getElementById('liveTime').textContent = 'Live · '+new Date().toLocaleString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+updateClock(); setInterval(updateClock,1000);
+
+/* ─── CAPACITY RINGS ─── */
+function makeRing(id, pct, color){
+  new Chart(document.getElementById(id),{
+    type:'doughnut',
+    data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'#f1f5f9'],borderWidth:0,hoverOffset:0}]},
+    options:{cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:800}}
+  });
+}
+makeRing('ring-total',68,'#ff6b35');
+makeRing('ring-wp',71,'#0ea5e9');
+makeRing('ring-ap',64,'#8b5cf6');
+
+/* ─── RIDE CARDS ─── */
+function queueColor(q,cap){const p=q/cap; return p<.3?'#06d6a0':p<.6?'#f59e0b':'#ef233c';}
+function renderRides(rides,cid,tag){
+  document.getElementById(cid).innerHTML = rides.map(r=>`
+    <div class="ride-card ride-${r.status}" id="rc-${cid}-${r.name.replace(/\s/g,'_')}">
       <div class="ride-status-bar"></div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div class="ride-name">${r.name}</div>
-          <span class="ride-park ${parkClass}">${parkClass==='wp'?'Water Park':'Amusement'}</span>
-        </div>
-        <span class="ride-status-badge rsb-${r.status}">${r.status==='open'?'Open':r.status==='maint'?'Maint':'Closed'}</span>
+        <div><div class="ride-name">${r.name}</div><span class="ride-tag tag-${tag}">${tag==='wp'?'Water Park':'Amusement'}</span></div>
+        <span class="rsb rsb-${r.status}">${r.status==='open'?'Open':r.status==='maint'?'Maint':'Closed'}</span>
       </div>
       <div class="ride-meta">
-        <div class="ride-meta-item">
-          <div class="ride-meta-val" style="color:${queueColor(r.queue,r.cap)};">${r.queue}</div>
-          <div class="ride-meta-lbl">Queue</div>
-        </div>
-        <div class="ride-meta-item">
-          <div class="ride-meta-val">${r.uptime}%</div>
-          <div class="ride-meta-lbl">Uptime</div>
-        </div>
+        <div class="rm-item"><div class="rm-val" style="color:${queueColor(r.queue,r.cap)};">${r.queue}</div><div class="rm-lbl">Queue</div></div>
+        <div class="rm-item"><div class="rm-val">${r.uptime}%</div><div class="rm-lbl">Uptime</div></div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
+renderRides(wpRides,'wp-rides','wp');
+renderRides(apRides,'ap-rides','ap');
 
-renderRides(wpRides, 'wp-rides', 'wp');
-renderRides(apRides, 'ap-rides', 'ap');
-
-/* ── Gates ── */
+/* ─── GATES ─── */
 const gates = [
-  { id:'G1', name:'Main Gate', status:'open',   scanned:1284, staff:6 },
-  { id:'G2', name:'Gate 2',    status:'open',   scanned:986,  staff:4 },
-  { id:'G3', name:'Gate 3',    status:'open',   scanned:748,  staff:4 },
-  { id:'G4', name:'Gate 4',    status:'open',   scanned:612,  staff:3 },
-  { id:'G5', name:'Gate 5',    status:'closed', scanned:0,    staff:0 },
-  { id:'G6', name:'Exit Only', status:'open',   scanned:3218, staff:4 },
+  {id:'G1',name:'Main Gate', status:'open',   scanned:1284, staff:6},
+  {id:'G2',name:'Gate 2',    status:'open',   scanned:986,  staff:4},
+  {id:'G3',name:'Gate 3',    status:'open',   scanned:748,  staff:4},
+  {id:'G4',name:'Gate 4',    status:'open',   scanned:612,  staff:3},
+  {id:'G5',name:'Gate 5',    status:'closed', scanned:0,    staff:0},
+  {id:'G6',name:'Exit Only', status:'open',   scanned:3218, staff:4},
 ];
-
-document.getElementById('gates-grid').innerHTML = gates.map(g => `
+document.getElementById('gates-grid').innerHTML = gates.map(g=>`
   <div class="gate-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-      <span style="font-size:13px;font-weight:800;">${g.name}</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:12px;font-weight:800;">${g.name}</span>
       <span class="badge ${g.status==='open'?'badge-green':'badge-red'}" style="font-size:10px;">${g.status==='open'?'Open':'Closed'}</span>
     </div>
     <div style="display:flex;justify-content:space-around;">
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--ink);font-family:'Nunito',sans-serif;">${g.scanned.toLocaleString('en-IN')}</div><div style="font-size:10px;color:var(--muted);">Scanned</div></div>
-      <div style="text-align:center;"><div style="font-size:18px;font-weight:900;color:var(--ink);font-family:'Nunito',sans-serif;">${g.staff}</div><div style="font-size:10px;color:var(--muted);">Staff</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:900;">${g.scanned.toLocaleString('en-IN')}</div><div style="font-size:10px;color:#64748b;">Scanned</div></div>
+      <div style="text-align:center;"><div style="font-size:16px;font-weight:900;">${g.staff}</div><div style="font-size:10px;color:#64748b;">Staff</div></div>
     </div>
-  </div>
-`).join('');
+  </div>`).join('');
 
-/* ── Staff ── */
-const staffData = [
-  { zone:'Main Entrance',    dept:'Security',      sched:20, present:18, absent:2 },
-  { zone:'Water Park',       dept:'Ride Operators', sched:45, present:43, absent:2 },
-  { zone:'Water Park',       dept:'Lifeguards',    sched:18, present:18, absent:0 },
-  { zone:'Amusement Park',   dept:'Ride Operators', sched:38, present:36, absent:2 },
-  { zone:'F&B Outlets',      dept:'Food Service',  sched:52, present:48, absent:4 },
-  { zone:'All Zones',        dept:'Housekeeping',  sched:35, present:34, absent:1 },
-  { zone:'First Aid',        dept:'Medical',       sched:8,  present:8,  absent:0 },
-  { zone:'Admin / Office',   dept:'Management',    sched:24, present:22, absent:2 },
-  { zone:'Parking',          dept:'Traffic Mgmt',  sched:15, present:15, absent:0 },
-  { zone:'Guest Relations',  dept:'Service',       sched:18, present:17, absent:1 },
-];
-
-document.getElementById('staff-tbody').innerHTML = staffData.map(s => `
+/* ─── STAFF TABLE ─── */
+document.getElementById('staff-tbody').innerHTML = staffData.map(s=>`
   <tr>
-    <td>${s.zone}</td>
-    <td>${s.dept}</td>
+    <td>${s.zone}</td><td>${s.dept}</td>
     <td style="text-align:center;">${s.sched}</td>
-    <td style="text-align:center;font-weight:700;color:var(--green);">${s.present}</td>
-    <td style="text-align:center;font-weight:700;color:${s.absent>0?'var(--red)':'var(--green)'};">${s.absent}</td>
-    <td><span class="badge ${s.absent===0?'badge-green':s.absent<=2?'badge-amber':'badge-red'}" style="font-size:10px;">${s.absent===0?'Full':'Short-staffed'}</span></td>
-  </tr>
-`).join('');
+    <td style="text-align:center;font-weight:700;color:#06d6a0;">${s.present}</td>
+    <td><span class="badge ${s.absent===0?'badge-green':s.absent<=2?'badge-amber':'badge-red'}" style="font-size:10px;">${s.absent===0?'✓ Full':'Short ('+s.absent+' absent)'}</span></td>
+  </tr>`).join('');
 
-/* ── Hourly Chart ── */
-new Chart(document.getElementById('footfallChart'), {
-  type:'bar',
-  data: {
-    labels:['10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm'],
-    datasets:[
-      {label:'Water Park',data:[280,520,840,780,920,1050,880,640,200],backgroundColor:'rgba(0,123,181,.7)',borderRadius:6},
-      {label:'Amusement',data:[210,380,660,590,720,810,680,480,150],backgroundColor:'rgba(94,53,177,.6)',borderRadius:6}
-    ]
-  },
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{y:{beginAtZero:true},x:{stacked:false}}}
-});
-
-/* ── Live Updates ── */
-function refreshAll() {
-  const footfall = document.getElementById('ok-footfall');
-  if (footfall) footfall.textContent = (parseInt(footfall.textContent.replace(',',''))+Math.floor(Math.random()*20)).toLocaleString('en-IN');
-  alert('Dashboard refreshed!');
+/* ─── INCIDENTS ─── */
+function renderIncidents(){
+  document.getElementById('incidents-list').innerHTML = incidents.map(i=>`
+    <div class="incident-item">
+      <div style="width:8px;height:8px;border-radius:50%;background:${i.sev==='red'?'#ef233c':i.sev==='amber'?'#f59e0b':i.sev==='green'?'#06d6a0':'#3b82f6'};margin-top:4px;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;color:#1e293b;">${i.desc}</div>
+        <div style="font-size:11px;color:#64748b;">${i.time} · ${i.note}</div>
+      </div>
+      ${i.active?'<span class="badge badge-amber" style="font-size:10px;flex-shrink:0;">Active</span>':'<span class="badge badge-green" style="font-size:10px;flex-shrink:0;">Resolved</span>'}
+    </div>`).join('');
 }
+renderIncidents();
 
-function emergencyClose() {
-  if (confirm('⚠️ EMERGENCY CLOSE: This will broadcast an evacuation alert to all staff and guests. Confirm?')) {
-    alert('🚨 Emergency closure initiated! All gates locked. Staff alerted via radio + app. Guests being directed to exits.');
-  }
-}
-
-function logIncident() {
-  const desc = prompt('Describe the incident:');
-  if (desc) {
-    const li = document.createElement('div');
-    li.className = 'incident-item';
-    li.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:5px;flex-shrink:0;"></div><div><div style="font-size:12px;font-weight:700;">${desc}</div><div style="font-size:11px;color:var(--muted);">Just now · Logged by Super Admin</div></div>`;
-    document.getElementById('incidents-list').prepend(li);
-  }
-}
-
-function exportStaff() { alert('Exporting staff deployment report...'); }
-
-// Simulate queue updates
-setInterval(() => {
-  document.querySelectorAll('.ride-meta-val').forEach(el => {
-    const curr = parseInt(el.textContent);
-    if (!isNaN(curr) && el.closest('.ride-open')) {
-      el.textContent = Math.max(0, curr + Math.floor(Math.random()*10)-4);
+/* ─── HOURLY CHART ─── */
+const footfallData = [280,520,840,780,920,1050,880,640,200,0,0];
+const revenueData  = [2.1,4.8,7.6,7.1,8.4,9.6,8.0,5.8,1.8,0,0];
+const hourLabels   = ['10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm'];
+let hourlyChart;
+function buildHourly(mode){
+  if(hourlyChart) hourlyChart.destroy();
+  hourlyChart = new Chart(document.getElementById('hourlyChart'),{
+    type:'bar',
+    data:{
+      labels:hourLabels,
+      datasets:[{
+        label: mode==='footfall'?'Footfall (pax)':'Revenue (₹L)',
+        data: mode==='footfall'?footfallData:revenueData,
+        backgroundColor:'rgba(255,107,53,.7)',borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{callback:v=>mode==='revenue'?'₹'+v+'L':v}}}
     }
   });
-}, 8000);
+}
+buildHourly('footfall');
+function switchHourly(mode){
+  buildHourly(mode);
+  document.getElementById('btnFF').style.borderColor = mode==='footfall'?'#ff6b35':'#e2e8f0';
+  document.getElementById('btnRev').style.borderColor = mode==='revenue'?'#ff6b35':'#e2e8f0';
+}
+
+/* ─── REVENUE BREAKDOWN ─── */
+new Chart(document.getElementById('revenueBreakdown'),{
+  type:'doughnut',
+  data:{
+    labels:['Tickets','F&B','Locker/Costume','Passport','Merchandise'],
+    datasets:[{data:[62,22,7,6,3],backgroundColor:['#ff6b35','#0ea5e9','#06d6a0','#8b5cf6','#f59e0b'],borderWidth:2,borderColor:'#fff'}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11}}}}}
+});
+
+/* ─── LIVE SIMULATION ─── */
+let footfall = 4218;
+setInterval(()=>{
+  const add = Math.floor(Math.random()*8+2);
+  footfall += add;
+  document.getElementById('kpi-footfall').textContent = footfall.toLocaleString('en-IN');
+  document.getElementById('inside-count').textContent = footfall.toLocaleString('en-IN');
+  const rev = (footfall * 910 / 100000).toFixed(1);
+  document.getElementById('kpi-revenue').textContent = '₹'+rev+'L';
+  const cap = Math.round(footfall/6200*100);
+  document.getElementById('kpi-capacity').textContent = cap+'%';
+  document.getElementById('ring-total-txt').textContent = cap+'%';
+  document.getElementById('ring-wp-txt').textContent = Math.round(cap*1.04)+'%';
+  document.getElementById('ring-ap-txt').textContent = Math.round(cap*0.95)+'%';
+}, 4000);
+
+/* ─── CONTROLS ─── */
+function refreshAll(){alert('All panels refreshed with latest data.');}
+function emergencyClose(){
+  if(confirm('⚠️ EMERGENCY CLOSE: This will lock all gates and send evacuation alert to all staff and PA system. Confirm?')){
+    alert('🚨 Emergency closure initiated!\n✅ All gates locked\n✅ PA announcement triggered\n✅ Staff radios alerted\n✅ Security teams dispatched\n✅ Medical on standby');
+  }
+}
+function logIncident(){
+  const desc = prompt('Describe the incident (e.g. Zone, Nature):');
+  if(desc){
+    incidents.unshift({sev:'amber',desc,time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),note:'Newly logged · Under review',active:true});
+    document.getElementById('kpi-incidents').textContent = incidents.filter(i=>i.active).length;
+    renderIncidents();
+  }
+}
+function exportStaff(){alert('Staff deployment CSV exported!');}
+function addStaff(){alert('Opening staff redeployment console…');}
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
