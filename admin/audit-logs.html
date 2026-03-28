@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Audit Logs — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.log-table { width:100%;border-collapse:collapse; }
+.log-table th { background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0; }
+.log-table td { padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle; }
+.log-table tr:hover td { background:var(--bg); }
+.action-badge { padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase; }
+.act-create { background:var(--green-lt);color:var(--green); }
+.act-update { background:var(--primary-lt);color:var(--primary); }
+.act-delete { background:var(--red-lt);color:var(--red); }
+.act-login  { background:var(--purple-lt);color:var(--purple); }
+.act-logout { background:var(--bg3);color:var(--muted); }
+.act-approve{ background:var(--green-lt);color:var(--green-dk); }
+.act-reject { background:var(--red-lt);color:var(--red); }
+.act-export { background:var(--teal-lt);color:var(--teal); }
+.act-config { background:var(--amber-lt);color:var(--amber); }
+.role-pill { padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700; }
+.role-superadmin { background:#080E1E;color:#fff; }
+.role-admin { background:var(--primary);color:#fff; }
+.role-finance { background:var(--green-lt);color:var(--green-dk); }
+.role-ops { background:var(--purple-lt);color:var(--purple); }
+.role-sales { background:var(--amber-lt);color:var(--amber); }
+.role-agent { background:var(--teal-lt);color:var(--teal); }
+.filter-bar { display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 16px;background:var(--bg);border-bottom:1px solid var(--border); }
+.stats-strip { display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px; }
+.stat-box { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:14px;text-align:center; }
+.stat-box-val { font-size:26px;font-weight:900;color:var(--ink);font-family:'Nunito',sans-serif; }
+.stat-box-lbl { font-size:11px;color:var(--muted);font-weight:600;margin-top:2px; }
+.diff-cell { font-family:'Courier New',monospace;font-size:11px;background:var(--bg2);padding:2px 6px;border-radius:4px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.diff-cell.ins { background:var(--green-lt);color:var(--green-dk); }
+.diff-cell.del { background:var(--red-lt);color:var(--red); }
+</style>
+</head>
+<body>
+<div class="adm-layout">
+
+<!-- SIDEBAR -->
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge">
+      <div class="adm-sidebar-badge-title">WOW Admin</div>
+      <div class="adm-sidebar-badge-sub">EALCPL Platform</div>
+    </div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <a href="tickets.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Tickets Issued</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
+    <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <a href="loyalty-admin.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
+    <div class="adm-nav-section">B2B &amp; Partner</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
+    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
+    <a href="ta-approvals.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> TA/Reseller KYC</a>
+    <a href="reseller-config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> Reseller Config</a>
+    <a href="partners.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Partners</a>
+    <div class="adm-nav-section">Passport Sales ERP</div>
+    <a href="passport-products.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Plans Config</a>
+    <a href="../sales/passport-login.html" class="adm-nav-item"><span class="nav-icon">🧑‍💼</span> Agent Sales Portal</a>
+    <a href="../sales/erp-dashboard.html" class="adm-nav-item"><span class="nav-icon">📈</span> Sales ERP Dashboard</a>
+    <a href="../sales/erp-crm.html" class="adm-nav-item"><span class="nav-icon">👥</span> ERP CRM &amp; Leads</a>
+    <a href="../sales/erp-agents.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Agent Performance</a>
+    <a href="../sales/erp-reports.html" class="adm-nav-item"><span class="nav-icon">📊</span> ERP Reports</a>
+    <div class="adm-nav-section">Ticketing &amp; F&amp;B</div>
+    <a href="ticketing-engine.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Ticketing Engine</a>
+    <a href="fnb-packages.html" class="adm-nav-item"><span class="nav-icon">🥗</span> F&amp;B Packages</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
+    <a href="ops-dashboard.html" class="adm-nav-item"><span class="nav-icon">🎡</span> Ops Dashboard</a>
+    <a href="call-center.html" class="adm-nav-item"><span class="nav-icon">📞</span> Call Center ERP</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="module-control.html" class="adm-nav-item"><span class="nav-icon">🔧</span> Module Control</a>
+    <a href="api-secrets.html" class="adm-nav-item"><span class="nav-icon">🔑</span> API Secrets</a>
+    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
+    <a href="audit-logs.html" class="adm-nav-item active"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="advisories.html" class="adm-nav-item"><span class="nav-icon">📢</span> Advisories</a>
+    <div class="adm-nav-section">Reports</div>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
+    <div style="margin-top:auto;"></div>
+    <div class="adm-nav-section">Quick Links</div>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+    <a href="../partner/dashboard.html" class="adm-nav-item"><span class="nav-icon">🤝</span> Partner Portal</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">SA</div>
+      <div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title">🔍 Audit Logs</div>
+      <div class="adm-topbar-sub">Immutable Activity Trail · All Roles · Real-time</div>
+    </div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportLogs('csv')"><i class="fa fa-file-csv"></i> Export CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="exportLogs('pdf')"><i class="fa fa-file-pdf"></i> Export PDF</button>
+    </div>
+  </div>
+  <div class="adm-content">
+
+    <!-- Stats -->
+    <div class="stats-strip">
+      <div class="stat-box"><div class="stat-box-val" id="st-total">12,841</div><div class="stat-box-lbl">Total Events Today</div></div>
+      <div class="stat-box"><div class="stat-box-val" id="st-users">47</div><div class="stat-box-lbl">Active Users</div></div>
+      <div class="stat-box" style="border-color:var(--red);"><div class="stat-box-val" style="color:var(--red);" id="st-critical">3</div><div class="stat-box-lbl">Critical Actions</div></div>
+      <div class="stat-box"><div class="stat-box-val" id="st-logins">89</div><div class="stat-box-lbl">Login Events</div></div>
+      <div class="stat-box"><div class="stat-box-val" id="st-config">14</div><div class="stat-box-lbl">Config Changes</div></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="padding:0;margin-bottom:20px;overflow:hidden;">
+      <div class="filter-bar">
+        <input class="form-input" id="al-search" placeholder="🔍 Search user, action, resource..." style="width:240px;font-size:12px;padding:7px 12px;" oninput="filterLogs()"/>
+        <select class="form-input" id="al-role" style="width:140px;font-size:12px;padding:7px 10px;" onchange="filterLogs()">
+          <option value="">All Roles</option>
+          <option>Super Admin</option><option>Admin</option><option>Finance</option>
+          <option>Ops</option><option>Sales</option><option>Agent</option>
+        </select>
+        <select class="form-input" id="al-action" style="width:140px;font-size:12px;padding:7px 10px;" onchange="filterLogs()">
+          <option value="">All Actions</option>
+          <option>CREATE</option><option>UPDATE</option><option>DELETE</option>
+          <option>LOGIN</option><option>LOGOUT</option><option>APPROVE</option>
+          <option>REJECT</option><option>EXPORT</option><option>CONFIG</option>
+        </select>
+        <select class="form-input" id="al-module" style="width:160px;font-size:12px;padding:7px 10px;" onchange="filterLogs()">
+          <option value="">All Modules</option>
+          <option>Tickets</option><option>Passport</option><option>Bookings</option>
+          <option>Finance</option><option>TA/KYC</option><option>Users</option>
+          <option>Config</option><option>CRM</option><option>GST</option>
+        </select>
+        <input type="date" class="form-input" id="al-date-from" style="width:140px;font-size:12px;padding:7px 10px;" onchange="filterLogs()"/>
+        <input type="date" class="form-input" id="al-date-to" style="width:140px;font-size:12px;padding:7px 10px;" onchange="filterLogs()"/>
+        <button class="btn btn-ghost btn-sm" onclick="clearFilters()"><i class="fa fa-times"></i> Clear</button>
+      </div>
+
+      <div style="overflow-x:auto;max-height:600px;overflow-y:auto;">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th style="min-width:150px;">Timestamp</th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Action</th>
+              <th>Module</th>
+              <th>Resource / ID</th>
+              <th style="min-width:200px;">Change Summary</th>
+              <th>IP Address</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody id="audit-tbody">
+            <!-- populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-top:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--muted);" id="log-count-lbl">Showing 50 of 12,841 events</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm" onclick="prevPage()"><i class="fa fa-chevron-left"></i></button>
+          <button class="btn btn-ghost btn-sm" style="background:var(--primary);color:#fff;">1</button>
+          <button class="btn btn-ghost btn-sm">2</button>
+          <button class="btn btn-ghost btn-sm">3</button>
+          <button class="btn btn-ghost btn-sm">…</button>
+          <button class="btn btn-ghost btn-sm">257</button>
+          <button class="btn btn-ghost btn-sm" onclick="nextPage()"><i class="fa fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+const logData = [
+  { ts:'2025-03-27 10:42:18', user:'Vikram Mehta',    role:'Super Admin', action:'CONFIG',  module:'Config',    resource:'Payment Gateway',   summary:'Updated Razorpay key_id → ****new',   ip:'10.0.1.2',   result:'SUCCESS' },
+  { ts:'2025-03-27 10:38:55', user:'Priya Sharma',    role:'Admin',       action:'APPROVE', module:'TA/KYC',    resource:'TA-KYC-00089',       summary:'Approved KYC for Sunita Tours',       ip:'10.0.1.8',   result:'SUCCESS' },
+  { ts:'2025-03-27 10:35:22', user:'Amit Kumar',      role:'Finance',     action:'EXPORT',  module:'GST',       resource:'GSTR-3B Mar-2025',    summary:'Exported GSTR-3B JSON',              ip:'10.0.1.15',  result:'SUCCESS' },
+  { ts:'2025-03-27 10:30:01', user:'Deepak Singh',    role:'Sales',       action:'CREATE',  module:'CRM',       resource:'LEAD-2025-0441',      summary:'New lead: DPS School Noida',         ip:'10.0.2.3',   result:'SUCCESS' },
+  { ts:'2025-03-27 10:28:44', user:'Sneha Gupta',     role:'Agent',       action:'UPDATE',  module:'Passport',  resource:'PASS-00142',          summary:'Status: Pending → Active',           ip:'10.0.1.22',  result:'SUCCESS' },
+  { ts:'2025-03-27 10:22:10', user:'Rahul Admin',     role:'Admin',       action:'DELETE',  module:'Tickets',   resource:'BATCH-2025-014',      summary:'Deleted expired batch (exp 20-Mar)', ip:'10.0.1.5',   result:'SUCCESS' },
+  { ts:'2025-03-27 10:18:33', user:'Vikram Mehta',    role:'Super Admin', action:'CONFIG',  module:'Config',    resource:'GST Settings',        summary:'GST rate: 12% → 18%',               ip:'10.0.1.2',   result:'SUCCESS' },
+  { ts:'2025-03-27 10:15:00', user:'Anita Finance',   role:'Finance',     action:'CREATE',  module:'Finance',   resource:'INV-2025-03-0291',    summary:'Invoice for WOW-BK-09221 ₹52,800',  ip:'10.0.1.17',  result:'SUCCESS' },
+  { ts:'2025-03-27 10:10:47', user:'Mohit Ops',       role:'Ops',         action:'UPDATE',  module:'Tickets',   resource:'TKT-2025-0847',       summary:'Status: Open → Escalated',          ip:'10.0.1.19',  result:'SUCCESS' },
+  { ts:'2025-03-27 10:05:12', user:'Unknown',         role:'—',           action:'LOGIN',   module:'Users',     resource:'admin@wow.com',       summary:'Failed login attempt (3rd try)',      ip:'182.73.9.1', result:'FAILED' },
+  { ts:'2025-03-27 10:02:30', user:'Priya Sharma',    role:'Admin',       action:'LOGIN',   module:'Users',     resource:'priya@wow.com',       summary:'Login via Google SSO',               ip:'10.0.1.8',   result:'SUCCESS' },
+  { ts:'2025-03-27 09:58:00', user:'Karan Sales',     role:'Sales',       action:'UPDATE',  module:'CRM',       resource:'LEAD-2025-0440',      summary:'Stage: Proposal → Negotiation',      ip:'10.0.2.8',   result:'SUCCESS' },
+  { ts:'2025-03-27 09:52:44', user:'Anita Finance',   role:'Finance',     action:'APPROVE', module:'Finance',   resource:'REFUND-2025-0044',    summary:'Refund ₹3,200 approved for Gupta',   ip:'10.0.1.17',  result:'SUCCESS' },
+  { ts:'2025-03-27 09:45:18', user:'Vikram Mehta',    role:'Super Admin', action:'CONFIG',  module:'Users',     resource:'USER-0082',           summary:'Role changed: Agent → Sales',         ip:'10.0.1.2',   result:'SUCCESS' },
+  { ts:'2025-03-27 09:40:05', user:'Deepak Singh',    role:'Sales',       action:'CREATE',  module:'Passport',  resource:'PASS-00199',          summary:'Passport sold: Aarav Sharma, ₹5,999', ip:'10.0.2.3',   result:'SUCCESS' },
+  { ts:'2025-03-27 09:35:22', user:'Sneha Gupta',     role:'Agent',       action:'UPDATE',  module:'Bookings',  resource:'WOW-BK-09220',        summary:'Date extended: 28-Mar → 4-Apr',      ip:'10.0.1.22',  result:'SUCCESS' },
+  { ts:'2025-03-27 09:30:00', user:'Priya Sharma',    role:'Admin',       action:'REJECT',  module:'TA/KYC',    resource:'TA-KYC-00091',        summary:'Rejected KYC: doc mismatch',         ip:'10.0.1.8',   result:'SUCCESS' },
+  { ts:'2025-03-27 09:22:18', user:'Mohit Ops',       role:'Ops',         action:'CREATE',  module:'Tickets',   resource:'BATCH-2025-022',      summary:'Bulk batch 200 QR tickets created',  ip:'10.0.1.19',  result:'SUCCESS' },
+  { ts:'2025-03-27 09:18:00', user:'Anita Finance',   role:'Finance',     action:'EXPORT',  module:'Finance',   resource:'Mar-2025 Revenue',    summary:'Revenue report exported (PDF)',       ip:'10.0.1.17',  result:'SUCCESS' },
+  { ts:'2025-03-27 09:10:44', user:'Karan Sales',     role:'Sales',       action:'UPDATE',  module:'Passport',  resource:'PLAN-SILVER',         summary:'Price: ₹3,499 → ₹3,999',            ip:'10.0.2.8',   result:'SUCCESS' },
+];
+
+const actionClass = { CREATE:'act-create', UPDATE:'act-update', DELETE:'act-delete', LOGIN:'act-login',
+                      LOGOUT:'act-logout', APPROVE:'act-approve', REJECT:'act-reject', EXPORT:'act-export', CONFIG:'act-config' };
+const roleClass   = { 'Super Admin':'role-superadmin', 'Admin':'role-admin', 'Finance':'role-finance',
+                      'Ops':'role-ops', 'Sales':'role-sales', 'Agent':'role-agent' };
+
+function renderLogs(data) {
+  document.getElementById('audit-tbody').innerHTML = data.map(l => `
+    <tr>
+      <td style="font-family:'Courier New',monospace;font-size:11px;color:var(--muted);white-space:nowrap;">${l.ts}</td>
+      <td style="font-size:12px;font-weight:700;">${l.user}</td>
+      <td><span class="role-pill ${roleClass[l.role]||''}" style="font-size:10px;">${l.role}</span></td>
+      <td><span class="action-badge ${actionClass[l.action]||''}">${l.action}</span></td>
+      <td><span class="badge badge-blue" style="font-size:10px;">${l.module}</span></td>
+      <td style="font-family:'Courier New',monospace;font-size:11px;color:var(--primary);">${l.resource}</td>
+      <td><div class="diff-cell ${l.action==='DELETE'?'del':l.action==='CREATE'?'ins':''}" title="${l.summary}">${l.summary}</div></td>
+      <td style="font-family:'Courier New',monospace;font-size:11px;color:var(--muted);">${l.ip}</td>
+      <td><span class="badge ${l.result==='SUCCESS'?'badge-green':'badge-red'}" style="font-size:10px;">${l.result}</span></td>
+    </tr>
+  `).join('');
+  document.getElementById('log-count-lbl').textContent = `Showing ${data.length} of 12,841 events`;
+}
+
+function filterLogs() {
+  const q = document.getElementById('al-search').value.toLowerCase();
+  const r = document.getElementById('al-role').value;
+  const a = document.getElementById('al-action').value;
+  const m = document.getElementById('al-module').value;
+  renderLogs(logData.filter(l =>
+    (!q || l.user.toLowerCase().includes(q) || l.summary.toLowerCase().includes(q) || l.resource.toLowerCase().includes(q)) &&
+    (!r || l.role === r) &&
+    (!a || l.action === a) &&
+    (!m || l.module === m)
+  ));
+}
+
+function clearFilters() {
+  ['al-search','al-role','al-action','al-module','al-date-from','al-date-to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderLogs(logData);
+}
+
+function exportLogs(fmt) { alert(`Exporting audit logs as ${fmt.toUpperCase()}...`); }
+function prevPage() { alert('Previous page'); }
+function nextPage() { alert('Next page'); }
+
+renderLogs(logData);
+
+// Simulate live counter
+setInterval(() => {
+  const el = document.getElementById('st-total');
+  if (el) el.textContent = (parseInt(el.textContent.replace(',',''))+Math.floor(Math.random()*3)).toLocaleString('en-IN');
+}, 3000);
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
