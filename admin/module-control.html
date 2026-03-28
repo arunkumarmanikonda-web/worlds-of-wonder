@@ -356,8 +356,21 @@ const MODULES = {
   ]
 };
 
+// Full state: always stores every module's current toggle value
 let moduleState = {};
 let changeCount = 0;
+
+function initModuleState() {
+  // Build full state from defaults
+  const full = {};
+  Object.values(MODULES).flat().forEach(m => { full[m.id] = m.default; });
+  // Override with any previously saved state
+  try {
+    const saved = localStorage.getItem('wow_module_state');
+    if (saved) { Object.assign(full, JSON.parse(saved)); }
+  } catch(e) {}
+  moduleState = full;
+}
 
 function renderModules() {
   Object.entries(MODULES).forEach(([group, mods]) => {
@@ -388,6 +401,9 @@ function renderModules() {
   });
 }
 
+// Track original vs current for change detection
+let originalState = {};
+
 function toggleModule(id, input) {
   moduleState[id] = input.checked;
   const status = document.getElementById('status-' + id);
@@ -395,59 +411,83 @@ function toggleModule(id, input) {
     status.textContent = input.checked ? 'ON' : 'OFF';
     status.className = 'toggle-status ' + (input.checked ? 'on' : '');
   }
+  // Visual feedback on card
+  const card = document.getElementById('card-' + id);
+  if (card) card.style.borderColor = (moduleState[id] !== originalState[id]) ? 'rgba(245,168,0,.4)' : '';
   updateChangeCount();
 }
 
 function updateChangeCount() {
-  changeCount = Object.keys(moduleState).length;
+  // Count actual differences from original saved state
+  changeCount = Object.keys(moduleState).filter(k => moduleState[k] !== originalState[k]).length;
   const badge = document.getElementById('changes-count');
-  const bar = document.getElementById('save-status');
+  const bar   = document.getElementById('save-status');
   if (changeCount > 0) {
     badge.textContent = changeCount;
     badge.style.display = 'inline-flex';
     if (bar) bar.innerHTML = `<span style="color:#F5D679;font-weight:700;">${changeCount} unsaved change${changeCount>1?'s':''}.</span> Click Save to apply.`;
   } else {
     badge.style.display = 'none';
+    if (bar) bar.innerHTML = 'All changes saved. Last saved: <span id="last-saved">' + (localStorage.getItem('wow_module_saved_at') || 'Just now') + '</span>';
   }
 }
 
 function saveModules() {
-  const btn = document.querySelector('.btn-save');
-  btn.textContent = '⏳ Saving...';
+  const btns = document.querySelectorAll('.btn-save');
+  btns.forEach(b => b.textContent = '⏳ Saving...');
+
   setTimeout(() => {
+    // Save FULL state (all modules, not just changed)
     localStorage.setItem('wow_module_state', JSON.stringify(moduleState));
+    const now = new Date().toLocaleTimeString('en-IN');
+    localStorage.setItem('wow_module_saved_at', now);
+
+    // Reset change tracking
+    originalState = { ...moduleState };
     changeCount = 0;
-    moduleState = {};
+
+    // Remove yellow borders
+    document.querySelectorAll('.module-card').forEach(c => c.style.borderColor = '');
+
     const badge = document.getElementById('changes-count');
     badge.style.display = 'none';
-    btn.textContent = '✅ Saved!';
-    document.getElementById('save-status').innerHTML = 'All changes saved. Last saved: <span id="last-saved">' + new Date().toLocaleTimeString('en-IN') + '</span>';
-    setTimeout(() => { btn.textContent = '💾 Save All Changes'; }, 2000);
-  }, 800);
+    btns.forEach(b => b.textContent = '✅ Saved!');
+    document.getElementById('save-status').innerHTML = 'All changes saved. Last saved: <span id="last-saved">' + now + '</span>';
+    setTimeout(() => btns.forEach(b => b.textContent = '💾 Save All Changes'), 2000);
+
+    // Show toast
+    showToast('Module settings saved successfully!', 'success');
+  }, 600);
 }
 
 function resetAll() {
-  if (!confirm('Reset all modules to default settings?')) return;
-  moduleState = {};
-  document.querySelectorAll('.toggle input').forEach(input => {
-    const id = input.closest('.module-card').id.replace('card-', '');
-    let allMods = Object.values(MODULES).flat();
-    const mod = allMods.find(m => m.id === id);
-    if (mod) {
-      input.checked = mod.default;
-      const status = document.getElementById('status-' + id);
-      if (status) { status.textContent = mod.default ? 'ON' : 'OFF'; status.className = 'toggle-status ' + (mod.default ? 'on' : ''); }
-    }
+  if (!confirm('Reset all modules to factory defaults? This cannot be undone.')) return;
+  const allMods = Object.values(MODULES).flat();
+  allMods.forEach(m => {
+    moduleState[m.id] = m.default;
+    const input  = document.querySelector(`#card-${m.id} .toggle input`);
+    const status = document.getElementById('status-' + m.id);
+    if (input) input.checked = m.default;
+    if (status) { status.textContent = m.default ? 'ON' : 'OFF'; status.className = 'toggle-status ' + (m.default ? 'on' : ''); }
+    const card = document.getElementById('card-' + m.id);
+    if (card) card.style.borderColor = '';
   });
   updateChangeCount();
+  showToast('All modules reset to factory defaults. Save to apply.', 'info');
 }
 
-// Load saved state
-const saved = localStorage.getItem('wow_module_state');
-if (saved) {
-  try { moduleState = JSON.parse(saved); } catch(e) {}
+function showToast(msg, type = 'success') {
+  const colours = { success: '#0A9B5F', error: '#E53E3E', info: '#0055B3' };
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:80px;right:24px;background:${colours[type]};color:#fff;padding:12px 20px;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:fadeIn .3s ease;`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
 }
 
+// Initialise
+initModuleState();
+originalState = { ...moduleState };
 renderModules();
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
