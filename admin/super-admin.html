@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Super Admin — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --bg:#040810;--sidebar:#070c18;--card:#0e1525;--card2:#111928;--border:rgba(255,255,255,.07);
+  --text:#f0f0f0;--muted:rgba(255,255,255,.42);
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--orange:#f97316;--teal:#14b8a6;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);display:flex;flex-direction:column;}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;}
+.sb-logo{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.sb-logo img{height:32px;filter:none!important;width:auto;object-fit:contain;}
+.sb-title{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:1.5px;font-family:'Courier Prime',monospace;}
+.sb-nav{padding:12px 8px;}
+.sb-section{font-size:8.5px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:'Courier Prime',monospace;padding:12px 10px 6px;}
+.sb-link{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;margin:2px 0;cursor:pointer;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;transition:all .18s;}
+.sb-link:hover,.sb-link.active{background:rgba(201,168,76,.1);color:var(--gold);}
+.sb-link i{width:16px;text-align:center;font-size:13px;}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:8.5px;font-weight:700;padding:2px 6px;border-radius:10px;font-family:'Courier Prime',monospace;}
+
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{padding:12px 24px;background:rgba(4,8,16,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;backdrop-filter:blur(8px);}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.page-title{font-family:'Poppins',sans-serif;font-size:16px;font-weight:800;color:#fff;}
+.page-sub{font-size:11px;color:var(--muted);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.sa-pill{display:flex;align-items:center;gap:8px;background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);border-radius:20px;padding:5px 12px;}
+.sa-pill .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#C9A84C);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.sa-pill .name{font-size:11px;font-weight:700;color:var(--gold2);}
+.btn-sm{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none;}
+.btn-danger{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:var(--red);}
+
+/* CONTENT */
+.content{padding:24px;flex:1;}
+.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto;}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.stat-val{font-family:'Poppins',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:2px;}
+.stat-lbl{font-size:11px;color:var(--muted);}
+.stat-card .icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:10px;}
+
+/* MODULE GRID */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:24px;}
+.module-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;transition:all .2s;}
+.module-card:hover{border-color:rgba(255,255,255,.12);}
+.mc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.mc-text{flex:1;}
+.mc-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;}
+.mc-desc{font-size:10.5px;color:var(--muted);line-height:1.5;}
+/* Toggle switch */
+.toggle-wrap{flex-shrink:0;}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:24px;transition:.3s;border:1px solid rgba(255,255,255,.1);}
+.toggle input:checked+.toggle-track{background:var(--green);border-color:var(--green);}
+.toggle-thumb{position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:.3s;box-shadow:0 2px 4px rgba(0,0,0,.3);}
+.toggle input:checked~.toggle-thumb{transform:translateX(20px);}
+
+/* USER TABLE */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.table-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.table-head-title{font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;}
+.table-actions{display:flex;gap:8px;align-items:center;}
+.search-input{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:12px;outline:none;width:180px;font-family:'Nunito',sans-serif;}
+.search-input:focus{border-color:var(--gold);}
+.btn-add{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#040810;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Poppins',sans-serif;}
+table.users-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.users-table th{padding:10px 16px;text-align:left;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
+table.users-table td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+table.users-table tr:last-child td{border-bottom:none;}
+table.users-table tr:hover td{background:rgba(255,255,255,.02);}
+.user-name{font-weight:700;color:#fff;}
+.user-email{font-size:11px;color:var(--muted);margin-top:1px;}
+.role-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:10px;font-size:9.5px;font-weight:700;font-family:'Courier Prime',monospace;letter-spacing:.5px;}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;}
+.action-btns{display:flex;gap:6px;}
+.btn-icon{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;}
+.btn-icon:hover{border-color:var(--gold);color:var(--gold);}
+.btn-icon.danger:hover{border-color:var(--red);color:var(--red);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);}
+.overlay.open{display:flex;}
+.modal{background:#0d1120;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:30px;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.modal-title{font-family:'Poppins',sans-serif;font-size:17px;font-weight:800;margin-bottom:3px;}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.form-group{margin-bottom:14px;}
+.flabel{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;display:block;font-family:'Courier Prime',monospace;}
+.finput,.fselect{width:100%;padding:10px 13px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:13px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;}
+.finput:focus,.fselect:focus{border-color:var(--gold);}
+.fselect option{background:#0d1120;}
+.btn-submit{width:100%;padding:12px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--gold3),var(--gold));color:#040810;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Poppins',sans-serif;margin-top:6px;}
+.btn-submit:hover{box-shadow:0 6px 20px rgba(201,168,76,.3);}
+
+/* SECTION */
+.section-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title i{color:var(--gold);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s;}
+  .main{margin-left:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <img src="../images/logo.png" alt="Worlds of Wonder"/>
+    <div class="sb-title">SUPER ADMIN</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <a href="javascript:void(0)" class="sb-link active" onclick="showTab('dashboard')"><i class="fa fa-th-large"></i> Dashboard</a>
+    <a href="javascript:void(0)" class="sb-link" onclick="showTab('users')"><i class="fa fa-users"></i> User Management <span class="sb-badge">3</span></a>
+    <a href="javascript:void(0)" class="sb-link" onclick="showTab('modules')"><i class="fa fa-toggle-on"></i> Module Control</a>
+    <a href="javascript:void(0)" class="sb-link" onclick="showTab('rights')"><i class="fa fa-shield-alt"></i> Rights &amp; Roles</a>
+    <a href="javascript:void(0)" class="sb-link" onclick="showTab('audit')"><i class="fa fa-history"></i> Audit Logs</a>
+
+    <div class="sb-section">Portals</div>
+    <a href="index.html" class="sb-link"><i class="fa fa-cogs"></i> Admin ERP</a>
+    <a href="../sales/erp-dashboard.html" class="sb-link"><i class="fa fa-chart-line"></i> Sales ERP</a>
+    <a href="../partner/dashboard.html" class="sb-link"><i class="fa fa-store"></i> Partner Portal</a>
+    <a href="../internal/index.html" class="sb-link"><i class="fa fa-sitemap"></i> Staff Gateway</a>
+
+    <div class="sb-section">System</div>
+    <a href="config.html" class="sb-link"><i class="fa fa-sliders-h"></i> System Config</a>
+    <a href="api-secrets.html" class="sb-link"><i class="fa fa-key"></i> API Secrets</a>
+    <a href="../index.html" class="sb-link"><i class="fa fa-globe"></i> Public Site</a>
+    <a href="../internal/index.html" class="sb-link" style="margin-top:16px;color:var(--red);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-sub">Super Admin Control Panel &mdash; Worlds of Wonder</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="sa-pill">
+        <div class="avatar">AK</div>
+        <div class="name">AKM / Super Admin</div>
+      </div>
+      <a href="../internal/index.html" class="btn-sm btn-danger"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── DASHBOARD TAB ── -->
+    <div id="tab-dashboard">
+      <div class="stats-row">
+        <div class="stat-card"><div class="icon" style="background:rgba(59,130,246,.15);color:#3b82f6;"><i class="fa fa-users"></i></div><div class="stat-val">247</div><div class="stat-lbl">Total Users</div></div>
+        <div class="stat-card"><div class="icon" style="background:rgba(34,197,94,.15);color:#22c55e;"><i class="fa fa-check-circle"></i></div><div class="stat-val">21</div><div class="stat-lbl">Active Modules</div></div>
+        <div class="stat-card"><div class="icon" style="background:rgba(249,115,22,.15);color:#f97316;"><i class="fa fa-passport"></i></div><div class="stat-val">1,847</div><div class="stat-lbl">Passports Issued</div></div>
+        <div class="stat-card"><div class="icon" style="background:rgba(168,85,247,.15);color:#a855f7;"><i class="fa fa-store"></i></div><div class="stat-val">38</div><div class="stat-lbl">Active Partners</div></div>
+        <div class="stat-card"><div class="icon" style="background:rgba(20,184,166,.15);color:#14b8a6;"><i class="fa fa-ticket-alt"></i></div><div class="stat-val">12,490</div><div class="stat-lbl">Tickets Sold (MTD)</div></div>
+        <div class="stat-card"><div class="icon" style="background:rgba(201,168,76,.15);color:var(--gold);"><i class="fa fa-rupee-sign"></i></div><div class="stat-val">&#8377;48L</div><div class="stat-lbl">Revenue (MTD)</div></div>
+      </div>
+
+      <div class="section-title"><i class="fa fa-bell"></i> Pending Approvals</div>
+      <div class="table-wrap">
+        <div class="table-head"><div class="table-head-title">Items Awaiting Action</div></div>
+        <table class="users-table">
+          <thead><tr><th>TYPE</th><th>NAME</th><th>SUBMITTED</th><th>STATUS</th><th>ACTION</th></tr></thead>
+          <tbody>
+            <tr><td><span class="role-badge" style="background:rgba(168,85,247,.15);color:#c084fc;">Reseller KYC</span></td><td><div class="user-name">Sharma Tours & Travels</div><div class="user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b68737a69767a5b6f746e696835787476">[email&#160;protected]</a></div></td><td>27 Mar 2025</td><td><span class="status-dot" style="background:var(--orange);"></span>Pending Review</td><td><div class="action-btns"><button class="btn-icon" style="color:var(--green);border-color:rgba(34,197,94,.3);" title="Approve"><i class="fa fa-check"></i></button><button class="btn-icon danger" title="Reject"><i class="fa fa-times"></i></button></div></td></tr>
+            <tr><td><span class="role-badge" style="background:rgba(236,72,153,.15);color:#f472b6;">TA KYC</span></td><td><div class="user-name">Delhi Dream Holidays</div><div class="user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c1a8afa7ae81a5a5a9aeadb2efa2aeac">[email&#160;protected]</a></div></td><td>26 Mar 2025</td><td><span class="status-dot" style="background:var(--orange);"></span>Pending Review</td><td><div class="action-btns"><button class="btn-icon" style="color:var(--green);border-color:rgba(34,197,94,.3);" title="Approve"><i class="fa fa-check"></i></button><button class="btn-icon danger" title="Reject"><i class="fa fa-times"></i></button></div></td></tr>
+            <tr><td><span class="role-badge" style="background:rgba(34,197,94,.15);color:#4ade80;">Corp KYC</span></td><td><div class="user-name">Infosys BPO Ltd</div><div class="user-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9cf4eedcf5f2faf3efe5efb2fff3f1">[email&#160;protected]</a></div></td><td>25 Mar 2025</td><td><span class="status-dot" style="background:var(--blue);"></span>Under Review</td><td><div class="action-btns"><button class="btn-icon" style="color:var(--green);border-color:rgba(34,197,94,.3);" title="Approve"><i class="fa fa-check"></i></button><button class="btn-icon danger" title="Reject"><i class="fa fa-times"></i></button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── USER MANAGEMENT TAB ── -->
+    <div id="tab-users" style="display:none;">
+      <div class="table-wrap">
+        <div class="table-head">
+          <div class="table-head-title">All Staff &amp; Partner Accounts</div>
+          <div class="table-actions">
+            <input class="search-input" placeholder="Search users..." oninput="filterUsers(this.value)"/>
+            <button class="btn-add" onclick="openAddUser()"><i class="fa fa-plus"></i> Add User</button>
+          </div>
+        </div>
+        <table class="users-table" id="usersTable">
+          <thead>
+            <tr><th>NAME / EMAIL</th><th>ROLE</th><th>PORTAL</th><th>CREATED</th><th>STATUS</th><th>ACTIONS</th></tr>
+          </thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── MODULES TAB ── -->
+    <div id="tab-modules" style="display:none;">
+      <div class="section-title"><i class="fa fa-toggle-on"></i> Module On / Off Control</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Toggle any module system-wide. Changes take effect immediately and are logged in the audit trail.</p>
+      <div class="module-grid" id="moduleGrid"></div>
+    </div>
+
+    <!-- ── RIGHTS TAB ── -->
+    <div id="tab-rights" style="display:none;">
+      <div class="section-title"><i class="fa fa-shield-alt"></i> Role Definitions &amp; Permissions</div>
+      <div class="table-wrap">
+        <div class="table-head"><div class="table-head-title">Escalation Matrix</div></div>
+        <div style="overflow-x:auto;">
+          <table class="users-table">
+            <thead><tr><th>ROLE</th><th>CREATES</th><th>APPROVES</th><th>VIEWS</th><th>ESCALATES TO</th></tr></thead>
+            <tbody>
+              <tr><td><span class="role-badge" style="background:rgba(168,85,247,.2);color:#c084fc;">Super Admin</span></td><td>All roles</td><td>All KYC, all accounts</td><td>Everything</td><td>— (Top level)</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(59,130,246,.2);color:#60a5fa;">Park Admin</span></td><td>Staff, agents</td><td>Ops decisions</td><td>All except system config</td><td>Super Admin</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(249,115,22,.2);color:#fb923c;">Sales Manager</span></td><td>Sales agents, passport agents</td><td>Passport issuance</td><td>CRM, sales, reports</td><td>Park Admin</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(249,115,22,.15);color:#fb923c;">Sales Agent</span></td><td>None</td><td>None</td><td>Own pipeline only</td><td>Sales Manager</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(201,168,76,.2);color:#F0D080;">Passport Agent</span></td><td>Passport holders</td><td>Passport payments</td><td>Passport records</td><td>Sales Manager</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(20,184,166,.2);color:#2dd4bf;">Call Centre</span></td><td>None</td><td>Complaint resolution</td><td>Bookings, tickets</td><td>Park Admin</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(168,85,247,.15);color:#c084fc;">Reseller Owner</span></td><td>Reseller agents</td><td>Batch pricing</td><td>Own inventory, invoices</td><td>Park Admin</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(168,85,247,.1);color:#c084fc;">Reseller Agent</span></td><td>None</td><td>None</td><td>Own sales only</td><td>Reseller Owner</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(236,72,153,.2);color:#f472b6;">TA Admin</span></td><td>TA agents, sub-agents</td><td>Bookings</td><td>Own team + leads</td><td>Park Admin</td></tr>
+              <tr><td><span class="role-badge" style="background:rgba(236,72,153,.12);color:#f472b6;">TA Agent</span></td><td>Sub-agents (if allowed)</td><td>None</td><td>Own leads only</td><td>TA Admin</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AUDIT TAB ── -->
+    <div id="tab-audit" style="display:none;">
+      <div class="section-title"><i class="fa fa-history"></i> Audit Log</div>
+      <div class="table-wrap">
+        <div class="table-head"><div class="table-head-title">Recent System Events</div></div>
+        <table class="users-table">
+          <thead><tr><th>TIME</th><th>USER</th><th>ACTION</th><th>TARGET</th><th>IP</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">28 Mar 2025 08:41</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9ffef4f2dff6f1fbf6fef8eaf3f3e6b1fcf0f2">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(34,197,94,.15);color:#4ade80;">LOGIN</span></td><td>Super Admin Panel</td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.10</td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">28 Mar 2025 08:35</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5031343d393e10273f277e333f3d">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(201,168,76,.15);color:#F0D080;">MODULE TOGGLE</span></td><td>GST Auto-Reverse: OFF → ON</td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.11</td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">27 Mar 2025 17:22</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0a7a6b79797a65787e4a7d657d24696567">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(59,130,246,.15);color:#60a5fa;">PASSPORT ISSUED</span></td><td>WOW-E-2024-00847 (Arjun Sharma)</td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.15</td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">27 Mar 2025 14:10</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="781913153811161c11191f0d141401561b1715">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(168,85,247,.15);color:#c084fc;">USER CREATED</span></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="20524553454c4c455260534841524d410d544f5552530e434f4d">[email&#160;protected]</a> (Reseller)</td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.10</td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">27 Mar 2025 11:05</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b1c2d0ddd4c2f1c6dec69fd2dedc">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(249,115,22,.15);color:#fb923c;">KYC APPROVED</span></td><td>Delhi Dream Holidays (TA)</td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.12</td></tr>
+            <tr><td style="font-family:'Courier Prime',monospace;color:var(--muted);font-size:10px;">26 Mar 2025 19:33</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1c7d77715c757278757d7b69707065327f7371">[email&#160;protected]</a></td><td><span class="role-badge" style="background:rgba(239,68,68,.15);color:#ef4444;">USER SUSPENDED</span></td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e18e8d85cc8086848f95a1968e96cf828e8c">[email&#160;protected]</a></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">103.21.244.10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ADD USER MODAL -->
+<div class="overlay" id="userModal" onclick="if(event.target===this)closeUserModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeUserModal()"><i class="fa fa-times"></i></button>
+    <div class="modal-title">Create New User</div>
+    <div class="modal-sub">Set role, portal access, and credentials. User will receive an email invite.</div>
+    <div class="form-row">
+      <div class="form-group"><label class="flabel">First Name</label><input class="finput" placeholder="First name"/></div>
+      <div class="form-group"><label class="flabel">Last Name</label><input class="finput" placeholder="Last name"/></div>
+    </div>
+    <div class="form-group"><label class="flabel">Email Address</label><input class="finput" type="email" placeholder="user@example.com"/></div>
+    <div class="form-group"><label class="flabel">Mobile</label><input class="finput" type="tel" placeholder="+91 98765 43210"/></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="flabel">Role</label>
+        <select class="fselect" onchange="updatePortalFromRole(this.value)">
+          <option value="">Select role</option>
+          <option>Super Admin</option>
+          <option>Park Admin</option>
+          <option>Sales Manager</option>
+          <option>Sales Agent</option>
+          <option>Passport Agent</option>
+          <option>Call Centre Agent</option>
+          <option>Reseller Owner</option>
+          <option>Reseller Agent</option>
+          <option>TA Admin</option>
+          <option>TA Agent</option>
+          <option>Corporate</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="flabel">Portal Access</label>
+        <select class="fselect" id="portalSelect">
+          <option>Admin ERP</option>
+          <option>Sales ERP</option>
+          <option>Partner Portal</option>
+          <option>Travel Agent Portal</option>
+          <option>Internal Gateway</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="flabel">Temporary Password</label><input class="finput" type="password" placeholder="Min 8 chars, 1 uppercase, 1 number"/></div>
+    <div class="form-group">
+      <label class="flabel">Notes / Restrictions</label>
+      <input class="finput" placeholder="e.g. Water Park only, View-only reports"/>
+    </div>
+    <button class="btn-submit" onclick="createUser()"><i class="fa fa-user-plus"></i> Create User &amp; Send Invite</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ── USERS DATA ── */
+const USERS = [
+  {name:'Rahul Sharma',email:'rahul@wow.com',role:'Park Admin',portal:'Admin ERP',created:'01 Jan 2025',status:'active',color:'#60a5fa'},
+  {name:'Priya Singh',email:'priya@wow.com',role:'Sales Manager',portal:'Sales ERP',created:'15 Jan 2025',status:'active',color:'#fb923c'},
+  {name:'Amit Kumar',email:'amit@wow.com',role:'Sales Agent',portal:'Sales ERP',created:'20 Jan 2025',status:'active',color:'#fb923c'},
+  {name:'Neha Gupta',email:'neha@wow.com',role:'Passport Agent',portal:'Sales ERP',created:'01 Feb 2025',status:'active',color:'#F0D080'},
+  {name:'Ravi Patel',email:'ravi@wow.com',role:'Call Centre Agent',portal:'Call Centre',created:'10 Feb 2025',status:'active',color:'#2dd4bf'},
+  {name:'Sharma Tours',email:'reseller@sharma-tours.com',role:'Reseller Owner',portal:'Partner Portal',created:'20 Feb 2025',status:'active',color:'#c084fc'},
+  {name:'Delhi Dreams Holidays',email:'info@ddhols.com',role:'TA Admin',portal:'Travel Agent',created:'25 Feb 2025',status:'pending',color:'#f472b6'},
+  {name:'Anil Verma',email:'anil@wow.com',role:'Ops Manager',portal:'Admin ERP',created:'05 Mar 2025',status:'active',color:'#60a5fa'},
+  {name:'Old Agent',email:'old-agent@wow.com',role:'Sales Agent',portal:'Sales ERP',created:'01 Dec 2024',status:'suspended',color:'#fb923c'},
+];
+
+/* ── MODULES DATA ── */
+const MODULES = [
+  {id:'ticketing',name:'Ticketing Engine',desc:'Water Park + Amusement Park ticket sales',icon:'fa-ticket-alt',color:'#3b82f6',on:true},
+  {id:'passport',name:'WOW Passport System',desc:'Issue, redeem, validate WOW Passports',icon:'fa-passport',color:'#C9A84C',on:true},
+  {id:'loyalty',name:'Loyalty Program',desc:'Points accrual, redemption, tier upgrades',icon:'fa-star',color:'#f97316',on:true},
+  {id:'combo',name:'Combo Ticket Engine',desc:'Water + Amusement combo pricing',icon:'fa-layer-group',color:'#22c55e',on:true},
+  {id:'crm',name:'CRM & Leads',desc:'Full CRM with lead scoring and pipeline',icon:'fa-users',color:'#3b82f6',on:true},
+  {id:'gst',name:'GST Auto-Reverse',desc:'Auto GST computation and reverse charge',icon:'fa-file-invoice',color:'#14b8a6',on:true},
+  {id:'qr',name:'QR Ticket Validation',desc:'On-gate QR scanning and single-use check',icon:'fa-qrcode',color:'#a855f7',on:true},
+  {id:'fnb',name:'F&B Packages',desc:'Food and beverage combos and add-ons',icon:'fa-utensils',color:'#ec4899',on:true},
+  {id:'weather',name:'Weather Alerts',desc:'Auto-alert for rain, heat and advisory push',icon:'fa-cloud-sun',color:'#06b6d4',on:false},
+  {id:'whatsapp',name:'WhatsApp Comms',desc:'Automated WhatsApp notifications (Hinglish)',icon:'fa-comment-dots',color:'#22c55e',on:true},
+  {id:'email',name:'Email Engine',desc:'Transactional emails — booking, passport, refund',icon:'fa-envelope',color:'#3b82f6',on:true},
+  {id:'sms',name:'SMS Gateway',desc:'OTP and booking confirmation SMS',icon:'fa-sms',color:'#f97316',on:true},
+  {id:'reseller',name:'Reseller Module',desc:'Bulk ticket allocation for resellers',icon:'fa-store',color:'#a855f7',on:true},
+  {id:'ta',name:'Travel Agent Module',desc:'TA portal, commission, batch booking',icon:'fa-suitcase-rolling',color:'#ec4899',on:true},
+  {id:'corporate',name:'Corporate / Groups',desc:'Group bookings, schools, corporate deals',icon:'fa-building',color:'#22c55e',on:true},
+  {id:'callcenter',name:'Call Centre CRM',desc:'Inbound/outbound call management',icon:'fa-headset',color:'#14b8a6',on:true},
+  {id:'cms',name:'CMS & Banners',desc:'Homepage CMS, banners, offers content',icon:'fa-newspaper',color:'#f59e0b',on:true},
+  {id:'reporting',name:'Advanced Reporting',desc:'BI dashboards, revenue, footfall analytics',icon:'fa-chart-bar',color:'#3b82f6',on:true},
+  {id:'audit',name:'Audit Trail',desc:'Full system event logging and compliance',icon:'fa-history',color:'#6b7280',on:true},
+  {id:'voucher',name:'Dual Voucher Storage',desc:'Customer + admin voucher copy for disputes',icon:'fa-copy',color:'#C9A84C',on:true},
+  {id:'finance',name:'Finance & Invoicing',desc:'GST invoices, refunds, payout processing',icon:'fa-rupee-sign',color:'#22c55e',on:true},
+];
+
+/* ── TABS ── */
+function showTab(tab) {
+  ['dashboard','users','modules','rights','audit'].forEach(t => {
+    const el = document.getElementById('tab-'+t);
+    if (el) el.style.display = (t===tab) ? '' : 'none';
+  });
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('pageTitle').textContent =
+    {dashboard:'Dashboard',users:'User Management',modules:'Module Control',rights:'Rights & Roles',audit:'Audit Logs'}[tab];
+  if (tab === 'users') renderUsers();
+  if (tab === 'modules') renderModules();
+}
+
+/* ── RENDER USERS ── */
+function renderUsers(filter='') {
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+  const filtered = USERS.filter(u =>
+    u.name.toLowerCase().includes(filter.toLowerCase()) ||
+    u.email.toLowerCase().includes(filter.toLowerCase()) ||
+    u.role.toLowerCase().includes(filter.toLowerCase())
+  );
+  filtered.forEach((u,i) => {
+    const statusColor = u.status === 'active' ? '#22c55e' : u.status === 'pending' ? '#f97316' : '#ef4444';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></td>
+      <td><span class="role-badge" style="background:${u.color}22;color:${u.color};">${u.role}</span></td>
+      <td style="color:var(--muted);font-size:11.5px;">${u.portal}</td>
+      <td style="color:var(--muted);font-size:11px;font-family:'Courier Prime',monospace;">${u.created}</td>
+      <td><span style="color:${statusColor};font-size:12px;font-weight:700;"><span class="status-dot" style="background:${statusColor};"></span>${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-icon" title="Edit User"><i class="fa fa-edit"></i></button>
+        <button class="btn-icon" title="Reset Password"><i class="fa fa-key"></i></button>
+        <button class="btn-icon danger" title="Suspend User" onclick="toggleUser(${i})"><i class="fa ${u.status==='suspended'?'fa-unlock':'fa-ban'}"></i></button>
+      </div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterUsers(q) { renderUsers(q); }
+
+/* ── RENDER MODULES ── */
+function renderModules() {
+  const grid = document.getElementById('moduleGrid');
+  grid.innerHTML = '';
+  MODULES.forEach((m,i) => {
+    const div = document.createElement('div');
+    div.className = 'module-card';
+    div.innerHTML = `
+      <div class="mc-icon" style="background:${m.color}18;color:${m.color};"><i class="fa ${m.icon}"></i></div>
+      <div class="mc-text">
+        <div class="mc-title">${m.name}</div>
+        <div class="mc-desc">${m.desc}</div>
+      </div>
+      <div class="toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" ${m.on?'checked':''} onchange="toggleModule(${i},this.checked)"/>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function toggleModule(i, val) {
+  MODULES[i].on = val;
+  const msg = `Module "${MODULES[i].name}" turned ${val?'ON':'OFF'} by Super Admin.`;
+  console.log(msg);
+  // In production: PATCH tables/module_settings/{id}
+}
+
+function toggleUser(i) {
+  USERS[i].status = USERS[i].status === 'suspended' ? 'active' : 'suspended';
+  renderUsers();
+}
+
+/* ── ADD USER MODAL ── */
+function openAddUser() {
+  document.getElementById('userModal').classList.add('open');
+}
+function closeUserModal() {
+  document.getElementById('userModal').classList.remove('open');
+}
+function createUser() {
+  alert('User created! An email invitation has been sent. (In production this will POST to the users API and trigger an email via the notification engine.)');
+  closeUserModal();
+}
+function updatePortalFromRole(role) {
+  const map = {
+    'Park Admin':'Admin ERP','Sales Manager':'Sales ERP','Sales Agent':'Sales ERP',
+    'Passport Agent':'Sales ERP','Call Centre Agent':'Call Centre',
+    'Reseller Owner':'Partner Portal','Reseller Agent':'Partner Portal',
+    'TA Admin':'Travel Agent Portal','TA Agent':'Travel Agent Portal',
+    'Corporate':'Corporate Portal'
+  };
+  const sel = document.getElementById('portalSelect');
+  if (map[role]) {
+    for (let opt of sel.options) { if (opt.text === map[role]) { opt.selected = true; break; } }
+  }
+}
+
+/* INIT */
+showTab('dashboard');
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
