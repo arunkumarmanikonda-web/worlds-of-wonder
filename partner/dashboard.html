@@ -1,201 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Partner Dashboard — Worlds of Wonder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Partner Dashboard — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#080c18;color:#e0e6f0;display:flex;min-height:100vh;}
+.sidebar{width:216px;background:linear-gradient(180deg,#0d1220,#080c18);border-right:1px solid rgba(255,215,0,.1);display:flex;flex-direction:column;flex-shrink:0;}
+.sidebar-brand{padding:16px;border-bottom:1px solid rgba(255,215,0,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo{width:34px;height:34px;background:linear-gradient(135deg,#ffd700,#ff8c00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0a0e1a;flex-shrink:0;}
+.sb-name{font-size:12px;font-weight:700;color:#ffd700;}
+.sb-role{font-size:10px;color:#8899aa;}
+.nav-section{padding:12px 10px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4a5568;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:7px;margin:1px 6px;cursor:pointer;color:#8899aa;font-size:12px;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:rgba(255,215,0,.07);color:#ffd700;}
+.nav-item.active{background:rgba(255,215,0,.12);color:#ffd700;border-left:2px solid #ffd700;}
+.nav-item i{width:15px;text-align:center;font-size:12px;}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700;}
+.sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.05);}
+.partner-chip{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.13);border-radius:8px;padding:10px;}
+.partner-chip .name{font-size:12px;font-weight:700;color:#ffd700;}
+.partner-chip .code{font-size:10px;color:#8899aa;margin-top:1px;}
+.partner-chip .st{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;margin-top:6px;color:#10b981;}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:rgba(255,255,255,.025);border-bottom:1px solid rgba(255,255,255,.06);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;}
+.topbar h2{font-size:17px;font-weight:700;}
+.topbar .sub{font-size:11px;color:#8899aa;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.tb-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:7px 13px;color:#e0e6f0;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;text-decoration:none;}
+.tb-btn:hover{background:rgba(255,215,0,.1);color:#ffd700;border-color:rgba(255,215,0,.25);}
+.tb-btn.gold{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;border:none;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.kpi-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;cursor:pointer;transition:.3s;}
+.kpi-card:hover{transform:translateY(-2px);border-color:rgba(255,215,0,.2);}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:9px;}
+.kpi-label{font-size:10px;color:#8899aa;font-weight:500;margin-bottom:3px;}
+.kpi-value{font-size:20px;font-weight:800;color:#fff;line-height:1;}
+.kpi-ch{font-size:10px;margin-top:4px;display:flex;align-items:center;gap:3px;}
+.kpi-ch.up{color:#10b981;} .kpi-ch.dn{color:#ef4444;}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:18px;}
+.qa-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:.3s;text-decoration:none;color:#e0e6f0;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.qa-btn:hover{transform:translateY(-3px);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.05);}
+.qa-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;}
+.qa-label{font-size:12px;font-weight:600;}
+.qa-sub{font-size:10px;color:#8899aa;}
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:13px;margin-bottom:18px;}
+.chart-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;}
+.chart-title{font-size:13px;font-weight:700;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;}
+.chart-title .sub2{font-size:10px;color:#8899aa;font-weight:400;}
+.bottom-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:13px;}
+.panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;}
+.panel-header{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.panel-header a{font-size:11px;color:#6c63ff;text-decoration:none;}
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#8899aa;padding:5px 9px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06);}
+.data-table td{padding:8px 9px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.data-table tr:last-child td{border-bottom:none;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:18px;font-size:10px;font-weight:600;}
+.b-paid{background:rgba(16,185,129,.14);color:#10b981;border:1px solid rgba(16,185,129,.2);}
+.b-pending{background:rgba(251,191,36,.14);color:#fbbf24;border:1px solid rgba(251,191,36,.2);}
+.b-quoted{background:rgba(147,51,234,.14);color:#c084fc;border:1px solid rgba(147,51,234,.2);}
+.b-confirmed{background:rgba(59,130,246,.14);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.act-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.act-text{font-size:11px;color:#a0aec0;line-height:1.5;}
+.act-time{font-size:9px;color:#4a5568;margin-top:1px;}
+.comm-track{background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.12);border-radius:9px;padding:12px;}
+.comm-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.comm-row:last-child{border-bottom:none;font-weight:700;color:#ffd700;}
+.prog-mini{background:rgba(255,255,255,.07);border-radius:20px;height:5px;margin-top:9px;}
+.prog-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#ffd700,#ff8c00);}
+.banner{background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,140,0,.07));border:1px solid rgba(255,215,0,.18);border-radius:11px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;font-size:13px;}
+.banner b{color:#ffd700;}
+.banner-close{background:rgba(255,255,255,.07);border:none;border-radius:6px;padding:4px 10px;color:#e0e6f0;font-size:11px;cursor:pointer;}
+@media(max-width:900px){.sidebar{display:none;}.kpi-grid{grid-template-columns:repeat(3,1fr);}.charts-row,.bottom-grid{grid-template-columns:1fr;}.quick-actions{grid-template-columns:repeat(2,1fr);}}
+</style>
 </head>
 <body>
-<div id="app">
-  <div class="portal-dashboard">
 
-    <!-- Sidebar -->
-    <aside class="portal-sidebar" id="portal-sidebar" style="background:#0d1f0e;">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:48px;width:auto;object-fit:contain;filter:none!important;" />
-        </a>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:6px;">Partner Portal</div>
-      </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item active" style="border-left-color:#22c55e;">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </a>
-        <a href="buy-tickets.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
-          Buy Tickets
-        </a>
-        <a href="ticket-batches.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-          Ticket Batches
-        </a>
-        <a href="invoices.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Invoices
-        </a>
-        <a href="statements.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-          Statement &amp; Ledger
-        </a>
-        <a href="support.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          Support
-        </a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          Back to WOW Site
-        </a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Sign Out
-        </button>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="portal-main">
-      <div id="portal-loading" class="portal-loading"><div class="portal-spinner"></div><p>Loading partner dashboard…</p></div>
-      <div id="portal-content" style="display:none;">
-
-        <!-- Header -->
-        <div class="portal-main-header">
-          <div>
-            <h1 class="portal-main-title" id="partner-greeting">Partner Dashboard</h1>
-            <p class="portal-main-sub" id="partner-status-line">Loading partner status…</p>
-          </div>
-          <a href="buy-tickets.html" class="btn btn-primary" style="white-space:nowrap;background:linear-gradient(135deg,#166534,#14532d);">+ Buy Tickets</a>
-        </div>
-
-        <!-- Pending approval banner -->
-        <div id="pending-banner" class="portal-notice portal-notice--amber" style="display:none;">
-          <strong>⏳ Application Under Review</strong> — Your partner application is being reviewed by our team. You'll receive an email within 1 business day. For urgent queries, call <a href="tel:08069090000">080-6909-0000</a>.
-        </div>
-
-        <!-- Stats -->
-        <div class="portal-stats-row" id="partner-stats">
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-tickets">—</div>
-            <div class="portal-stat-label">Tickets Issued This Month</div>
-          </div>
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-revenue">—</div>
-            <div class="portal-stat-label">Revenue This Month</div>
-          </div>
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-commission">—</div>
-            <div class="portal-stat-label">Commission Earned</div>
-          </div>
-          <div class="portal-stat-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;">
-            <div class="portal-stat-num" style="color:#166534;" id="stat-balance">—</div>
-            <div class="portal-stat-label">Wallet Balance</div>
-          </div>
-        </div>
-
-        <!-- Quick actions -->
-        <div style="margin-bottom:28px;">
-          <div class="portal-card-title" style="margin-bottom:16px;">Quick Actions</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
-            <a href="buy-tickets.html" class="partner-action-card">
-              <span style="font-size:28px;">🎟</span>
-              <span>Buy Tickets</span>
-            </a>
-            <a href="ticket-batches.html" class="partner-action-card">
-              <span style="font-size:28px;">📦</span>
-              <span>View Batches</span>
-            </a>
-            <a href="invoices.html" class="partner-action-card">
-              <span style="font-size:28px;">🧾</span>
-              <span>Download Invoice</span>
-            </a>
-            <a href="support.html" class="partner-action-card">
-              <span style="font-size:28px;">💬</span>
-              <span>Raise Support</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Recent transactions -->
-        <div class="portal-card">
-          <div class="portal-card-title">Recent Transactions</div>
-          <div id="recent-transactions" style="margin-top:16px;">
-            <div style="text-align:center;padding:40px 20px;color:#9ca3af;">
-              <div style="font-size:40px;margin-bottom:12px;">📊</div>
-              <p style="font-size:15px;">No transactions yet. Start by purchasing your first ticket batch.</p>
-              <a href="buy-tickets.html" class="btn btn-primary" style="margin-top:16px;background:linear-gradient(135deg,#166534,#14532d);">Buy Tickets Now →</a>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </main>
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sb-logo">WW</div>
+    <div><div class="sb-name">WOW Partner Portal</div><div class="sb-role">Travel Agent ERP</div></div>
   </div>
-</div><!-- #app -->
+  <div class="nav-section">Main</div>
+  <a class="nav-item active" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+  <a class="nav-item" href="quote-builder.html"><i class="fas fa-file-invoice"></i> Quote Builder <span class="nav-badge">3</span></a>
+  <a class="nav-item" href="bulk-tickets.html"><i class="fas fa-qrcode"></i> Bulk Tickets</a>
+  <div class="nav-section">Commerce</div>
+  <a class="nav-item" href="invoice-gst.html"><i class="fas fa-receipt"></i> Invoices &amp; GST</a>
+  <a class="nav-item" href="#"><i class="fas fa-wallet"></i> Commissions</a>
+  <a class="nav-item" href="#"><i class="fas fa-history"></i> Order History</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="onboarding-kyc.html"><i class="fas fa-id-badge"></i> KYC / Profile</a>
+  <a class="nav-item" href="#"><i class="fas fa-cog"></i> Settings</a>
+  <a class="nav-item" href="#" onclick="alert('Logged out!')"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <div class="sidebar-footer">
+    <div class="partner-chip">
+      <div class="name">XYZ Tours Pvt Ltd</div>
+      <div class="code">WOW-TA-2026-0089</div>
+      <div class="st"><div class="dot"></div> KYC Approved · Active</div>
+    </div>
+  </div>
+</div>
 
-<style>
-.partner-action-card {
-  display:flex; flex-direction:column; align-items:center; gap:8px;
-  padding:20px 16px; background:white; border:1.5px solid #e5edf8;
-  border-radius:14px; text-decoration:none; color:#374151;
-  font-size:13.5px; font-weight:700; text-align:center;
-  transition:transform .2s, box-shadow .2s, border-color .2s;
-  box-shadow:0 1px 6px rgba(0,0,0,.04);
-}
-.partner-action-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(0,0,0,.08); border-color:#22c55e; }
-.portal-notice { padding:14px 18px; border-radius:12px; font-size:14px; margin-bottom:20px; }
-.portal-notice--amber { background:#fffbeb; border:1px solid #fde68a; color:#92400e; }
-.portal-notice a { color:#92400e; font-weight:700; }
-</style>
+<div class="main">
+  <div class="topbar">
+    <div><h2>Good morning, Rajesh 👋</h2><div class="sub">Tuesday, 15 Apr 2026 · Partner Dashboard</div></div>
+    <div class="topbar-right">
+      <a class="tb-btn" href="quote-builder.html"><i class="fas fa-plus"></i> New Quote</a>
+      <a class="tb-btn" href="bulk-tickets.html"><i class="fas fa-ticket-alt"></i> Buy Tickets</a>
+      <button class="tb-btn gold" onclick="toggleNotif()"><i class="fas fa-bell"></i> <span style="background:#ef4444;color:#fff;border-radius:10px;padding:0 5px;font-size:10px;font-weight:700;">4</span></button>
+    </div>
+  </div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+  <div class="content">
+    <div class="banner" id="ab">
+      <div>🎉 <b>KYC Approved!</b> Your account is active. Commission slab: <b>12%</b> · Credit limit: <b>₹5,00,000</b></div>
+      <button class="banner-close" onclick="document.getElementById('ab').style.display='none'">✕</button>
+    </div>
 
-  const app  = initializeApp(WOW_FB_CONFIG);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.2);">💰</div>
+        <div class="kpi-label">This Month Revenue</div>
+        <div class="kpi-value">₹3.42L</div>
+        <div class="kpi-ch up"><i class="fas fa-arrow-up"></i> +24% vs last month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);">🎫</div>
+        <div class="kpi-label">Tickets Sold</div>
+        <div class="kpi-value">1,847</div>
+        <div class="kpi-ch up"><i class="fas fa-arrow-up"></i> +312 this week</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);">📋</div>
+        <div class="kpi-label">Quotes Sent</div>
+        <div class="kpi-value">28</div>
+        <div class="kpi-ch up"><i class="fas fa-check"></i> 8 awaiting reply</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(255,140,0,.12);border:1px solid rgba(255,140,0,.2);">💎</div>
+        <div class="kpi-label">Commission Earned</div>
+        <div class="kpi-value">₹41,040</div>
+        <div class="kpi-ch up"><i class="fas fa-percent"></i> 12% rate applied</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);">⏳</div>
+        <div class="kpi-label">Outstanding</div>
+        <div class="kpi-value">₹18,200</div>
+        <div class="kpi-ch dn"><i class="fas fa-clock"></i> Due in 3 days</div>
+      </div>
+    </div>
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = 'login.html'; return; }
-    document.getElementById('portal-loading').style.display = 'none';
-    document.getElementById('portal-content').style.display = 'block';
+    <div class="quick-actions">
+      <a class="qa-btn" href="quote-builder.html">
+        <div class="qa-icon" style="background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.2);">📝</div>
+        <div class="qa-label">New Quote</div><div class="qa-sub">School / Corp / Birthday</div>
+      </a>
+      <a class="qa-btn" href="bulk-tickets.html">
+        <div class="qa-icon" style="background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);">🎟</div>
+        <div class="qa-label">Bulk Tickets</div><div class="qa-sub">Water + Amusement Park</div>
+      </a>
+      <a class="qa-btn" href="invoice-gst.html">
+        <div class="qa-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2);">🧾</div>
+        <div class="qa-label">GST Invoice</div><div class="qa-sub">Auto-compute &amp; download</div>
+      </a>
+      <a class="qa-btn" href="../sales/passport-kyc.html">
+        <div class="qa-icon" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);">🛂</div>
+        <div class="qa-label">Sell Passport</div><div class="qa-sub">WOW Membership</div>
+      </a>
+    </div>
 
-    const name = user.displayName?.split(' ')[0] || 'Partner';
-    document.getElementById('partner-greeting').textContent = `Welcome back, ${name} 👋`;
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-title">Monthly Sales Trend <span class="sub2">Tickets + Revenue ₹K</span></div>
+        <div id="salesChart" style="height:210px;"></div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Sales by Segment</div>
+        <div id="catChart" style="height:210px;"></div>
+      </div>
+    </div>
 
-    // Check partner status from Firestore
-    try {
-      const snap = await getDoc(doc(db, 'partner_applications', user.uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.status === 'pending_review') {
-          document.getElementById('pending-banner').style.display = 'block';
-          document.getElementById('partner-status-line').textContent = '🟡 Application under review';
-        } else if (data.status === 'active') {
-          document.getElementById('partner-status-line').textContent = '🟢 Active Partner — ' + (data.partnerType?.replace('_', ' ') || '');
-        }
-      }
-    } catch {}
+    <div class="bottom-grid">
+      <div class="panel">
+        <div class="panel-header">Recent Bookings <a href="#">View All →</a></div>
+        <table class="data-table">
+          <thead><tr><th>Booking</th><th>Group</th><th>Pax</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#WOW-B-7821</td><td>DPS Noida School Trip</td><td>240</td><td>₹1,44,000</td><td><span class="badge b-paid">Paid</span></td></tr>
+            <tr><td>#WOW-B-7800</td><td>Infosys Team Outing</td><td>85</td><td>₹68,000</td><td><span class="badge b-pending">Pending</span></td></tr>
+            <tr><td>#WOW-B-7789</td><td>Happy Birthdays Co.</td><td>30</td><td>₹22,500</td><td><span class="badge b-paid">Paid</span></td></tr>
+            <tr><td>#WOW-B-7770</td><td>Modern School Faridabad</td><td>180</td><td>₹1,08,000</td><td><span class="badge b-quoted">Quoted</span></td></tr>
+            <tr><td>#WOW-B-7765</td><td>Zomato Corporate Day</td><td>110</td><td>₹77,000</td><td><span class="badge b-confirmed">Confirmed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px;">
+        <div class="panel">
+          <div class="panel-header">Commission Tracker</div>
+          <div class="comm-track">
+            <div class="comm-row"><span>Gross Revenue</span><span>₹3,42,000</span></div>
+            <div class="comm-row"><span>Rate</span><span>12%</span></div>
+            <div class="comm-row"><span>Commission</span><span>₹41,040</span></div>
+            <div class="comm-row"><span>TDS (2%)</span><span>-₹6,840</span></div>
+            <div class="comm-row"><span>Net Payable</span><span>₹34,200</span></div>
+          </div>
+          <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#8899aa;margin-bottom:3px;"><span>Target ₹5L</span><span>68%</span></div>
+            <div class="prog-mini"><div class="prog-fill" style="width:68%;"></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">Activity Feed</div>
+          <div class="act-item"><div class="act-dot" style="background:#10b981;"></div><div><div class="act-text">Quote #Q-128 accepted by DPS Noida</div><div class="act-time">2 hours ago</div></div></div>
+          <div class="act-item"><div class="act-dot" style="background:#fbbf24;"></div><div><div class="act-text">Payment reminder sent — Infosys booking</div><div class="act-time">5 hours ago</div></div></div>
+          <div class="act-item"><div class="act-dot" style="background:#6c63ff;"></div><div><div class="act-text">240 QR tickets generated for DPS trip</div><div class="act-time">Yesterday</div></div></div>
+          <div class="act-item"><div class="act-dot" style="background:#ffd700;"></div><div><div class="act-text">Commission ₹28,800 credited for March</div><div class="act-time">2 days ago</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    // Placeholder stats (real data comes from Firestore in production)
-    document.getElementById('stat-tickets').textContent = '0';
-    document.getElementById('stat-revenue').textContent = '₹0';
-    document.getElementById('stat-commission').textContent = '₹0';
-    document.getElementById('stat-balance').textContent = '₹0';
-  });
+<!-- Notification Panel -->
+<div id="notif-panel" style="display:none;position:fixed;top:54px;right:18px;width:290px;background:#13182a;border:1px solid rgba(255,215,0,.15);border-radius:13px;padding:14px;z-index:9999;box-shadow:0 8px 40px rgba(0,0,0,.6);">
+  <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;"><span>Notifications</span><span style="cursor:pointer;color:#8899aa;font-size:16px;" onclick="toggleNotif()">×</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;">
+    <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:8px;padding:9px;color:#a0aec0;"><b style="color:#10b981;">✅ KYC Approved</b><br/>Account fully active.</div>
+    <div style="background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.15);border-radius:8px;padding:9px;color:#a0aec0;"><b style="color:#ffd700;">💰 Commission Payout</b><br/>₹34,200 credited to your bank.</div>
+    <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.15);border-radius:8px;padding:9px;color:#a0aec0;"><b style="color:#fbbf24;">⚠ Invoice Due</b><br/>INV-0089 due in 3 days (₹18,200).</div>
+    <div style="background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.15);border-radius:8px;padding:9px;color:#a0aec0;"><b style="color:#a78bfa;">🎟 Weekend Bonus</b><br/>+5% commission on 100+ tickets!</div>
+  </div>
+</div>
 
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await signOut(auth);
-    window.location.href = 'login.html';
-  });
+<script>
+function toggleNotif(){const p=document.getElementById('notif-panel');p.style.display=p.style.display==='none'?'block':'none';}
+
+const sc=echarts.init(document.getElementById('salesChart'));
+sc.setOption({backgroundColor:'transparent',tooltip:{trigger:'axis',backgroundColor:'rgba(13,18,32,.9)',borderColor:'rgba(255,215,0,.2)',textStyle:{color:'#e0e6f0',fontSize:11}},legend:{data:['Tickets','Revenue (₹K)'],textStyle:{color:'#8899aa',fontSize:10},top:0},grid:{left:38,right:16,top:28,bottom:28},xAxis:{type:'category',data:['Nov','Dec','Jan','Feb','Mar','Apr'],axisLine:{lineStyle:{color:'rgba(255,255,255,.08)'}},axisLabel:{color:'#8899aa',fontSize:10}},yAxis:[{type:'value',axisLabel:{color:'#8899aa',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,.04)'}}},{type:'value',axisLabel:{color:'#8899aa',fontSize:10},splitLine:{show:false}}],series:[{name:'Tickets',type:'bar',barWidth:14,data:[820,1240,980,1120,1560,1847],itemStyle:{borderRadius:[3,3,0,0],color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#6c63ff'},{offset:1,color:'rgba(108,99,255,.25)'}]}}},{name:'Revenue (₹K)',type:'line',smooth:true,yAxisIndex:1,data:[82,124,98,112,156,184],symbol:'circle',symbolSize:5,lineStyle:{color:'#ffd700',width:2},itemStyle:{color:'#ffd700'},areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(255,215,0,.18)'},{offset:1,color:'rgba(255,215,0,0)'}]}}}]});
+
+const cc=echarts.init(document.getElementById('catChart'));
+cc.setOption({backgroundColor:'transparent',tooltip:{trigger:'item',formatter:'{b}: {c} ({d}%)',backgroundColor:'rgba(13,18,32,.9)',borderColor:'rgba(255,215,0,.2)',textStyle:{color:'#e0e6f0',fontSize:11}},legend:{orient:'vertical',right:0,top:'middle',textStyle:{color:'#8899aa',fontSize:10}},series:[{type:'pie',radius:['42%','72%'],center:['36%','50%'],data:[{value:780,name:'Schools',itemStyle:{color:'#6c63ff'}},{value:420,name:'Corporates',itemStyle:{color:'#ffd700'}},{value:310,name:'Birthdays',itemStyle:{color:'#10b981'}},{value:220,name:'FIT Groups',itemStyle:{color:'#ff8c00'}},{value:117,name:'Others',itemStyle:{color:'#8899aa'}}],label:{show:false},emphasis:{scale:true}}]});
+
+window.addEventListener('resize',()=>{sc.resize();cc.resize();});
 </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
