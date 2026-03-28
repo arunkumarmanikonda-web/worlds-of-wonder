@@ -1,373 +1,706 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notification Templates — WOW Admin</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/wow-design-system.css" />
-  <style>
-    body { background:#0a0f1e; font-family:'Inter',sans-serif; color:#e2e8f0; min-height:100vh; }
-    .admin-layout { display:flex; min-height:100vh; }
-    .admin-sidebar { width:240px; background:#060b17; border-right:1px solid rgba(255,255,255,.06); flex-shrink:0; padding:24px 0; }
-    .admin-sidebar-logo { padding:0 20px 24px; border-bottom:1px solid rgba(255,255,255,.06); margin-bottom:16px; }
-    .admin-sidebar-logo img { height:40px; filter:none !important; opacity:1; object-fit:contain; }
-    .admin-nav-link { display:flex; align-items:center; gap:10px; padding:9px 20px; font-size:13px; font-weight:600; color:rgba(255,255,255,.5); text-decoration:none; border-radius:8px; margin:2px 8px; transition:all .15s; }
-    .admin-nav-link:hover { background:rgba(255,255,255,.07); color:rgba(255,255,255,.85); }
-    .admin-nav-link.active { background:rgba(0,85,179,.25); color:#60A5FA; }
-    .admin-main { flex:1; overflow:auto; }
-    .admin-topbar { background:#060b17; border-bottom:1px solid rgba(255,255,255,.06); padding:16px 28px; position:sticky; top:0; z-index:10; }
-    .admin-topbar h1 { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; }
-    .admin-topbar p  { font-size:12px; color:rgba(255,255,255,.4); margin-top:1px; }
-    .admin-content { padding:28px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comms & Notifications Engine — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.admin-header{background:#1e293b;border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.admin-header img{height:42px;filter:none!important}
+.admin-header h1{font-size:1rem;font-weight:700;color:#f1f5f9}
+.admin-header h1 span{color:#f59e0b;font-size:.72rem;display:block;font-weight:400}
+.btn-sm{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.btn-gold{background:#f59e0b;color:#000}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-green{background:#16a34a;color:#fff}
+.btn-red{background:#dc2626;color:#fff}
+.btn-outline{background:transparent;border:1px solid #475569;color:#cbd5e1}
+.btn-sm:hover{transform:translateY(-1px);opacity:.9}
 
-    /* Channel Tabs */
-    .ch-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
-    .ch-tab { display:flex; align-items:center; gap:6px; padding:8px 18px; border-radius:10px; border:1.5px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); font-size:13px; font-weight:600; color:rgba(255,255,255,.5); cursor:pointer; transition:all .15s; font-family:'Inter',sans-serif; }
-    .ch-tab:hover { border-color:rgba(255,255,255,.2); color:rgba(255,255,255,.8); }
-    .ch-tab.active { background:rgba(0,85,179,.2); border-color:#0055B3; color:#60A5FA; }
+/* Main layout */
+.nc-body{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 69px)}
+.nc-sidebar{background:#1e293b;border-right:1px solid #334155;padding:16px 12px;display:flex;flex-direction:column;gap:6px}
+.nc-sidebar-title{font-size:.72rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:8px 8px 4px;margin-top:8px}
+.nc-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.83rem;color:#94a3b8;transition:all .2s}
+.nc-nav-item:hover,.nc-nav-item.active{background:#0f172a;color:#f1f5f9}
+.nc-nav-item.active{border-left:3px solid #f59e0b}
+.nc-nav-item i{width:16px;text-align:center}
+.nc-main{flex:1;overflow-y:auto;padding:24px}
 
-    /* Template Grid */
-    .tpl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:16px; }
+/* Section headers */
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.section-hdr h2{font-size:1.1rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:10px}
+.section-hdr .btn-group{display:flex;gap:8px}
 
-    .tpl-card {
-      background:#111827; border:1px solid rgba(255,255,255,.07); border-radius:14px; overflow:hidden; transition:border-color .2s;
-    }
-    .tpl-card:hover { border-color:rgba(255,255,255,.15); }
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center}
+.stat-card .sv{font-size:1.5rem;font-weight:800;color:#f59e0b}
+.stat-card .sl{font-size:.72rem;color:#64748b;margin-top:4px}
+.stat-card .sd{font-size:.78rem;color:#4ade80;font-weight:600}
 
-    .tpl-head { padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; gap:10px; }
-    .tpl-icon { font-size:18px; }
-    .tpl-name { font-size:13px; font-weight:700; color:#fff; flex:1; }
-    .tpl-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
-    .tpl-status.active { background:rgba(16,185,129,.15); color:#6EE7B7; }
-    .tpl-status.draft  { background:rgba(245,168,0,.15); color:#F5D679; }
-    .tpl-status.off    { background:rgba(100,100,100,.15); color:#9CA3AF; }
+/* Card grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
 
-    .tpl-body { padding:14px 16px; }
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px}
+.card h4{font-size:.88rem;font-weight:700;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #334155;padding-bottom:10px}
 
-    .tpl-preview {
-      background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:8px;
-      padding:12px 14px; font-size:12px; color:rgba(255,255,255,.7); line-height:1.6;
-      margin-bottom:12px; font-family:'Courier New',monospace; white-space:pre-wrap;
-      word-break:break-word; max-height:100px; overflow:auto;
-    }
+/* Template builder */
+.template-builder{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:20px;margin-bottom:20px}
+.tb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.tb-header h3{font-size:.95rem;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px}
+.tb-channel-tabs{display:flex;gap:4px;background:#0f172a;padding:4px;border-radius:10px;margin-bottom:16px}
+.ch-tab{flex:1;padding:8px;border:none;background:transparent;color:#64748b;font-size:.8rem;font-weight:600;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.ch-tab.active{background:#1e293b;color:#f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.ch-tab.active.wa{background:#075e54;color:#fff}
+.ch-tab.active.email{background:#1d4ed8;color:#fff}
+.ch-tab.active.sms{background:#7c3aed;color:#fff}
+.ch-tab.active.push{background:#dc2626;color:#fff}
+.tb-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tb-form.full-width{grid-template-columns:1fr}
+.form-group{margin-bottom:0}
+.form-group label{display:block;font-size:.75rem;color:#94a3b8;margin-bottom:5px;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:9px 12px;color:#e2e8f0;font-size:.83rem;font-family:inherit}
+.form-group textarea{resize:vertical;min-height:100px;line-height:1.6}
+.form-group input::placeholder,.form-group textarea::placeholder{color:#475569}
+.variable-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.var-chip{background:#172554;color:#93c5fd;padding:3px 10px;border-radius:12px;font-size:.72rem;cursor:pointer;font-weight:600;border:1px solid #1e3a8a;transition:all .2s}
+.var-chip:hover{background:#1e3a8a}
+.preview-box{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;margin-top:14px;position:relative}
+.preview-box .pb-label{position:absolute;top:-10px;left:12px;background:#1e293b;padding:2px 8px;font-size:.7rem;color:#64748b;font-weight:700;border-radius:4px}
+.preview-box .pb-content{font-size:.85rem;line-height:1.7;color:#e2e8f0;white-space:pre-wrap}
+.preview-box.wa{border-color:#25d366}
+.preview-box.email{border-color:#3b82f6}
+.preview-box.sms{border-color:#7c3aed}
 
-    .tpl-vars { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
-    .tpl-var { font-size:10px; background:rgba(0,85,179,.2); color:#7DD3FC; padding:2px 8px; border-radius:20px; font-family:'Courier New',monospace; }
+/* Triggers */
+.trigger-list{display:flex;flex-direction:column;gap:10px}
+.trigger-item{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;display:flex;align-items:center;gap:14px}
+.trigger-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.trigger-info{flex:1}
+.trigger-info .ti-name{font-size:.88rem;font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.trigger-info .ti-desc{font-size:.75rem;color:#94a3b8}
+.trigger-channels{display:flex;gap:6px;margin-top:6px}
+.ch-badge{padding:2px 8px;border-radius:8px;font-size:.68rem;font-weight:700}
+.ch-wa{background:#075e54;color:#25d366}
+.ch-email{background:#172554;color:#60a5fa}
+.ch-sms{background:#3b0764;color:#a78bfa}
+.ch-push{background:#450a0a;color:#f87171}
+.trigger-toggle{display:flex;flex-direction:column;align-items:center;gap:4px}
+.toggle-sw{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#334155;border-radius:12px;transition:.3s}
+.toggle-slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#94a3b8;border-radius:50%;transition:.3s}
+.toggle-sw input:checked+.toggle-slider{background:#16a34a}
+.toggle-sw input:checked+.toggle-slider::before{transform:translateX(20px);background:#fff}
+.toggle-label{font-size:.68rem;color:#64748b}
 
-    .tpl-actions { display:flex; gap:8px; }
-    .tpl-btn { padding:6px 14px; border-radius:7px; border:none; font-size:12px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; transition:all .15s; }
-    .tpl-btn-edit { background:rgba(0,85,179,.2); color:#7DD3FC; border:1px solid rgba(0,85,179,.3); }
-    .tpl-btn-test { background:rgba(16,185,129,.15); color:#6EE7B7; border:1px solid rgba(16,185,129,.2); }
-    .tpl-btn-toggle { background:rgba(255,255,255,.07); color:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.1); }
+/* Campaigns */
+.campaign-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.campaign-table th{text-align:left;padding:10px;color:#64748b;font-weight:700;font-size:.75rem;border-bottom:1px solid #334155}
+.campaign-table td{padding:10px;border-bottom:1px solid #1e293b;color:#e2e8f0;vertical-align:middle}
+.status-badge{padding:3px 10px;border-radius:10px;font-size:.72rem;font-weight:700}
+.sb-sent{background:#0d2b1a;color:#4ade80}
+.sb-scheduled{background:#172554;color:#60a5fa}
+.sb-draft{background:#1e293b;color:#94a3b8}
+.sb-running{background:#3b1f00;color:#fbbf24}
+.progress-bar-wrap{background:#0f172a;border-radius:4px;height:6px;width:100px}
+.progress-bar-fill{height:6px;border-radius:4px;background:linear-gradient(90deg,#2563eb,#7c3aed)}
 
-    /* Edit Modal */
-    .tpl-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:200; align-items:center; justify-content:center; }
-    .tpl-modal.open { display:flex; }
-    .tpl-modal-box { background:#111827; border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:28px; max-width:600px; width:95%; max-height:90vh; overflow:auto; }
-    .tpl-modal-title { font-family:'Nunito',sans-serif; font-size:18px; font-weight:800; color:#fff; margin-bottom:16px; }
-    .tpl-textarea { width:100%; padding:12px 14px; background:rgba(255,255,255,.05); border:1.5px solid rgba(255,255,255,.1); border-radius:10px; color:#fff; font-family:'Courier New',monospace; font-size:13px; min-height:160px; outline:none; resize:vertical; }
-    .tpl-textarea:focus { border-color:#0055B3; }
-    .tpl-save-btn { padding:10px 24px; border-radius:10px; border:none; background:linear-gradient(135deg,#003D82,#0055B3); color:#fff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:800; cursor:pointer; margin-top:14px; }
-    .tpl-close-btn { padding:10px 20px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:transparent; color:rgba(255,255,255,.5); font-size:13px; cursor:pointer; margin-top:14px; margin-right:8px; font-family:'Inter',sans-serif; }
-  </style>
+/* Audience builder */
+.audience-filter{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:12px}
+.af-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.af-select{background:#1e293b;border:1px solid #334155;border-radius:6px;padding:7px 10px;color:#e2e8f0;font-size:.8rem}
+.audience-count{background:#172554;color:#60a5fa;padding:10px 16px;border-radius:8px;font-size:.85rem;font-weight:700;text-align:center}
+
+/* Log table */
+.log-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #1e293b;font-size:.78rem;align-items:center}
+.log-time{color:#64748b;white-space:nowrap;font-family:'Courier Prime',monospace;font-size:.75rem}
+.log-channel{padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;flex-shrink:0}
+.log-recipient{color:#60a5fa;flex:1}
+.log-msg{color:#94a3b8;flex:2}
+.log-status{font-size:.7rem;font-weight:700}
+.log-delivered{color:#4ade80}
+.log-failed{color:#f87171}
+.log-pending{color:#fbbf24}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid #f59e0b;border-radius:10px;padding:12px 18px;color:#fbbf24;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all .4s;display:flex;align-items:center;gap:8px}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
 </head>
 <body>
-<div class="admin-layout">
-  <nav class="admin-sidebar">
-    <div class="admin-sidebar-logo"><a href="index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:40px;width:auto;object-fit:contain;filter:none!important;" /></a></div>
-    <a href="index.html" class="admin-nav-link">📊 Dashboard</a>
-    <a href="crm.html" class="admin-nav-link">👥 CRM</a>
-    <a href="bookings.html" class="admin-nav-link">🎫 Bookings</a>
-    <a href="settings.html" class="admin-nav-link">🛠 Settings</a>
-    <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
-    <a href="module-control.html" class="admin-nav-link">⚙️ Module Control</a>
-    <a href="api-secrets.html" class="admin-nav-link">🔑 API Secrets</a>
-    <a href="notifications.html" class="admin-nav-link active">🔔 Notifications</a>
+
+<header class="admin-header">
+  <div style="display:flex;align-items:center;gap:14px">
+    <img src="../images/logo.png" alt="WOW">
+    <h1>Communications & Notifications Engine <span>⚡ WhatsApp · Email · SMS · Push — Hinglish Comms</span></h1>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-sm btn-gold" onclick="launchCampaign()"><i class="fas fa-paper-plane"></i> Launch Campaign</button>
+    <button class="btn-sm btn-outline" onclick="window.location='index.html'"><i class="fas fa-th"></i> Admin</button>
+  </div>
+</header>
+
+<div class="nc-body">
+  <!-- Sidebar -->
+  <nav class="nc-sidebar">
+    <div class="nc-sidebar-title">Channels</div>
+    <div class="nc-nav-item active" onclick="showSection('dashboard',this)"><i class="fas fa-chart-bar" style="color:#f59e0b"></i> Dashboard</div>
+    <div class="nc-nav-item" onclick="showSection('templates',this)"><i class="fab fa-whatsapp" style="color:#25d366"></i> Message Templates</div>
+    <div class="nc-nav-item" onclick="showSection('campaigns',this)"><i class="fas fa-bullhorn" style="color:#3b82f6"></i> Campaigns</div>
+    <div class="nc-nav-item" onclick="showSection('triggers',this)"><i class="fas fa-bolt" style="color:#fbbf24"></i> Auto Triggers</div>
+    <div class="nc-sidebar-title">Content</div>
+    <div class="nc-nav-item" onclick="showSection('whatsapp',this)"><i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp</div>
+    <div class="nc-nav-item" onclick="showSection('email',this)"><i class="fas fa-envelope" style="color:#60a5fa"></i> Email Builder</div>
+    <div class="nc-nav-item" onclick="showSection('sms',this)"><i class="fas fa-sms" style="color:#a78bfa"></i> SMS</div>
+    <div class="nc-nav-item" onclick="showSection('push',this)"><i class="fas fa-bell" style="color:#f87171"></i> Push Notifications</div>
+    <div class="nc-sidebar-title">Analytics</div>
+    <div class="nc-nav-item" onclick="showSection('analytics',this)"><i class="fas fa-chart-line" style="color:#4ade80"></i> Delivery Analytics</div>
+    <div class="nc-nav-item" onclick="showSection('logs',this)"><i class="fas fa-list" style="color:#94a3b8"></i> Message Logs</div>
+    <div class="nc-nav-item" onclick="showSection('audience',this)"><i class="fas fa-users" style="color:#f59e0b"></i> Audience Builder</div>
   </nav>
 
-  <div class="admin-main">
-    <div class="admin-topbar">
-      <div>
-        <h1>🔔 Notification Templates</h1>
-        <p>Manage WhatsApp, SMS, and Email templates for all customer communications. Variables shown in {braces}.</p>
+  <!-- Main Content -->
+  <main class="nc-main">
+
+    <!-- DASHBOARD -->
+    <div id="section-dashboard">
+      <div class="section-hdr">
+        <h2><i class="fas fa-chart-bar" style="color:#f59e0b"></i> Comms Dashboard</h2>
+        <div class="btn-group">
+          <button class="btn-sm btn-outline">Today</button>
+          <button class="btn-sm btn-outline">This Week</button>
+          <button class="btn-sm btn-blue">This Month</button>
+        </div>
       </div>
-      <button onclick="openNewTemplate()" style="padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,#003D82,#0055B3);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;">+ New Template</button>
+      <div class="stats-row">
+        <div class="stat-card"><div class="sv">48,291</div><div class="sl">WhatsApp Sent</div><div class="sd">↑ 12% vs last month</div></div>
+        <div class="stat-card"><div class="sv">22,847</div><div class="sl">Emails Sent</div><div class="sd">↑ 8%</div></div>
+        <div class="stat-card"><div class="sv">15,432</div><div class="sl">SMS Sent</div><div class="sd">↑ 5%</div></div>
+        <div class="stat-card"><div class="sv" style="color:#4ade80">94.2%</div><div class="sl">Delivery Rate</div><div class="sd">↑ 2.1%</div></div>
+        <div class="stat-card"><div class="sv" style="color:#a78bfa">32.8%</div><div class="sl">Avg. Open Rate</div><div class="sd">↑ 4.3%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h4><i class="fas fa-chart-line" style="color:#4ade80"></i> Monthly Message Volume</h4><div style="height:200px;position:relative"><canvas id="volumeChart"></canvas></div></div>
+        <div class="card"><h4><i class="fas fa-chart-doughnut" style="color:#a78bfa"></i> Channel Mix</h4><div style="height:200px;position:relative"><canvas id="channelChart"></canvas></div></div>
+      </div>
+      <!-- Recent campaigns -->
+      <div class="card">
+        <h4><i class="fas fa-bullhorn" style="color:#3b82f6"></i> Recent Campaigns</h4>
+        <table class="campaign-table">
+          <thead><tr><th>Campaign Name</th><th>Channel</th><th>Audience</th><th>Sent</th><th>Open Rate</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>🌊 Weekend Special — Wave Pool Fiesta</td>
+              <td><span class="ch-badge ch-wa">WhatsApp</span></td>
+              <td>12,400 fans</td>
+              <td>12,388</td>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:68%"></div></div>68%</div></td>
+              <td><span class="status-badge sb-sent">Sent</span></td>
+              <td><button class="btn-sm btn-outline" style="padding:4px 10px;font-size:.72rem">Report</button></td>
+            </tr>
+            <tr>
+              <td>🎢 Roller Coaster Reopening Alert!</td>
+              <td><span class="ch-badge ch-email">Email</span></td>
+              <td>8,200 fans</td>
+              <td>8,200</td>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:41%"></div></div>41%</div></td>
+              <td><span class="status-badge sb-sent">Sent</span></td>
+              <td><button class="btn-sm btn-outline" style="padding:4px 10px;font-size:.72rem">Report</button></td>
+            </tr>
+            <tr>
+              <td>☀️ Holi Dhamaka — Bring Your Squad</td>
+              <td><span class="ch-badge ch-sms">SMS</span></td>
+              <td>25,000 fans</td>
+              <td>—</td>
+              <td>—</td>
+              <td><span class="status-badge sb-scheduled">Scheduled</span></td>
+              <td><button class="btn-sm btn-blue" style="padding:4px 10px;font-size:.72rem">Edit</button></td>
+            </tr>
+            <tr>
+              <td>🎂 Birthday Bash Offer — ₹999 OFF</td>
+              <td><span class="ch-badge ch-wa">WhatsApp</span></td>
+              <td>3,180 fans</td>
+              <td>1,240</td>
+              <td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:55%"></div></div>55%</div></td>
+              <td><span class="status-badge sb-running">Running</span></td>
+              <td><button class="btn-sm btn-red" style="padding:4px 10px;font-size:.72rem">Stop</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="admin-content">
-
-      <!-- Channel Tabs -->
-      <div class="ch-tabs">
-        <button class="ch-tab active" onclick="filterChannel('all',this)">🔔 All Templates</button>
-        <button class="ch-tab" onclick="filterChannel('whatsapp',this)">💬 WhatsApp</button>
-        <button class="ch-tab" onclick="filterChannel('sms',this)">📱 SMS</button>
-        <button class="ch-tab" onclick="filterChannel('email',this)">✉️ Email</button>
-        <button class="ch-tab" onclick="filterChannel('push',this)">🔔 Push</button>
+    <!-- TEMPLATES -->
+    <div id="section-templates" style="display:none">
+      <div class="section-hdr">
+        <h2><i class="fas fa-file-alt" style="color:#f59e0b"></i> Message Templates</h2>
+        <button class="btn-sm btn-gold" onclick="saveTemplate()"><i class="fas fa-save"></i> Save Template</button>
       </div>
 
-      <div class="tpl-grid" id="tpl-grid">
-        <!-- Rendered by JS -->
+      <div class="template-builder">
+        <div class="tb-header">
+          <h3><i class="fas fa-magic" style="color:#a78bfa"></i> Template Builder — Hinglish Comms</h3>
+          <select style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:7px 12px;color:#e2e8f0;font-size:.8rem" id="templateSelect" onchange="loadTemplate(this.value)">
+            <option value="">— Load existing template —</option>
+            <option value="booking_confirm">Booking Confirmation</option>
+            <option value="passport_ready">Passport Ready</option>
+            <option value="weather_alert">Weather Alert</option>
+            <option value="holiday_promo">Holiday Promo</option>
+            <option value="refund_processed">Refund Processed</option>
+            <option value="birthday_wish">Birthday Wish</option>
+            <option value="offer_flash">Flash Offer</option>
+            <option value="kyc_approved">KYC Approved</option>
+          </select>
+        </div>
+
+        <div class="tb-channel-tabs">
+          <button class="ch-tab active wa" onclick="switchChannel('wa',this)"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+          <button class="ch-tab email" onclick="switchChannel('email',this)"><i class="fas fa-envelope"></i> Email</button>
+          <button class="ch-tab sms" onclick="switchChannel('sms',this)"><i class="fas fa-sms"></i> SMS</button>
+          <button class="ch-tab push" onclick="switchChannel('push',this)"><i class="fas fa-bell"></i> Push</button>
+        </div>
+
+        <div class="tb-form">
+          <div class="form-group">
+            <label>Template Name</label>
+            <input type="text" id="tmplName" placeholder="e.g., Booking Confirmation — Hinglish">
+          </div>
+          <div class="form-group">
+            <label>Trigger Event</label>
+            <select id="tmplTrigger">
+              <option>Booking Confirmed</option>
+              <option>Passport Issued</option>
+              <option>KYC Approved / Rejected</option>
+              <option>Refund Processed</option>
+              <option>Weather Alert (rain/heat)</option>
+              <option>Birthday (7 days before)</option>
+              <option>Holiday Promo</option>
+              <option>Flash Offer</option>
+              <option>Manual / Campaign</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Language</label>
+            <select id="tmplLang">
+              <option>Hinglish (default)</option>
+              <option>Hindi</option>
+              <option>English</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Audience Segment</label>
+            <select>
+              <option>All Customers</option>
+              <option>Passport Holders</option>
+              <option>Recent Visitors (30 days)</option>
+              <option>Birthday (this week)</option>
+              <option>Lapsed (90+ days)</option>
+              <option>B2B / Corporate</option>
+              <option>Resellers</option>
+              <option>Travel Agents</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-group">
+            <label>Message Body (Hinglish) — Use {{variables}} for dynamic content</label>
+            <textarea id="tmplBody" rows="6" placeholder="Type your Hinglish message here…"></textarea>
+          </div>
+          <div style="font-size:.75rem;color:#64748b;margin-bottom:8px">Insert variables:</div>
+          <div class="variable-chips">
+            <span class="var-chip" onclick="insertVar('{{name}}')">{{name}}</span>
+            <span class="var-chip" onclick="insertVar('{{booking_id}}')">{{booking_id}}</span>
+            <span class="var-chip" onclick="insertVar('{{date}}')">{{date}}</span>
+            <span class="var-chip" onclick="insertVar('{{amount}}')">{{amount}}</span>
+            <span class="var-chip" onclick="insertVar('{{ticket_type}}')">{{ticket_type}}</span>
+            <span class="var-chip" onclick="insertVar('{{passport_tier}}')">{{passport_tier}}</span>
+            <span class="var-chip" onclick="insertVar('{{weather}}')">{{weather}}</span>
+            <span class="var-chip" onclick="insertVar('{{offer_code}}')">{{offer_code}}</span>
+            <span class="var-chip" onclick="insertVar('{{park_name}}')">{{park_name}}</span>
+            <span class="var-chip" onclick="insertVar('{{qr_link}}')">{{qr_link}}</span>
+            <span class="var-chip" onclick="insertVar('{{discount_pct}}')">{{discount_pct}}</span>
+          </div>
+          <div class="preview-box wa" style="margin-top:14px">
+            <div class="pb-label">WhatsApp Preview</div>
+            <div class="pb-content" id="tmplPreview">Type a message above to see the preview…</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+          <button class="btn-sm btn-outline" onclick="testSend()"><i class="fas fa-flask"></i> Test Send (My Number)</button>
+          <button class="btn-sm btn-gold" onclick="saveTemplate()"><i class="fas fa-save"></i> Save Template</button>
+          <button class="btn-sm btn-blue" onclick="launchCampaign()"><i class="fas fa-paper-plane"></i> Launch Campaign</button>
+        </div>
       </div>
 
+      <!-- Pre-built templates library -->
+      <div class="card">
+        <h4><i class="fas fa-library" style="color:#a78bfa"></i> Template Library — Hinglish Collection</h4>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="templateLibrary"></div>
+      </div>
     </div>
-  </div>
+
+    <!-- AUTO TRIGGERS -->
+    <div id="section-triggers" style="display:none">
+      <div class="section-hdr">
+        <h2><i class="fas fa-bolt" style="color:#fbbf24"></i> Automated Trigger Rules</h2>
+        <button class="btn-sm btn-gold" onclick="showToast('New trigger created!')"><i class="fas fa-plus"></i> New Trigger</button>
+      </div>
+      <div class="trigger-list" id="triggerList"></div>
+    </div>
+
+    <!-- AUDIENCE BUILDER -->
+    <div id="section-audience" style="display:none">
+      <div class="section-hdr">
+        <h2><i class="fas fa-users" style="color:#f59e0b"></i> Audience Segmentation Builder</h2>
+      </div>
+      <div class="card">
+        <h4><i class="fas fa-filter" style="color:#60a5fa"></i> Build Audience Segment</h4>
+        <div class="audience-filter">
+          <div class="af-row">
+            <select class="af-select"><option>Customer Type</option></select>
+            <select class="af-select"><option>is</option><option>is not</option><option>contains</option></select>
+            <select class="af-select"><option>Individual</option><option>Business / B2B</option><option>Reseller</option><option>Travel Agent</option></select>
+            <button class="btn-sm btn-outline" style="padding:5px 10px"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="audience-filter">
+          <div class="af-row">
+            <select class="af-select"><option>Passport Tier</option></select>
+            <select class="af-select"><option>is</option><option>is not</option></select>
+            <select class="af-select"><option>Explore</option><option>Together</option><option>Legacy</option><option>No Passport</option></select>
+            <button class="btn-sm btn-outline" style="padding:5px 10px"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="audience-filter">
+          <div class="af-row">
+            <select class="af-select"><option>Last Visit</option></select>
+            <select class="af-select"><option>is within</option><option>is more than</option></select>
+            <input type="number" class="af-select" value="30" style="width:80px">
+            <select class="af-select"><option>days</option><option>weeks</option><option>months</option></select>
+            <button class="btn-sm btn-outline" style="padding:5px 10px"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="audience-filter">
+          <div class="af-row">
+            <select class="af-select"><option>City / Location</option></select>
+            <select class="af-select"><option>is</option></select>
+            <select class="af-select"><option>Delhi</option><option>Noida</option><option>Gurgaon</option><option>Faridabad</option><option>Ghaziabad</option></select>
+            <button class="btn-sm btn-outline" style="padding:5px 10px"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <div class="audience-count" id="audienceCount" style="margin-top:16px">
+          <i class="fas fa-users"></i> Estimated Audience: <strong>14,882 contacts</strong>
+          <button class="btn-sm btn-blue" style="margin-left:14px" onclick="refreshAudience()"><i class="fas fa-sync"></i> Refresh Count</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div id="section-logs" style="display:none">
+      <div class="section-hdr">
+        <h2><i class="fas fa-list" style="color:#94a3b8"></i> Message Delivery Logs</h2>
+        <button class="btn-sm btn-outline"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+      <div class="card">
+        <h4><i class="fas fa-clock" style="color:#64748b"></i> Live Log Feed (last 100 messages)</h4>
+        <div id="logFeed" style="max-height:500px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS (placeholder) -->
+    <div id="section-analytics" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-chart-line" style="color:#4ade80"></i> Delivery Analytics</h2></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="sv" style="color:#25d366">94.8%</div><div class="sl">WhatsApp Delivered</div></div>
+        <div class="stat-card"><div class="sv" style="color:#3b82f6">89.2%</div><div class="sl">Email Delivered</div></div>
+        <div class="stat-card"><div class="sv" style="color:#a78bfa">97.1%</div><div class="sl">SMS Delivered</div></div>
+        <div class="stat-card"><div class="sv" style="color:#4ade80">32.8%</div><div class="sl">Avg Open Rate</div></div>
+        <div class="stat-card"><div class="sv" style="color:#f59e0b">8.4%</div><div class="sl">Avg Click Rate</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h4><i class="fas fa-chart-bar" style="color:#3b82f6"></i> Open Rate by Channel</h4><div style="height:200px"><canvas id="openRateChart"></canvas></div></div>
+        <div class="card"><h4><i class="fas fa-chart-line" style="color:#4ade80"></i> Weekly Delivery Trend</h4><div style="height:200px"><canvas id="trendChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- Other sections (whatsapp, email, sms, push, campaigns) show brief placeholders -->
+    <div id="section-whatsapp" style="display:none">
+      <div class="section-hdr"><h2><i class="fab fa-whatsapp" style="color:#25d366"></i> WhatsApp Business API</h2></div>
+      <div class="card">
+        <h4>Connection Status</h4>
+        <div style="display:flex;align-items:center;gap:12px;background:#0d2b1a;border-radius:8px;padding:14px;margin-bottom:16px">
+          <i class="fas fa-check-circle" style="color:#4ade80;font-size:1.5rem"></i>
+          <div><div style="font-weight:700;color:#4ade80">Connected — MSG91 WhatsApp Business API</div>
+          <div style="font-size:.78rem;color:#94a3b8">Phone: +91-80-6909-0000 · Business Account Verified ✓</div></div>
+        </div>
+        <div class="grid-3">
+          <div class="stat-card"><div class="sv" style="color:#25d366">48,291</div><div class="sl">Sent This Month</div></div>
+          <div class="stat-card"><div class="sv">94.8%</div><div class="sl">Delivery Rate</div></div>
+          <div class="stat-card"><div class="sv" style="color:#a78bfa">₹0.28</div><div class="sl">Avg Cost/Message</div></div>
+        </div>
+        <button class="btn-sm btn-green" style="margin-top:14px" onclick="showSection('templates',document.querySelector('[onclick*=templates]'))"><i class="fas fa-plus"></i> Create WhatsApp Template</button>
+      </div>
+    </div>
+
+    <div id="section-email" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-envelope" style="color:#60a5fa"></i> Email Marketing</h2></div>
+      <div class="card">
+        <h4>SMTP / ESP Configuration</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group"><label>ESP Provider</label><select><option>SendGrid</option><option>Mailchimp</option><option>AWS SES</option><option>Mailjet</option></select></div>
+          <div class="form-group"><label>From Email</label><input type="email" value="hello@worldsofwonder.in"></div>
+          <div class="form-group"><label>From Name</label><input type="text" value="Worlds of Wonder — WOW!"></div>
+          <div class="form-group"><label>Reply-To</label><input type="email" value="support@worldsofwonder.in"></div>
+        </div>
+        <button class="btn-sm btn-blue" style="margin-top:14px" onclick="showToast('Email config saved!')"><i class="fas fa-save"></i> Save Config</button>
+      </div>
+    </div>
+
+    <div id="section-sms" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-sms" style="color:#a78bfa"></i> SMS Gateway</h2></div>
+      <div class="card">
+        <h4>SMS Configuration</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="form-group"><label>Provider</label><select><option>MSG91</option><option>Fast2SMS</option><option>TextLocal</option><option>Twilio</option></select></div>
+          <div class="form-group"><label>Sender ID</label><input type="text" value="WOWFUN"></div>
+          <div class="form-group"><label>DLT Entity ID</label><input type="text" value="WOW-DLT-10101010"></div>
+          <div class="form-group"><label>DLT Template ID</label><input type="text" value="Multiple — see template library"></div>
+        </div>
+        <button class="btn-sm btn-blue" style="margin-top:14px" onclick="showToast('SMS config saved!')"><i class="fas fa-save"></i> Save</button>
+      </div>
+    </div>
+
+    <div id="section-push" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-bell" style="color:#f87171"></i> Push Notifications</h2></div>
+      <div class="card"><h4>Firebase Cloud Messaging (FCM)</h4>
+        <div style="background:#0d2b1a;border-radius:8px;padding:14px;display:flex;gap:12px;align-items:center">
+          <i class="fas fa-check-circle" style="color:#4ade80;font-size:1.3rem"></i>
+          <div><div style="font-weight:700;color:#4ade80">FCM Connected</div><div style="font-size:.78rem;color:#94a3b8">8,241 subscribed devices · Android: 6,180 · iOS: 2,061</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="section-campaigns" style="display:none">
+      <div class="section-hdr"><h2><i class="fas fa-bullhorn" style="color:#3b82f6"></i> Campaigns</h2><button class="btn-sm btn-gold" onclick="showToast('Campaign wizard opened!')"><i class="fas fa-plus"></i> New Campaign</button></div>
+      <div class="card"><h4>All Campaigns</h4>
+        <table class="campaign-table">
+          <thead><tr><th>Name</th><th>Channel</th><th>Audience</th><th>Scheduled</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Weekend Wave Pool Fiesta</td><td><span class="ch-badge ch-wa">WA</span></td><td>12,400</td><td>Every Fri 6PM</td><td><span class="status-badge sb-running">Running</span></td><td><button class="btn-sm btn-outline" style="padding:4px 8px;font-size:.7rem">Edit</button></td></tr>
+            <tr><td>Holi Special — Color Your Day</td><td><span class="ch-badge ch-sms">SMS</span></td><td>25,000</td><td>28 Mar 10AM</td><td><span class="status-badge sb-scheduled">Scheduled</span></td><td><button class="btn-sm btn-outline" style="padding:4px 8px;font-size:.7rem">Edit</button></td></tr>
+            <tr><td>Legacy Passport VIP Preview</td><td><span class="ch-badge ch-email">Email</span></td><td>1,240</td><td>31 Mar 9AM</td><td><span class="status-badge sb-draft">Draft</span></td><td><button class="btn-sm btn-blue" style="padding:4px 8px;font-size:.7rem">Launch</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
 </div>
 
-<!-- Edit Modal -->
-<div class="tpl-modal" id="tpl-modal">
-  <div class="tpl-modal-box">
-    <div class="tpl-modal-title" id="modal-title">Edit Template</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:14px;">Available variables:</div>
-    <div id="modal-vars" class="tpl-vars" style="margin-bottom:14px;"></div>
-    <label style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:6px;">Template Body</label>
-    <textarea class="tpl-textarea" id="modal-body"></textarea>
-    <div>
-      <button class="tpl-close-btn" onclick="closeModal()">Cancel</button>
-      <button class="tpl-save-btn" onclick="saveTemplate()">💾 Save Template</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-const TEMPLATES = [
-  {
-    id:'bk-confirm-wa', channel:'whatsapp', icon:'💬', name:'Booking Confirmed (WhatsApp)',
-    status:'active', trigger:'On successful payment',
-    body:`🎉 *Booking Confirmed!*
-Hi {guest_name}, your WOW tickets are ready!
+// ── Section switcher ──
+function showSection(name,el){
+  document.querySelectorAll('[id^="section-"]').forEach(s=>s.style.display='none');
+  const sec = document.getElementById('section-'+name);
+  if(sec)sec.style.display='';
+  document.querySelectorAll('.nc-nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
 
-📅 *Visit Date:* {visit_date}
-🎫 *Park:* {park_name}
-👥 *Guests:* {ticket_summary}
-💰 *Total Paid:* ₹{total_amount}
-🎫 *Booking ID:* {booking_id}
-
-Your QR ticket is attached. Show it at the gate!
-
-📍 A-2, Sector 38A, Noida | 🕙 10AM–6PM
-Need help? Call 080-6909-0000
-
-Have a WOW day! 🌊🎢`,
-    vars:['{guest_name}','{visit_date}','{park_name}','{ticket_summary}','{total_amount}','{booking_id}']
+// ── Template library ──
+const TEMPLATES = {
+  booking_confirm:{
+    name:'Booking Confirmation',
+    body:`🎉 Yay {{name}} ji! \n\nAapki booking *confirm* ho gayi! 🙌\n\n🎟 *Booking ID:* {{booking_id}}\n🏞 *Park:* {{park_name}}\n📅 *Date:* {{date}}\n💰 *Amount:* ₹{{amount}}\n\nApna QR code yahan se download karein: {{qr_link}}\n\nKoi sawaal ho toh WhatsApp pe humse poochein 😄\n\n*Worlds of Wonder — WOW kar do!* 🌊🎢`
   },
-  {
-    id:'bk-confirm-sms', channel:'sms', icon:'📱', name:'Booking Confirmed (SMS)',
-    status:'active', trigger:'On successful payment',
-    body:`WOW! Booking confirmed for {guest_name}. Date: {visit_date}. Tickets: {ticket_summary}. ID: {booking_id}. Show QR at gate. Helpline: 080-6909-0000`,
-    vars:['{guest_name}','{visit_date}','{ticket_summary}','{booking_id}']
+  passport_ready:{
+    name:'Passport Ready',
+    body:`🪪 *Namaste {{name}} ji!* \n\nAapka *WOW {{passport_tier}} Passport* ready hai! 🎉\n\nAb aap *unlimited* entry le sakte hain WOW ke dono parks mein — Water Park 🌊 aur Amusement Park 🎢!\n\nApna Digital Passport dekhen: {{qr_link}}\n\n✨ *Pehli visit par dono parks enjoy karein — party shuru ho jao!*\n\n— Team WOW 🌟`
   },
-  {
-    id:'passport-activate-wa', channel:'whatsapp', icon:'💬', name:'Passport Activated (WhatsApp)',
-    status:'active', trigger:'On KYC approval',
-    body:`⭐ *Your WOW Passport is Active!*
-Congratulations {member_name}!
-
-Your annual passport is now valid until *{expiry_date}*.
-🪪 *Passport ID:* {passport_id}
-🏟 *Access:* Both Parks | Unlimited Visits
-
-Show this message + your ID at the passport lane for priority entry.
-
-Welcome to the WOW Family! 🎉`,
-    vars:['{member_name}','{expiry_date}','{passport_id}']
+  weather_alert:{
+    name:'Weather Alert',
+    body:`☀️ *{{name}} ji, WOW Weather Update!*\n\nAaj Noida mein {{weather}} hai — *{{park_name}}* ke liye perfect weather! 🌊\n\nAaj aao, maza do guna hoga! 🎉 Combo ticket sirf *₹1,999* mein — offer aaj hi khatam ho raha hai!\n\nBook karein: wow.in/book\n\n*Sunscreen lagao, paani piyo, WOW karo!* 💪`
   },
-  {
-    id:'passport-expiry-wa', channel:'whatsapp', icon:'💬', name:'Passport Expiry Reminder (WhatsApp)',
-    status:'active', trigger:'30 days before expiry',
-    body:`⏰ *WOW Passport Expiring Soon!*
-Hi {member_name},
-
-Your WOW Passport expires on *{expiry_date}* — just {days_left} days left!
-
-🔄 Renew now and get ₹500 off as a loyalty reward.
-
-👉 Renew at: worldsofwonder.in/passport
-Or call: 080-6909-0000
-
-Keep the WOW going! 🌊🎢`,
-    vars:['{member_name}','{expiry_date}','{days_left}']
+  holiday_promo:{
+    name:'Holiday Promo',
+    body:`🎊 *Happy Holiday {{name}} ji!*\n\nChutti hai toh WOW karo! 🎢 Is weekend *{{discount_pct}}% OFF* sab tickets pe — sirf limited time ke liye!\n\n🎯 Offer Code: *{{offer_code}}*\n📅 Valid: {{date}} tak\n\nJaldi karo — seats bhar rahe hain! 🏃‍♂️\n\nBook NOW 👉 wow.in/offers\n\n*WOW — Dilli NCR Ka #1 Theme Park!* 🌟`
   },
-  {
-    id:'flash-offer-wa', channel:'whatsapp', icon:'💬', name:'Flash Offer Alert (WhatsApp)',
-    status:'active', trigger:'Manual trigger / Campaign',
-    body:`⚡ *FLASH OFFER — Expires Tonight!*
-Hi {guest_name},
-
-WOW Weekend Special 🎉
-
-💰 *{discount_percent}% OFF* on {park_name} tickets
-🎟 Use code: *{promo_code}*
-⏰ Valid till: {offer_expiry}
-
-🔗 Book now: worldsofwonder.in
-Min. {min_tickets} tickets. Hurry — limited slots!
-
-Reply STOP to opt out.`,
-    vars:['{guest_name}','{discount_percent}','{park_name}','{promo_code}','{offer_expiry}','{min_tickets}']
+  refund_processed:{
+    name:'Refund Processed',
+    body:`✅ *Refund Update — {{name}} ji*\n\nAapka refund process ho gaya! 🙏\n\n💰 *Amount:* ₹{{amount}}\n🏦 *Mode:* Original Payment Method\n⏳ *Timeline:* 5-7 working days\n\nHumein khushi hai ki hum aapki madad kar sake. Agle visit pe aapka swagat hai! 🌊\n\n*Koi baat ho toh humse zaroor baat karein.* ❤️`
   },
-  {
-    id:'weather-trigger-wa', channel:'whatsapp', icon:'💬', name:'Weather Trigger (WhatsApp)',
-    status:'active', trigger:'When temp > 35°C or sunny weekend',
-    body:`☀️ *Perfect Water Park Day in Noida!*
-Hi {guest_name},
-
-It's going to be *{temperature}°C* this {day_name}! 🌊
-
-Why not splash into WOW Water Park?
-🎟 Tickets from ₹1,299 | Open 10AM–6PM
-
-👉 Book now: worldsofwonder.in/book
-Use code *SUNNY50* for ₹50 off today!
-
-See you at the Wave Pool! 🌊`,
-    vars:['{guest_name}','{temperature}','{day_name}']
+  birthday_wish:{
+    name:'Birthday Wish',
+    body:`🎂 *Happy Birthday {{name}} ji!* 🎉🎉\n\nAaj ka din aapka hai — WOW par manao! 🎢\n\nBirthday special offer: *BIRTHDAY30* code pe *30% OFF* sab tickets + free birthday cake 🎂 F&B area mein!\n\n📅 Offer valid: Sirf aaj ke liye!\n\nWOW Birthday ke liye aaye aur zindagi bhar ki yadein banao! 🌟\n\n*From all of us at WOW — WISH YOU A WOW-DERFUL BIRTHDAY!* 🎊`
   },
-  {
-    id:'otp-sms', channel:'sms', icon:'📱', name:'OTP Verification (SMS)',
-    status:'active', trigger:'On mobile verification',
-    body:`{otp} is your WOW verification OTP. Valid for 10 minutes. Do not share this with anyone. - Worlds of Wonder`,
-    vars:['{otp}']
+  offer_flash:{
+    name:'Flash Offer',
+    body:`⚡ *FLASH OFFER — {{name}} ji!* ⚡\n\nSirf *2 ghante* ke liye — *{{discount_pct}}% OFF* Combo Tickets! 🎉\n\n🎯 Code: *{{offer_code}}*\n⏰ Valid until: {{date}}\n\nYe offer blink karte hi khatam ho jayega! 👀\n\nABHI BOOK KARO 👉 wow.in/flash\n\n*WOW — Jab bhi aao, maja kabhi mat chhoroo!* 🌊🎢`
   },
-  {
-    id:'bk-confirm-email', channel:'email', icon:'✉️', name:'Booking Confirmation (Email)',
-    status:'active', trigger:'On successful payment',
-    body:`Subject: Your WOW Tickets are Confirmed! Booking #{booking_id}
-
-Dear {guest_name},
-
-Thank you for booking with Worlds of Wonder!
-
-BOOKING SUMMARY
-----------------
-Park: {park_name}
-Visit Date: {visit_date}
-Tickets: {ticket_summary}
-Total Paid: ₹{total_amount} (incl. 18% GST)
-Booking ID: {booking_id}
-
-Your QR e-ticket is attached. Please show it at the gate.
-Keep your Booking ID safe for any queries.
-
-PARK TIMINGS: 10:00 AM to 6:00 PM | Last Entry: 4:00 PM
-ADDRESS: A-2, Sector 38A, Noida, UP 201301
-
-NEED HELP? Call 080-6909-0000 or email support@worldsofwonder.in
-
-See you soon!
-Team Worlds of Wonder`,
-    vars:['{guest_name}','{booking_id}','{park_name}','{visit_date}','{ticket_summary}','{total_amount}']
-  },
-  {
-    id:'reminder-24h-wa', channel:'whatsapp', icon:'💬', name:'Visit Reminder 24h (WhatsApp)',
-    status:'active', trigger:'24 hours before visit date',
-    body:`🌊 *Reminder: Your WOW Visit is TOMORROW!*
-Hi {guest_name},
-
-Get ready for an epic day! 🎢
-
-📅 Date: *{visit_date}*
-🎫 Park: *{park_name}*
-📱 Your QR: Ready to scan at gate
-🕙 Opens at 10:00 AM — Last entry 4:00 PM
-
-🧴 Remember: Bring sunscreen, swimwear, and a valid photo ID!
-
-See you tomorrow! 🌊🎉`,
-    vars:['{guest_name}','{visit_date}','{park_name}']
-  },
-  {
-    id:'push-flash', channel:'push', icon:'🔔', name:'Flash Sale Push Notification',
-    status:'draft', trigger:'Manual trigger',
-    body:`Title: ⚡ Flash Sale — 20% Off Today Only!
-Body: WOW {park_name} tickets at 20% off! Only {slots_left} slots left. Book now!`,
-    vars:['{park_name}','{slots_left}']
+  kyc_approved:{
+    name:'KYC Approved',
+    body:`✅ *Badhaai ho {{name}} ji!*\n\nAapki KYC verification *approved* ho gayi! 🎉\n\nAap ab WOW Business Partner hain — apna dashboard yahan access karein:\n👉 {{qr_link}}\n\nAapka dedicated Account Manager jald contact karega.\n\n*Welcome to the WOW Partner Family!* 🤝\n\nKoi sawaal? reply karein is WhatsApp pe.`
   }
+};
+
+const TRIGGER_DATA = [
+  {icon:'fas fa-check-circle',color:'#0d2b1a',iconColor:'#4ade80',name:'Booking Confirmation',desc:'Sent immediately after successful payment — includes QR ticket link',channels:['wa','email','sms'],enabled:true},
+  {icon:'fas fa-passport',color:'#3b1f00',iconColor:'#fbbf24',name:'WOW Passport Issued',desc:'Sent when annual passport is activated — includes digital passport link',channels:['wa','email'],enabled:true},
+  {icon:'fas fa-cloud-rain',color:'#172554',iconColor:'#60a5fa',name:'Weather Alert — Rain / Extreme Heat',desc:'Triggered by Open-Meteo API when temp >40°C or rain probability >60%',channels:['wa','sms','push'],enabled:true},
+  {icon:'fas fa-birthday-cake',color:'#3b0764',iconColor:'#a78bfa',name:'Birthday Offer (7 days before)',desc:'Birthday discount offer sent 7 days in advance to all customers',channels:['wa','email'],enabled:true},
+  {icon:'fas fa-calendar',color:'#1e3a5f',iconColor:'#60a5fa',name:'Holiday Promotion',desc:'Auto-campaigns before Holi, Diwali, Eid, Christmas, New Year, Summer holidays',channels:['wa','sms','email'],enabled:true},
+  {icon:'fas fa-undo',color:'#2d0a0a',iconColor:'#f87171',name:'Refund Processed',desc:'Customer notified immediately when refund is approved and processed',channels:['wa','email','sms'],enabled:true},
+  {icon:'fas fa-exclamation-triangle',color:'#3b2f00',iconColor:'#fbbf24',name:'KYC Status Update',desc:'KYC approved / rejected notification to B2B, resellers and travel agents',channels:['wa','email'],enabled:true},
+  {icon:'fas fa-fire',color:'#3b1000',iconColor:'#fb923c',name:'Flash Offer Alert',desc:'Triggered by marketing team — time-limited offer to segmented audience',channels:['wa','sms','push'],enabled:false},
+  {icon:'fas fa-star',color:'#1a1000',iconColor:'#f59e0b',name:'Loyalty Milestone',desc:'Sent when customer crosses 500, 1000, 5000 loyalty points',channels:['wa','push'],enabled:true},
+  {icon:'fas fa-clock',color:'#0f2210',iconColor:'#4ade80',name:'Visit Reminder (24 hrs before)',desc:'Reminder with weather forecast and parking tips sent day before booked visit',channels:['wa','sms'],enabled:true},
 ];
 
-let currentTplId = null;
-let activeChannel = 'all';
+const LOG_DATA = [
+  {time:'10:44:12',channel:'wa',recipient:'+91 98765 XXXXX',name:'Rahul Sharma',msg:'Booking confirmation — WOW-TK-2025-004817',status:'delivered'},
+  {time:'10:43:55',channel:'email',recipient:'anjali.g@gmail.com',name:'Anjali Gupta',msg:'Flash Offer — Weekend Special 20% OFF',status:'delivered'},
+  {time:'10:43:38',channel:'sms',recipient:'+91 87654 XXXXX',name:'Vijay Kumar',msg:'Passport ready — WOW Explore Passport',status:'delivered'},
+  {time:'10:43:21',channel:'push',recipient:'Device ID: FCM-a8f2…',name:'Meena R.',msg:'Wave Pool Fiesta starts in 2 hours!',status:'delivered'},
+  {time:'10:43:04',channel:'wa',recipient:'+91 76543 XXXXX',name:'Sanjay Verma',msg:'Birthday offer — BIRTHDAY30 code',status:'failed'},
+  {time:'10:42:47',channel:'email',recipient:'priti.s@outlook.com',name:'Priti Saxena',msg:'KYC Approved — Reseller Account Active',status:'delivered'},
+  {time:'10:42:30',channel:'sms',recipient:'+91 65432 XXXXX',name:'Kavita Singh',msg:'Booking reminder — tomorrow 10 AM',status:'pending'},
+  {time:'10:42:13',channel:'wa',recipient:'+91 54321 XXXXX',name:'Mohit Bajaj',msg:'Refund processed — ₹3,998 in 5-7 days',status:'delivered'},
+];
 
-function renderTemplates() {
-  const filtered = activeChannel === 'all' ? TEMPLATES : TEMPLATES.filter(t => t.channel === activeChannel);
-  document.getElementById('tpl-grid').innerHTML = filtered.map(tpl => `
-    <div class="tpl-card" id="tpl-${tpl.id}">
-      <div class="tpl-head">
-        <span class="tpl-icon">${tpl.icon}</span>
-        <span class="tpl-name">${tpl.name}</span>
-        <span class="tpl-status ${tpl.status}">${tpl.status.toUpperCase()}</span>
+const CH_ICONS = {wa:'fab fa-whatsapp',email:'fas fa-envelope',sms:'fas fa-sms',push:'fas fa-bell'};
+const CH_COLORS = {wa:'#25d366',email:'#60a5fa',sms:'#a78bfa',push:'#f87171'};
+
+function renderTriggers(){
+  document.getElementById('triggerList').innerHTML = TRIGGER_DATA.map((t,i)=>`
+    <div class="trigger-item">
+      <div class="trigger-icon" style="background:${t.color}"><i class="${t.icon}" style="color:${t.iconColor}"></i></div>
+      <div class="trigger-info">
+        <div class="ti-name">${t.name}</div>
+        <div class="ti-desc">${t.desc}</div>
+        <div class="trigger-channels">${t.channels.map(c=>`<span class="ch-badge ch-${c}"><i class="${CH_ICONS[c]}"></i> ${c.toUpperCase()}</span>`).join('')}</div>
       </div>
-      <div class="tpl-body">
-        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">Trigger: ${tpl.trigger}</div>
-        <div class="tpl-preview">${tpl.body.substring(0,200)}${tpl.body.length > 200 ? '...' : ''}</div>
-        <div class="tpl-vars">${tpl.vars.map(v => `<span class="tpl-var">${v}</span>`).join('')}</div>
-        <div class="tpl-actions">
-          <button class="tpl-btn tpl-btn-edit" onclick="editTemplate('${tpl.id}')">✏️ Edit</button>
-          <button class="tpl-btn tpl-btn-test" onclick="testTemplate('${tpl.id}')">📤 Test Send</button>
-          <button class="tpl-btn tpl-btn-toggle" onclick="toggleTemplate('${tpl.id}')">${tpl.status === 'active' ? '⏸ Pause' : '▶ Enable'}</button>
-        </div>
+      <div class="trigger-toggle">
+        <label class="toggle-sw"><input type="checkbox" ${t.enabled?'checked':''} onchange="toggleTrigger(${i},this.checked)"><span class="toggle-slider"></span></label>
+        <span class="toggle-label">${t.enabled?'ON':'OFF'}</span>
       </div>
     </div>
   `).join('');
 }
 
-function filterChannel(ch, btn) {
-  activeChannel = ch;
-  document.querySelectorAll('.ch-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTemplates();
+function toggleTrigger(i,v){
+  TRIGGER_DATA[i].enabled=v;
+  renderTriggers();
+  showToast(`Trigger "${TRIGGER_DATA[i].name}" ${v?'enabled':'disabled'}`);
 }
 
-function editTemplate(id) {
-  const tpl = TEMPLATES.find(t => t.id === id);
-  if (!tpl) return;
-  currentTplId = id;
-  document.getElementById('modal-title').textContent = 'Edit: ' + tpl.name;
-  document.getElementById('modal-body').value = tpl.body;
-  document.getElementById('modal-vars').innerHTML = tpl.vars.map(v => `<span class="tpl-var">${v}</span>`).join('');
-  document.getElementById('tpl-modal').classList.add('open');
+function renderTemplateLibrary(){
+  const lib = document.getElementById('templateLibrary');
+  if(!lib)return;
+  lib.innerHTML = Object.entries(TEMPLATES).map(([key,t])=>`
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px;cursor:pointer;transition:all .2s" onmouseenter="this.style.borderColor='#f59e0b'" onmouseleave="this.style.borderColor='#334155'" onclick="loadTemplate('${key}');showSection('templates',document.querySelectorAll('.nc-nav-item')[1])">
+      <div style="font-weight:700;color:#f1f5f9;font-size:.85rem;margin-bottom:6px">${t.name}</div>
+      <div style="font-size:.75rem;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.body.substring(0,80)}…</div>
+      <div style="margin-top:8px"><span class="ch-badge ch-wa">WA</span> <span class="ch-badge ch-email">Email</span></div>
+    </div>
+  `).join('');
 }
 
-function closeModal() {
-  document.getElementById('tpl-modal').classList.remove('open');
-  currentTplId = null;
+function loadTemplate(key){
+  if(!key||!TEMPLATES[key])return;
+  const t=TEMPLATES[key];
+  document.getElementById('tmplName').value = t.name;
+  document.getElementById('tmplBody').value = t.body;
+  updatePreview();
 }
 
-function saveTemplate() {
-  const tpl = TEMPLATES.find(t => t.id === currentTplId);
-  if (tpl) tpl.body = document.getElementById('modal-body').value;
-  renderTemplates();
-  closeModal();
-  alert('✅ Template saved successfully!');
+function insertVar(v){
+  const ta = document.getElementById('tmplBody');
+  const pos = ta.selectionStart;
+  ta.value = ta.value.substring(0,pos)+v+ta.value.substring(pos);
+  updatePreview();
 }
 
-function testTemplate(id) {
-  const tpl = TEMPLATES.find(t => t.id === id);
-  if (tpl) alert(`Test ${tpl.channel.toUpperCase()} sent to admin test number with sample data.`);
+function updatePreview(){
+  const body = document.getElementById('tmplBody').value;
+  document.getElementById('tmplPreview').textContent = body
+    .replace(/{{name}}/g,'Rahul ji')
+    .replace(/{{booking_id}}/g,'WOW-TK-2025-004817')
+    .replace(/{{date}}/g,'29 Mar 2025')
+    .replace(/{{amount}}/g,'4,999')
+    .replace(/{{ticket_type}}/g,'Combo Ticket')
+    .replace(/{{passport_tier}}/g,'Explore')
+    .replace(/{{weather}}/g,'sunny (34°C)')
+    .replace(/{{offer_code}}/g,'WOW20')
+    .replace(/{{park_name}}/g,'Worlds of Wonder, Noida')
+    .replace(/{{qr_link}}/g,'wow.in/ticket/004817')
+    .replace(/{{discount_pct}}/g,'20');
 }
 
-function toggleTemplate(id) {
-  const tpl = TEMPLATES.find(t => t.id === id);
-  if (tpl) {
-    tpl.status = tpl.status === 'active' ? 'off' : 'active';
-    renderTemplates();
-  }
+function renderLogs(){
+  document.getElementById('logFeed').innerHTML = LOG_DATA.map(l=>`
+    <div class="log-row">
+      <span class="log-time">${l.time}</span>
+      <span class="log-channel" style="background:${CH_COLORS[l.channel]}22;color:${CH_COLORS[l.channel]}"><i class="${CH_ICONS[l.channel]}"></i> ${l.channel.toUpperCase()}</span>
+      <span class="log-recipient">${l.name} · ${l.recipient}</span>
+      <span class="log-msg">${l.msg}</span>
+      <span class="log-status log-${l.status}">${l.status==='delivered'?'✓ Delivered':l.status==='failed'?'✗ Failed':'⏳ Pending'}</span>
+    </div>
+  `).join('');
 }
 
-function openNewTemplate() {
-  currentTplId = null;
-  document.getElementById('modal-title').textContent = 'New Template';
-  document.getElementById('modal-body').value = '';
-  document.getElementById('modal-vars').innerHTML = '';
-  document.getElementById('tpl-modal').classList.add('open');
+function initCharts(){
+  // Volume chart
+  const vc = document.getElementById('volumeChart');
+  if(vc){new Chart(vc.getContext('2d'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'WhatsApp',data:[38000,42000,48291,0,0,0],backgroundColor:'#25d36666'},{label:'Email',data:[18000,20000,22847,0,0,0],backgroundColor:'#3b82f666'},{label:'SMS',data:[12000,14000,15432,0,0,0],backgroundColor:'#7c3aed66'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b'}}}}})}
+  // Channel pie
+  const cc = document.getElementById('channelChart');
+  if(cc){new Chart(cc.getContext('2d'),{type:'doughnut',data:{labels:['WhatsApp','Email','SMS','Push'],datasets:[{data:[55,25,15,5],backgroundColor:['#25d366','#3b82f6','#7c3aed','#f87171'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}},position:'right'}}}})}
+  // Analytics charts
+  const orc = document.getElementById('openRateChart');
+  if(orc){new Chart(orc.getContext('2d'),{type:'bar',data:{labels:['WhatsApp','Email','SMS','Push'],datasets:[{data:[42,28,18,35],backgroundColor:['#25d366','#3b82f6','#7c3aed','#f87171']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#64748b'}},y:{ticks:{color:'#64748b'},grid:{color:'#1e293b'}}}}})}
+  const tc = document.getElementById('trendChart');
+  if(tc){new Chart(tc.getContext('2d'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Sent',data:[8200,9100,7800,10200,12400,15800,9600],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:9}}},y:{ticks:{color:'#64748b',font:{size:9}},grid:{color:'#1e293b'}}}}})}
 }
 
-document.getElementById('tpl-modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('tpl-modal')) closeModal();
+function saveTemplate(){showToast('✅ Template saved to library!')}
+function testSend(){showToast('📱 Test message sent to your number!')}
+function launchCampaign(){showToast('🚀 Campaign launched! Audience notified.')}
+function refreshAudience(){showToast('🔄 Audience count refreshed — 14,882 contacts')}
+function switchChannel(ch,el){
+  document.querySelectorAll('.ch-tab').forEach(t=>{t.classList.remove('active','wa','email','sms','push')});
+  el.classList.add('active',ch);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML = `<i class="fas fa-check-circle" style="color:#4ade80"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Live preview update
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta = document.getElementById('tmplBody');
+  if(ta)ta.addEventListener('input',updatePreview);
+  renderTriggers();
+  renderTemplateLibrary();
+  renderLogs();
+  setTimeout(initCharts,100);
 });
-
-renderTemplates();
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
