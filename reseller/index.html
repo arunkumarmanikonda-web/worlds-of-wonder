@@ -3,402 +3,497 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Reseller ERP — Worlds of Wonder</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<title>Reseller ERP Portal — Worlds of Wonder</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
+:root{--brand:#ff6b35;--brand-dark:#e85a22;--brand-light:#fff3ee;--teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--sidebar:260px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --purple:#7c3aed;--purple2:#a855f7;--purple3:#c084fc;
-  --gold:#C9A84C;--gold2:#F0D080;
-  --bg:#06040e;--sidebar:#09060f;--card:#100d1a;--card2:#15111f;--border:rgba(255,255,255,.07);
-  --text:#f0f0f0;--muted:rgba(255,255,255,.42);
-  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;--teal:#14b8a6;
-}
-html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);display:flex;}
-
-/* SIDEBAR */
-.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;}
-.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sb-logo img{height:32px;filter:none!important;width:auto;}
-.sb-label{font-size:9px;font-weight:800;color:var(--purple3);letter-spacing:2px;font-family:'Courier Prime',monospace;}
-.sb-nav{padding:10px 8px;}
-.sb-sec{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 10px 5px;font-family:'Courier Prime',monospace;}
-.sb-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;margin:2px 0;cursor:pointer;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:none;transition:all .2s;}
-.sb-link:hover,.sb-link.active{background:rgba(168,85,247,.12);color:var(--purple3);}
-.sb-link i{width:15px;text-align:center;}
-.sb-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:8px;}
-
-/* MAIN */
-.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
-.topbar{padding:12px 22px;background:rgba(6,4,14,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
-.page-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;}
-.page-sub{font-size:11px;color:var(--muted);}
-.user-pill{display:flex;align-items:center;gap:8px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);border-radius:20px;padding:5px 12px;}
-.user-pill .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
-.user-pill .nm{font-size:11px;font-weight:700;color:var(--purple3);}
-
-/* CONTENT */
-.content{padding:20px;flex:1;}
-.tab-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;}
-.tab-btn{padding:9px 18px;font-size:12.5px;font-weight:700;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;}
-.tab-btn.active{color:var(--purple3);border-bottom-color:var(--purple2);}
-
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
-.stat-val{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:#fff;}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
-.stat .ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px;}
-
-/* CARDS / TABLE */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
-.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.card-title{font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:700;}
-.btns{display:flex;gap:8px;}
-.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none;}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;}
-.btn-primary:hover{box-shadow:0 4px 14px rgba(168,85,247,.3);}
-.btn-outline{border:1px solid var(--border);background:none;color:var(--muted);}
-.btn-outline:hover{border-color:var(--purple3);color:var(--purple3);}
-.btn-green{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:var(--green);}
-.search{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:12px;outline:none;width:160px;font-family:'Nunito',sans-serif;}
-.search:focus{border-color:var(--purple3);}
-table{width:100%;border-collapse:collapse;font-size:12.5px;}
-th{padding:9px 14px;text-align:left;font-family:'Courier Prime',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
-td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(255,255,255,.02);}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;font-size:9.5px;font-weight:700;font-family:'Courier Prime',monospace;}
-.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;}
-.ib{display:flex;gap:5px;}
-.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;}
-.icon-btn:hover{border-color:var(--purple3);color:var(--purple3);}
-.icon-btn.red:hover{border-color:var(--red);color:var(--red);}
-
-/* INVENTORY BARS */
-.inv-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px;}
-.inv-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--teal));}
-.inv-fill.mid{background:linear-gradient(90deg,var(--orange),#facc15);}
-.inv-fill.low{background:linear-gradient(90deg,var(--red),#f97316);}
-
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
+.sidebar-logo .mark{width:38px;height:38px;background:var(--purple);border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:14px;}
+.sidebar-logo span{font-weight:700;font-size:14px;color:#fff;display:block;}
+.sidebar-logo small{font-size:10px;color:rgba(255,255,255,.5);}
+.reseller-badge{margin:14px;background:rgba(255,255,255,.07);border-radius:10px;padding:12px;}
+.reseller-badge .rname{font-size:13px;font-weight:700;}
+.reseller-badge .rcode{font-size:10px;color:rgba(255,255,255,.5);font-family:monospace;}
+.reseller-badge .rtier{display:inline-block;margin-top:6px;background:var(--purple);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.nav-section{padding:14px 0 6px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);padding:0 18px 6px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--purple);}
+.nav-item i{width:18px;text-align:center;font-size:13px;}
+.main{margin-left:var(--sidebar);flex:1;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:17px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-purple:hover{background:#6d28d9;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--purple);color:var(--purple);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.btn-green{background:var(--green);color:#fff;}
+.content{padding:24px 28px;}
+.tab-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.tab.active{background:var(--purple);color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:700;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:26px;font-weight:800;margin:4px 0 2px;}
+.stat-sub{font-size:11px;color:var(--muted);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border:none;}
+tbody td{padding:11px 14px;vertical-align:middle;}
+tbody tr:hover{background:#f9fafb;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-yellow{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-orange{background:#ffedd5;color:#9a3412;}
+/* INVENTORY CARDS */
+.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.inv-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px;transition:.2s;}
+.inv-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(124,58,237,.1);}
+.inv-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.inv-card-name{font-size:14px;font-weight:700;}
+.inv-card-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.inv-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
+.inv-stat{background:#f8fafc;border-radius:8px;padding:8px;text-align:center;}
+.inv-stat-val{font-size:16px;font-weight:800;}
+.inv-stat-lbl{font-size:10px;color:var(--muted);}
+/* QR GRID */
+.qr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.qr-ticket{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.qr-ticket .ticket-type{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+.qr-ticket .ticket-id{font-family:monospace;font-size:10px;color:var(--muted);margin-top:6px;}
+.qr-ticket.used{opacity:.4;background:#f8fafc;}
+/* PROGRESS BAR */
+.progress-bar{height:7px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:4px;}
+.progress-fill{height:100%;border-radius:20px;transition:width .6s;}
 /* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
-.overlay.open{display:flex;}
-.modal{background:#0e0a18;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;max-height:90vh;overflow-y:auto;}
-.modal-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
-.modal h3{font-family:'Poppins',sans-serif;font-size:16px;font-weight:800;margin-bottom:3px;}
-.modal p{font-size:11.5px;color:var(--muted);margin-bottom:18px;}
-.fg{margin-bottom:13px;}
-.fl{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:block;font-family:'Courier Prime',monospace;}
-.fi{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:13px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;}
-.fi:focus{border-color:var(--purple2);}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.btn-submit{width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-top:4px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;}
+.modal-overlay.show{display:grid;}
+.modal{background:var(--white);border-radius:16px;width:90%;max-width:650px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+label{font-size:12px;font-weight:600;color:var(--slate);}
+input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:100%;transition:.15s;}
+input:focus,select:focus{outline:none;border-color:var(--purple);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr);}.inv-grid{grid-template-columns:1fr 1fr;}.qr-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.grid-4,.inv-grid,.qr-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
+<div class="shell">
 <aside class="sidebar">
-  <div class="sb-logo">
-    <img src="../images/logo.png" alt="WOW"/>
-    <div class="sb-label">RESELLER ERP</div>
+  <div class="sidebar-logo">
+    <div class="mark"><i class="fa fa-store" style="font-size:14px;"></i></div>
+    <div><span>Reseller Portal</span><small>Worlds of Wonder</small></div>
   </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Main</div>
-    <a class="sb-link active" href="javascript:void(0)" onclick="showTab('dashboard')"><i class="fa fa-th-large"></i> Dashboard</a>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('inventory')"><i class="fa fa-boxes"></i> Ticket Inventory <span class="sb-badge">87</span></a>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('bulk')"><i class="fa fa-layer-group"></i> Bulk Tickets</a>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('team')"><i class="fa fa-users"></i> My Team</a>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('sales')"><i class="fa fa-chart-bar"></i> Sales History</a>
-    <div class="sb-sec">Finance</div>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('invoices')"><i class="fa fa-file-invoice"></i> GST Invoices</a>
-    <a class="sb-link" href="javascript:void(0)" onclick="showTab('commissions')"><i class="fa fa-rupee-sign"></i> Commissions</a>
-    <div class="sb-sec">Support</div>
-    <a class="sb-link" href="javascript:void(0)"><i class="fa fa-headset"></i> Support</a>
-    <a class="sb-link" href="../internal/index.html" style="margin-top:16px;color:var(--red);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+  <div class="reseller-badge">
+    <div class="rname">TravelMart India Pvt Ltd</div>
+    <div class="rcode">RS-CODE: TM-2024-1182</div>
+    <div class="rtier">💎 Platinum Reseller</div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">ERP Modules</div>
+      <a class="nav-item active" href="index.html"><i class="fa fa-th-large"></i>Dashboard</a>
+      <a class="nav-item" href="#" onclick="switchTab('inventory',event)"><i class="fa fa-boxes"></i>Inventory</a>
+      <a class="nav-item" href="#" onclick="switchTab('bulk-qr',event)"><i class="fa fa-qrcode"></i>Bulk QR Tickets</a>
+      <a class="nav-item" href="#" onclick="switchTab('orders',event)"><i class="fa fa-shopping-cart"></i>Orders</a>
+      <a class="nav-item" href="#" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i>Commission Ledger</a>
+      <a class="nav-item" href="#" onclick="switchTab('team',event)"><i class="fa fa-users"></i>Team Management</a>
+      <a class="nav-item" href="#" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i>Reports</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Resources</div>
+      <a class="nav-item" href="#"><i class="fa fa-file-contract"></i>Agreement</a>
+      <a class="nav-item" href="#"><i class="fa fa-images"></i>Marketing Assets</a>
+      <a class="nav-item" href="#"><i class="fa fa-headset"></i>Partner Support</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item" href="../admin/index.html"><i class="fa fa-cog"></i>Back-office</a>
+      <a class="nav-item" href="../partner/onboarding.html"><i class="fa fa-handshake"></i>Onboarding</a>
+    </div>
   </nav>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
-  <div class="topbar">
-    <div>
-      <div class="page-title" id="pageTitle">Reseller Dashboard</div>
-      <div class="page-sub">Sharma Tours &amp; Travels · Reseller Partner</div>
+<div class="topbar">
+  <div class="topbar-title"><i class="fa fa-store" style="color:var(--purple);margin-right:8px;"></i>Reseller ERP Portal</div>
+  <div class="topbar-right">
+    <button class="btn btn-outline btn-sm" onclick="switchTab('bulk-qr',null)"><i class="fa fa-qrcode"></i> Generate QR</button>
+    <button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> New Order</button>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
+      <img src="https://api.dicebear.com/7.x/initials/svg?seed=TM" width="26" height="26" style="border-radius:50%;"/>
+      <span style="font-size:12px;font-weight:600;">TravelMart India</span>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div class="user-pill"><div class="av">ST</div><div class="nm">Sharma Tours</div></div>
-    </div>
-  </div>
-
-  <div class="content">
-
-    <!-- ── DASHBOARD ── -->
-    <div id="tab-dashboard">
-      <div class="stats">
-        <div class="stat"><div class="ico" style="background:rgba(168,85,247,.15);color:var(--purple2);"><i class="fa fa-ticket-alt"></i></div><div class="stat-val">1,240</div><div class="stat-lbl">Tickets in Stock</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(34,197,94,.15);color:var(--green);"><i class="fa fa-check-circle"></i></div><div class="stat-val">3,847</div><div class="stat-lbl">Tickets Sold (MTD)</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(201,168,76,.15);color:var(--gold);"><i class="fa fa-rupee-sign"></i></div><div class="stat-val">&#8377;38,470</div><div class="stat-lbl">Commission Earned</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(249,115,22,.15);color:var(--orange);"><i class="fa fa-users"></i></div><div class="stat-val">7</div><div class="stat-lbl">Active Agents</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(59,130,246,.15);color:var(--blue);"><i class="fa fa-file-invoice"></i></div><div class="stat-val">23</div><div class="stat-lbl">Invoices (MTD)</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><div class="card-title">&#9888; Inventory Alerts</div></div>
-        <table>
-          <thead><tr><th>TICKET TYPE</th><th>IN STOCK</th><th>USED TODAY</th><th>STATUS</th><th>ACTION</th></tr></thead>
-          <tbody>
-            <tr><td>Water Park Adult</td><td>87</td><td>12</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Good</span></td><td><button class="btn btn-outline" onclick="openRestock('Water Park Adult')">Request More</button></td></tr>
-            <tr><td>Amusement Park Adult</td><td>24</td><td>8</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Low</span></td><td><button class="btn btn-primary" onclick="openRestock('Amusement Park Adult')">Request Urgently</button></td></tr>
-            <tr><td>Combo Ticket</td><td>0</td><td>0</td><td><span class="badge" style="background:rgba(239,68,68,.15);color:var(--red);">Out of Stock</span></td><td><button class="btn btn-primary" onclick="openRestock('Combo Ticket')">Request Now</button></td></tr>
-            <tr><td>Child Water Park</td><td>145</td><td>5</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Good</span></td><td><button class="btn btn-outline" onclick="openRestock('Child Water Park')">Request More</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── INVENTORY ── -->
-    <div id="tab-inventory" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Ticket Inventory</div>
-          <div class="btns">
-            <input class="search" placeholder="Search..."/>
-            <button class="btn btn-primary" onclick="openRestock('')"><i class="fa fa-plus"></i> Request Allocation</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>TICKET TYPE</th><th>PARK</th><th>ALLOCATED</th><th>SOLD</th><th>REMAINING</th><th>INVENTORY</th><th>EXPIRY</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Water Park — Adult</strong></td><td>Water Park</td><td>500</td><td>413</td><td>87</td><td><div>87/500 (17%)</div><div class="inv-bar"><div class="inv-fill low" style="width:17%;"></div></div></td><td>31 Mar 2025</td></tr>
-            <tr><td><strong>Amusement Park — Adult</strong></td><td>Amusement</td><td>300</td><td>276</td><td>24</td><td><div>24/300 (8%)</div><div class="inv-bar"><div class="inv-fill low" style="width:8%;"></div></div></td><td>31 Mar 2025</td></tr>
-            <tr><td><strong>Combo Ticket</strong></td><td>Both</td><td>200</td><td>200</td><td>0</td><td><div>0/200 (0%)</div><div class="inv-bar"><div class="inv-fill low" style="width:1%;"></div></div></td><td>31 Mar 2025</td></tr>
-            <tr><td><strong>Child Water Park</strong></td><td>Water Park</td><td>300</td><td>155</td><td>145</td><td><div>145/300 (48%)</div><div class="inv-bar"><div class="inv-fill mid" style="width:48%;"></div></div></td><td>31 Mar 2025</td></tr>
-            <tr><td><strong>Senior Citizen (60+)</strong></td><td>Both</td><td>100</td><td>42</td><td>58</td><td><div>58/100 (58%)</div><div class="inv-bar"><div class="inv-fill" style="width:58%;"></div></div></td><td>31 Mar 2025</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── BULK TICKETS ── -->
-    <div id="tab-bulk" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Bulk Ticket Generation</div>
-          <button class="btn btn-primary" onclick="openBulkCreate()"><i class="fa fa-layer-group"></i> Create Bulk Batch</button>
-        </div>
-        <table>
-          <thead><tr><th>BATCH ID</th><th>TYPE</th><th>QUANTITY</th><th>ISSUED</th><th>VALID TILL</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
-          <tbody>
-            <tr>
-              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0142</td>
-              <td>Water Park Adult</td><td>100</td><td>15 Mar 2025</td><td>31 Mar 2025</td>
-              <td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Active</span></td>
-              <td><div class="ib"><div class="icon-btn" title="Download QR Batch"><i class="fa fa-download"></i></div><div class="icon-btn" title="View Tickets"><i class="fa fa-eye"></i></div></div></td>
-            </tr>
-            <tr>
-              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0138</td>
-              <td>Combo Ticket</td><td>50</td><td>10 Mar 2025</td><td>31 Mar 2025</td>
-              <td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Exhausted</span></td>
-              <td><div class="ib"><div class="icon-btn" title="Download"><i class="fa fa-download"></i></div></div></td>
-            </tr>
-            <tr>
-              <td style="font-family:'Courier Prime',monospace;font-size:10px;">BATCH-2025-0121</td>
-              <td>Amusement Adult</td><td>200</td><td>01 Mar 2025</td><td>31 Mar 2025</td>
-              <td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Active</span></td>
-              <td><div class="ib"><div class="icon-btn"><i class="fa fa-download"></i></div><div class="icon-btn"><i class="fa fa-eye"></i></div></div></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── TEAM ── -->
-    <div id="tab-team" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">My Sales Team</div>
-          <div class="btns">
-            <input class="search" placeholder="Search agents..."/>
-            <button class="btn btn-primary" onclick="openAddAgent()"><i class="fa fa-user-plus"></i> Add Agent</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>AGENT NAME</th><th>MOBILE</th><th>ROLE</th><th>TICKETS SOLD</th><th>COMMISSION</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
-          <tbody id="agentsBody">
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── SALES ── -->
-    <div id="tab-sales" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Sales History</div>
-          <div class="btns">
-            <select class="search"><option>This Month</option><option>Last Month</option><option>This Year</option></select>
-            <button class="btn btn-outline"><i class="fa fa-download"></i> Export CSV</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>DATE</th><th>TICKET TYPE</th><th>QTY</th><th>AGENT</th><th>AMOUNT</th><th>COMMISSION</th><th>STATUS</th></tr></thead>
-          <tbody>
-            <tr><td style="font-size:11px;color:var(--muted);">28 Mar 2025</td><td>Water Park Adult</td><td>4</td><td>Raju Singh</td><td>&#8377;5,196</td><td>&#8377;520</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
-            <tr><td style="font-size:11px;color:var(--muted);">28 Mar 2025</td><td>Combo Ticket</td><td>2</td><td>Priya Patel</td><td>&#8377;3,998</td><td>&#8377;400</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
-            <tr><td style="font-size:11px;color:var(--muted);">27 Mar 2025</td><td>Amusement Adult</td><td>6</td><td>Raju Singh</td><td>&#8377;7,194</td><td>&#8377;719</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Pending</span></td></tr>
-            <tr><td style="font-size:11px;color:var(--muted);">26 Mar 2025</td><td>Child Water Park</td><td>8</td><td>Direct</td><td>&#8377;5,992</td><td>&#8377;599</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Settled</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── INVOICES ── -->
-    <div id="tab-invoices" style="display:none;">
-      <div class="card">
-        <div class="card-head"><div class="card-title">GST Invoices</div><button class="btn btn-outline"><i class="fa fa-download"></i> Download All</button></div>
-        <table>
-          <thead><tr><th>INVOICE NO.</th><th>DATE</th><th>AMOUNT</th><th>GST</th><th>TOTAL</th><th>STATUS</th><th>PDF</th></tr></thead>
-          <tbody>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">INV-2025-0089</td><td>28 Mar 2025</td><td>&#8377;38,470</td><td>&#8377;6,925</td><td>&#8377;45,395</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">INV-2025-0074</td><td>28 Feb 2025</td><td>&#8377;42,300</td><td>&#8377;7,614</td><td>&#8377;49,914</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── COMMISSIONS ── -->
-    <div id="tab-commissions" style="display:none;">
-      <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
-        <div class="stat"><div class="stat-val" style="color:var(--gold);">&#8377;38,470</div><div class="stat-lbl">Earned this month</div></div>
-        <div class="stat"><div class="stat-val" style="color:var(--green);">&#8377;38,470</div><div class="stat-lbl">Settled (credited)</div></div>
-        <div class="stat"><div class="stat-val" style="color:var(--orange);">&#8377;0</div><div class="stat-lbl">Pending payout</div></div>
-        <div class="stat"><div class="stat-val">10%</div><div class="stat-lbl">Your commission slab</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">Commission Statement</div><button class="btn btn-outline"><i class="fa fa-download"></i> Export</button></div>
-        <table>
-          <thead><tr><th>PERIOD</th><th>TICKETS SOLD</th><th>GROSS SALES</th><th>COMMISSION RATE</th><th>EARNED</th><th>PAYOUT DATE</th><th>STATUS</th></tr></thead>
-          <tbody>
-            <tr><td>March 2025</td><td>3,847</td><td>&#8377;3,84,700</td><td>10%</td><td>&#8377;38,470</td><td>05 Apr 2025</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Scheduled</span></td></tr>
-            <tr><td>February 2025</td><td>4,230</td><td>&#8377;4,23,000</td><td>10%</td><td>&#8377;42,300</td><td>05 Mar 2025</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </div>
 </div>
 
-<!-- MODALS -->
-<div class="overlay" id="restockModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('restockModal').classList.remove('open')"><i class="fa fa-times"></i></button>
-    <h3>Request Ticket Allocation</h3>
-    <p>Request additional inventory from WOW admin. Approval usually takes 4–6 hours on working days.</p>
-    <div class="fg"><label class="fl">Ticket Type</label><input class="fi" id="restockType" placeholder="e.g. Water Park Adult"/></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Quantity Required</label><input class="fi" type="number" placeholder="e.g. 200"/></div>
-      <div class="fg"><label class="fl">Required By</label><input class="fi" type="date"/></div>
+<div class="content">
+<div class="grid-4">
+  <div class="stat-card"><div class="stat-label">Tickets Sold (MTD)</div><div class="stat-value" style="color:var(--purple);">2,847</div><div class="stat-sub">↑ 342 this week</div></div>
+  <div class="stat-card"><div class="stat-label">Revenue Generated</div><div class="stat-value" style="color:var(--green);">₹38.2L</div><div class="stat-sub">FY 2024–25</div></div>
+  <div class="stat-card"><div class="stat-label">Commission Earned</div><div class="stat-value" style="color:var(--brand);">₹5.73L</div><div class="stat-sub">15% Platinum rate</div></div>
+  <div class="stat-card"><div class="stat-label">QR Inventory</div><div class="stat-value" style="color:var(--teal);">1,240</div><div class="stat-sub">480 used · 760 pending</div></div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" id="tab-btn-overview" onclick="switchTab('overview',event)"><i class="fa fa-home"></i> Overview</div>
+  <div class="tab" id="tab-btn-inventory" onclick="switchTab('inventory',event)"><i class="fa fa-boxes"></i> Inventory</div>
+  <div class="tab" id="tab-btn-bulk-qr" onclick="switchTab('bulk-qr',event)"><i class="fa fa-qrcode"></i> Bulk QR</div>
+  <div class="tab" id="tab-btn-orders" onclick="switchTab('orders',event)"><i class="fa fa-shopping-cart"></i> Orders</div>
+  <div class="tab" id="tab-btn-commission" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i> Commission</div>
+  <div class="tab" id="tab-btn-team" onclick="switchTab('team',event)"><i class="fa fa-users"></i> Team</div>
+  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i> Reports</div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab-panel active">
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;">
+    <div class="card"><div class="card-header"><span class="card-title">Monthly Sales Trend</span></div><div style="height:220px;"><canvas id="sales-trend"></canvas></div></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Ticket Mix</span></div>
+      <div style="height:220px;"><canvas id="ticket-mix"></canvas></div>
     </div>
-    <div class="fg"><label class="fl">Reason / Notes</label><input class="fi" placeholder="e.g. Weekend rush — stock running low"/></div>
-    <button class="btn-submit" onclick="submitRestock()">Submit Allocation Request</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">QR Inventory Status</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#15803d;">760</div><div style="font-size:10px;font-weight:700;color:#15803d;">AVAILABLE</div></div>
+        <div style="background:#fff3ee;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--brand);">480</div><div style="font-size:10px;font-weight:700;color:var(--brand);">USED</div></div>
+        <div style="background:#fef9c3;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#854d0e;">42</div><div style="font-size:10px;font-weight:700;color:#854d0e);">EXPIRED</div></div>
+      </div>
+      <div style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:4px;"><span>Utilization Rate</span><span style="color:var(--purple);">38.7%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:38.7%;background:var(--purple);"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Top Performing Products</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">💧 Water Park (Adult)</span><span style="font-weight:700;color:var(--teal);">1,240 sold</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎭 Combo Ticket</span><span style="font-weight:700;color:var(--green);">842 sold</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎢 Amusement (Adult)</span><span style="font-weight:700;color:var(--brand);">523 sold</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎪 Corporate Package</span><span style="font-weight:700;color:var(--purple);">242 sold</span></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="overlay" id="bulkModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('bulkModal').classList.remove('open')"><i class="fa fa-times"></i></button>
-    <h3>Create Bulk Ticket Batch</h3>
-    <p>Generate a batch of pre-signed QR tickets from your inventory allocation.</p>
-    <div class="fg"><label class="fl">Ticket Type</label>
-      <select class="fi"><option>Water Park Adult</option><option>Amusement Adult</option><option>Combo Ticket</option><option>Child Water Park</option></select>
+<!-- INVENTORY -->
+<div id="tab-inventory" class="tab-panel">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Ticket Inventory</span>
+      <div style="display:flex;gap:8px;"><select style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:auto;" onchange="renderInventory(this.value)"><option value="all">All Types</option><option value="water">Water Park</option><option value="amusement">Amusement</option><option value="combo">Combo</option><option value="corporate">Corporate</option></select><button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> Request Stock</button></div>
     </div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Quantity</label><input class="fi" type="number" placeholder="e.g. 100"/></div>
-      <div class="fg"><label class="fl">Valid Till</label><input class="fi" type="date"/></div>
-    </div>
-    <div class="fg"><label class="fl">Batch Name / Reference</label><input class="fi" placeholder="e.g. March Weekend Batch"/></div>
-    <button class="btn-submit" onclick="createBatch()">Generate Batch &amp; QR Codes</button>
+    <div class="inv-grid" id="inv-grid"></div>
   </div>
 </div>
 
-<div class="overlay" id="agentModal" onclick="if(event.target===this)this.classList.remove('open')">
+<!-- BULK QR -->
+<div id="tab-bulk-qr" class="tab-panel">
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-header"><span class="card-title">Generate Bulk QR Tickets</span></div>
+    <div style="display:grid;grid-template-columns:200px 200px 160px 160px auto;gap:12px;align-items:end;flex-wrap:wrap;">
+      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Ticket Type</label>
+        <select id="qr-type" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+          <option value="water">Water Park — Adult</option><option value="water-child">Water Park — Child</option>
+          <option value="amusement">Amusement — Adult</option><option value="combo">Combo Ticket</option>
+        </select>
+      </div>
+      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Visit Date</label><input type="date" id="qr-date" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Quantity</label><input type="number" id="qr-qty" value="10" min="1" max="200" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Batch ID</label><input type="text" id="qr-batch" placeholder="AUTO" style="width:100%;"/></div>
+      <button class="btn btn-purple" onclick="generateBulkQR()"><i class="fa fa-qrcode"></i> Generate</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title" id="qr-panel-title">QR Ticket Panel</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="printAllQR()"><i class="fa fa-print"></i> Print All</button>
+        <button class="btn btn-outline btn-sm" onclick="downloadQRZip()"><i class="fa fa-download"></i> Download ZIP</button>
+      </div>
+    </div>
+    <div class="qr-grid" id="qr-panel">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);"><i class="fa fa-qrcode" style="font-size:48px;opacity:.2;display:block;margin-bottom:12px;"></i>Set parameters above and click Generate</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px;">
+    <div class="card-header"><span class="card-title">QR Batch History</span></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Batch ID</th><th>Type</th><th>Qty</th><th>Visit Date</th><th>Generated</th><th>Used</th><th>Expired</th><th>Actions</th></tr></thead>
+    <tbody id="batch-history">
+      <tr><td><code>BATCH-20250315-001</code></td><td>Water Park Adult</td><td>100</td><td>15–31 Mar 2025</td><td>100</td><td>87</td><td>0</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
+      <tr><td><code>BATCH-20250301-002</code></td><td>Combo Ticket</td><td>50</td><td>Mar 2025</td><td>50</td><td>38</td><td>4</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
+      <tr><td><code>BATCH-20250220-001</code></td><td>Corporate Package</td><td>30</td><td>Feb–Mar 2025</td><td>30</td><td>28</td><td>2</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
+    </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ORDERS -->
+<div id="tab-orders" class="tab-panel">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Purchase Orders</span><button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> New Order</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Order ID</th><th>Type</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="orders-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- COMMISSION -->
+<div id="tab-commission" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Commission Summary</span></div>
+      <table style="width:100%;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Total Earned (FY)</td><td style="text-align:right;font-weight:700;color:var(--green);">₹5,73,750</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Paid Out</td><td style="text-align:right;font-weight:700;">₹4,80,000</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Pending Payout</td><td style="text-align:right;font-weight:700;color:var(--yellow);">₹93,750</td></tr>
+        <tr><td style="padding:8px 0;font-weight:700;">Current Tier Rate</td><td style="text-align:right;font-weight:800;color:var(--purple);font-size:16px;">15%</td></tr>
+      </table>
+      <div style="margin-top:14px;background:#f8f5ff;border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;">NEXT BONUS THRESHOLD</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:77%;background:var(--purple);"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">₹38.2L of ₹50L annual target · 77% · Bonus: ₹2L</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Tier Structure</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:#f5f3ff;border-radius:10px;border-left:4px solid var(--purple);"><div style="font-size:12px;font-weight:800;color:var(--purple);">PLATINUM — 15% <span style="background:var(--purple);color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">CURRENT</span></div><div style="font-size:11px;color:var(--muted);">Revenue ≥ ₹25L/year + dedicated manager</div></div>
+        <div style="padding:12px;background:#fef9c3;border-radius:10px;border-left:4px solid #ca8a04;"><div style="font-size:12px;font-weight:800;color:#ca8a04;">GOLD — 12%</div><div style="font-size:11px;color:var(--muted);">Revenue ₹10L–₹24.9L/year</div></div>
+        <div style="padding:12px;background:#dbeafe;border-radius:10px;border-left:4px solid #1e40af;"><div style="font-size:12px;font-weight:800;color:#1e40af;">SILVER — 10%</div><div style="font-size:11px;color:var(--muted);">Revenue ₹5L–₹9.9L/year</div></div>
+        <div style="padding:12px;background:#f8fafc;border-radius:10px;border-left:4px solid var(--border);"><div style="font-size:12px;font-weight:800;color:var(--muted);">BRONZE — 8%</div><div style="font-size:11px;color:var(--muted);">Revenue &lt; ₹5L/year</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Commission Ledger</span><button class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Export</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Month</th><th>Tickets Sold</th><th>Revenue</th><th>Rate</th><th>Gross</th><th>TDS 2%</th><th>Net</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Mar 2025</td><td>342</td><td>₹5,13,000</td><td>15%</td><td>₹76,950</td><td>₹1,539</td><td>₹75,411</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+      <tr><td>Feb 2025</td><td>398</td><td>₹5,97,000</td><td>15%</td><td>₹89,550</td><td>₹1,791</td><td>₹87,759</td><td><span class="badge badge-green">Paid</span></td></tr>
+      <tr><td>Jan 2025</td><td>312</td><td>₹4,68,000</td><td>15%</td><td>₹70,200</td><td>₹1,404</td><td>₹68,796</td><td><span class="badge badge-green">Paid</span></td></tr>
+      <tr><td>Dec 2024</td><td>520</td><td>₹7,80,000</td><td>15%</td><td>₹1,17,000</td><td>₹2,340</td><td>₹1,14,660</td><td><span class="badge badge-green">Paid</span></td></tr>
+    </tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="tab-team" class="tab-panel">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Sales Team</span><button class="btn btn-purple btn-sm" onclick="openTeamModal()"><i class="fa fa-user-plus"></i> Add Member</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Agent</th><th>Role</th><th>Region</th><th>Tickets Sold</th><th>Revenue</th><th>Commission</th><th>Conversion</th><th>Status</th><th>Actions</th></tr></thead><tbody id="team-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div id="tab-reports" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card"><div class="card-header"><span class="card-title">Sales by Ticket Type</span></div><div style="height:250px;"><canvas id="type-rpt-chart"></canvas></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Monthly Revenue</span></div><div style="height:250px;"><canvas id="rev-rpt-chart"></canvas></div></div>
+    <div class="card" style="grid-column:span 2;"><div class="card-header"><span class="card-title">Commission Trend</span></div><div style="height:220px;"><canvas id="comm-rpt-chart"></canvas></div></div>
+  </div>
+</div>
+
+</div></div></div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="order-modal">
   <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('agentModal').classList.remove('open')"><i class="fa fa-times"></i></button>
-    <h3>Add Sales Agent</h3>
-    <p>Add a team member to your reseller account. They can sell from your allocated inventory.</p>
-    <div class="fr">
-      <div class="fg"><label class="fl">First Name</label><input class="fi" placeholder="First name"/></div>
-      <div class="fg"><label class="fl">Last Name</label><input class="fi" placeholder="Last name"/></div>
+    <div class="modal-header"><div class="modal-title">New Stock Order</div><button class="modal-close" onclick="closeModal('order-modal')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Ticket Type</label><select id="om-type"><option>Water Park Adult</option><option>Water Park Child</option><option>Amusement Adult</option><option>Amusement Child</option><option>Combo Ticket</option><option>Corporate Package</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="om-qty" placeholder="100" min="1"/></div></div>
+    <div class="form-row"><div class="form-group"><label>Validity Period</label><select id="om-validity"><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option></select></div><div class="form-group"><label>Special Instructions</label><input type="text" id="om-notes" placeholder="e.g. weekend only"/></div></div>
+    <div style="background:var(--brand-light);border:1.5px solid #ffd8c4;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;">
+      <div style="font-weight:700;margin-bottom:6px;">Price Preview</div>
+      <div style="display:flex;justify-content:space-between;"><span>Unit Reseller Price</span><span id="unit-price">₹679 (15% off MRP)</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-top:6px;border-top:1px solid #ffd8c4;padding-top:6px;"><span>Total Order Value</span><span id="order-total" style="color:var(--brand);">₹67,900</span></div>
     </div>
-    <div class="fg"><label class="fl">Mobile Number</label><input class="fi" type="tel" placeholder="+91 98765 43210"/></div>
-    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="agent@example.com"/></div>
-    <div class="fg"><label class="fl">Daily Ticket Limit</label><input class="fi" type="number" placeholder="e.g. 50 tickets per day"/></div>
-    <div class="fg"><label class="fl">Can Access Reports?</label>
-      <select class="fi"><option>No — Sales only</option><option>Yes — View own sales report</option></select>
-    </div>
-    <button class="btn-submit" onclick="addAgent()">Create Agent Account</button>
+    <div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline" onclick="closeModal('order-modal')">Cancel</button><button class="btn btn-purple" onclick="saveOrder()"><i class="fa fa-save"></i> Place Order</button></div>
+  </div>
+</div>
+
+<!-- TEAM MODAL -->
+<div class="modal-overlay" id="team-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add Team Member</div><button class="modal-close" onclick="closeModal('team-modal')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="tm-name" placeholder="e.g. Anjali Sharma"/></div><div class="form-group"><label>Role</label><select id="tm-role"><option>Sales Executive</option><option>Area Manager</option><option>Regional Head</option><option>Key Accounts</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Mobile</label><input type="text" id="tm-mobile" placeholder="+91 9XXXXXXXXX"/></div><div class="form-group"><label>Region</label><select id="tm-region"><option>Delhi NCR</option><option>Mumbai</option><option>Bengaluru</option><option>Kolkata</option><option>Others</option></select></div></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('team-modal')">Cancel</button><button class="btn btn-purple" onclick="saveTeamMember()"><i class="fa fa-save"></i> Add Member</button></div>
   </div>
 </div>
 
 <script>
-const AGENTS = [
-  {name:'Raju Singh',mobile:'+91 98110 44321',role:'Senior Agent',sold:1240,comm:'₹12,400',status:'active'},
-  {name:'Priya Patel',mobile:'+91 98765 00123',role:'Agent',sold:890,comm:'₹8,900',status:'active'},
-  {name:'Amit Verma',mobile:'+91 99990 11234',role:'Agent',sold:720,comm:'₹7,200',status:'active'},
-  {name:'Sunita Devi',mobile:'+91 98000 55432',role:'Agent',sold:540,comm:'₹5,400',status:'active'},
-  {name:'Vikram Yadav',mobile:'+91 98765 99876',role:'Junior Agent',sold:280,comm:'₹2,800',status:'active'},
-  {name:'Mohan Lal',mobile:'+91 99876 54321',role:'Agent',sold:120,comm:'₹1,200',status:'inactive'},
-  {name:'Kavita Sharma',mobile:'+91 98000 12345',role:'Junior Agent',sold:57,comm:'₹570',status:'active'},
+/* ── DATA ── */
+const invData=[
+  {id:1,name:'Water Park — Adult',cat:'water',price:799,reseller:679,total:400,used:180,reserved:40},
+  {id:2,name:'Water Park — Child',cat:'water',price:499,reseller:424,total:200,used:90,reserved:20},
+  {id:3,name:'Amusement Park — Adult',cat:'amusement',price:699,reseller:594,total:300,used:120,reserved:30},
+  {id:4,name:'Amusement Park — Child',cat:'amusement',price:449,reseller:382,total:150,used:60,reserved:15},
+  {id:5,name:'Combo Ticket',cat:'combo',price:1299,reseller:1104,total:250,used:100,reserved:25},
+  {id:6,name:'Corporate Package',cat:'corporate',price:1899,reseller:1614,total:100,used:40,reserved:10},
 ];
+let orders=[
+  {id:'ORD-2025-0342',type:'Water Park Adult',qty:200,unit:679,total:135800,date:'2025-03-20',status:'fulfilled'},
+  {id:'ORD-2025-0298',type:'Combo Ticket',qty:100,unit:1104,total:110400,date:'2025-03-08',status:'fulfilled'},
+  {id:'ORD-2025-0261',type:'Amusement Adult',qty:150,unit:594,total:89100,date:'2025-02-15',status:'fulfilled'},
+  {id:'ORD-2025-0352',type:'Corporate Package',qty:50,unit:1614,total:80700,date:'2025-03-25',status:'processing'},
+];
+let team=[
+  {name:'Priya Sharma',role:'Area Manager',region:'Delhi NCR',sold:1240,rev:842000,comm:126300,conv:72},
+  {name:'Ravi Kapoor',role:'Sales Executive',region:'Delhi NCR',sold:820,rev:557400,comm:83610,conv:68},
+  {name:'Anjali Singh',role:'Regional Head',region:'Noida',sold:787,rev:534700,comm:80205,conv:74},
+];
+let generatedQRs=[];
 
-function showTab(t) {
-  ['dashboard','inventory','bulk','team','sales','invoices','commissions'].forEach(id => {
-    const el = document.getElementById('tab-'+id);
-    if (el) el.style.display = (id===t)?'':'none';
-  });
-  const titles = {dashboard:'Reseller Dashboard',inventory:'Ticket Inventory',bulk:'Bulk Tickets',team:'My Team',sales:'Sales History',invoices:'GST Invoices',commissions:'Commissions'};
-  document.getElementById('pageTitle').textContent = titles[t]||t;
-  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
-  if (t==='team') renderAgents();
+/* ── RENDER INVENTORY ── */
+function renderInventory(filter='all'){
+  const list=filter==='all'?invData:invData.filter(i=>i.cat===filter);
+  document.getElementById('inv-grid').innerHTML=list.map(item=>{
+    const available=item.total-item.used-item.reserved;
+    const usedPct=Math.round(item.used/item.total*100);
+    return `<div class="inv-card">
+      <div class="inv-card-header">
+        <div><div class="inv-card-name">${item.name}</div><div class="inv-card-meta">MRP ₹${item.price} · Reseller ₹${item.reseller}</div></div>
+        <span class="badge ${available<20?'badge-red':available<50?'badge-yellow':'badge-green'}">${available<20?'⚠ Low':available<50?'Limited':'✓ Good'}</span>
+      </div>
+      <div class="inv-stats">
+        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--teal);">${item.total}</div><div class="inv-stat-lbl">Total</div></div>
+        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--green);">${available}</div><div class="inv-stat-lbl">Available</div></div>
+        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--brand);">${item.used}</div><div class="inv-stat-lbl">Sold</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${usedPct}%;background:${usedPct>80?'var(--red)':usedPct>50?'var(--yellow)':'var(--purple)'};"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">${usedPct}% sold</div>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="switchTab('bulk-qr',null)"><i class="fa fa-qrcode"></i> QR</button>
+        <button class="btn btn-purple btn-sm" style="flex:1;" onclick="openOrderModal()"><i class="fa fa-plus"></i> Reorder</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderInventory();
+
+/* ── BULK QR ── */
+function generateBulkQR(){
+  const type=document.getElementById('qr-type').value;
+  const date=document.getElementById('qr-date').value||'Open';
+  const qty=Math.min(+document.getElementById('qr-qty').value||10,200);
+  const batch=document.getElementById('qr-batch').value||('BATCH-'+Date.now().toString().slice(-8));
+  document.getElementById('qr-panel-title').textContent=`QR Tickets — ${batch} (${qty} tickets)`;
+  generatedQRs=[];
+  const panel=document.getElementById('qr-panel');
+  panel.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--purple);"></i><div style="margin-top:8px;font-size:13px;color:var(--muted);">Generating QR codes…</div></div>';
+  setTimeout(()=>{
+    panel.innerHTML='';
+    for(let i=0;i<qty;i++){
+      const tid='WOW-'+batch+'-'+String(i+1).padStart(3,'0');
+      generatedQRs.push(tid);
+      const el=document.createElement('div');
+      el.className='qr-ticket';
+      const typeLabel={water:'Water Park',amusement:'Amusement','water-child':'Water Park Child',combo:'Combo'}[type]||'Ticket';
+      el.innerHTML=`<div class="ticket-type">${typeLabel}</div><div id="qr-c-${i}"></div><div class="ticket-id">${tid}</div><div style="font-size:10px;color:var(--muted);">${date}</div>`;
+      panel.appendChild(el);
+      try{new QRCode(el.querySelector('#qr-c-'+i),{text:tid+'|'+type+'|'+date,width:72,height:72,colorDark:'#0a1628',colorLight:'#ffffff'});}catch(e){}
+    }
+    alert(`✅ ${qty} QR tickets generated for batch ${batch}!`);
+  },800);
+}
+function printAllQR(){window.print();}
+function downloadQRZip(){alert('📦 Downloading QR batch as ZIP ('+generatedQRs.length+' tickets)…');}
+
+/* ── ORDERS ── */
+function renderOrders(){
+  const sm={fulfilled:'badge-green',processing:'badge-yellow',pending:'badge-blue',cancelled:'badge-red'};
+  document.getElementById('orders-body').innerHTML=orders.map(o=>`
+  <tr><td><code style="font-size:11px;">${o.id}</code></td><td>${o.type}</td><td>${o.qty}</td><td>₹${o.unit.toLocaleString('en-IN')}</td>
+  <td><strong>₹${o.total.toLocaleString('en-IN')}</strong></td><td>${o.date}</td>
+  <td><span class="badge ${sm[o.status]||'badge-blue'}">${o.status}</span></td>
+  <td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>`).join('');
+}
+renderOrders();
+
+/* ── TEAM ── */
+function renderTeam(){
+  document.getElementById('team-body').innerHTML=team.map(m=>`
+  <tr><td><div style="display:flex;align-items:center;gap:8px;"><img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.name)}" width="30" height="30" style="border-radius:50%;"/><strong>${m.name}</strong></div></td>
+  <td>${m.role}</td><td>${m.region}</td><td>${m.sold.toLocaleString('en-IN')}</td>
+  <td>₹${m.rev.toLocaleString('en-IN')}</td><td style="color:var(--green);font-weight:700;">₹${m.comm.toLocaleString('en-IN')}</td>
+  <td><span style="font-weight:700;color:${m.conv>=70?'var(--green)':'var(--yellow)'};">${m.conv}%</span></td>
+  <td><span class="badge badge-green">Active</span></td>
+  <td><button class="btn btn-outline btn-sm"><i class="fa fa-edit"></i></button></td></tr>`).join('');
+}
+renderTeam();
+
+/* ── TABS ── */
+function switchTab(id,e){
+  if(e)e.preventDefault();
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const b=document.getElementById('tab-btn-'+id);if(b)b.classList.add('active');
+  if(id==='overview')initOv();
+  if(id==='reports')initRp();
+  if(id==='orders')renderOrders();
+  if(id==='team')renderTeam();
 }
 
-function renderAgents() {
-  const tbody = document.getElementById('agentsBody');
-  tbody.innerHTML = '';
-  AGENTS.forEach((a,i) => {
-    const sc = a.status==='active'?'var(--green)':'var(--red)';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td><strong style="color:#fff;">${a.name}</strong></td><td style="font-family:'Courier Prime',monospace;font-size:11px;">${a.mobile}</td><td><span class="badge" style="background:rgba(168,85,247,.15);color:var(--purple3);">${a.role}</span></td><td>${a.sold}</td><td style="color:var(--gold);">${a.comm}</td><td><span style="color:${sc};"><span class="dot" style="background:${sc};"></span>${a.status}</span></td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn" title="Set daily limit"><i class="fa fa-sliders-h"></i></div><div class="icon-btn red" onclick="toggleAgent(${i})"><i class="fa ${a.status==='active'?'fa-ban':'fa-check'}"></i></div></div></td>`;
-    tbody.appendChild(tr);
-  });
+let ovInited=false,rpInited=false;
+function initOv(){
+  if(ovInited)return;ovInited=true;
+  new Chart(document.getElementById('sales-trend'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Tickets',data:[420,510,720,380,490,342],borderColor:'var(--purple)',backgroundColor:'rgba(124,58,237,.1)',tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('ticket-mix'),{type:'doughnut',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[43,18,30,9],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
 }
+function initRp(){
+  if(rpInited)return;rpInited=true;
+  new Chart(document.getElementById('type-rpt-chart'),{type:'pie',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[43,18,30,9],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+  new Chart(document.getElementById('rev-rpt-chart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'₹',data:[520000,630000,900000,470000,605000,513000],backgroundColor:'rgba(124,58,237,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('comm-rpt-chart'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Commission ₹',data:[78000,94500,135000,70500,90750,76950],borderColor:'var(--green)',tension:.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+}
+setTimeout(initOv,100);
 
-function toggleAgent(i) { AGENTS[i].status = AGENTS[i].status==='active'?'inactive':'active'; renderAgents(); }
-
-function openRestock(type) {
-  document.getElementById('restockType').value = type;
-  document.getElementById('restockModal').classList.add('open');
+/* ── MODALS ── */
+function openOrderModal(){document.getElementById('order-modal').classList.add('show');}
+function openTeamModal(){document.getElementById('team-modal').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function saveOrder(){
+  const type=document.getElementById('om-type').value;
+  const qty=+document.getElementById('om-qty').value||100;
+  const unitMap={'Water Park Adult':679,'Water Park Child':424,'Amusement Adult':594,'Amusement Child':382,'Combo Ticket':1104,'Corporate Package':1614};
+  const unit=unitMap[type]||679;
+  orders.unshift({id:'ORD-2025-'+String(Math.floor(Math.random()*9000+1000)),type,qty,unit,total:unit*qty,date:new Date().toISOString().slice(0,10),status:'processing'});
+  renderOrders();closeModal('order-modal');switchTab('orders',null);alert('✅ Order placed! Processing…');
 }
-function submitRestock() {
-  alert('Allocation request submitted to WOW Admin. Expected approval: 4–6 hours.');
-  document.getElementById('restockModal').classList.remove('open');
+function saveTeamMember(){
+  const name=document.getElementById('tm-name').value.trim();
+  if(!name){alert('Name required.');return;}
+  team.push({name,role:document.getElementById('tm-role').value,region:document.getElementById('tm-region').value,sold:0,rev:0,comm:0,conv:0});
+  renderTeam();closeModal('team-modal');
 }
-function openBulkCreate() { document.getElementById('bulkModal').classList.add('open'); }
-function createBatch() {
-  alert('Bulk batch created! QR codes are being generated. You will receive a download link within 5 minutes via WhatsApp and email.');
-  document.getElementById('bulkModal').classList.remove('open');
-}
-function openAddAgent() { document.getElementById('agentModal').classList.add('open'); }
-function addAgent() {
-  alert('Agent account created! They will receive a login OTP on their mobile number.');
-  document.getElementById('agentModal').classList.remove('open');
-}
-
-showTab('dashboard');
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
