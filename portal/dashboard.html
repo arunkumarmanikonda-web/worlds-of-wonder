@@ -1,325 +1,735 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Dashboard — Worlds of Wonder</title>
-  <meta name="description" content="Your WOW account dashboard — bookings, passport, loyalty points and offers." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
-  <style>
-    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-    @media(max-width:900px){ .dash-grid, .dash-grid-3 { grid-template-columns:1fr; } }
-    .stat-card { background:var(--clr-bg-card,#1a2235); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; display:flex; align-items:center; gap:16px; }
-    .stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
-    .stat-icon.blue  { background:rgba(0,85,179,.2); }
-    .stat-icon.gold  { background:rgba(245,168,0,.15); }
-    .stat-icon.green { background:rgba(16,185,129,.15); }
-    .stat-icon.red   { background:rgba(239,68,68,.15); }
-    .stat-val  { font-size:28px; font-weight:800; color:#fff; }
-    .stat-lbl  { font-size:13px; color:rgba(255,255,255,.55); margin-top:2px; }
-    .widget-card { background:var(--clr-bg-card,#1a2235); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:24px; }
-    .widget-title { font-size:14px; font-weight:700; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.08em; margin-bottom:18px; }
-    .booking-row { display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.06); }
-    .booking-row:last-child { border-bottom:none; }
-    .booking-badge { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; background:rgba(0,85,179,.15); }
-    .booking-info { flex:1; min-width:0; }
-    .booking-name { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .booking-meta { font-size:12px; color:rgba(255,255,255,.45); margin-top:2px; }
-    .booking-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
-    .status-confirmed { background:rgba(16,185,129,.15); color:#10b981; }
-    .status-pending   { background:rgba(245,168,0,.15);  color:#f5a800; }
-    .status-used      { background:rgba(255,255,255,.08); color:rgba(255,255,255,.4); }
-    .loyalty-bar-wrap { margin:16px 0; }
-    .loyalty-bar-label { display:flex; justify-content:space-between; font-size:12px; color:rgba(255,255,255,.55); margin-bottom:8px; }
-    .loyalty-bar { height:8px; background:rgba(255,255,255,.08); border-radius:4px; overflow:hidden; }
-    .loyalty-bar-fill { height:100%; background:linear-gradient(90deg,#F5A800,#f97316); border-radius:4px; transition:width .6s; }
-    .tier-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; }
-    .tier-gold { background:linear-gradient(135deg,#F5A800,#f97316); color:#000; }
-    .tier-silver { background:linear-gradient(135deg,#94a3b8,#cbd5e1); color:#000; }
-    .tier-platinum { background:linear-gradient(135deg,#a78bfa,#7c3aed); color:#fff; }
-    .offer-chip { display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); border-radius:12px; margin-bottom:10px; }
-    .offer-chip-icon { font-size:22px; }
-    .offer-chip-info { flex:1; }
-    .offer-chip-title { font-size:13px; font-weight:600; color:#fff; }
-    .offer-chip-sub   { font-size:11px; color:rgba(255,255,255,.45); margin-top:2px; }
-    .offer-chip-cta   { font-size:12px; font-weight:700; color:#F5A800; white-space:nowrap; }
-    .quick-links { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    @media(max-width:600px){ .quick-links { grid-template-columns:repeat(2,1fr); } }
-    .quick-link-btn { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px 12px; text-align:center; text-decoration:none; transition:all .2s; }
-    .quick-link-btn:hover { background:rgba(0,85,179,.15); border-color:rgba(0,85,179,.3); transform:translateY(-2px); }
-    .quick-link-icon { font-size:26px; display:block; margin-bottom:8px; }
-    .quick-link-lbl  { font-size:12px; font-weight:600; color:rgba(255,255,255,.7); }
-    .passport-card   { background:linear-gradient(135deg,#0055B3 0%,#0a2a6e 100%); border-radius:16px; padding:20px 24px; position:relative; overflow:hidden; }
-    .passport-card::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:rgba(255,255,255,.05); border-radius:50%; }
-    .passport-title  { font-size:11px; font-weight:700; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:.1em; }
-    .passport-name   { font-size:20px; font-weight:800; color:#fff; margin:6px 0 2px; }
-    .passport-plan   { font-size:13px; color:rgba(255,255,255,.6); }
-    .passport-valid  { font-size:12px; color:#F5A800; font-weight:600; margin-top:12px; }
-    .passport-visits { position:absolute; right:24px; top:50%; transform:translateY(-50%); text-align:right; }
-    .passport-visits-num { font-size:36px; font-weight:900; color:#F5A800; }
-    .passport-visits-lbl { font-size:10px; color:rgba(255,255,255,.45); }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Dashboard — Worlds of Wonder</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --brand:#ff6b35;--brand-dark:#e85a22;--brand-light:#fff3ee;
+  --teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;--purple:#7c3aed;
+  --navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f0f4f8;--white:#fff;--sidebar:260px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);background:var(--navy);color:#fff;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;display:flex;flex-direction:column;}
+.sidebar-brand{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;text-decoration:none;}
+.sidebar-brand .mark{width:38px;height:38px;background:var(--brand);border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:17px;color:#fff;flex-shrink:0;}
+.sidebar-brand .lbl{font-weight:800;font-size:15px;color:#fff;display:block;}
+.sidebar-brand small{font-size:10px;color:rgba(255,255,255,.5);display:block;}
+.user-card{margin:14px;background:rgba(255,255,255,.07);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;}
+.user-avatar{width:42px;height:42px;border-radius:50%;border:2px solid var(--brand);flex-shrink:0;}
+.user-name{font-size:13px;font-weight:700;}
+.user-meta{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;}
+.user-tier{display:inline-block;background:var(--yellow);color:var(--navy);font-size:9px;font-weight:800;padding:1px 7px;border-radius:20px;margin-top:4px;}
+.nav-section{padding:12px 0 4px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);padding:0 18px 5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--brand);}
+.nav-item i{width:18px;text-align:center;font-size:13px;}
+.nav-item .nav-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-greeting{font-size:16px;font-weight:700;}
+.topbar-greeting small{font-size:12px;color:var(--muted);font-weight:400;display:block;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);display:grid;place-items:center;cursor:pointer;position:relative;}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--white);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;text-decoration:none;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-dark);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* ── CONTENT ── */
+.content{padding:24px 28px;}
+
+/* ── HERO BANNER ── */
+.welcome-banner{background:linear-gradient(135deg,var(--navy) 0%,#1a2f52 50%,var(--brand-dark) 100%);border-radius:18px;padding:28px 32px;color:#fff;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;position:relative;overflow:hidden;}
+.welcome-banner::before{content:'🎢';font-size:140px;position:absolute;right:-10px;top:-20px;opacity:.08;line-height:1;}
+.welcome-banner h2{font-size:22px;font-weight:900;margin-bottom:4px;}
+.welcome-banner p{font-size:13px;opacity:.8;margin-bottom:16px;}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;}
+.weather-chip{background:rgba(255,214,10,.2);border-color:rgba(255,214,10,.4);color:var(--yellow);}
+
+/* ── QUICK STATS ── */
+.quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.qs-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:.2s;cursor:pointer;}
+.qs-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);transform:translateY(-2px);}
+.qs-icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0;}
+.qs-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.qs-value{font-size:22px;font-weight:800;margin:2px 0;}
+.qs-sub{font-size:11px;color:var(--muted);}
+.qs-trend{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;margin-top:3px;}
+.trend-up{background:#d1fae5;color:#065f46;}
+.trend-warn{background:#fef9c3;color:#854d0e;}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-bottom:20px;}
+
+/* ── TICKET PREVIEW ── */
+.ticket-card{background:linear-gradient(135deg,var(--brand),var(--brand-dark));border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden;}
+.ticket-card::after{content:'🎡';font-size:80px;position:absolute;right:-10px;bottom:-15px;opacity:.12;line-height:1;}
+.ticket-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.ticket-title{font-size:15px;font-weight:800;}
+.ticket-sub{font-size:11px;opacity:.8;margin-top:2px;}
+.ticket-date-box{text-align:right;}
+.ticket-date{font-size:22px;font-weight:900;}
+.ticket-date small{font-size:11px;opacity:.7;display:block;}
+.ticket-divider{border:none;border-top:1px dashed rgba(255,255,255,.3);margin:12px 0;}
+.ticket-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+.ticket-row span:last-child{font-weight:700;}
+.ticket-actions{display:flex;gap:8px;margin-top:14px;align-items:center;}
+.ticket-qr{width:60px;height:60px;background:rgba(255,255,255,.2);border-radius:8px;display:grid;place-items:center;font-size:9px;text-align:center;border:1px solid rgba(255,255,255,.3);flex-shrink:0;}
+.t-btn{flex:1;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;text-align:center;transition:.15s;}
+.t-btn:hover{background:rgba(255,255,255,.3);}
+
+/* ── COUNTDOWN ── */
+.countdown-box{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.countdown-label{font-size:11px;opacity:.8;}
+.countdown-timer{display:flex;gap:8px;}
+.countdown-unit{text-align:center;}
+.countdown-num{font-size:22px;font-weight:900;display:block;line-height:1;}
+.countdown-lbl{font-size:9px;opacity:.7;}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:700;}
+
+/* ── BOOKINGS ── */
+.booking-item{display:flex;align-items:center;gap:12px;padding:11px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;transition:.15s;text-decoration:none;color:inherit;}
+.booking-item:hover{border-color:var(--brand);background:var(--brand-light);}
+.booking-icon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+.booking-title{font-size:13px;font-weight:700;}
+.booking-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.booking-right{margin-left:auto;text-align:right;}
+.booking-amt{font-size:13px;font-weight:800;margin-top:3px;}
+
+/* ── OFFERS ── */
+.offers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.offer-card{border-radius:12px;padding:16px;color:#fff;cursor:pointer;transition:.2s;position:relative;overflow:hidden;}
+.offer-card:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(0,0,0,.15);}
+.offer-tag{font-size:10px;font-weight:700;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:8px;}
+.offer-title{font-size:14px;font-weight:800;margin-bottom:3px;}
+.offer-desc{font-size:11px;opacity:.85;}
+.offer-code{margin-top:8px;background:rgba(255,255,255,.2);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;font-family:monospace;display:inline-block;}
+.offer-expires{font-size:10px;opacity:.6;margin-top:4px;}
+
+/* ── LOYALTY WIDGET ── */
+.loyalty-widget{background:linear-gradient(135deg,#4f46e5,var(--purple));border-radius:16px;padding:20px;color:#fff;margin-bottom:16px;}
+.coins-big{font-size:38px;font-weight:900;line-height:1;}
+.tier-bar{height:8px;background:rgba(255,255,255,.2);border-radius:20px;overflow:hidden;margin:6px 0;}
+.tier-fill{height:100%;background:var(--yellow);border-radius:20px;transition:width .6s ease;}
+
+/* ── WALLET WIDGET ── */
+.wallet-widget{background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:16px;padding:18px;color:#fff;margin-bottom:16px;}
+.wallet-balance{font-size:30px;font-weight:900;margin:6px 0;}
+.wallet-actions{display:flex;gap:8px;margin-top:12px;}
+.wallet-btn{flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;text-align:center;transition:.15s;text-decoration:none;display:block;}
+.wallet-btn:hover{background:rgba(255,255,255,.25);}
+
+/* ── PASSPORT MINI CARD ── */
+.passport-mini{background:linear-gradient(135deg,var(--navy),#1a3a5e);border-radius:12px;padding:16px;color:#fff;}
+
+/* ── QUICK ACTIONS ── */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qa-item{border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;transition:.15s;text-decoration:none;display:block;}
+.qa-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+
+/* ── SPEND CHART ── */
+.chart-wrap{position:relative;height:200px;}
+
+/* ── ACTIVITY ── */
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-yellow{background:#fef9c3;color:#854d0e;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+
+/* ── VISIT HISTORY ── */
+.visit-timeline{position:relative;padding-left:20px;}
+.visit-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border);}
+.vt-item{position:relative;margin-bottom:16px;}
+.vt-dot{width:12px;height:12px;border-radius:50%;background:var(--brand);position:absolute;left:-20px;top:3px;border:2px solid var(--white);}
+.vt-title{font-size:13px;font-weight:700;}
+.vt-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.main-grid{grid-template-columns:1fr;}.offers-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:900px){.quick-stats{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){
+  .sidebar{transform:translateX(-100%);transition:.3s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .quick-stats{grid-template-columns:1fr;}
+  .offers-grid{grid-template-columns:1fr;}
+  .content{padding:16px;}
+  .topbar{padding:0 16px;}
+}
+</style>
 </head>
-<body class="portal-body">
-<div id="app">
-  <div class="portal-layout">
+<body>
 
-    <!-- Sidebar -->
-    <aside class="portal-sidebar">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
-        </a>
-      </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item active">
-          <span class="portal-sidenav-icon">🏠</span><span>Dashboard</span>
-        </a>
-        <a href="my-bookings.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">🎟️</span><span>My Bookings</span>
-        </a>
-        <a href="tickets.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">📱</span><span>My Tickets</span>
-        </a>
-        <a href="passport.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">🛂</span><span>My Passport</span>
-        </a>
-        <a href="loyalty.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">⭐</span><span>Loyalty Points</span>
-        </a>
-        <a href="offers.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">🎁</span><span>My Offers</span>
-        </a>
-        <a href="notifications.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">🔔</span><span>Notifications <span class="notif-badge" id="notifCount" style="background:#e53e3e;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:800;margin-left:4px;">3</span></span>
-        </a>
-        <a href="profile.html" class="portal-sidenav-item">
-          <span class="portal-sidenav-icon">👤</span><span>Profile</span>
-        </a>
-        <div style="margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);">
-          <a href="../index.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);">
-            <span class="portal-sidenav-icon">🌐</span><span>Back to Site</span>
-          </a>
-          <a href="login.html" class="portal-sidenav-item" style="color:rgba(255,255,255,.4);" id="signOutBtn">
-            <span class="portal-sidenav-icon">🚪</span><span>Sign Out</span>
-          </a>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="portal-main">
-      <div class="portal-topbar">
-        <div>
-          <h1 class="portal-page-title">Welcome back, <span id="userName" style="color:#F5A800;">Rajesh</span>! 👋</h1>
-          <p style="color:rgba(255,255,255,.5);font-size:14px;margin-top:4px;">Here's your WOW account overview</p>
-        </div>
-        <a href="../book/water-park.html" class="btn btn-primary" style="white-space:nowrap;">
-          🎟️ Book Tickets
-        </a>
-      </div>
-
-      <!-- Stats Row -->
-      <div class="dash-grid-3" style="margin-bottom:24px;">
-        <div class="stat-card">
-          <div class="stat-icon blue">🎟️</div>
-          <div>
-            <div class="stat-val">12</div>
-            <div class="stat-lbl">Total Bookings</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon gold">⭐</div>
-          <div>
-            <div class="stat-val">2,450</div>
-            <div class="stat-lbl">Loyalty Points</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon green">💰</div>
-          <div>
-            <div class="stat-val">₹340</div>
-            <div class="stat-lbl">Rewards Value</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Passport Card -->
-      <div class="passport-card" style="margin-bottom:24px;">
-        <div class="passport-title">Annual Passport</div>
-        <div class="passport-name" id="passportName">Rajesh Kumar</div>
-        <div class="passport-plan">Gold Passport — Water Park + Amusement Park</div>
-        <div class="passport-valid">✓ Valid until 31 March 2027</div>
-        <div class="passport-visits">
-          <div class="passport-visits-num">24</div>
-          <div class="passport-visits-lbl">Visits This Year</div>
-        </div>
-      </div>
-
-      <div class="dash-grid" style="margin-bottom:24px;">
-        <!-- Recent Bookings -->
-        <div class="widget-card">
-          <div class="widget-title">Recent Bookings</div>
-          <div class="booking-row">
-            <div class="booking-badge">🌊</div>
-            <div class="booking-info">
-              <div class="booking-name">Water Park — 3 Adults</div>
-              <div class="booking-meta">BK-2026-08841 · 28 Mar 2026</div>
-            </div>
-            <span class="booking-status status-confirmed">Confirmed</span>
-          </div>
-          <div class="booking-row">
-            <div class="booking-badge">🎢</div>
-            <div class="booking-info">
-              <div class="booking-name">Combo Deal — 2 Adults, 1 Child</div>
-              <div class="booking-meta">BK-2026-08712 · 15 Mar 2026</div>
-            </div>
-            <span class="booking-status status-used">Used</span>
-          </div>
-          <div class="booking-row">
-            <div class="booking-badge">🎡</div>
-            <div class="booking-info">
-              <div class="booking-name">Amusement Park — 4 Adults</div>
-              <div class="booking-meta">BK-2026-08401 · 5 Mar 2026</div>
-            </div>
-            <span class="booking-status status-used">Used</span>
-          </div>
-          <div class="booking-row">
-            <div class="booking-badge">🎟️</div>
-            <div class="booking-info">
-              <div class="booking-name">Annual Passport Renewal</div>
-              <div class="booking-meta">BK-2026-07991 · 1 Apr 2026</div>
-            </div>
-            <span class="booking-status status-pending">Upcoming</span>
-          </div>
-          <div style="margin-top:16px;">
-            <a href="my-bookings.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;">View all bookings →</a>
-          </div>
-        </div>
-
-        <!-- Loyalty & Offers -->
-        <div>
-          <!-- Loyalty -->
-          <div class="widget-card" style="margin-bottom:20px;">
-            <div class="widget-title">Loyalty Status</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-              <span class="tier-badge tier-gold">🥇 Gold Tier</span>
-              <span style="font-size:13px;color:rgba(255,255,255,.5);">2,450 pts</span>
-            </div>
-            <div class="loyalty-bar-wrap">
-              <div class="loyalty-bar-label">
-                <span>Gold (2,000)</span><span>Platinum at 5,000</span>
-              </div>
-              <div class="loyalty-bar">
-                <div class="loyalty-bar-fill" style="width:49%;"></div>
-              </div>
-            </div>
-            <p style="font-size:12px;color:rgba(255,255,255,.45);margin-top:10px;">Earn 2,550 more points to reach Platinum tier.</p>
-            <a href="loyalty.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;display:block;margin-top:10px;">View full history →</a>
-          </div>
-          <!-- Offers -->
-          <div class="widget-card">
-            <div class="widget-title">Active Offers for You</div>
-            <div class="offer-chip">
-              <div class="offer-chip-icon">🎯</div>
-              <div class="offer-chip-info">
-                <div class="offer-chip-title">Gold Member: 15% Off Combo</div>
-                <div class="offer-chip-sub">Valid till 31 May 2026</div>
-              </div>
-              <a href="../book/combo.html" class="offer-chip-cta">Use →</a>
-            </div>
-            <div class="offer-chip">
-              <div class="offer-chip-icon">🎂</div>
-              <div class="offer-chip-info">
-                <div class="offer-chip-title">Birthday Month: Free Entry</div>
-                <div class="offer-chip-sub">Redeem in April</div>
-              </div>
-              <a href="../book/water-park.html" class="offer-chip-cta">Redeem →</a>
-            </div>
-            <div class="offer-chip">
-              <div class="offer-chip-icon">👨‍👩‍👧</div>
-              <div class="offer-chip-info">
-                <div class="offer-chip-title">Bring a Friend: ₹200 Off</div>
-                <div class="offer-chip-sub">Min 2 tickets</div>
-              </div>
-              <a href="../book/water-park.html" class="offer-chip-cta">Apply →</a>
-            </div>
-            <a href="offers.html" style="font-size:13px;color:#F5A800;font-weight:600;text-decoration:none;display:block;margin-top:10px;">See all offers →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="widget-card" style="margin-bottom:24px;">
-        <div class="widget-title">Quick Actions</div>
-        <div class="quick-links">
-          <a href="../book/water-park.html" class="quick-link-btn">
-            <span class="quick-link-icon">🌊</span>
-            <span class="quick-link-lbl">Book Water Park</span>
-          </a>
-          <a href="../book/amusement-park.html" class="quick-link-btn">
-            <span class="quick-link-icon">🎢</span>
-            <span class="quick-link-lbl">Book Amusement</span>
-          </a>
-          <a href="../book/combo.html" class="quick-link-btn">
-            <span class="quick-link-icon">🎡</span>
-            <span class="quick-link-lbl">Combo Deal</span>
-          </a>
-          <a href="../book/passport.html" class="quick-link-btn">
-            <span class="quick-link-icon">🛂</span>
-            <span class="quick-link-lbl">Annual Passport</span>
-          </a>
-          <a href="tickets.html" class="quick-link-btn">
-            <span class="quick-link-icon">📱</span>
-            <span class="quick-link-lbl">View Tickets</span>
-          </a>
-          <a href="profile.html" class="quick-link-btn">
-            <span class="quick-link-icon">⚙️</span>
-            <span class="quick-link-lbl">Account Settings</span>
-          </a>
-          <a href="../plan-your-visit.html" class="quick-link-btn">
-            <span class="quick-link-icon">🗺️</span>
-            <span class="quick-link-lbl">Plan Your Visit</span>
-          </a>
-          <a href="../contact.html" class="quick-link-btn">
-            <span class="quick-link-icon">💬</span>
-            <span class="quick-link-lbl">Get Help</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Upcoming Visit Banner -->
-      <div style="background:linear-gradient(135deg,#0a3d62,#1a5276);border-radius:16px;padding:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-        <div style="font-size:48px;">🎉</div>
-        <div style="flex:1;">
-          <div style="font-size:18px;font-weight:800;color:#fff;">You have an upcoming visit!</div>
-          <div style="font-size:14px;color:rgba(255,255,255,.6);margin-top:4px;">Water Park — 28 March 2026 · 3 guests · BK-2026-08841</div>
-        </div>
-        <a href="tickets.html" class="btn btn-primary">View Tickets</a>
-      </div>
-
-    </main>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="../index.html" class="sidebar-brand">
+    <div class="mark">W</div>
+    <div><span class="lbl">Worlds of Wonder</span><small>Customer Portal</small></div>
+  </a>
+  <div class="user-card">
+    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Rajesh" class="user-avatar" alt="Avatar"/>
+    <div>
+      <div class="user-name">Rajesh Kumar</div>
+      <div class="user-meta">+91 98765 43210</div>
+      <div class="user-tier">⭐ Silver Passport</div>
+    </div>
   </div>
-</div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">My WOW</div>
+      <a href="dashboard.html" class="nav-item active"><i class="fa fa-home"></i>Dashboard</a>
+      <a href="tickets.html" class="nav-item"><i class="fa fa-ticket-alt"></i>My Tickets<span class="nav-badge">2</span></a>
+      <a href="my-bookings.html" class="nav-item"><i class="fa fa-calendar-check"></i>Bookings</a>
+      <a href="wow-passport.html" class="nav-item"><i class="fa fa-id-card"></i>WOW Passport</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Benefits</div>
+      <a href="loyalty.html" class="nav-item"><i class="fa fa-star"></i>Loyalty Points<span class="nav-badge">1,240</span></a>
+      <a href="wallet.html" class="nav-item"><i class="fa fa-wallet"></i>WOW Wallet</a>
+      <a href="offers.html" class="nav-item"><i class="fa fa-tag"></i>My Offers</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <a href="notifications.html" class="nav-item"><i class="fa fa-bell"></i>Notifications<span class="nav-badge">3</span></a>
+      <a href="profile.html" class="nav-item"><i class="fa fa-user"></i>Profile</a>
+      <a href="login.html" class="nav-item"><i class="fa fa-sign-out-alt"></i>Logout</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Plan Visit</div>
+      <a href="../book/water-park.html" class="nav-item"><i class="fa fa-swimmer"></i>Book Water Park</a>
+      <a href="../book/amusement-park.html" class="nav-item"><i class="fa fa-dharmachakra"></i>Book Amusement Park</a>
+      <a href="../book/combo.html" class="nav-item"><i class="fa fa-layer-group"></i>Book Combo</a>
+      <a href="../book/group.html" class="nav-item"><i class="fa fa-users"></i>Group Booking</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="icon-btn" id="menuToggle" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none;">
+        <i class="fa fa-bars" style="color:var(--slate);"></i>
+      </button>
+      <div class="topbar-greeting">
+        Good afternoon, Rajesh! 👋
+        <small id="todayDate">Saturday, 28 March 2026</small>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+        <span style="color:var(--green);">⬤</span> Park Open · 38°C ☀️
+      </div>
+      <div class="icon-btn" onclick="window.location='notifications.html'" style="position:relative;">
+        <i class="fa fa-bell" style="color:var(--muted);font-size:15px;"></i>
+        <div class="notif-dot"></div>
+      </div>
+      <a href="../book/combo.html" class="btn btn-brand btn-sm"><i class="fa fa-ticket-alt"></i> Book Now</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner" style="margin-bottom:24px;">
+      <div>
+        <h2>Welcome back, Rajesh! 🎉</h2>
+        <p>Your next splash is just 8 days away. Park is open today — 9 AM to 6 PM.</p>
+        <div class="chip-row">
+          <div class="chip"><i class="fa fa-calendar-check"></i> Next visit: <strong>Sat, 5 Apr 2026</strong></div>
+          <div class="chip weather-chip"><i class="fa fa-sun"></i> 38°C · Sunny · Perfect pool day!</div>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:24px;">
+        <div style="font-size:11px;opacity:.7;">WOW Passport Tier</div>
+        <div style="font-size:28px;font-weight:900;color:var(--yellow);">🥈 Silver</div>
+        <div style="font-size:11px;opacity:.7;margin-top:2px;">3 visits remaining</div>
+        <a href="wow-passport.html" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);margin-top:10px;">View Passport</a>
+      </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="quick-stats">
+      <a href="tickets.html" class="qs-card" style="text-decoration:none;color:inherit;">
+        <div class="qs-icon" style="background:#fff3ee;"><i class="fa fa-ticket-alt" style="color:var(--brand);font-size:22px;"></i></div>
+        <div>
+          <div class="qs-label">Active Tickets</div>
+          <div class="qs-value">2</div>
+          <div class="qs-sub">For Apr 5, 2026</div>
+          <div class="qs-trend trend-up"><i class="fa fa-arrow-up"></i> Combo Pack</div>
+        </div>
+      </a>
+      <a href="loyalty.html" class="qs-card" style="text-decoration:none;color:inherit;">
+        <div class="qs-icon" style="background:#f0fdf4;"><i class="fa fa-star" style="color:#15803d;font-size:22px;"></i></div>
+        <div>
+          <div class="qs-label">WOW Coins</div>
+          <div class="qs-value">1,240</div>
+          <div class="qs-sub">≈ ₹620 redeemable</div>
+          <div class="qs-trend trend-up"><i class="fa fa-arrow-up"></i> +50 last visit</div>
+        </div>
+      </a>
+      <a href="wallet.html" class="qs-card" style="text-decoration:none;color:inherit;">
+        <div class="qs-icon" style="background:#f0fdfa;"><i class="fa fa-wallet" style="color:#0f766e;font-size:22px;"></i></div>
+        <div>
+          <div class="qs-label">Wallet Balance</div>
+          <div class="qs-value">₹850</div>
+          <div class="qs-sub">WOW Wallet</div>
+          <div class="qs-trend trend-warn"><i class="fa fa-info-circle"></i> Auto-reload at ₹200</div>
+        </div>
+      </a>
+      <a href="wow-passport.html" class="qs-card" style="text-decoration:none;color:inherit;">
+        <div class="qs-icon" style="background:#f5f3ff;"><i class="fa fa-id-card" style="color:var(--purple);font-size:22px;"></i></div>
+        <div>
+          <div class="qs-label">Passport Visits</div>
+          <div class="qs-value">9/12</div>
+          <div class="qs-sub">Silver · 3 left</div>
+          <div class="qs-trend trend-up"><i class="fa fa-crown"></i> Upgrade available</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- COUNTDOWN BANNER -->
+    <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:14px;padding:18px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;color:#fff;">
+      <div>
+        <div style="font-size:11px;opacity:.6;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Your Next Visit Countdown</div>
+        <div style="font-size:14px;font-weight:700;">💧 Water Park + 🎢 Amusement Combo · Apr 5, 2026</div>
+      </div>
+      <div style="display:flex;gap:14px;text-align:center;" id="countdownTimer">
+        <div><div class="countdown-num" id="cd-days">08</div><div style="font-size:9px;opacity:.6;text-transform:uppercase;">Days</div></div>
+        <div style="font-size:22px;opacity:.4;line-height:1.4;">:</div>
+        <div><div class="countdown-num" id="cd-hours">--</div><div style="font-size:9px;opacity:.6;text-transform:uppercase;">Hours</div></div>
+        <div style="font-size:22px;opacity:.4;line-height:1.4;">:</div>
+        <div><div class="countdown-num" id="cd-mins">--</div><div style="font-size:9px;opacity:.6;text-transform:uppercase;">Mins</div></div>
+        <div style="font-size:22px;opacity:.4;line-height:1.4;">:</div>
+        <div><div class="countdown-num" id="cd-secs">--</div><div style="font-size:9px;opacity:.6;text-transform:uppercase;">Secs</div></div>
+      </div>
+      <a href="tickets.html" class="btn btn-sm" style="background:var(--brand);color:#fff;flex-shrink:0;">View Ticket</a>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- UPCOMING BOOKING CARD -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <span class="card-title">🎟 Upcoming Visit</span>
+            <a href="tickets.html" class="btn btn-outline btn-sm">All Tickets</a>
+          </div>
+          <div class="ticket-card">
+            <div class="ticket-top">
+              <div>
+                <div class="ticket-title">💧 Water Park + 🎢 Amusement Combo</div>
+                <div class="ticket-sub">Worlds of Wonder · Sector 38A, Noida · Gate 1</div>
+              </div>
+              <div class="ticket-date-box">
+                <div class="ticket-date">05 Apr</div>
+                <small>Saturday 2026</small>
+              </div>
+            </div>
+            <hr class="ticket-divider"/>
+            <div class="ticket-row"><span>Guest</span><span>Rajesh Kumar + 2 guests</span></div>
+            <div class="ticket-row"><span>Entry Time</span><span>Any Time (9 AM – 6 PM)</span></div>
+            <div class="ticket-row"><span>Booking ID</span><span>#WOW-2026-49820</span></div>
+            <div class="ticket-row"><span>Status</span><span><span class="badge badge-green" style="background:rgba(6,214,160,.25);color:#a7f3d0;">✓ Confirmed</span></span></div>
+            <div class="ticket-actions">
+              <div class="ticket-qr" id="dash-qr-1">⬛</div>
+              <button class="t-btn" onclick="alert('Downloading ticket PDF…')"><i class="fa fa-download"></i> Download</button>
+              <button class="t-btn" onclick="alert('Opening WhatsApp share…')"><i class="fab fa-whatsapp"></i> Share</button>
+              <button class="t-btn" onclick="alert('Adding to calendar…')"><i class="fa fa-calendar-plus"></i> Add to Cal</button>
+            </div>
+          </div>
+
+          <!-- RECENT BOOKINGS -->
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;margin-top:4px;">Recent Bookings</div>
+          <a href="my-bookings.html" class="booking-item">
+            <div class="booking-icon" style="background:#f0fdf4;">🎢</div>
+            <div>
+              <div class="booking-title">Amusement Park Family Visit</div>
+              <div class="booking-meta">15 Feb 2026 · 4 guests · WOW-2026-42180</div>
+            </div>
+            <div class="booking-right">
+              <div class="badge badge-green">Completed</div>
+              <div class="booking-amt">₹2,796</div>
+            </div>
+          </a>
+          <a href="my-bookings.html" class="booking-item">
+            <div class="booking-icon" style="background:#fff3ee;">💧</div>
+            <div>
+              <div class="booking-title">Water Park Solo Day</div>
+              <div class="booking-meta">12 Jan 2026 · 1 guest · WOW-2026-38420</div>
+            </div>
+            <div class="booking-right">
+              <div class="badge badge-green">Completed</div>
+              <div class="booking-amt">₹799</div>
+            </div>
+          </a>
+          <a href="my-bookings.html" class="booking-item">
+            <div class="booking-icon" style="background:#f5f3ff;">🎯</div>
+            <div>
+              <div class="booking-title">Combo Pack — New Year Eve</div>
+              <div class="booking-meta">31 Dec 2025 · 3 guests · WOW-2025-80012</div>
+            </div>
+            <div class="booking-right">
+              <div class="badge badge-green">Completed</div>
+              <div class="booking-amt">₹3,597</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- PERSONALISED OFFERS -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <span class="card-title">🔥 Offers Just For You</span>
+            <a href="offers.html" class="btn btn-outline btn-sm">All Offers</a>
+          </div>
+          <div class="offers-grid">
+            <div class="offer-card" style="background:linear-gradient(135deg,var(--brand),#f97316);" onclick="copyCode('SILVER20')">
+              <div class="offer-tag">EXCLUSIVE</div>
+              <div class="offer-title">20% Off Combo</div>
+              <div class="offer-desc">Silver Passport members only</div>
+              <div class="offer-code">SILVER20</div>
+              <div class="offer-expires">Expires 30 Apr</div>
+            </div>
+            <div class="offer-card" style="background:linear-gradient(135deg,#0f766e,#0d9488);" onclick="copyCode('FOOD150')">
+              <div class="offer-tag">WEEKEND</div>
+              <div class="offer-title">F&B ₹150 Off</div>
+              <div class="offer-desc">On orders above ₹500 — use at food court</div>
+              <div class="offer-code">FOOD150</div>
+              <div class="offer-expires">Weekends only</div>
+            </div>
+            <div class="offer-card" style="background:linear-gradient(135deg,var(--purple),#6d28d9);" onclick="copyCode('BDAY25')">
+              <div class="offer-tag">BIRTHDAY</div>
+              <div class="offer-title">Free Entry</div>
+              <div class="offer-desc">On your birthday, bring 2 friends free</div>
+              <div class="offer-code">BDAY25</div>
+              <div class="offer-expires">On your birthday</div>
+            </div>
+          </div>
+          <div id="copy-toast" style="display:none;margin-top:10px;background:#d1fae5;color:#065f46;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;text-align:center;"></div>
+        </div>
+
+        <!-- SPENDING HISTORY CHART -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <span class="card-title">📊 My Spending History</span>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-outline btn-sm" onclick="switchChart('bar')" id="btnBar">Bar</button>
+              <button class="btn btn-outline btn-sm" onclick="switchChart('line')" id="btnLine">Line</button>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="spend-chart"></canvas></div>
+          <div style="display:flex;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+            <div style="flex:1;text-align:center;">
+              <div style="font-size:18px;font-weight:800;color:var(--brand);">₹11,888</div>
+              <div style="font-size:11px;color:var(--muted);">Total Spent</div>
+            </div>
+            <div style="flex:1;text-align:center;border-left:1px solid var(--border);">
+              <div style="font-size:18px;font-weight:800;color:var(--green);">6</div>
+              <div style="font-size:11px;color:var(--muted);">Total Visits</div>
+            </div>
+            <div style="flex:1;text-align:center;border-left:1px solid var(--border);">
+              <div style="font-size:18px;font-weight:800;color:var(--purple);">₹1,981</div>
+              <div style="font-size:11px;color:var(--muted);">Avg per Visit</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISIT TIMELINE -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🗓 Visit History</span><a href="my-bookings.html" class="btn btn-outline btn-sm">Full History</a></div>
+          <div class="visit-timeline">
+            <div class="vt-item">
+              <div class="vt-dot" style="background:var(--brand);"></div>
+              <div class="vt-title">Combo Pack — Upcoming</div>
+              <div class="vt-meta">5 Apr 2026 · 3 pax · WOW-2026-49820 <span class="badge badge-blue" style="margin-left:4px;">Upcoming</span></div>
+            </div>
+            <div class="vt-item">
+              <div class="vt-dot" style="background:var(--green);"></div>
+              <div class="vt-title">Amusement Park — Family</div>
+              <div class="vt-meta">15 Feb 2026 · 4 pax · ₹2,796 <span class="badge badge-green" style="margin-left:4px;">Completed</span></div>
+            </div>
+            <div class="vt-item">
+              <div class="vt-dot" style="background:var(--green);"></div>
+              <div class="vt-title">Water Park — Solo</div>
+              <div class="vt-meta">12 Jan 2026 · 1 pax · ₹799 <span class="badge badge-green" style="margin-left:4px;">Completed</span></div>
+            </div>
+            <div class="vt-item">
+              <div class="vt-dot" style="background:var(--green);"></div>
+              <div class="vt-title">Combo Pack — New Year</div>
+              <div class="vt-meta">31 Dec 2025 · 3 pax · ₹3,597 <span class="badge badge-green" style="margin-left:4px;">Completed</span></div>
+            </div>
+            <div class="vt-item">
+              <div class="vt-dot" style="background:var(--muted);"></div>
+              <div class="vt-title">Water Park — Weekend</div>
+              <div class="vt-meta">5 Nov 2025 · 2 pax · ₹1,598 <span class="badge badge-green" style="margin-left:4px;">Completed</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left column -->
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <!-- LOYALTY WIDGET -->
+        <div class="loyalty-widget">
+          <div style="font-size:12px;font-weight:700;opacity:.7;letter-spacing:1px;">WOW LOYALTY</div>
+          <div style="display:flex;align-items:center;gap:10px;margin:10px 0 4px;">
+            <div style="font-size:30px;">⭐</div>
+            <div>
+              <div class="coins-big">1,240</div>
+              <div style="font-size:11px;opacity:.7;">WOW Coins · Worth ₹620</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+              <span>🥈 Silver → 🥇 Gold</span><span>1,240 / 2,000</span>
+            </div>
+            <div class="tier-bar"><div class="tier-fill" style="width:62%;"></div></div>
+            <div style="font-size:10px;opacity:.6;margin-top:2px;">760 more coins to unlock Gold tier</div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;">
+            <a href="loyalty.html" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.2);flex:1;justify-content:center;">History</a>
+            <button class="btn btn-sm" style="background:var(--yellow);color:var(--navy);flex:1;font-weight:800;" onclick="alert('Redeem at checkout — select WOW Coins as payment.')">Redeem</button>
+          </div>
+        </div>
+
+        <!-- WALLET WIDGET -->
+        <div class="wallet-widget">
+          <div style="font-size:12px;font-weight:700;opacity:.7;letter-spacing:1px;">WOW WALLET</div>
+          <div class="wallet-balance">₹850.00</div>
+          <div style="font-size:11px;opacity:.7;margin-bottom:4px;">Auto-reloads at ₹200 · Linked to UPI</div>
+          <div style="background:rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:3px;"><span>Last Top-up</span><span>₹500 · 20 Mar 2026</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;"><span>Last Used</span><span>₹150 F&B · 28 Mar 2026</span></div>
+          </div>
+          <div class="wallet-actions">
+            <a href="wallet.html" class="wallet-btn"><i class="fa fa-plus"></i> Top Up</a>
+            <a href="wallet.html" class="wallet-btn"><i class="fa fa-history"></i> History</a>
+            <div class="wallet-btn" onclick="alert('Bank withdrawal coming soon!')"><i class="fa fa-university"></i> Withdraw</div>
+          </div>
+        </div>
+
+        <!-- PASSPORT WIDGET -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><span class="card-title">🛂 WOW Passport</span><a href="wow-passport.html" class="btn btn-outline btn-sm">View</a></div>
+          <div class="passport-mini">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+              <div>
+                <div style="font-size:9px;opacity:.5;letter-spacing:1.5px;">WORLDS OF WONDER</div>
+                <div style="font-size:16px;font-weight:800;margin-top:2px;">RAJESH KUMAR</div>
+                <div style="font-size:10px;opacity:.6;margin-top:1px;">ID: WOW-SLV-2024-00847</div>
+              </div>
+              <div style="background:var(--yellow);color:var(--navy);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;">🥈 SILVER</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+              <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:20px;font-weight:900;">9</div>
+                <div style="font-size:9px;opacity:.5;">Used</div>
+              </div>
+              <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:20px;font-weight:900;">3</div>
+                <div style="font-size:9px;opacity:.5;">Left</div>
+              </div>
+              <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:20px;font-weight:900;">20%</div>
+                <div style="font-size:9px;opacity:.5;">Discount</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,.07);border-radius:6px;padding:6px 10px;">
+              <div style="font-size:9px;font-family:monospace;opacity:.4;">P&lt;WOWKUMAR&lt;RAJESH&lt;&lt;&lt;&lt;WOW-SLV-2024-00847</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <a href="wow-passport.html" class="btn btn-outline btn-sm" style="flex:1;justify-content:center;"><i class="fa fa-eye"></i> View</a>
+            <a href="../passport.html" class="btn btn-brand btn-sm" style="flex:1;justify-content:center;"><i class="fa fa-arrow-up"></i> Upgrade to Gold</a>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><span class="card-title">⚡ Quick Actions</span></div>
+          <div class="qa-grid">
+            <a href="../book/water-park.html" class="qa-item" style="background:#fff3ee;border:1.5px solid #ffd8c4;">
+              <div style="font-size:24px;margin-bottom:4px;">💧</div>
+              <div style="font-size:12px;font-weight:700;color:var(--brand);">Book Water Park</div>
+            </a>
+            <a href="../book/amusement-park.html" class="qa-item" style="background:#f0fdf4;border:1.5px solid #bbf7d0;">
+              <div style="font-size:24px;margin-bottom:4px;">🎢</div>
+              <div style="font-size:12px;font-weight:700;color:#15803d;">Book Amusement</div>
+            </a>
+            <a href="../book/combo.html" class="qa-item" style="background:#f5f3ff;border:1.5px solid #ddd6fe;">
+              <div style="font-size:24px;margin-bottom:4px;">🎯</div>
+              <div style="font-size:12px;font-weight:700;color:var(--purple);">Combo Deal</div>
+            </a>
+            <a href="../groups/birthdays.html" class="qa-item" style="background:#fef9c3;border:1.5px solid #fde68a;">
+              <div style="font-size:24px;margin-bottom:4px;">🎂</div>
+              <div style="font-size:12px;font-weight:700;color:#854d0e;">Plan Birthday</div>
+            </a>
+            <a href="../book/group.html" class="qa-item" style="background:#dbeafe;border:1.5px solid #bfdbfe;">
+              <div style="font-size:24px;margin-bottom:4px;">👥</div>
+              <div style="font-size:12px;font-weight:700;color:#1e40af;">Group Booking</div>
+            </a>
+            <a href="../passport.html" class="qa-item" style="background:#ffe4e6;border:1.5px solid #fecdd3;">
+              <div style="font-size:24px;margin-bottom:4px;">🪪</div>
+              <div style="font-size:12px;font-weight:700;color:#be123c;">Buy Passport</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- RECENT NOTIFICATIONS -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔔 Notifications</span><a href="notifications.html" class="btn btn-outline btn-sm">All</a></div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green);"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">Booking confirmed for Apr 5</div>
+              <div style="font-size:11px;color:var(--muted);">2 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--yellow);"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">SILVER20 code activated for you</div>
+              <div style="font-size:11px;color:var(--muted);">1 hr ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--teal);"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">+50 WOW Coins added for last visit</div>
+              <div style="font-size:11px;color:var(--muted);">15 Feb 2026</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--purple);"></div>
+            <div>
+              <div style="font-size:13px;font-weight:600;">Wallet auto-topped up ₹500</div>
+              <div style="font-size:11px;color:var(--muted);">20 Mar 2026</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right column -->
+    </div><!-- /main-grid -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
-  // Load user data from localStorage
-  const user = JSON.parse(localStorage.getItem('wow_user') || '{"name":"Rajesh Kumar","email":"rajesh@example.com"}');
-  const firstName = (user.name || 'Guest').split(' ')[0];
-  document.getElementById('userName').textContent = firstName;
-  document.getElementById('passportName').textContent = user.name || 'Guest';
-  document.getElementById('signOutBtn').addEventListener('click', function(e){
-    e.preventDefault();
-    localStorage.removeItem('wow_user');
-    localStorage.removeItem('wow_auth');
-    window.location.href = 'login.html';
+// ── Today date ──
+const now = new Date();
+document.getElementById('todayDate').textContent = now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── QR Code ──
+try{
+  new QRCode(document.getElementById('dash-qr-1'),{
+    text:'WOW-2026-49820|Combo|2026-04-05|Rajesh Kumar',
+    width:56,height:56,colorDark:'#0a1628',colorLight:'#ff6b35'
   });
+}catch(e){document.getElementById('dash-qr-1').innerHTML='<i class="fa fa-qrcode" style="font-size:28px;color:rgba(255,255,255,.6);"></i>';}
+
+// ── Countdown ──
+const visitDate = new Date('2026-04-05T09:00:00');
+function updateCountdown(){
+  const diff = visitDate - new Date();
+  if(diff <= 0){ document.getElementById('countdownTimer').innerHTML='<div style="font-size:16px;font-weight:700;color:var(--yellow);">🎉 Today is the day!</div>'; return; }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+
+// ── Spend Chart ──
+const spendLabels = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+const spendData = [1299,0,3597,799,2796,3397];
+let spendChart;
+function buildChart(type){
+  if(spendChart) spendChart.destroy();
+  spendChart = new Chart(document.getElementById('spend-chart'),{
+    type,
+    data:{
+      labels:spendLabels,
+      datasets:[{
+        label:'Spent (₹)',
+        data:spendData,
+        backgroundColor:'rgba(255,107,53,.65)',
+        borderColor:'var(--brand)',
+        borderWidth:2,
+        borderRadius:type==='bar'?6:0,
+        fill:type==='line',
+        tension:.35,
+        pointBackgroundColor:'var(--brand)',
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'₹'+ctx.parsed.y.toLocaleString('en-IN')}}},
+      scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')},grid:{color:'rgba(0,0,0,.04)'}}}
+    }
+  });
+}
+buildChart('bar');
+function switchChart(type){
+  buildChart(type);
+  document.getElementById('btnBar').style.borderColor = type==='bar'?'var(--brand)':'var(--border)';
+  document.getElementById('btnLine').style.borderColor = type==='line'?'var(--brand)':'var(--border)';
+}
+
+// ── Copy promo code ──
+function copyCode(code){
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const toast = document.getElementById('copy-toast');
+  toast.textContent = '✓ Code "'+code+'" copied to clipboard!';
+  toast.style.display='block';
+  setTimeout(()=>toast.style.display='none',3000);
+}
+
+// ── Mobile menu toggle show ──
+if(window.innerWidth < 600){
+  document.getElementById('menuToggle').style.display='grid';
+}
+window.addEventListener('resize',()=>{
+  document.getElementById('menuToggle').style.display = window.innerWidth<600?'grid':'none';
+});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
