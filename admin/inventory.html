@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Inventory — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<style>
+.inv-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px; }
+.inv-item { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;position:relative; }
+.inv-item.low { border-color:var(--red); }
+.inv-item.warn { border-color:var(--amber); }
+.inv-item.ok { border-color:var(--green); }
+.inv-item-name { font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px; }
+.inv-item-cat { font-size:11px;color:var(--muted); }
+.inv-progress { height:6px;background:var(--bg3);border-radius:6px;margin:10px 0; }
+.inv-progress-fill { height:100%;border-radius:6px;transition:width .3s; }
+.stock-val { font-size:28px;font-weight:900;font-family:'Nunito',sans-serif; }
+.stock-lbl { font-size:11px;color:var(--muted); }
+.inv-action-row { display:flex;gap:6px;margin-top:10px; }
+.adm-table { width:100%;border-collapse:collapse; }
+.adm-table th { background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left; }
+.adm-table td { padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px; }
+</style>
+</head>
+<body>
+<div class="adm-layout">
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <a href="tickets.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Tickets Issued</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="inventory.html" class="adm-nav-item active"><span class="nav-icon">📦</span> Inventory</a>
+    <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="fnb-packages.html" class="adm-nav-item"><span class="nav-icon">🥗</span> F&amp;B Packages</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
+    <a href="ops-dashboard.html" class="adm-nav-item"><span class="nav-icon">🎡</span> Ops Dashboard</a>
+    <a href="call-center.html" class="adm-nav-item"><span class="nav-icon">📞</span> Call Center ERP</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <div class="adm-nav-section">Content &amp; System</div>
+    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
+    <div style="margin-top:auto;"></div>
+    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user"><div class="adm-user-avatar">SA</div><div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div></div>
+  </div>
+</aside>
+<main class="adm-main">
+  <div class="adm-topbar">
+    <div><div class="adm-topbar-title">📦 Inventory Management</div><div class="adm-topbar-sub">Stock levels · Replenishment alerts · Category management</div></div>
+    <div class="adm-topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="addItem()"><i class="fa fa-plus"></i> Add Item</button>
+      <button class="btn btn-primary btn-sm" onclick="exportInventory()"><i class="fa fa-download"></i> Export</button>
+    </div>
+  </div>
+  <div class="adm-content">
+
+    <!-- KPI strip -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;">142</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Total SKUs</div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--red);border-radius:var(--r-md);padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--red);">8</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Critical Low Stock</div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--amber);border-radius:var(--r-md);padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--amber);">14</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Reorder Needed</div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--green);border-radius:var(--r-md);padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--green);">120</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Adequate Stock</div>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="filterCat(this,'')">All</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'F&B')">🥗 F&B</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Merchandise')">🛍 Merchandise</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Costumes')">👗 Costumes</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Safety')">🦺 Safety</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Lockers')">🔒 Lockers</button>
+    </div>
+
+    <!-- Inventory Grid -->
+    <div class="inv-grid" id="inv-grid"></div>
+
+    <!-- Recent Movements -->
+    <div class="card">
+      <div class="card-header"><span class="section-title" style="margin:0;">📋 Recent Stock Movements</span></div>
+      <table class="adm-table">
+        <thead><tr><th>Time</th><th>Item</th><th>Action</th><th>Qty</th><th>By</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--muted);">10:30</td><td>Life Jackets (Small)</td><td><span class="badge badge-green" style="font-size:10px;">Restock</span></td><td>+50</td><td>Suresh Kumar</td><td>Morning restock</td></tr>
+          <tr><td style="color:var(--muted);">10:15</td><td>Sunscreen Lotion 100ml</td><td><span class="badge badge-red" style="font-size:10px;">Issue</span></td><td>-120</td><td>System</td><td>Dispensed at entry gates</td></tr>
+          <tr><td style="color:var(--muted);">09:50</td><td>Costume Set — Superhero</td><td><span class="badge badge-blue" style="font-size:10px;">Reserved</span></td><td>-5</td><td>Events Team</td><td>School booking DPS</td></tr>
+          <tr><td style="color:var(--muted);">09:30</td><td>Locker Keys (A-Block)</td><td><span class="badge badge-green" style="font-size:10px;">Restock</span></td><td>+200</td><td>IT Dept</td><td>New batch received</td></tr>
+          <tr><td style="color:var(--muted);">09:00</td><td>Mineral Water 500ml</td><td><span class="badge badge-amber" style="font-size:10px;">Consumed</span></td><td>-480</td><td>F&B System</td><td>Auto-deducted from POS</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+const inventory = [
+  {name:'Life Jackets (Large)',    cat:'Safety',      stock:84,  max:200, unit:'Pcs',  low:50},
+  {name:'Life Jackets (Medium)',   cat:'Safety',      stock:62,  max:200, unit:'Pcs',  low:50},
+  {name:'Life Jackets (Small)',    cat:'Safety',      stock:18,  max:150, unit:'Pcs',  low:40},
+  {name:'Goggles (Swimming)',      cat:'Safety',      stock:124, max:300, unit:'Pcs',  low:60},
+  {name:'Sunscreen Lotion 100ml',  cat:'F&B',         stock:220, max:1000,unit:'Btls', low:200},
+  {name:'Mineral Water 500ml',     cat:'F&B',         stock:1840,max:5000,unit:'Btls', low:1000},
+  {name:'Soft Drinks 250ml',       cat:'F&B',         stock:940, max:3000,unit:'Cans', low:500},
+  {name:'Costume Set — Superhero', cat:'Costumes',    stock:12,  max:50,  unit:'Sets', low:10},
+  {name:'Costume Set — Princess',  cat:'Costumes',    stock:8,   max:40,  unit:'Sets', low:10},
+  {name:'Locker Keys (A-Block)',   cat:'Lockers',     stock:200, max:400, unit:'Keys', low:80},
+  {name:'Locker Keys (B-Block)',   cat:'Lockers',     stock:45,  max:300, unit:'Keys', low:60},
+  {name:'WOW T-Shirts (Kids)',     cat:'Merchandise', stock:84,  max:500, unit:'Pcs',  low:100},
+  {name:'WOW T-Shirts (Adult)',    cat:'Merchandise', stock:62,  max:500, unit:'Pcs',  low:100},
+  {name:'WOW Caps',                cat:'Merchandise', stock:141, max:400, unit:'Pcs',  low:80},
+  {name:'Photo Print Packages',    cat:'Merchandise', stock:240, max:500, unit:'Pkgs', low:100},
+  {name:'First Aid Kits',          cat:'Safety',      stock:22,  max:40,  unit:'Kits', low:10},
+];
+
+let currentCat = '';
+
+function stockLevel(stock, max) { return Math.round(stock/max*100); }
+function stockClass(stock, max, low) { if(stock <= low*0.5) return 'low'; if(stock <= low) return 'warn'; return 'ok'; }
+function stockColor(stock, max, low) { if(stock <= low*0.5) return 'var(--red)'; if(stock <= low) return 'var(--amber)'; return 'var(--green)'; }
+
+function renderInventory(data) {
+  document.getElementById('inv-grid').innerHTML = data.map(item => {
+    const pct = stockLevel(item.stock, item.max);
+    const cls = stockClass(item.stock, item.max, item.low);
+    const col = stockColor(item.stock, item.max, item.low);
+    return `
+      <div class="inv-item ${cls}">
+        <div class="inv-item-name">${item.name}</div>
+        <div class="inv-item-cat"><span class="badge badge-blue" style="font-size:10px;">${item.cat}</span></div>
+        <div class="inv-progress"><div class="inv-progress-fill" style="width:${pct}%;background:${col};"></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div><span class="stock-val" style="color:${col};">${item.stock}</span> <span class="stock-lbl">${item.unit}</span></div>
+          <div style="text-align:right;font-size:11px;color:var(--muted);">Max: ${item.max} · Low: ${item.low}<br/><b>${pct}%</b> capacity</div>
+        </div>
+        ${cls!=='ok'?`<div style="font-size:11px;font-weight:700;color:${col};margin-top:6px;">${cls==='low'?'🚨 Critical — Order immediately!':'⚠️ Below reorder point'}</div>`:''}
+        <div class="inv-action-row">
+          <button class="btn btn-ghost btn-sm" style="font-size:11px;flex:1;" onclick="restock('${item.name}')"><i class="fa fa-plus"></i> Restock</button>
+          <button class="btn btn-ghost btn-sm" style="font-size:11px;flex:1;" onclick="editItem('${item.name}')"><i class="fa fa-edit"></i> Edit</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.adm-topbar-actions .btn, .adm-content .btn-sm').forEach(b => b.classList.remove('btn-primary'));
+  btn.className = btn.className.replace('btn-ghost','btn-primary');
+  currentCat = cat;
+  renderInventory(cat ? inventory.filter(i => i.cat === cat) : inventory);
+}
+
+function restock(name) { const qty = prompt(`Restock "${name}" — Enter quantity:`,'50'); if(qty) alert(`Restocking ${qty} units of ${name}...`); }
+function editItem(name) { alert(`Opening edit form for: ${name}`); }
+function addItem() { alert('Opening Add Inventory Item form...'); }
+function exportInventory() { alert('Exporting inventory as CSV...'); }
+
+renderInventory(inventory);
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
