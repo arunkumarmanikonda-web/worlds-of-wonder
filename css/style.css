@@ -265,6 +265,20 @@ ul { list-style: none; }
   border-color: rgba(0,110,230,.4);
 }
 
+/* ── Login group (My Account + Business) ── */
+.nav-login-group { display: flex; align-items: center; gap: 6px; }
+.btn-nav-business {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.8); border: 1px solid rgba(255,255,255,.18);
+  border-radius: 9px; padding: 8px 12px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  text-decoration: none; white-space: nowrap;
+  transition: all .2s;
+}
+.btn-nav-business:hover { background: rgba(255,255,255,.15); color: #fff; }
+.site-header.scrolled .btn-nav-business { background: rgba(0,85,179,.06); color: var(--primary); border-color: rgba(0,85,179,.2); }
+
 /* ── Dropdown Mega-Nav ─────────────────────────────────────── */
 .nav-dropdown { position: relative; }
 .nav-dropdown-btn {
