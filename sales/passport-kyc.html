@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Passport KYC & Onboarding — WOW Sales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--gold:#C9A84C;--gold-light:#F0D080;--gold-dark:#9A6F2A;--bg:#0a0a14;--card:#12122a;--card2:#16163a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    /* TOP NAV */
+    .topnav{background:#0e0e22;border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .topnav-brand{display:flex;align-items:center;gap:10px}
+    .topnav-brand .ico{width:34px;height:34px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem}
+    .topnav-brand span{font-weight:800;font-size:.9rem;color:var(--gold)}
+    .topnav-right{display:flex;align-items:center;gap:12px}
+    .btn-back{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.8rem;color:var(--muted);cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;transition:all .2s}
+    .btn-back:hover{color:#fff;border-color:var(--gold)}
+    /* STEPPER */
+    .stepper-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:20px 24px}
+    .stepper{display:flex;align-items:center;max-width:860px;margin:0 auto}
+    .step{display:flex;align-items:center;flex:1;position:relative}
+    .step:last-child{flex:0}
+    .step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:var(--muted);background:var(--bg);transition:all .3s;flex-shrink:0;position:relative;z-index:2}
+    .step.active .step-circle{border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,.3)}
+    .step.done .step-circle{border-color:var(--green);background:var(--green);color:#fff}
+    .step-line{flex:1;height:2px;background:var(--border);margin:0 6px;transition:background .3s}
+    .step.done + .step .step-line,.step.done .step-line{background:var(--green)}
+    .step-label{position:absolute;top:42px;left:50%;transform:translateX(-50%);font-size:.68rem;font-weight:700;color:var(--muted);white-space:nowrap}
+    .step.active .step-label{color:var(--gold)}
+    .step.done .step-label{color:var(--green)}
+    /* MAIN */
+    .page-wrap{max-width:860px;margin:0 auto;padding:28px 24px}
+    /* PANELS */
+    .panel{display:none}
+    .panel.active{display:block}
+    .panel-title{font-size:1.3rem;font-weight:800;margin-bottom:6px}
+    .panel-title span{color:var(--gold)}
+    .panel-sub{font-size:.85rem;color:var(--muted);margin-bottom:24px}
+    /* PLAN SELECTION */
+    .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+    .plan-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:22px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .plan-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-2px)}
+    .plan-card.selected{border-color:var(--gold);background:rgba(201,168,76,.07)}
+    .plan-card.selected::after{content:'✓';position:absolute;top:12px;right:14px;width:22px;height:22px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#0a0a14}
+    .plan-card .plan-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:800;margin-bottom:10px}
+    .plan-card .plan-badge.water{background:rgba(59,130,246,.2);color:#60a5fa}
+    .plan-card .plan-badge.amuse{background:rgba(168,85,247,.2);color:#c084fc}
+    .plan-card .plan-badge.combo{background:rgba(201,168,76,.2);color:var(--gold)}
+    .plan-card .plan-name{font-size:1rem;font-weight:800;margin-bottom:4px}
+    .plan-card .plan-price{font-size:1.5rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif}
+    .plan-card .plan-price span{font-size:.75rem;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:600}
+    .plan-card .plan-features{margin-top:12px;list-style:none}
+    .plan-card .plan-features li{font-size:.78rem;color:var(--muted);margin-bottom:5px;display:flex;align-items:flex-start;gap:6px}
+    .plan-card .plan-features li i{color:var(--gold);margin-top:2px;font-size:.72rem;flex-shrink:0}
+    /* FORM */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-grid.full{grid-template-columns:1fr}
+    .field{margin-bottom:0}
+    .field label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+    .field .input-wrap{position:relative}
+    .field .input-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem}
+    .field input,.field select,.field textarea{width:100%;background:#0d0d22;border:1.5px solid var(--border);border-radius:10px;padding:11px 12px 11px 36px;color:#fff;font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1)}
+    .field input::placeholder,.field textarea::placeholder{color:#44446a}
+    .field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238888aa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .field select option{background:#0d0d22}
+    .field textarea{min-height:80px;padding-top:10px;padding-bottom:10px;resize:vertical}
+    .field.error input,.field.error select{border-color:var(--red)}
+    .field-err{font-size:.72rem;color:var(--red);margin-top:4px;display:none}
+    .field.error .field-err{display:block}
+    /* PHOTO CAPTURE */
+    .photo-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+    .photo-section h3{font-size:.95rem;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+    .photo-section h3 i{color:var(--gold)}
+    .photo-section p{font-size:.8rem;color:var(--muted);margin-bottom:16px}
+    .camera-area{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+    .camera-box{flex:1;min-width:260px;position:relative}
+    .cam-video{width:100%;aspect-ratio:3/4;background:#0d0d22;border-radius:12px;border:2px dashed var(--border);object-fit:cover;display:block}
+    .cam-canvas{display:none}
+    .cam-preview{width:100%;aspect-ratio:3/4;border-radius:12px;border:2px solid var(--gold);object-fit:cover;display:none}
+    .cam-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    .face-guide{width:50%;aspect-ratio:3/4;border:2px dashed rgba(201,168,76,.4);border-radius:50% 50% 40% 40%;opacity:.6}
+    .cam-controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .cam-btn{flex:1;padding:9px;border-radius:9px;border:none;font-size:.8rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;min-width:80px}
+    .cam-btn.primary{background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0a0a14}
+    .cam-btn.outline{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text)}
+    .cam-btn:hover{opacity:.9;transform:translateY(-1px)}
+    .photo-tips{flex:0 0 auto;width:200px}
+    .photo-tips h4{font-size:.78rem;font-weight:700;color:var(--gold);margin-bottom:10px}
+    .tip-item{display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;font-size:.75rem;color:var(--muted)}
+    .tip-item i{color:var(--green);margin-top:2px;font-size:.7rem}
+    /* SECTION CARD */
+    .sec-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+    .sec-card h3{font-size:.92rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:#fff}
+    .sec-card h3 i{color:var(--gold)}
+    /* LOGIN PREVIEW */
+    .login-preview{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:20px;margin-top:16px}
+    .login-preview h4{font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+    .lp-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.82rem}
+    .lp-label{color:var(--muted);font-weight:600}
+    .lp-val{color:#fff;font-weight:700;font-family:'Poppins',sans-serif}
+    /* BUTTONS */
+    .btn-row{display:flex;gap:12px;margin-top:28px;justify-content:space-between}
+    .btn-primary{background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light));color:#0a0a14;border:none;border-radius:12px;padding:13px 28px;font-size:.92rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4)}
+    .btn-secondary{background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:12px;padding:13px 24px;font-size:.88rem;font-weight:700;color:var(--text);cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+    .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+    /* SUCCESS */
+    .success-box{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:20px;text-align:center;margin-bottom:20px}
+    .success-box i{font-size:2.5rem;color:var(--green);margin-bottom:10px;display:block}
+    .success-box h3{font-size:1.1rem;font-weight:800;color:var(--green)}
+    .success-box p{font-size:.82rem;color:var(--muted);margin-top:6px}
+    /* REVIEW */
+    .review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+    .review-item .ri-label{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+    .review-item .ri-val{font-size:.9rem;font-weight:700}
+    .review-photo{width:100px;height:120px;border-radius:10px;border:2px solid var(--gold);object-fit:cover;margin-right:20px}
+    .alert-box{padding:12px 16px;border-radius:10px;font-size:.82rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .alert-box.warn{background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);color:#fbbf24}
+    .alert-box.info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#60a5fa}
+    @media(max-width:640px){.plan-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.camera-area{flex-direction:column}.photo-tips{width:100%}}
+  </style>
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-brand">
+    <div class="ico"><i class="fas fa-passport"></i></div>
+    <span>Passport KYC Onboarding</span>
+  </div>
+  <div class="topnav-right">
+    <a href="passport-dashboard.html" class="btn-back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+  </div>
+</nav>
+
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="step active" id="s1">
+      <div class="step-circle">1</div>
+      <div class="step-label">Select Plan</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step" id="s2">
+      <div class="step-circle">2</div>
+      <div class="step-label">Customer KYC</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step" id="s3">
+      <div class="step-circle">3</div>
+      <div class="step-label">Photo Capture</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step" id="s4">
+      <div class="step-circle">4</div>
+      <div class="step-label">Review & Login</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="step" id="s5">
+      <div class="step-circle">5</div>
+      <div class="step-label">Payment</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- STEP 1: Plan Selection -->
+  <div class="panel active" id="panel1">
+    <div class="panel-title">Choose a <span>Passport Plan</span></div>
+    <div class="panel-sub">Select the plan the customer would like to purchase. Prices and benefits are defined by admin.</div>
+    <div class="plan-grid">
+      <div class="plan-card" id="plan-water" onclick="selectPlan('Water Park Passport',2999,'water')">
+        <div class="plan-badge water"><i class="fas fa-water"></i> Water Park</div>
+        <div class="plan-name">Water Park Passport</div>
+        <div class="plan-price">₹2,999 <span>/ year</span></div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> Unlimited water park entries (365 days)</li>
+          <li><i class="fas fa-check"></i> 10% discount on F&B</li>
+          <li><i class="fas fa-check"></i> 2 free guest passes/month</li>
+          <li><i class="fas fa-check"></i> Priority queue access</li>
+          <li><i class="fas fa-check"></i> 3 free meal vouchers</li>
+        </ul>
+      </div>
+      <div class="plan-card" id="plan-amuse" onclick="selectPlan('Amusement Passport',2499,'amuse')">
+        <div class="plan-badge amuse"><i class="fas fa-gamepad"></i> Amusement</div>
+        <div class="plan-name">Amusement Passport</div>
+        <div class="plan-price">₹2,499 <span>/ year</span></div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> Unlimited amusement park entries</li>
+          <li><i class="fas fa-check"></i> 15% discount on all rides</li>
+          <li><i class="fas fa-check"></i> 1 free guest pass/month</li>
+          <li><i class="fas fa-check"></i> Exclusive member events</li>
+          <li><i class="fas fa-check"></i> 2 free meal vouchers</li>
+        </ul>
+      </div>
+      <div class="plan-card" id="plan-combo" onclick="selectPlan('Combo Passport',4999,'combo')">
+        <div class="plan-badge combo"><i class="fas fa-star"></i> BEST VALUE</div>
+        <div class="plan-name">Combo Passport</div>
+        <div class="plan-price">₹4,999 <span>/ year</span></div>
+        <ul class="plan-features">
+          <li><i class="fas fa-check"></i> Both Water + Amusement parks</li>
+          <li><i class="fas fa-check"></i> 20% discount on F&B</li>
+          <li><i class="fas fa-check"></i> 3 free guest passes/month</li>
+          <li><i class="fas fa-check"></i> VIP lounge access</li>
+          <li><i class="fas fa-check"></i> 5 free meal vouchers</li>
+          <li><i class="fas fa-check"></i> Free locker per visit</li>
+        </ul>
+      </div>
+    </div>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn-primary" onclick="goStep(2)"><i class="fas fa-arrow-right"></i> Continue to KYC</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Customer KYC Details -->
+  <div class="panel" id="panel2">
+    <div class="panel-title">Customer <span>KYC Details</span></div>
+    <div class="panel-sub">Collect all required customer information. Fields marked * are mandatory.</div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-user"></i> Personal Information</h3>
+      <div class="form-grid">
+        <div class="field" id="f-fname">
+          <label>First Name *</label>
+          <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="fname" placeholder="e.g. Rahul"/></div>
+          <div class="field-err">First name is required</div>
+        </div>
+        <div class="field" id="f-lname">
+          <label>Last Name *</label>
+          <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="lname" placeholder="e.g. Sharma"/></div>
+          <div class="field-err">Last name is required</div>
+        </div>
+        <div class="field" id="f-dob">
+          <label>Date of Birth *</label>
+          <div class="input-wrap"><i class="fas fa-calendar"></i><input type="date" id="dob"/></div>
+          <div class="field-err">Date of birth is required</div>
+        </div>
+        <div class="field">
+          <label>Gender *</label>
+          <div class="input-wrap"><i class="fas fa-venus-mars"></i>
+            <select id="gender">
+              <option value="">Select gender</option>
+              <option>Male</option><option>Female</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-phone"></i> Contact Information</h3>
+      <div class="form-grid">
+        <div class="field" id="f-phone">
+          <label>Mobile Number * (used as Login ID)</label>
+          <div class="input-wrap"><i class="fas fa-mobile-alt"></i><input type="tel" id="phone" placeholder="10-digit mobile" maxlength="10" inputmode="numeric"/></div>
+          <div class="field-err">Valid 10-digit mobile number required</div>
+        </div>
+        <div class="field" id="f-email">
+          <label>Email Address * (alternate Login ID)</label>
+          <div class="input-wrap"><i class="fas fa-envelope"></i><input type="email" id="email" placeholder="customer@email.com"/></div>
+          <div class="field-err">Valid email address required</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-map-marker-alt"></i> Physical Address</h3>
+      <div class="form-grid">
+        <div class="field form-grid" style="grid-column:1/-1;padding:0;background:none;border:none">
+          <div class="field" id="f-addr">
+            <label>Street Address *</label>
+            <div class="input-wrap"><i class="fas fa-home"></i><input type="text" id="addr" placeholder="House No., Street, Area"/></div>
+            <div class="field-err">Address is required</div>
+          </div>
+          <div class="field">
+            <label>City *</label>
+            <div class="input-wrap"><i class="fas fa-city"></i><input type="text" id="city" placeholder="City"/></div>
+          </div>
+          <div class="field">
+            <label>State</label>
+            <div class="input-wrap"><i class="fas fa-map"></i>
+              <select id="state">
+                <option value="">Select State</option>
+                <option>Delhi</option><option>Uttar Pradesh</option><option>Haryana</option><option>Rajasthan</option><option>Punjab</option><option>Maharashtra</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>PIN Code</label>
+            <div class="input-wrap"><i class="fas fa-hashtag"></i><input type="text" id="pincode" placeholder="6-digit PIN" maxlength="6" inputmode="numeric"/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-id-card"></i> Identity Verification</h3>
+      <div class="form-grid">
+        <div class="field">
+          <label>ID Type</label>
+          <div class="input-wrap"><i class="fas fa-id-badge"></i>
+            <select id="idType">
+              <option value="">Select ID type</option>
+              <option>Aadhaar Card</option><option>PAN Card</option><option>Voter ID</option><option>Driving Licence</option><option>Passport</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>ID Number</label>
+          <div class="input-wrap"><i class="fas fa-hashtag"></i><input type="text" id="idNum" placeholder="ID document number"/></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="validateKYC()"><i class="fas fa-arrow-right"></i> Continue to Photo</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Photo Capture -->
+  <div class="panel" id="panel3">
+    <div class="panel-title">Customer <span>Photo Capture</span></div>
+    <div class="panel-sub">Capture a clear passport-style photo of the customer using the device camera.</div>
+
+    <div class="photo-section">
+      <h3><i class="fas fa-camera"></i> Live Camera Capture</h3>
+      <p>Position the customer's face within the oval guide. Ensure good lighting and a plain background.</p>
+      <div class="camera-area">
+        <div class="camera-box">
+          <video id="camVideo" class="cam-video" autoplay playsinline muted></video>
+          <img id="camPreview" class="cam-preview" alt="Captured photo"/>
+          <canvas id="camCanvas" class="cam-canvas"></canvas>
+          <div class="cam-overlay" id="camOverlay"><div class="face-guide"></div></div>
+          <div class="cam-controls">
+            <button class="cam-btn primary" id="btnStartCam" onclick="startCamera()"><i class="fas fa-video"></i> Start Camera</button>
+            <button class="cam-btn primary" id="btnCapture" onclick="capturePhoto()" style="display:none"><i class="fas fa-camera"></i> Capture</button>
+            <button class="cam-btn outline" id="btnRetake" onclick="retakePhoto()" style="display:none"><i class="fas fa-redo"></i> Retake</button>
+          </div>
+        </div>
+        <div class="photo-tips">
+          <h4><i class="fas fa-lightbulb"></i> Photo Guidelines</h4>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> Plain white/light background</div>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> Face clearly visible, front-facing</div>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> Good natural or artificial light</div>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> No sunglasses or cap</div>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> Neutral expression</div>
+          <div class="tip-item"><i class="fas fa-check-circle"></i> Both ears visible</div>
+          <div style="margin-top:16px;padding:10px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:8px">
+            <div style="font-size:.72rem;color:var(--gold);font-weight:700;margin-bottom:4px">Or Upload Photo</div>
+            <input type="file" id="photoUpload" accept="image/*" onchange="uploadPhoto(this)" style="font-size:.72rem;color:var(--muted);width:100%"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="validatePhoto()"><i class="fas fa-arrow-right"></i> Continue to Review</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Review & Login Creation -->
+  <div class="panel" id="panel4">
+    <div class="panel-title">Review & <span>Create Login</span></div>
+    <div class="panel-sub">Verify all details before creating the customer account and proceeding to payment.</div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-user-check"></i> Customer Summary</h3>
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <img id="reviewPhoto" class="review-photo" src="" alt="Customer Photo" onerror="this.style.display='none'"/>
+        <div style="flex:1">
+          <div class="review-grid" id="reviewGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <h3><i class="fas fa-passport"></i> Selected Plan</h3>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div id="reviewPlan" style="font-size:1.1rem;font-weight:800"></div>
+          <div id="reviewPlanSub" style="font-size:.8rem;color:var(--muted);margin-top:3px">Annual validity · Activates on payment</div>
+        </div>
+        <div style="text-align:right">
+          <div id="reviewPrice" style="font-size:1.5rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif"></div>
+          <div style="font-size:.72rem;color:var(--muted)">incl. GST</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-preview">
+      <h4><i class="fas fa-key"></i> Auto-Generated Login Credentials</h4>
+      <div class="alert-box info"><i class="fas fa-info-circle"></i> These credentials will be sent to the customer via SMS & Email after payment.</div>
+      <div class="lp-row"><span class="lp-label">Login ID (Mobile)</span><span class="lp-val" id="lpMobile">—</span></div>
+      <div class="lp-row"><span class="lp-label">Login ID (Email)</span><span class="lp-val" id="lpEmail">—</span></div>
+      <div class="lp-row"><span class="lp-label">Temp Password</span><span class="lp-val" id="lpPwd">—</span></div>
+      <div class="lp-row"><span class="lp-label">Account Type</span><span class="lp-val">WOW Passport Member</span></div>
+    </div>
+
+    <div class="alert-box warn" style="margin-top:16px"><i class="fas fa-exclamation-triangle"></i> Please confirm all details are correct before proceeding to payment. KYC data cannot be edited after payment.</div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="proceedToPayment()"><i class="fas fa-credit-card"></i> Proceed to Payment</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Redirect to Payment -->
+  <div class="panel" id="panel5">
+    <div class="success-box">
+      <i class="fas fa-check-circle"></i>
+      <h3>KYC Complete! Redirecting to Payment…</h3>
+      <p>Customer account created. Processing payment window…</p>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+// Auth guard
+const agent = JSON.parse(sessionStorage.getItem('sales_agent') || '{"name":"Demo Agent","role":"agent","zone":"Demo","target":50}');
+
+let currentStep = 1;
+let selectedPlan = null;
+let selectedPlanType = null;
+let selectedPrice = 0;
+let capturedPhoto = null;
+let cameraStream = null;
+
+const PLANS = {
+  water:  { name:'Water Park Passport',  price:2999, type:'water' },
+  amuse:  { name:'Amusement Passport',   price:2499, type:'amuse' },
+  combo:  { name:'Combo Passport',       price:4999, type:'combo' },
+};
+
+function selectPlan(name, price, type){
+  selectedPlan = name; selectedPrice = price; selectedPlanType = type;
+  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('plan-'+type).classList.add('selected');
+}
+
+function goStep(n){
+  if(n===2 && !selectedPlan){ alert('Please select a passport plan first.'); return; }
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+n).classList.add('active');
+  // Update stepper
+  for(let i=1;i<=5;i++){
+    const s=document.getElementById('s'+i);
+    s.classList.remove('active','done');
+    if(i<n) s.classList.add('done');
+    else if(i===n) s.classList.add('active');
+    // Update circle content
+    const circ=s.querySelector('.step-circle');
+    if(i<n) circ.innerHTML='<i class="fas fa-check" style="font-size:.72rem"></i>';
+    else circ.textContent=i;
+  }
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function validateKYC(){
+  let ok=true;
+  const req=[
+    {id:'fname',fid:'f-fname'},{id:'lname',fid:'f-lname'},
+    {id:'dob',fid:'f-dob'},{id:'phone',fid:'f-phone'},{id:'email',fid:'f-email'},{id:'addr',fid:'f-addr'}
+  ];
+  req.forEach(r=>{
+    const el=document.getElementById(r.id);
+    const fe=document.getElementById(r.fid);
+    if(!el.value.trim()){fe&&fe.classList.add('error');ok=false;}
+    else{fe&&fe.classList.remove('error');}
+  });
+  const ph=document.getElementById('phone').value;
+  if(ph.length!==10||isNaN(ph)){document.getElementById('f-phone').classList.add('error');ok=false;}
+  if(!ok){alert('Please fill all required fields correctly.');return;}
+  goStep(3);
+}
+
+// CAMERA
+async function startCamera(){
+  try{
+    cameraStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}});
+    const v=document.getElementById('camVideo');
+    v.srcObject=cameraStream;
+    document.getElementById('btnStartCam').style.display='none';
+    document.getElementById('btnCapture').style.display='';
+  } catch(e){
+    alert('Camera access denied. Please use the upload option below.');
+  }
+}
+function capturePhoto(){
+  const v=document.getElementById('camVideo');
+  const c=document.getElementById('camCanvas');
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  capturedPhoto=c.toDataURL('image/jpeg',0.85);
+  const prev=document.getElementById('camPreview');
+  prev.src=capturedPhoto; prev.style.display='block';
+  v.style.display='none';
+  document.getElementById('camOverlay').style.display='none';
+  document.getElementById('btnCapture').style.display='none';
+  document.getElementById('btnRetake').style.display='';
+  if(cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
+}
+function retakePhoto(){
+  capturedPhoto=null;
+  document.getElementById('camPreview').style.display='none';
+  document.getElementById('camVideo').style.display='block';
+  document.getElementById('camOverlay').style.display='flex';
+  document.getElementById('btnRetake').style.display='none';
+  document.getElementById('btnStartCam').style.display='';
+}
+function uploadPhoto(input){
+  const file=input.files[0];
+  if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    capturedPhoto=e.target.result;
+    const prev=document.getElementById('camPreview');
+    prev.src=capturedPhoto; prev.style.display='block';
+    document.getElementById('camVideo').style.display='none';
+    document.getElementById('camOverlay').style.display='none';
+    document.getElementById('btnStartCam').style.display='none';
+    document.getElementById('btnCapture').style.display='none';
+    document.getElementById('btnRetake').style.display='';
+    if(cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
+  };
+  r.readAsDataURL(file);
+}
+function validatePhoto(){
+  if(!capturedPhoto){ alert('Please capture or upload a customer photo to continue.'); return; }
+  buildReview();
+  goStep(4);
+}
+
+// REVIEW
+function buildReview(){
+  const fname=document.getElementById('fname').value;
+  const lname=document.getElementById('lname').value;
+  const phone=document.getElementById('phone').value;
+  const email=document.getElementById('email').value;
+  const dob=document.getElementById('dob').value;
+  const gender=document.getElementById('gender').value;
+  const addr=document.getElementById('addr').value;
+  const city=document.getElementById('city').value;
+  const state=document.getElementById('state').value;
+  const pin=document.getElementById('pincode').value;
+  const idType=document.getElementById('idType').value;
+  const idNum=document.getElementById('idNum').value;
+
+  document.getElementById('reviewPhoto').src=capturedPhoto||'';
+  document.getElementById('reviewPhoto').style.display=capturedPhoto?'block':'none';
+  document.getElementById('reviewPlan').textContent=selectedPlan;
+  document.getElementById('reviewPrice').textContent='₹'+selectedPrice.toLocaleString('en-IN');
+
+  const fields=[
+    ['Full Name',fname+' '+lname],['Date of Birth',dob?new Date(dob).toLocaleDateString('en-IN'):'-'],
+    ['Gender',gender||'-'],['Mobile',phone],['Email',email],
+    ['Address',addr+(city?', '+city:'')+(state?', '+state:'')+(pin?'-'+pin:'')],
+    ['ID Type',idType||'-'],['ID Number',idNum||'-']
+  ];
+  document.getElementById('reviewGrid').innerHTML=fields.map(([l,v])=>`
+    <div class="review-item"><div class="ri-label">${l}</div><div class="ri-val">${v}</div></div>`).join('');
+
+  // Login credentials
+  const tempPwd = 'WOW@'+phone.slice(-4)+Math.floor(Math.random()*100);
+  document.getElementById('lpMobile').textContent = phone;
+  document.getElementById('lpEmail').textContent = email;
+  document.getElementById('lpPwd').textContent = tempPwd;
+
+  // Store KYC data
+  const kycData={
+    fname,lname,fullName:fname+' '+lname,phone,email,dob,gender,addr,city,state,pincode:pin,
+    idType,idNum,photo:capturedPhoto,plan:selectedPlan,planType:selectedPlanType,price:selectedPrice,
+    tempPwd,agentId:agent.id||'EMP-001',agentName:agent.name,timestamp:new Date().toISOString(),
+    kycId:'KYC-'+Date.now()
+  };
+  sessionStorage.setItem('current_kyc',JSON.stringify(kycData));
+}
+
+function proceedToPayment(){
+  goStep(5);
+  setTimeout(()=>window.location.href='passport-payment.html',1500);
+}
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
