@@ -3,372 +3,390 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Travel Agent ERP — Worlds of Wonder</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<title>Travel Agent Portal — Worlds of Wonder</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+:root{--brand:#ff6b35;--brand-dark:#e85a22;--teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--sidebar:260px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --pink:#9d174d;--pink2:#ec4899;--pink3:#f472b6;
-  --gold:#C9A84C;--gold2:#F0D080;
-  --bg:#0e060e;--sidebar:#0a040a;--card:#160c16;--border:rgba(255,255,255,.07);
-  --text:#f0f0f0;--muted:rgba(255,255,255,.42);
-  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;--teal:#14b8a6;
-}
-html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);display:flex;}
-.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:50;}
-.sb-logo{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.sb-logo img{height:32px;filter:none!important;width:auto;}
-.sb-label{font-size:9px;font-weight:800;color:var(--pink3);letter-spacing:2px;font-family:'Courier Prime',monospace;}
-.sb-nav{padding:10px 8px;}
-.sb-sec{font-size:8px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:10px 10px 5px;font-family:'Courier Prime',monospace;}
-.sb-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;margin:2px 0;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:none;cursor:pointer;transition:all .2s;}
-.sb-link:hover,.sb-link.active{background:rgba(236,72,153,.12);color:var(--pink3);}
-.sb-link i{width:15px;text-align:center;}
-.sb-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:8px;}
-.main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
-.topbar{padding:12px 22px;background:rgba(14,6,14,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
-.page-title{font-family:'Poppins',sans-serif;font-size:15px;font-weight:800;}
-.page-sub{font-size:11px;color:var(--muted);}
-.user-pill{display:flex;align-items:center;gap:8px;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.2);border-radius:20px;padding:5px 12px;}
-.user-pill .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--pink2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
-.user-pill .nm{font-size:11px;font-weight:700;color:var(--pink3);}
-.content{padding:20px;flex:1;}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
-.stat-val{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;color:#fff;}
-.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
-.stat .ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
-.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-.card-title{font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:700;}
-.btns{display:flex;gap:8px;}
-.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:5px;transition:all .2s;text-decoration:none;}
-.btn-primary{background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;}
-.btn-primary:hover{box-shadow:0 4px 14px rgba(236,72,153,.3);}
-.btn-outline{border:1px solid var(--border);background:none;color:var(--muted);}
-.btn-outline:hover{border-color:var(--pink3);color:var(--pink3);}
-.search{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:12px;outline:none;width:160px;font-family:'Nunito',sans-serif;}
-table{width:100%;border-collapse:collapse;font-size:12.5px;}
-th{padding:9px 14px;text-align:left;font-family:'Courier Prime',monospace;font-size:8.5px;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
-td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:rgba(255,255,255,.02);}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;font-size:9.5px;font-weight:700;font-family:'Courier Prime',monospace;}
-.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;}
-.ib{display:flex;gap:5px;}
-.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;}
-.icon-btn:hover{border-color:var(--pink3);color:var(--pink3);}
-.icon-btn.red:hover{border-color:var(--red);color:var(--red);}
-/* LEAD SCORE */
-.lead-score{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;font-family:'Courier Prime',monospace;}
-/* KANBAN */
-.kanban{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
-.kol{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;}
-.kol-head{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
-.kol-head .cnt{background:rgba(255,255,255,.08);color:#fff;padding:1px 6px;border-radius:6px;font-size:10px;}
-.kcard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
-.kcard:hover{border-color:rgba(236,72,153,.25);background:rgba(236,72,153,.05);}
-.kcard-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;}
-.kcard-meta{font-size:10px;color:var(--muted);line-height:1.5;}
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);}
-.overlay.open{display:flex;}
-.modal{background:#100810;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;width:100%;max-width:460px;position:relative;max-height:90vh;overflow-y:auto;}
-.modal-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
-.modal h3{font-family:'Poppins',sans-serif;font-size:16px;font-weight:800;margin-bottom:3px;}
-.modal p{font-size:11.5px;color:var(--muted);margin-bottom:18px;}
-.fg{margin-bottom:13px;}
-.fl{font-size:10px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:block;font-family:'Courier Prime',monospace;}
-.fi{width:100%;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:13px;outline:none;transition:border-color .2s;font-family:'Nunito',sans-serif;}
-.fi:focus{border-color:var(--pink2);}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.btn-submit{width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--pink),var(--pink2));color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-top:4px;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
+.sidebar-logo .mark{width:38px;height:38px;background:var(--teal);border-radius:10px;display:grid;place-items:center;}
+.sidebar-logo span{font-weight:700;font-size:14px;display:block;color:#fff;}
+.sidebar-logo small{font-size:10px;opacity:.6;color:rgba(255,255,255,.7);}
+.agent-card{margin:14px;background:rgba(255,255,255,.07);border-radius:10px;padding:12px;}
+.agent-card .name{font-size:13px;font-weight:700;}
+.agent-card .code{font-size:10px;color:rgba(255,255,255,.5);font-family:monospace;}
+.agent-card .tier{margin-top:6px;display:inline-block;background:var(--yellow);color:var(--navy);font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.nav-section{padding:14px 0 6px;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);padding:0 18px 6px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--teal);}
+.nav-item i{width:18px;text-align:center;font-size:13px;}
+.main{margin-left:var(--sidebar);flex:1;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:17px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:#0096c7;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+.content{padding:24px 28px;}
+.tab-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.tab.active{background:var(--teal);color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:700;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:26px;font-weight:800;margin:4px 0 2px;}
+.stat-sub{font-size:11px;color:var(--muted);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border:none;}
+tbody td{padding:11px 14px;vertical-align:middle;}
+tbody tr:hover{background:#f9fafb;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-yellow{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.kanban-col{background:#f1f5f9;border-radius:12px;padding:14px;min-height:300px;}
+.kanban-col-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.kanban-col-title{font-size:13px;font-weight:700;}
+.kanban-count{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;}
+.kanban-cards{display:flex;flex-direction:column;gap:10px;}
+.kanban-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:grab;transition:.15s;}
+.kanban-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08);border-color:var(--teal);}
+.kanban-card .kc-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.kanban-card .kc-sub{font-size:11px;color:var(--muted);}
+.kanban-card .kc-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.kanban-card .kc-amt{font-size:12px;font-weight:700;color:var(--teal);}
+.kanban-card .kc-date{font-size:10px;color:var(--muted);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;}
+.modal-overlay.show{display:grid;}
+.modal{background:var(--white);border-radius:16px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:17px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+label{font-size:12px;font-weight:600;color:var(--slate);}
+input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:100%;transition:.15s;}
+input:focus,select:focus{outline:none;border-color:var(--teal);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:1000px){.kanban{grid-template-columns:1fr 1fr;}.grid-4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.kanban,.grid-4{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
+<div class="shell">
 <aside class="sidebar">
-  <div class="sb-logo">
-    <img src="../images/logo.png" alt="WOW"/>
-    <div class="sb-label">TRAVEL AGENT ERP</div>
+  <div class="sidebar-logo">
+    <div class="mark"><i class="fa fa-plane" style="color:#fff;font-size:14px;"></i></div>
+    <div><span>TA Portal</span><small>Worlds of Wonder</small></div>
   </div>
-  <nav class="sb-nav">
-    <div class="sb-sec">Main</div>
-    <a class="sb-link active" onclick="showTab('dashboard')"><i class="fa fa-th-large"></i> Dashboard</a>
-    <a class="sb-link" onclick="showTab('leads')"><i class="fa fa-user-plus"></i> Leads <span class="sb-badge">5</span></a>
-    <a class="sb-link" onclick="showTab('pipeline')"><i class="fa fa-filter"></i> Pipeline</a>
-    <a class="sb-link" onclick="showTab('bookings')"><i class="fa fa-calendar-check"></i> Bookings</a>
-    <a class="sb-link" onclick="showTab('team')"><i class="fa fa-users"></i> My Team</a>
-    <div class="sb-sec">Finance</div>
-    <a class="sb-link" onclick="showTab('commissions')"><i class="fa fa-rupee-sign"></i> Commissions</a>
-    <a class="sb-link" onclick="showTab('invoices')"><i class="fa fa-file-invoice"></i> Invoices</a>
-    <div class="sb-sec">Support</div>
-    <a class="sb-link" onclick="showTab('manager')"><i class="fa fa-headset"></i> My Manager</a>
-    <a class="sb-link" href="../internal/index.html" style="margin-top:16px;color:var(--red);"><i class="fa fa-sign-out-alt"></i> Logout</a>
+  <div class="agent-card">
+    <div class="name">Horizon Holidays Pvt Ltd</div>
+    <div class="code">TA-CODE: HH-2024-0847</div>
+    <div class="tier">⭐ Gold Partner</div>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Operations</div>
+      <a class="nav-item active" href="index.html"><i class="fa fa-th-large"></i>Dashboard</a>
+      <a class="nav-item" href="#" onclick="switchTab('leads',event)"><i class="fa fa-funnel-dollar"></i>Leads Pipeline</a>
+      <a class="nav-item" href="#" onclick="switchTab('bookings',event)"><i class="fa fa-ticket-alt"></i>Bookings</a>
+      <a class="nav-item" href="#" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i>Commission</a>
+      <a class="nav-item" href="#" onclick="switchTab('team',event)"><i class="fa fa-users"></i>Team</a>
+      <a class="nav-item" href="#" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i>Reports</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Resources</div>
+      <a class="nav-item" href="#"><i class="fa fa-file-alt"></i>Rate Card 2025</a>
+      <a class="nav-item" href="#"><i class="fa fa-images"></i>Marketing Kit</a>
+      <a class="nav-item" href="#"><i class="fa fa-headset"></i>WOW Support</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item" href="../admin/index.html"><i class="fa fa-cog"></i>Back-office</a>
+      <a class="nav-item" href="../reseller/index.html"><i class="fa fa-store"></i>Reseller Portal</a>
+    </div>
   </nav>
 </aside>
 
 <div class="main">
-  <div class="topbar">
-    <div>
-      <div class="page-title" id="pageTitle">Travel Agent Dashboard</div>
-      <div class="page-sub">Delhi Dream Holidays · TA Partner</div>
+<div class="topbar">
+  <div class="topbar-title"><i class="fa fa-plane" style="color:var(--teal);margin-right:8px;"></i>Travel Agent Portal</div>
+  <div class="topbar-right">
+    <button class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Rate Card</button>
+    <button class="btn btn-teal btn-sm" onclick="openLeadModal()"><i class="fa fa-plus"></i> New Lead</button>
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
+      <img src="https://api.dicebear.com/7.x/initials/svg?seed=HH" width="26" height="26" style="border-radius:50%;"/>
+      <span style="font-size:12px;font-weight:600;">Horizon Holidays</span>
     </div>
-    <div class="user-pill"><div class="av">DD</div><div class="nm">Delhi Dreams</div></div>
-  </div>
-
-  <div class="content">
-
-    <!-- DASHBOARD -->
-    <div id="tab-dashboard">
-      <div class="stats">
-        <div class="stat"><div class="ico" style="background:rgba(236,72,153,.15);color:var(--pink2);"><i class="fa fa-user-plus"></i></div><div class="stat-val">34</div><div class="stat-lbl">Active Leads</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(34,197,94,.15);color:var(--green);"><i class="fa fa-calendar-check"></i></div><div class="stat-val">89</div><div class="stat-lbl">Bookings (MTD)</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(201,168,76,.15);color:var(--gold);"><i class="fa fa-rupee-sign"></i></div><div class="stat-val">&#8377;18,450</div><div class="stat-lbl">Commission (MTD)</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(249,115,22,.15);color:var(--orange);"><i class="fa fa-users"></i></div><div class="stat-val">5</div><div class="stat-lbl">Sub-Agents</div></div>
-        <div class="stat"><div class="ico" style="background:rgba(59,130,246,.15);color:var(--blue);"><i class="fa fa-ticket-alt"></i></div><div class="stat-val">342</div><div class="stat-lbl">Tickets Sold</div></div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Recent Bookings</div></div>
-          <table>
-            <thead><tr><th>CLIENT</th><th>DATE</th><th>TICKETS</th><th>STATUS</th></tr></thead>
-            <tbody>
-              <tr><td><strong>Mehta Family (5 pax)</strong></td><td style="font-size:10px;color:var(--muted);">28 Mar</td><td>Combo ×5</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Confirmed</span></td></tr>
-              <tr><td><strong>School Trip — DPS</strong></td><td style="font-size:10px;color:var(--muted);">27 Mar</td><td>Water Park ×42</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Confirmed</span></td></tr>
-              <tr><td><strong>Sharma Group (12 pax)</strong></td><td style="font-size:10px;color:var(--muted);">26 Mar</td><td>Amusement ×12</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Pending</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Hot Leads (Action Needed)</div></div>
-          <table>
-            <thead><tr><th>CLIENT</th><th>SCORE</th><th>ENQUIRY</th><th>NEXT STEP</th></tr></thead>
-            <tbody>
-              <tr><td><strong>TCS Corporate</strong></td><td><span class="lead-score" style="background:rgba(239,68,68,.15);color:var(--red);">HOT</span></td><td>200 pax outing</td><td>Send quote</td></tr>
-              <tr><td><strong>Patel Family</strong></td><td><span class="lead-score" style="background:rgba(249,115,22,.15);color:var(--orange);">WARM</span></td><td>4 pax combo</td><td>Follow up</td></tr>
-              <tr><td><strong>Ryan International</strong></td><td><span class="lead-score" style="background:rgba(59,130,246,.15);color:var(--blue);">COLD</span></td><td>School trip</td><td>Re-engage</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- LEADS -->
-    <div id="tab-leads" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">All Leads</div>
-          <div class="btns">
-            <input class="search" placeholder="Search leads..."/>
-            <button class="btn btn-primary" onclick="openAddLead()"><i class="fa fa-plus"></i> Add Lead</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>CLIENT NAME</th><th>MOBILE</th><th>ENQUIRY</th><th>SCORE</th><th>ASSIGNED TO</th><th>DATE</th><th>ACTIONS</th></tr></thead>
-          <tbody>
-            <tr><td><strong>TCS Corporate Events</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 00001</td><td>200 pax corporate outing</td><td><span class="lead-score" style="background:rgba(239,68,68,.15);color:var(--red);">HOT</span></td><td>Priya Agent</td><td style="font-size:10px;color:var(--muted);">28 Mar 2025</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-paper-plane"></i></div></div></td></tr>
-            <tr><td><strong>Patel Family</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98000 12312</td><td>4 pax combo tickets</td><td><span class="lead-score" style="background:rgba(249,115,22,.15);color:var(--orange);">WARM</span></td><td>Self</td><td style="font-size:10px;color:var(--muted);">27 Mar 2025</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-paper-plane"></i></div></div></td></tr>
-            <tr><td><strong>Ryan International School</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 11 4567 8901</td><td>School trip 80 students</td><td><span class="lead-score" style="background:rgba(59,130,246,.15);color:var(--blue);">COLD</span></td><td>Ravi Agent</td><td style="font-size:10px;color:var(--muted);">25 Mar 2025</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-paper-plane"></i></div></div></td></tr>
-            <tr><td><strong>Sharma Family</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 99887 12345</td><td>Birthday party 20 pax</td><td><span class="lead-score" style="background:rgba(34,197,94,.15);color:var(--green);">BOOKED</span></td><td>Self</td><td style="font-size:10px;color:var(--muted);">22 Mar 2025</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div></div></td></tr>
-            <tr><td><strong>Gupta Travels Client</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 54321</td><td>Honeymoon package 2 pax</td><td><span class="lead-score" style="background:rgba(249,115,22,.15);color:var(--orange);">WARM</span></td><td>Priya Agent</td><td style="font-size:10px;color:var(--muted);">20 Mar 2025</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-paper-plane"></i></div></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- PIPELINE KANBAN -->
-    <div id="tab-pipeline" style="display:none;">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Drag leads across stages to update your pipeline. Click a card for details.</p>
-      <div class="kanban">
-        <div class="kol">
-          <div class="kol-head">NEW <span class="cnt">5</span></div>
-          <div class="kcard"><div class="kcard-name">TCS Corporate</div><div class="kcard-meta">200 pax · ₹2,50,000 est.</div></div>
-          <div class="kcard"><div class="kcard-name">Patel Family</div><div class="kcard-meta">4 pax · ₹8,000 est.</div></div>
-        </div>
-        <div class="kol">
-          <div class="kol-head">QUOTED <span class="cnt">3</span></div>
-          <div class="kcard"><div class="kcard-name">Ryan International</div><div class="kcard-meta">80 students · ₹80,000 est.</div></div>
-          <div class="kcard"><div class="kcard-name">Gupta Client</div><div class="kcard-meta">2 pax · ₹4,000 est.</div></div>
-        </div>
-        <div class="kol">
-          <div class="kol-head">NEGOTIATING <span class="cnt">2</span></div>
-          <div class="kcard"><div class="kcard-name">Sharma Birthday</div><div class="kcard-meta">20 pax · ₹30,000 est.</div></div>
-        </div>
-        <div class="kol">
-          <div class="kol-head" style="color:var(--green);">CONFIRMED <span class="cnt">4</span></div>
-          <div class="kcard" style="border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.04);"><div class="kcard-name">Mehta Family</div><div class="kcard-meta">5 pax · ₹10,000</div></div>
-          <div class="kcard" style="border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.04);"><div class="kcard-name">DPS School Trip</div><div class="kcard-meta">42 students · ₹42,000</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOOKINGS -->
-    <div id="tab-bookings" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Booking History</div>
-          <div class="btns">
-            <select class="search"><option>This Month</option><option>Last Month</option><option>All Time</option></select>
-            <button class="btn btn-outline"><i class="fa fa-download"></i> Export</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>BOOKING ID</th><th>CLIENT</th><th>DATE</th><th>TICKET TYPE</th><th>PAX</th><th>AMOUNT</th><th>COMMISSION</th><th>STATUS</th></tr></thead>
-          <tbody>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">BK-2025-0892</td><td>Mehta Family</td><td>28 Mar</td><td>Combo</td><td>5</td><td>&#8377;9,995</td><td>&#8377;1,000</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Confirmed</span></td></tr>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">BK-2025-0887</td><td>DPS School</td><td>27 Mar</td><td>Water Park</td><td>42</td><td>&#8377;42,000</td><td>&#8377;4,200</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Confirmed</span></td></tr>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">BK-2025-0876</td><td>Sharma Group</td><td>26 Mar</td><td>Amusement</td><td>12</td><td>&#8377;14,388</td><td>&#8377;1,439</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Pending Payment</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TEAM -->
-    <div id="tab-team" style="display:none;">
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">My Sub-Agents</div>
-          <button class="btn btn-primary" onclick="openAddAgent()"><i class="fa fa-user-plus"></i> Add Sub-Agent</button>
-        </div>
-        <table>
-          <thead><tr><th>AGENT</th><th>MOBILE</th><th>LEADS</th><th>BOOKINGS</th><th>COMMISSION</th><th>RIGHTS</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Priya Mehta</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 11111</td><td>12</td><td>34</td><td>&#8377;6,800</td><td><span class="badge" style="background:rgba(236,72,153,.15);color:var(--pink3);">Full</span></td><td><span class="dot" style="background:var(--green);"></span>Active</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-shield-alt"></i></div></div></td></tr>
-            <tr><td><strong>Ravi Kumar</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 22222</td><td>8</td><td>22</td><td>&#8377;4,400</td><td><span class="badge" style="background:rgba(59,130,246,.15);color:var(--blue);">Bookings Only</span></td><td><span class="dot" style="background:var(--green);"></span>Active</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-shield-alt"></i></div></div></td></tr>
-            <tr><td><strong>Sunita Rao</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 33333</td><td>6</td><td>18</td><td>&#8377;3,600</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Leads Only</span></td><td><span class="dot" style="background:var(--green);"></span>Active</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn"><i class="fa fa-shield-alt"></i></div></div></td></tr>
-            <tr><td><strong>Anil Sharma</strong></td><td style="font-family:'Courier Prime',monospace;font-size:10px;">+91 98765 44444</td><td>4</td><td>10</td><td>&#8377;2,000</td><td><span class="badge" style="background:rgba(59,130,246,.15);color:var(--blue);">Bookings Only</span></td><td><span class="dot" style="background:var(--orange);"></span>Inactive</td><td><div class="ib"><div class="icon-btn"><i class="fa fa-edit"></i></div><div class="icon-btn red"><i class="fa fa-ban"></i></div></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- COMMISSIONS -->
-    <div id="tab-commissions" style="display:none;">
-      <div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
-        <div class="stat"><div class="stat-val" style="color:var(--gold);">&#8377;18,450</div><div class="stat-lbl">Earned this month</div></div>
-        <div class="stat"><div class="stat-val" style="color:var(--green);">&#8377;12,300</div><div class="stat-lbl">Settled (credited)</div></div>
-        <div class="stat"><div class="stat-val" style="color:var(--orange);">&#8377;6,150</div><div class="stat-lbl">Pending payout</div></div>
-        <div class="stat"><div class="stat-val">12%</div><div class="stat-lbl">Your commission slab</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">Commission Ledger</div></div>
-        <table>
-          <thead><tr><th>PERIOD</th><th>BOOKINGS</th><th>GROSS SALES</th><th>RATE</th><th>EARNED</th><th>PAYOUT DATE</th><th>STATUS</th></tr></thead>
-          <tbody>
-            <tr><td>March 2025</td><td>89</td><td>&#8377;1,53,750</td><td>12%</td><td>&#8377;18,450</td><td>05 Apr 2025</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Partial</span></td></tr>
-            <tr><td>February 2025</td><td>74</td><td>&#8377;1,20,000</td><td>12%</td><td>&#8377;14,400</td><td>05 Mar 2025</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- INVOICES -->
-    <div id="tab-invoices" style="display:none;">
-      <div class="card">
-        <div class="card-head"><div class="card-title">GST Invoices</div><button class="btn btn-outline"><i class="fa fa-download"></i> Download All</button></div>
-        <table>
-          <thead><tr><th>INVOICE NO.</th><th>DATE</th><th>AMOUNT</th><th>GST (18%)</th><th>TOTAL</th><th>STATUS</th><th>PDF</th></tr></thead>
-          <tbody>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">TA-INV-2025-0041</td><td>28 Mar 2025</td><td>&#8377;1,53,750</td><td>&#8377;27,675</td><td>&#8377;1,81,425</td><td><span class="badge" style="background:rgba(249,115,22,.15);color:var(--orange);">Partial Payment</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
-            <tr><td style="font-family:'Courier Prime',monospace;font-size:10px;">TA-INV-2025-0033</td><td>28 Feb 2025</td><td>&#8377;1,20,000</td><td>&#8377;21,600</td><td>&#8377;1,41,600</td><td><span class="badge" style="background:rgba(34,197,94,.15);color:var(--green);">Paid</span></td><td><div class="icon-btn"><i class="fa fa-file-pdf"></i></div></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- MANAGER -->
-    <div id="tab-manager" style="display:none;">
-      <div class="card" style="max-width:480px;">
-        <div class="card-head"><div class="card-title">Your Dedicated WOW Account Manager</div></div>
-        <div style="padding:24px;text-align:center;">
-          <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--pink2));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 14px;">RS</div>
-          <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:3px;">Rohit Saxena</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Senior Partner Relations Manager · WOW</div>
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-            <a href="tel:+919876500222" style="color:var(--pink3);text-decoration:none;"><i class="fa fa-phone"></i> +91 98765 00222</a>
-            <a href="https://wa.me/919876500222" style="color:var(--green);text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-            <a href="/cdn-cgi/l/email-protection#f0829f989984de839188959e91b0879f87de939f9d" style="color:var(--blue);text-decoration:none;"><i class="fa fa-envelope"></i> <span class="__cf_email__" data-cfemail="bbc9d4d3d2cf95c8dac3ded5dafbccd4cc95d8d4d6">[email&#160;protected]</span></a>
-          </div>
-          <div style="margin-top:16px;font-size:11px;color:var(--muted);">Available Mon-Sat · 9 AM to 7 PM</div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
-<!-- MODALS -->
-<div class="overlay" id="leadModal" onclick="if(event.target===this)this.classList.remove('open')">
+<div class="content">
+<div class="grid-4">
+  <div class="stat-card"><div class="stat-label">Total Bookings</div><div class="stat-value" style="color:var(--teal);">342</div><div class="stat-sub">↑ 18 this month</div></div>
+  <div class="stat-card"><div class="stat-label">Commission Earned</div><div class="stat-value" style="color:var(--green);">₹1.84L</div><div class="stat-sub">FY 2024–25</div></div>
+  <div class="stat-card"><div class="stat-label">Pending Leads</div><div class="stat-value" style="color:var(--yellow);">24</div><div class="stat-sub">8 hot, 16 warm</div></div>
+  <div class="stat-card"><div class="stat-label">Total Pax Booked</div><div class="stat-value" style="color:var(--brand);">2,847</div><div class="stat-sub">Revenue ₹42.3L</div></div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab active" id="tab-btn-overview" onclick="switchTab('overview',event)"><i class="fa fa-home"></i> Overview</div>
+  <div class="tab" id="tab-btn-leads" onclick="switchTab('leads',event)"><i class="fa fa-funnel-dollar"></i> Leads</div>
+  <div class="tab" id="tab-btn-bookings" onclick="switchTab('bookings',event)"><i class="fa fa-ticket-alt"></i> Bookings</div>
+  <div class="tab" id="tab-btn-commission" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i> Commission</div>
+  <div class="tab" id="tab-btn-team" onclick="switchTab('team',event)"><i class="fa fa-users"></i> Team</div>
+  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i> Reports</div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab-panel active">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card"><div class="card-header"><span class="card-title">Monthly Performance</span></div><div style="height:220px;"><canvas id="perf-chart"></canvas></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Revenue Breakdown</span></div><div style="height:220px;"><canvas id="rev-chart"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-top:18px;">
+    <div class="card-header"><span class="card-title">Recent Activity</span></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:8px;"><div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:grid;place-items:center;flex-shrink:0;"><i class="fa fa-check" style="color:#fff;font-size:12px;"></i></div><div><div style="font-size:13px;font-weight:600;">Booking Confirmed — WOW-2025-48920</div><div style="font-size:11px;color:var(--muted);">Mehta Family · 12 pax · ₹9,588 · 2 min ago</div></div><span class="badge badge-green" style="margin-left:auto;">Confirmed</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:8px;"><div style="width:36px;height:36px;background:var(--yellow);border-radius:50%;display:grid;place-items:center;flex-shrink:0;"><i class="fa fa-phone" style="color:#fff;font-size:12px;"></i></div><div><div style="font-size:13px;font-weight:600;">Lead Follow-up — Sharma Corporate</div><div style="font-size:11px;color:var(--muted);">150 pax · Proposal sent · 1 hr ago</div></div><span class="badge badge-yellow" style="margin-left:auto;">Proposal</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:8px;"><div style="width:36px;height:36px;background:var(--teal);border-radius:50%;display:grid;place-items:center;flex-shrink:0;"><i class="fa fa-rupee-sign" style="color:#fff;font-size:12px;"></i></div><div><div style="font-size:13px;font-weight:600;">Commission Credited — ₹57,251</div><div style="font-size:11px;color:var(--muted);">February 2025 payout · 3 hr ago</div></div><span class="badge badge-blue" style="margin-left:auto;">Credited</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LEADS KANBAN -->
+<div id="tab-leads" class="tab-panel">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Leads Pipeline — Kanban</span><button class="btn btn-teal btn-sm" onclick="openLeadModal()"><i class="fa fa-plus"></i> Add Lead</button></div>
+    <div class="kanban">
+      <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropLead(event,'inquiry')">
+        <div class="kanban-col-header"><div class="kanban-col-title">🔵 Inquiry</div><span class="kanban-count" id="cnt-inquiry">0</span></div>
+        <div class="kanban-cards" id="cards-inquiry"></div>
+      </div>
+      <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropLead(event,'proposal')">
+        <div class="kanban-col-header"><div class="kanban-col-title">🟡 Proposal Sent</div><span class="kanban-count" id="cnt-proposal">0</span></div>
+        <div class="kanban-cards" id="cards-proposal"></div>
+      </div>
+      <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropLead(event,'negotiation')">
+        <div class="kanban-col-header"><div class="kanban-col-title">🟠 Negotiation</div><span class="kanban-count" id="cnt-negotiation">0</span></div>
+        <div class="kanban-cards" id="cards-negotiation"></div>
+      </div>
+      <div class="kanban-col" ondragover="allowDrop(event)" ondrop="dropLead(event,'won')">
+        <div class="kanban-col-header"><div class="kanban-col-title">🟢 Won</div><span class="kanban-count" id="cnt-won">0</span></div>
+        <div class="kanban-cards" id="cards-won"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKINGS -->
+<div id="tab-bookings" class="tab-panel">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Confirmed Bookings</span>
+      <div style="display:flex;gap:8px;"><input type="search" placeholder="Search…" style="width:180px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;"/></div>
+    </div>
+    <div class="tbl-wrap"><table><thead><tr><th>Booking ID</th><th>Client</th><th>Type</th><th>Pax</th><th>Date</th><th>Value</th><th>Commission</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bookings-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- COMMISSION -->
+<div id="tab-commission" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Commission Summary</span></div>
+      <table style="width:100%;font-size:13px;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Total Earned (FY)</td><td style="text-align:right;font-weight:700;color:var(--green);">₹1,84,250</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Paid Out</td><td style="text-align:right;font-weight:700;">₹1,52,000</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Pending Payout</td><td style="text-align:right;font-weight:700;color:var(--yellow);">₹32,250</td></tr>
+        <tr><td style="padding:8px 0;font-weight:700;">Current Tier Rate</td><td style="text-align:right;font-weight:800;color:var(--teal);font-size:16px;">12%</td></tr>
+      </table>
+      <div style="margin-top:14px;background:var(--bg);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;">PLATINUM TIER PROGRESS</div>
+        <div style="height:8px;background:var(--border);border-radius:20px;overflow:hidden;"><div style="height:100%;width:62%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:20px;"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">₹1,84,250 of ₹3,00,000 target · 62%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Commission Tiers</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px;background:#f0fdf4;border-radius:10px;border-left:4px solid #15803d;"><div style="font-size:12px;font-weight:800;color:#15803d;">PLATINUM — 15%</div><div style="font-size:11px;color:var(--muted);">Revenue ≥ ₹3,00,000/year</div></div>
+        <div style="padding:12px;background:#fef9c3;border-radius:10px;border-left:4px solid #ca8a04;"><div style="font-size:12px;font-weight:800;color:#ca8a04;">GOLD — 12% <span style="background:#ca8a04;color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">CURRENT</span></div><div style="font-size:11px;color:var(--muted);">Revenue ₹1,00,000–₹2,99,999/year</div></div>
+        <div style="padding:12px;background:#dbeafe;border-radius:10px;border-left:4px solid #1e40af;"><div style="font-size:12px;font-weight:800;color:#1e40af;">SILVER — 10%</div><div style="font-size:11px;color:var(--muted);">Revenue ₹50,000–₹99,999/year</div></div>
+        <div style="padding:12px;background:#f8fafc;border-radius:10px;border-left:4px solid var(--border);"><div style="font-size:12px;font-weight:800;color:var(--muted);">BRONZE — 8%</div><div style="font-size:11px;color:var(--muted);">Revenue &lt; ₹50,000/year</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px;">
+    <div class="card-header"><span class="card-title">Commission Ledger</span><button class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Export CSV</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Month</th><th>Bookings</th><th>Pax</th><th>Revenue</th><th>Rate</th><th>Gross Comm</th><th>TDS 5%</th><th>Net Payout</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Mar 2025</td><td>18</td><td>284</td><td>₹4,26,000</td><td>12%</td><td>₹51,120</td><td>₹2,556</td><td>₹48,564</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+      <tr><td>Feb 2025</td><td>22</td><td>318</td><td>₹5,02,200</td><td>12%</td><td>₹60,264</td><td>₹3,013</td><td>₹57,251</td><td><span class="badge badge-green">Paid</span></td></tr>
+      <tr><td>Jan 2025</td><td>19</td><td>267</td><td>₹3,87,150</td><td>12%</td><td>₹46,458</td><td>₹2,323</td><td>₹44,135</td><td><span class="badge badge-green">Paid</span></td></tr>
+      <tr><td>Dec 2024</td><td>31</td><td>452</td><td>₹6,97,400</td><td>12%</td><td>₹83,688</td><td>₹4,184</td><td>₹79,504</td><td><span class="badge badge-green">Paid</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="tab-team" class="tab-panel">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Sales Team</span><button class="btn btn-teal btn-sm" onclick="openTeamModal()"><i class="fa fa-user-plus"></i> Add Member</button></div>
+    <div class="tbl-wrap"><table><thead><tr><th>Agent</th><th>Role</th><th>Mobile</th><th>Bookings MTD</th><th>Revenue MTD</th><th>Commission</th><th>Status</th><th>Actions</th></tr></thead><tbody id="team-body"></tbody></table></div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div id="tab-reports" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card"><div class="card-header"><span class="card-title">Revenue by Type</span></div><div style="height:250px;"><canvas id="type-chart"></canvas></div></div>
+    <div class="card"><div class="card-header"><span class="card-title">Monthly Pax Trend</span></div><div style="height:250px;"><canvas id="pax-chart"></canvas></div></div>
+    <div class="card" style="grid-column:span 2;"><div class="card-header"><span class="card-title">Commission Trend (₹)</span></div><div style="height:220px;"><canvas id="comm-chart"></canvas></div></div>
+  </div>
+</div>
+
+</div></div></div>
+
+<!-- LEAD MODAL -->
+<div class="modal-overlay" id="lead-modal">
   <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('leadModal').classList.remove('open')"><i class="fa fa-times"></i></button>
-    <h3>Add New Lead</h3>
-    <p>Capture a new client enquiry and assign it to yourself or a sub-agent.</p>
-    <div class="fg"><label class="fl">Client Name / Company</label><input class="fi" placeholder="e.g. Sharma Family or TCS Events"/></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Mobile</label><input class="fi" type="tel" placeholder="+91 98765..."/></div>
-      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="client@email.com"/></div>
-    </div>
-    <div class="fg"><label class="fl">Enquiry</label><input class="fi" placeholder="e.g. 10 pax water park on 15 April"/></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">Visit Date</label><input class="fi" type="date"/></div>
-      <div class="fg"><label class="fl">No. of Persons</label><input class="fi" type="number" placeholder="e.g. 10"/></div>
-    </div>
-    <div class="fg"><label class="fl">Assign To</label>
-      <select class="fi"><option>Self</option><option>Priya Mehta</option><option>Ravi Kumar</option><option>Sunita Rao</option></select>
-    </div>
-    <button class="btn-submit" onclick="addLead()">Save Lead</button>
+    <div class="modal-header"><div class="modal-title">Add New Lead</div><button class="modal-close" onclick="closeModal('lead-modal')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Client / Group Name</label><input type="text" id="lm-name" placeholder="e.g. Sharma Family"/></div><div class="form-group"><label>Contact Mobile</label><input type="text" id="lm-mobile" placeholder="+91 9XXXXXXXXX"/></div></div>
+    <div class="form-row"><div class="form-group"><label>Ticket Type</label><select id="lm-ticket"><option>Water Park</option><option>Amusement Park</option><option>Combo</option><option>Corporate</option></select></div><div class="form-group"><label>Expected Pax</label><input type="number" id="lm-pax" value="10" min="1"/></div></div>
+    <div class="form-row"><div class="form-group"><label>Visit Date</label><input type="date" id="lm-date"/></div><div class="form-group"><label>Stage</label><select id="lm-stage"><option value="inquiry">Inquiry</option><option value="proposal">Proposal Sent</option><option value="negotiation">Negotiation</option><option value="won">Won</option></select></div></div>
+    <div class="form-group"><label>Notes</label><textarea id="lm-notes" placeholder="Special requirements…" style="min-height:70px;"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('lead-modal')">Cancel</button><button class="btn btn-teal" onclick="saveLead()"><i class="fa fa-save"></i> Save Lead</button></div>
   </div>
 </div>
 
-<div class="overlay" id="agentModal" onclick="if(event.target===this)this.classList.remove('open')">
+<!-- TEAM MODAL -->
+<div class="modal-overlay" id="team-modal">
   <div class="modal">
-    <button class="modal-close" onclick="document.getElementById('agentModal').classList.remove('open')"><i class="fa fa-times"></i></button>
-    <h3>Add Sub-Agent</h3>
-    <p>Add a team member and set their rights. They can only access what you allow.</p>
-    <div class="fr">
-      <div class="fg"><label class="fl">First Name</label><input class="fi" placeholder="First"/></div>
-      <div class="fg"><label class="fl">Last Name</label><input class="fi" placeholder="Last"/></div>
-    </div>
-    <div class="fg"><label class="fl">Mobile</label><input class="fi" type="tel" placeholder="+91 98765 43210"/></div>
-    <div class="fg"><label class="fl">Access Rights</label>
-      <select class="fi">
-        <option>Full Access — All features</option>
-        <option>Leads Only — View and add leads</option>
-        <option>Bookings Only — Make and track bookings</option>
-        <option>View Only — Reports and history only</option>
-      </select>
-    </div>
-    <div class="fg"><label class="fl">Can Create Sub-Agents?</label>
-      <select class="fi"><option>No</option><option>Yes</option></select>
-    </div>
-    <button class="btn-submit" onclick="addAgent()">Create Sub-Agent Account</button>
+    <div class="modal-header"><div class="modal-title">Add Team Member</div><button class="modal-close" onclick="closeModal('team-modal')">✕</button></div>
+    <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="tm-name" placeholder="e.g. Priya Sharma"/></div><div class="form-group"><label>Role</label><select id="tm-role"><option>Sales Executive</option><option>Senior Agent</option><option>Team Lead</option><option>Manager</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Mobile</label><input type="text" id="tm-mobile" placeholder="+91 9XXXXXXXXX"/></div><div class="form-group"><label>Email</label><input type="email" id="tm-email" placeholder="agent@email.com"/></div></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('team-modal')">Cancel</button><button class="btn btn-teal" onclick="saveTeamMember()"><i class="fa fa-save"></i> Add Member</button></div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-function showTab(t) {
-  ['dashboard','leads','pipeline','bookings','team','commissions','invoices','manager'].forEach(id => {
-    const el = document.getElementById('tab-'+id);
-    if (el) el.style.display = (id===t)?'':'none';
+<script>
+const tkPrices={'Water Park':799,'Amusement Park':699,'Combo':1299,'Corporate':1899};
+let leads=[
+  {id:1,name:'Mehta Family Group',mobile:'+91 98765 43210',ticket:'Water Park',pax:12,date:'2025-04-05',stage:'won'},
+  {id:2,name:'Sharma Corporate Outing',mobile:'+91 87654 32109',ticket:'Combo',pax:150,date:'2025-04-12',stage:'proposal'},
+  {id:3,name:'Green Valley School',mobile:'+91 76543 21098',ticket:'Combo',pax:80,date:'2025-04-18',stage:'inquiry'},
+  {id:4,name:'Kapoor Birthday Party',mobile:'+91 65432 10987',ticket:'Water Park',pax:30,date:'2025-04-10',stage:'negotiation'},
+  {id:5,name:'Verma Weekend',mobile:'+91 54321 09876',ticket:'Amusement Park',pax:6,date:'2025-04-06',stage:'won'},
+  {id:6,name:'TechCorp MICE',mobile:'+91 43210 98765',ticket:'Corporate',pax:200,date:'2025-05-01',stage:'inquiry'},
+];
+function renderKanban(){
+  ['inquiry','proposal','negotiation','won'].forEach(s=>{
+    const items=leads.filter(l=>l.stage===s);
+    document.getElementById('cnt-'+s).textContent=items.length;
+    document.getElementById('cards-'+s).innerHTML=items.map(l=>`
+    <div class="kanban-card" draggable="true" ondragstart="dragLead(event,${l.id})">
+      <div class="kc-title">${l.name}</div>
+      <div class="kc-sub">${l.ticket} · ${l.pax} pax</div>
+      <div class="kc-meta"><span class="kc-amt">₹${((tkPrices[l.ticket]||799)*l.pax).toLocaleString('en-IN')}</span><span class="kc-date">${l.date||'TBD'}</span></div>
+    </div>`).join('');
   });
-  const titles = {dashboard:'TA Dashboard',leads:'All Leads',pipeline:'Sales Pipeline',bookings:'Booking History',team:'My Team',commissions:'Commissions',invoices:'GST Invoices',manager:'My Account Manager'};
-  document.getElementById('pageTitle').textContent = titles[t]||t;
-  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
 }
-function openAddLead() { document.getElementById('leadModal').classList.add('open'); }
-function addLead() {
-  alert('Lead saved! You can find it in the Leads tab. An automated WhatsApp follow-up has been scheduled for tomorrow 10 AM. Ek dam zabardast lead capture, bhai! 🎉');
-  document.getElementById('leadModal').classList.remove('open');
+renderKanban();
+let dragId=null;
+function dragLead(e,id){dragId=id;}
+function allowDrop(e){e.preventDefault();}
+function dropLead(e,stage){e.preventDefault();if(dragId){const l=leads.find(x=>x.id===dragId);if(l){l.stage=stage;renderKanban();}dragId=null;}}
+
+const bookings=[
+  {id:'WOW-2025-48920',client:'Mehta Family',type:'Water Park',pax:12,date:'2025-04-05',value:9588,comm:1151,status:'confirmed'},
+  {id:'WOW-2025-48765',client:'Verma Family',type:'Amusement Park',pax:6,date:'2025-04-06',value:4194,comm:503,status:'confirmed'},
+  {id:'WOW-2025-47821',client:'Gupta Group',type:'Combo',pax:25,date:'2025-03-28',value:32475,comm:3897,status:'checked-in'},
+  {id:'WOW-2025-46920',client:'Tech Outing 2025',type:'Corporate',pax:80,date:'2025-03-22',value:151920,comm:18230,status:'checked-in'},
+];
+function renderBookings(){
+  const smap={confirmed:'badge-blue','checked-in':'badge-green',completed:'badge-purple',cancelled:'badge-red'};
+  document.getElementById('bookings-body').innerHTML=bookings.map(b=>`
+  <tr><td><code style="font-size:11px;">${b.id}</code></td><td><strong>${b.client}</strong></td><td>${b.type}</td><td>${b.pax}</td><td>${b.date}</td>
+  <td><strong>₹${b.value.toLocaleString('en-IN')}</strong></td><td style="color:var(--green);font-weight:700;">₹${b.comm.toLocaleString('en-IN')}</td>
+  <td><span class="badge ${smap[b.status]||'badge-blue'}">${b.status}</span></td>
+  <td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button> <button class="btn btn-outline btn-sm"><i class="fa fa-file-pdf"></i></button></td></tr>`).join('');
 }
-function openAddAgent() { document.getElementById('agentModal').classList.add('open'); }
-function addAgent() {
-  alert('Sub-agent account created. They will receive an OTP on their mobile to activate. Swagat hai team mein! 👋');
-  document.getElementById('agentModal').classList.remove('open');
+renderBookings();
+
+let team=[
+  {name:'Ravi Kapoor',role:'Team Lead',mobile:'+91 98765 43210',bk:8,rev:64800,comm:7776},
+  {name:'Priya Sharma',role:'Senior Agent',mobile:'+91 87654 32109',bk:6,rev:42300,comm:5076},
+  {name:'Arjun Singh',role:'Sales Executive',mobile:'+91 76543 21098',bk:4,rev:28900,comm:3468},
+];
+function renderTeam(){
+  document.getElementById('team-body').innerHTML=team.map(m=>`
+  <tr><td><div style="display:flex;align-items:center;gap:8px;"><img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.name)}" width="30" height="30" style="border-radius:50%;"/><strong>${m.name}</strong></div></td>
+  <td>${m.role}</td><td>${m.mobile}</td><td>${m.bk}</td><td>₹${m.rev.toLocaleString('en-IN')}</td>
+  <td style="color:var(--green);font-weight:700;">₹${m.comm.toLocaleString('en-IN')}</td>
+  <td><span class="badge badge-green">Active</span></td>
+  <td><button class="btn btn-outline btn-sm"><i class="fa fa-edit"></i></button></td></tr>`).join('');
 }
-showTab('dashboard');
+renderTeam();
+
+function switchTab(id,e){
+  if(e)e.preventDefault();
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const b=document.getElementById('tab-btn-'+id);if(b)b.classList.add('active');
+  if(id==='overview')initOv();
+  if(id==='reports')initRp();
+}
+
+let ovInited=false,rpInited=false;
+function initOv(){
+  if(ovInited)return;ovInited=true;
+  new Chart(document.getElementById('perf-chart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Bookings',data:[28,32,45,31,38,18],backgroundColor:'rgba(0,180,216,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('rev-chart'),{type:'doughnut',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[30,20,35,15],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
+}
+function initRp(){
+  if(rpInited)return;rpInited=true;
+  new Chart(document.getElementById('type-chart'),{type:'pie',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[35,20,30,15],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+  new Chart(document.getElementById('pax-chart'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Pax',data:[320,380,520,340,420,284],borderColor:'#00b4d8',tension:.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('comm-chart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'₹',data:[28000,35200,83688,44135,57251,48564],backgroundColor:'rgba(6,214,160,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+}
+setTimeout(initOv,100);
+
+function openLeadModal(){document.getElementById('lead-modal').classList.add('show');}
+function openTeamModal(){document.getElementById('team-modal').classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function saveLead(){
+  const name=document.getElementById('lm-name').value.trim();
+  if(!name){alert('Client name required.');return;}
+  leads.push({id:Date.now(),name,mobile:document.getElementById('lm-mobile').value,ticket:document.getElementById('lm-ticket').value,pax:+document.getElementById('lm-pax').value||1,date:document.getElementById('lm-date').value,stage:document.getElementById('lm-stage').value});
+  renderKanban();closeModal('lead-modal');switchTab('leads',null);
+}
+function saveTeamMember(){
+  const name=document.getElementById('tm-name').value.trim();
+  if(!name){alert('Name required.');return;}
+  team.push({name,role:document.getElementById('tm-role').value,mobile:document.getElementById('tm-mobile').value,bk:0,rev:0,comm:0});
+  renderTeam();closeModal('team-modal');
+}
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
