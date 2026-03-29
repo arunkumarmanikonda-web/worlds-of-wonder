@@ -709,7 +709,7 @@
             What is the refund policy? <span>+</span>
           </button>
           <div class="pp-faq-a">
-            Passports are non-refundable after KYC activation. However, if activation is delayed beyond 7 days due to our processing issues, a full refund is available. Contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a4d7d1d4d4cbd6d0e4d3cbd6c8c0d7cbc2d3cbcac0c1d68acdca">[email&#160;protected]</a>.
+            Passports are non-refundable after KYC activation. However, if activation is delayed beyond 7 days due to our processing issues, a full refund is available. Contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1e181d1d021f192d1a021f01091e020b1a020309081f430403">[email&#160;protected]</a>.
           </div>
         </div>
 
@@ -741,8 +741,22 @@
 
 </div><!-- /app -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/wow-modules.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/wow-content-control.js"></script>
+<script src="js/wow-modules.js"></script>
 <script src="js/shell.js"></script>
+<script>
+(function() {
+  if (typeof WOWContent !== 'undefined') {
+    var pCfg = WOWContent.getProductCfg();
+    if (pCfg.PASSPORT && pCfg.PASSPORT.enabled === false) {
+      var app = document.getElementById('app');
+      if (app) app.innerHTML = '<div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;"><div style="font-size:56px;margin-bottom:16px;">&#129370;</div><h2 style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#003D82;margin-bottom:12px;">WOW Passport Temporarily Unavailable</h2><p style="font-size:16px;color:#6B7280;max-width:480px;margin-bottom:28px;">Annual Passport sales are currently paused. Please check back soon or contact us for assistance.</p><a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:#003D82;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;">&#8592; Back to Home</a></div>';
+      return;
+    }
+    WOWContent.apply();
+  }
+})();
+</script>
 <script>
 // Set expiry display
 const d = new Date();
