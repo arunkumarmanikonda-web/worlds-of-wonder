@@ -401,10 +401,20 @@
   </section>
 
 </div>
+<script src="js/wow-content-control.js"></script>
 <script src="js/wow-modules.js"></script>
 <script src="js/shell.js"></script>
 <script>
 (function () {
+  // Block page if Water Park is disabled by super admin
+  if (typeof WOWContent !== 'undefined') {
+    var pCfg = WOWContent.getProductCfg();
+    if (pCfg.WATER_DAY && pCfg.WATER_DAY.enabled === false) {
+      document.getElementById('app').innerHTML = '<div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;"><div style="font-size:56px;margin-bottom:16px;">&#127754;</div><h2 style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#003D82;margin-bottom:12px;">Water Park Information Unavailable</h2><p style="font-size:16px;color:#6B7280;max-width:480px;margin-bottom:28px;">This section is temporarily unavailable. Please visit our homepage or contact us for more information.</p><a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:#003D82;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;">&#8592; Back to Home</a></div>';
+      return;
+    }
+    WOWContent.apply();
+  }
   function startSlideshow(sel) {
     var slides = document.querySelectorAll(sel);
     if (!slides.length) return;
