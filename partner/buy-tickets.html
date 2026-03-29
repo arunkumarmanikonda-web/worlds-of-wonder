@@ -6,236 +6,1331 @@
   <title>Buy Tickets — Partner Portal | Worlds of Wonder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+  <script src="../js/wow-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary:#0055B3;--primary-dk:#003D82;--primary-lt:#EBF3FF;
+      --green:#0A9B5F;--green-lt:#E6F7F1;--green-dk:#077A4A;
+      --amber:#F5A800;--amber-lt:#FFF8E6;
+      --red:#E53E3E;--red-lt:#FFF5F5;
+      --ink:#080E1E;--ink2:#0D1730;--text:#1A2235;--text2:#4A5568;--text3:#94A3B8;
+      --bg:#F7F9FC;--bg2:#EEF2F8;--white:#FFFFFF;
+      --border:#DDE3EE;--border2:#C8D3E5;
+      --r-sm:10px;--r-md:16px;--r-lg:22px;--r-xl:32px;
+      --s1:0 1px 4px rgba(0,30,80,.06);--s2:0 4px 24px rgba(0,30,80,.10);--s3:0 12px 48px rgba(0,30,80,.14);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* Layout */
+    .p-layout{display:flex;min-height:100vh;}
+    .p-sidebar{width:260px;min-height:100vh;background:#0d1f0e;display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:200;}
+    .p-sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);}
+    .p-sidebar-logo img{height:42px;width:auto;object-fit:contain;}
+    .p-sidebar-badge{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;}
+    .p-nav{flex:1;padding:14px 0;overflow-y:auto;}
+    .p-nav a{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;font-weight:600;color:rgba(255,255,255,.65);text-decoration:none;transition:all .2s;border-left:3px solid transparent;}
+    .p-nav a:hover{color:#fff;background:rgba(255,255,255,.06);}
+    .p-nav a.active{color:#4ade80;background:rgba(74,222,128,.08);border-left-color:#4ade80;}
+    .p-nav-section{padding:14px 20px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);}
+    .p-nav-divider{height:1px;background:rgba(255,255,255,.08);margin:8px 16px;}
+    .p-sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);}
+    .p-user{display:flex;align-items:center;gap:10px;}
+    .p-user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#16a34a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;}
+    .p-user-name{font-size:13px;font-weight:700;color:#fff;}
+    .p-user-role{font-size:11px;color:rgba(255,255,255,.4);}
+
+    .p-main{margin-left:260px;flex:1;display:flex;flex-direction:column;}
+    .p-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .p-topbar-title{font-size:18px;font-weight:800;color:var(--ink);}
+    .p-topbar-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+    .p-content{padding:28px;flex:1;}
+
+    /* Stepper */
+    .stepper{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+    .step{display:flex;align-items:center;gap:10px;flex:1;}
+    .step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:2px solid var(--border);background:var(--white);color:var(--text3);flex-shrink:0;transition:all .3s;}
+    .step-circle.done{background:var(--green);border-color:var(--green);color:#fff;}
+    .step-circle.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+    .step-label{font-size:13px;font-weight:600;color:var(--text3);}
+    .step-label.active{color:var(--primary);}
+    .step-label.done{color:var(--green);}
+    .step-line{flex:1;height:2px;background:var(--border);margin:0 8px;transition:background .3s;}
+    .step-line.done{background:var(--green);}
+
+    /* Cards */
+    .card{background:var(--white);border-radius:var(--r-md);border:1.5px solid var(--border);padding:24px;box-shadow:var(--s1);}
+    .card-title{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .card-title .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--primary-lt);color:var(--primary);}
+
+    /* Park selector tabs */
+    .park-tabs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+    .park-tab{display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all .2s;text-align:left;}
+    .park-tab:hover{border-color:var(--green);box-shadow:var(--s1);}
+    .park-tab.active{border-color:var(--green);background:var(--green-lt);box-shadow:0 4px 16px rgba(10,155,95,.15);}
+    .park-tab-icon{font-size:26px;}
+    .park-tab-name{font-size:14px;font-weight:800;color:var(--ink);}
+    .park-tab-price{font-size:12px;color:var(--text3);margin-top:2px;}
+    .park-tab.active .park-tab-name{color:var(--green-dk);}
+
+    /* Tier table */
+    .tier-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .tier-table th{background:var(--bg2);padding:10px 14px;font-weight:700;color:var(--text2);text-align:left;border-bottom:2px solid var(--border);}
+    .tier-table td{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .tier-table tr:last-child td{border-bottom:none;}
+    .tier-table tr:hover td{background:var(--bg);}
+    .tier-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .tier-badge.silver{background:#f1f5f9;color:#475569;}
+    .tier-badge.gold{background:#fef3c7;color:#92400e;}
+    .tier-badge.platinum{background:linear-gradient(135deg,#e0e7ff,#ddd6fe);color:#4c1d95;}
+
+    /* Ticket quantity rows */
+    .tkt-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:10px;border:1.5px solid transparent;transition:border .2s;}
+    .tkt-row:hover{border-color:var(--border2);}
+    .tkt-row-info .name{font-size:14px;font-weight:700;color:var(--ink);}
+    .tkt-row-info .desc{font-size:12px;color:var(--text3);margin-top:2px;}
+    .tkt-row-pricing{text-align:right;}
+    .tkt-row-pricing .rate{font-size:13px;font-weight:700;color:var(--primary);}
+    .tkt-row-pricing .save{font-size:11px;color:var(--green);margin-top:2px;}
+    .qty-ctrl{display:flex;align-items:center;gap:10px;}
+    .qty-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);background:var(--white);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--ink);}
+    .qty-btn:hover{border-color:var(--green);background:var(--green-lt);}
+    .qty-num{font-size:18px;font-weight:900;color:var(--ink);min-width:28px;text-align:center;}
+
+    /* Order Summary */
+    .order-summary{position:sticky;top:80px;}
+    .sum-line{display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:8px;align-items:center;}
+    .sum-line .key{color:var(--text3);}
+    .sum-total-row{display:flex;justify-content:space-between;font-size:18px;font-weight:900;color:var(--ink);border-top:2px solid var(--border);padding-top:14px;margin-top:14px;}
+    .sum-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
+
+    /* Form inputs */
+    .form-group{margin-bottom:16px;}
+    .form-label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px;}
+    .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;background:var(--white);color:var(--ink);outline:none;font-family:'Poppins',sans-serif;transition:border .2s;}
+    .form-input:focus{border-color:var(--primary);}
+    .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+    .form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r-sm);font-size:14px;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;text-decoration:none;}
+    .btn-primary{background:linear-gradient(135deg,var(--green-dk),var(--green));color:#fff;}
+    .btn-primary:hover{box-shadow:0 6px 20px rgba(10,155,95,.35);transform:translateY(-1px);}
+    .btn-blue{background:linear-gradient(135deg,var(--primary-dk),var(--primary));color:#fff;}
+    .btn-blue:hover{box-shadow:0 6px 20px rgba(0,85,179,.35);}
+    .btn-ghost{background:var(--white);border:1.5px solid var(--border);color:var(--text);}
+    .btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+    .btn-sm{padding:7px 14px;font-size:12px;}
+    .btn-lg{padding:14px 28px;font-size:15px;}
+    .btn-full{width:100%;justify-content:center;}
+
+    /* Invoice preview */
+    .invoice-box{background:var(--white);border:2px solid var(--border);border-radius:var(--r-md);padding:32px;font-size:13px;line-height:1.7;}
+    .invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid var(--ink);}
+    .invoice-logo{font-size:22px;font-weight:900;color:var(--ink);}
+    .invoice-meta{text-align:right;}
+    .invoice-title{font-size:26px;font-weight:900;color:var(--ink);letter-spacing:.05em;}
+    .invoice-section{margin-bottom:20px;}
+    .invoice-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;}
+    .invoice-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .invoice-table th{background:var(--ink);color:#fff;padding:10px 14px;text-align:left;font-size:12px;}
+    .invoice-table td{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .invoice-table tr:last-child td{border-bottom:none;}
+    .invoice-total-row{font-weight:800;background:var(--bg2);}
+    .invoice-grand{font-size:15px;font-weight:900;background:var(--ink);color:#fff;}
+    .invoice-stamp{display:inline-block;border:3px solid var(--green);color:var(--green);font-weight:900;font-size:16px;padding:8px 20px;border-radius:4px;transform:rotate(-5deg);letter-spacing:.1em;}
+
+    /* QR Voucher */
+    .voucher-card{background:linear-gradient(135deg,#0d1f0e,#166534);border-radius:var(--r-lg);padding:24px;color:#fff;position:relative;overflow:hidden;}
+    .voucher-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05);}
+    .voucher-card::after{content:'';position:absolute;bottom:-30px;left:-30px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.04);}
+    .voucher-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+    .voucher-park{font-size:20px;font-weight:900;}
+    .voucher-batch{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;}
+    .voucher-qr{width:80px;height:80px;background:var(--white);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+    .voucher-info{display:flex;gap:24px;flex-wrap:wrap;}
+    .voucher-info-item{font-size:11px;color:rgba(255,255,255,.6);}
+    .voucher-info-val{font-size:16px;font-weight:800;color:#fff;display:block;}
+    .voucher-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.15);}
+    .voucher-code{font-size:18px;font-weight:900;letter-spacing:.1em;color:#4ade80;}
+    .voucher-valid{font-size:11px;color:rgba(255,255,255,.5);}
+
+    /* Tabs */
+    .tab-bar{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r-sm);padding:4px;margin-bottom:24px;}
+    .tab-btn{flex:1;padding:9px 12px;border-radius:6px;font-size:13px;font-weight:700;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;}
+    .tab-btn.active{background:var(--white);color:var(--ink);box-shadow:var(--s1);}
+
+    /* Alert banner */
+    .alert{padding:12px 16px;border-radius:var(--r-sm);font-size:13px;margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;}
+    .alert-info{background:var(--primary-lt);border-left:4px solid var(--primary);color:var(--primary-dk);}
+    .alert-success{background:var(--green-lt);border-left:4px solid var(--green);color:var(--green-dk);}
+    .alert-amber{background:var(--amber-lt);border-left:4px solid var(--amber);color:#92400e;}
+
+    /* Credit balance widget */
+    .credit-widget{background:linear-gradient(135deg,#0d1f0e,#14532d);border-radius:var(--r-md);padding:18px 22px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+    .credit-amount{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:#4ade80;}
+    .credit-label{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;}
+
+    /* History table */
+    .hist-table{width:100%;border-collapse:collapse;font-size:13px;}
+    .hist-table th{background:var(--bg2);padding:10px 14px;font-weight:700;color:var(--text2);text-align:left;}
+    .hist-table td{padding:10px 14px;border-bottom:1px solid var(--border);}
+    .hist-table tbody tr:hover td{background:var(--bg);}
+    .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-green{background:var(--green-lt);color:var(--green-dk);}
+    .badge-blue{background:var(--primary-lt);color:var(--primary);}
+    .badge-amber{background:var(--amber-lt);color:#92400e;}
+    .badge-red{background:var(--red-lt);color:var(--red);}
+    .badge-gray{background:var(--bg2);color:var(--text2);}
+
+    /* Responsive */
+    @media(max-width:900px){
+      .p-sidebar{transform:translateX(-100%);}
+      .p-main{margin-left:0;}
+      .form-grid2,.form-grid3{grid-template-columns:1fr;}
+      .two-col{grid-template-columns:1fr !important;}
+    }
+  </style>
 </head>
 <body>
-<div id="app">
-  <div class="portal-dashboard">
+<div class="p-layout">
 
-    <!-- Sidebar -->
-    <aside class="portal-sidebar" id="portal-sidebar" style="background:#0d1f0e;">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" /></a>
-        <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;">Partner Portal</div>
-      </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
-        <a href="buy-tickets.html" class="portal-sidenav-item active" style="border-left-color:#22c55e;"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>Buy Tickets</a>
-        <a href="ticket-batches.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Ticket Batches</a>
-        <a href="invoices.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Invoices</a>
-        <a href="statements.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Statement & Ledger</a>
-        <a href="support.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Support</a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Back to WOW Site</a>
-      </nav>
-    </aside>
-
-    <!-- Main -->
-    <main class="portal-main">
-      <div class="portal-main-header">
-        <div>
-          <h1 class="portal-main-title">Buy Tickets</h1>
-          <p class="portal-main-sub">Purchase tickets for your clients — instant batch QR issuance</p>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280;">
-          💳 Credit Balance: <strong style="color:#166534;font-size:16px;">₹2,40,000</strong>
-        </div>
-      </div>
-
-      <!-- Park Selector -->
-      <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <button class="park-sel-btn park-sel-btn--active" id="btn-water" onclick="selectPark('water')">
-          🌊 Water Park
-        </button>
-        <button class="park-sel-btn" id="btn-amusement" onclick="selectPark('amusement')">
-          🎢 Amusement Park
-        </button>
-        <button class="park-sel-btn" id="btn-combo" onclick="selectPark('combo')">
-          🎉 Combo (Both Parks)
-        </button>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;">
-        <!-- Left: Ticket form -->
-        <div>
-          <!-- Date selector -->
-          <div class="portal-card" style="margin-bottom:18px;">
-            <div class="portal-card-title">Visit Date</div>
-            <input type="date" id="visit-date" class="portal-input" style="max-width:260px;" />
-            <p style="font-size:12px;color:#6b7280;margin-top:6px;">⚠️ Tickets are valid only for the selected date.</p>
-          </div>
-
-          <!-- Ticket categories -->
-          <div class="portal-card" style="margin-bottom:18px;">
-            <div class="portal-card-title">Ticket Categories</div>
-            <div id="ticket-rows" style="display:flex;flex-direction:column;gap:14px;margin-top:14px;">
-              <!-- Rendered by JS -->
-            </div>
-          </div>
-
-          <!-- Guest name (optional for batches) -->
-          <div class="portal-card" style="margin-bottom:18px;">
-            <div class="portal-card-title">Booking Reference (Optional)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-              <div>
-                <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Your PO / Reference #</label>
-                <input type="text" id="po-ref" class="portal-input" placeholder="e.g. PO-2026-0842" />
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">Group / Client Name</label>
-                <input type="text" id="client-name" class="portal-input" placeholder="e.g. Sharma Family Tour" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Order Summary -->
-        <div class="portal-card" style="position:sticky;top:80px;">
-          <div class="portal-card-title">Order Summary</div>
-          <div id="summary-park" style="font-size:13px;font-weight:700;color:#1a56db;margin-bottom:12px;"></div>
-          <div id="summary-date" style="font-size:13px;color:#6b7280;margin-bottom:16px;"></div>
-          <div id="summary-lines" style="margin-bottom:16px;"></div>
-          <div style="border-top:1px solid #e5e7eb;padding-top:14px;">
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;margin-bottom:6px;">
-              <span>Subtotal</span><span id="sum-sub">₹0</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;margin-bottom:6px;">
-              <span>Partner Discount (12%)</span><span id="sum-disc" style="color:#16a34a;">-₹0</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:13px;color:#6b7280;margin-bottom:14px;">
-              <span>GST (18% incl.)</span><span id="sum-gst">₹0</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:900;color:#0a0f28;border-top:2px solid #e5e7eb;padding-top:12px;">
-              <span>Total</span><span id="sum-total">₹0</span>
-            </div>
-          </div>
-          <button class="btn btn-primary" style="width:100%;margin-top:18px;background:linear-gradient(135deg,#166534,#15803d);justify-content:center;font-size:15px;padding:14px;" onclick="placeOrder()">
-            🎟 Confirm &amp; Issue Tickets
-          </button>
-          <p style="font-size:11.5px;color:#9ca3af;text-align:center;margin-top:10px;">QR tickets issued instantly to your batch downloads</p>
-        </div>
-      </div>
-    </main>
-  </div>
-</div>
-
-<!-- Success Modal -->
-<div id="success-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-    <div style="font-size:60px;margin-bottom:16px;">🎉</div>
-    <h2 style="font-size:22px;font-weight:900;color:#0a0f28;margin-bottom:8px;">Order Confirmed!</h2>
-    <p style="font-size:14px;color:#6b7280;margin-bottom:20px;">Your ticket batch has been created. QR codes are ready for download.</p>
-    <div id="order-ref" style="font-size:13px;font-weight:700;color:#1a56db;background:#eff6ff;padding:10px 16px;border-radius:8px;margin-bottom:20px;"></div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <a href="ticket-batches.html" class="btn btn-primary" style="background:linear-gradient(135deg,#166534,#15803d);">📦 View Batch</a>
-      <button class="btn" style="border:1.5px solid #e5e7eb;" onclick="document.getElementById('success-modal').style.display='none'">Buy More</button>
+  <!-- Sidebar -->
+  <aside class="p-sidebar">
+    <div class="p-sidebar-logo">
+      <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" /></a>
+      <div class="p-sidebar-badge">Partner Portal</div>
     </div>
-  </div>
+    <nav class="p-nav">
+      <div class="p-nav-section">Navigation</div>
+      <a href="dashboard.html"><i class="fas fa-th-large" style="width:16px;"></i> Dashboard</a>
+      <a href="buy-tickets.html" class="active"><i class="fas fa-ticket-alt" style="width:16px;"></i> Buy Tickets</a>
+      <a href="ticket-batches.html"><i class="fas fa-layer-group" style="width:16px;"></i> Ticket Batches</a>
+      <a href="bulk-tickets.html"><i class="fas fa-boxes" style="width:16px;"></i> Bulk Orders</a>
+      <a href="quote-builder.html"><i class="fas fa-calculator" style="width:16px;"></i> Quote Builder</a>
+      <div class="p-nav-divider"></div>
+      <div class="p-nav-section">Finance</div>
+      <a href="invoices.html"><i class="fas fa-file-invoice" style="width:16px;"></i> Invoices</a>
+      <a href="invoice-gst.html"><i class="fas fa-file-invoice-dollar" style="width:16px;"></i> GST Invoices</a>
+      <a href="statements.html"><i class="fas fa-dollar-sign" style="width:16px;"></i> Statement &amp; Ledger</a>
+      <div class="p-nav-divider"></div>
+      <div class="p-nav-section">Account</div>
+      <a href="onboarding-kyc.html"><i class="fas fa-id-card" style="width:16px;"></i> KYC &amp; Onboarding</a>
+      <a href="reports.html"><i class="fas fa-chart-bar" style="width:16px;"></i> Reports</a>
+      <a href="support.html"><i class="fas fa-headset" style="width:16px;"></i> Support</a>
+      <div class="p-nav-divider"></div>
+      <a href="../index.html"><i class="fas fa-globe" style="width:16px;"></i> Back to WOW Site</a>
+    </nav>
+    <div class="p-sidebar-footer">
+      <div class="p-user">
+        <div class="p-user-av">SK</div>
+        <div>
+          <div class="p-user-name">Sharma Travels</div>
+          <div class="p-user-role">Gold Partner · GST 09ABCDE1234F1Z5</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="p-main">
+    <div class="p-topbar">
+      <div>
+        <div class="p-topbar-title">🎟 Buy Tickets</div>
+        <div class="p-topbar-sub">Purchase tickets instantly — QR batches issued in seconds</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="showTab('history')"><i class="fas fa-history"></i> Order History</button>
+        <button class="btn btn-blue btn-sm" onclick="showTab('bulk')"><i class="fas fa-boxes"></i> Bulk Upload</button>
+      </div>
+    </div>
+
+    <div class="p-content">
+
+      <!-- Credit Balance Widget -->
+      <div class="credit-widget">
+        <div>
+          <div class="credit-label">Available Credit Balance</div>
+          <div class="credit-amount">₹2,40,000</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;">Credit Limit: ₹5,00,000 · Used: ₹2,60,000</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:6px;">Tier &amp; Commission</div>
+          <span style="background:rgba(255,215,0,.15);color:gold;font-size:13px;font-weight:800;padding:5px 14px;border-radius:20px;border:1.5px solid rgba(255,215,0,.3);">🏅 GOLD · 12% Discount</span>
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px;">+ 5% Additional on Net Amount</div>
+        </div>
+      </div>
+
+      <!-- Main Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="main-tab-buy" onclick="switchMainTab('buy')">🛒 New Order</button>
+        <button class="tab-btn" id="main-tab-history" onclick="switchMainTab('history')">📋 Order History</button>
+        <button class="tab-btn" id="main-tab-bulk" onclick="switchMainTab('bulk')">📦 Bulk Upload</button>
+        <button class="tab-btn" id="main-tab-pricing" onclick="switchMainTab('pricing')">💰 Pricing Tiers</button>
+      </div>
+
+      <!-- === NEW ORDER TAB === -->
+      <div id="tab-buy">
+        <!-- Stepper -->
+        <div class="stepper" id="stepper">
+          <div class="step">
+            <div class="step-circle active" id="sc1">1</div>
+            <div class="step-label active" id="sl1">Select Tickets</div>
+          </div>
+          <div class="step-line" id="sline1"></div>
+          <div class="step">
+            <div class="step-circle" id="sc2">2</div>
+            <div class="step-label" id="sl2">Order Details</div>
+          </div>
+          <div class="step-line" id="sline2"></div>
+          <div class="step">
+            <div class="step-circle" id="sc3">3</div>
+            <div class="step-label" id="sl3">Review &amp; Pay</div>
+          </div>
+          <div class="step-line" id="sline3"></div>
+          <div class="step">
+            <div class="step-circle" id="sc4">4</div>
+            <div class="step-label" id="sl4">Vouchers Issued</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: Select Tickets -->
+        <div id="step1">
+          <!-- Park Selector -->
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title"><i class="fas fa-map-marker-alt" style="color:var(--green);"></i> Select Park</div>
+            <div class="park-tabs" id="park-tabs">
+              <div class="park-tab active" id="pt-water" onclick="selectPark('water')">
+                <div class="park-tab-icon">🌊</div>
+                <div>
+                  <div class="park-tab-name">Water Park</div>
+                  <div class="park-tab-price">Adult ₹1,299 · Child ₹999</div>
+                </div>
+              </div>
+              <div class="park-tab" id="pt-amusement" onclick="selectPark('amusement')">
+                <div class="park-tab-icon">🎢</div>
+                <div>
+                  <div class="park-tab-name">Amusement Park</div>
+                  <div class="park-tab-price">Adult ₹1,199 · Child ₹899</div>
+                </div>
+              </div>
+              <div class="park-tab" id="pt-combo" onclick="selectPark('combo')">
+                <div class="park-tab-icon">🎉</div>
+                <div>
+                  <div class="park-tab-name">Combo (Both Parks)</div>
+                  <div class="park-tab-price">Adult ₹1,999 · Child ₹1,499</div>
+                </div>
+              </div>
+              <div class="park-tab" id="pt-season" onclick="selectPark('season')">
+                <div class="park-tab-icon">🪪</div>
+                <div>
+                  <div class="park-tab-name">Annual Passport</div>
+                  <div class="park-tab-price">Silver ₹3,499 · Gold ₹5,999</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visit Date -->
+            <div style="display:flex;align-items:center;gap:16px;margin-top:4px;flex-wrap:wrap;">
+              <div>
+                <div class="form-label">Visit Date *</div>
+                <input type="date" id="visit-date" class="form-input" style="max-width:220px;" />
+              </div>
+              <div id="season-validity" style="display:none;">
+                <div class="form-label">Validity Period</div>
+                <select id="validity-select" class="form-input form-select" style="max-width:200px;">
+                  <option value="12">12 Months</option>
+                  <option value="6">6 Months</option>
+                  <option value="3">3 Months</option>
+                </select>
+              </div>
+              <div style="font-size:12px;color:var(--text3);padding-top:22px;">
+                <i class="fas fa-info-circle" style="color:var(--primary);"></i>
+                Tickets valid only for selected date · Park open 10 AM – 7 PM
+              </div>
+            </div>
+          </div>
+
+          <!-- Ticket Categories -->
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;" class="two-col">
+            <div>
+              <div class="card">
+                <div class="card-title"><i class="fas fa-users" style="color:var(--primary);"></i> Ticket Categories <span id="park-label" class="badge">Water Park</span></div>
+
+                <div class="alert alert-info" style="margin-bottom:16px;">
+                  <i class="fas fa-tag"></i>
+                  <div>Your <strong>Gold Tier</strong> discount of <strong>12%</strong> has been automatically applied to all prices below.</div>
+                </div>
+
+                <div id="ticket-rows"></div>
+
+                <!-- Group size indicator -->
+                <div id="group-tier-box" style="margin-top:16px;padding:14px;background:var(--bg);border-radius:var(--r-sm);border:1.5px solid var(--border);display:none;">
+                  <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;">📊 Group Size Pricing Active</div>
+                  <div id="group-tier-msg" style="font-size:13px;color:var(--green-dk);font-weight:700;"></div>
+                  <div style="height:4px;background:var(--border);border-radius:4px;margin-top:8px;overflow:hidden;">
+                    <div id="group-tier-bar" style="height:100%;background:var(--green);border-radius:4px;transition:width .3s;"></div>
+                  </div>
+                  <div id="group-tier-sub" style="font-size:11px;color:var(--text3);margin-top:4px;"></div>
+                </div>
+
+                <!-- F&B Add-ons -->
+                <div style="margin-top:20px;">
+                  <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;">🥗 F&amp;B Add-ons (Optional)</div>
+                  <div id="fnb-rows"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary">
+              <div class="card">
+                <div class="card-title"><i class="fas fa-receipt" style="color:var(--amber);"></i> Order Summary</div>
+                <div id="sum-park" style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:4px;"></div>
+                <div id="sum-date" style="font-size:12px;color:var(--text3);margin-bottom:16px;"></div>
+
+                <div id="sum-lines" style="min-height:60px;"></div>
+
+                <div id="sum-fnb-section" style="display:none;padding-top:12px;margin-top:4px;border-top:1px solid var(--border);">
+                  <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">F&amp;B ADD-ONS</div>
+                  <div id="sum-fnb-lines"></div>
+                </div>
+
+                <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+                  <div class="sum-line"><span class="key">Base Total</span><span id="s-base">₹0</span></div>
+                  <div class="sum-line" style="color:var(--green);"><span>Gold Discount (12%)</span><span id="s-disc" style="color:var(--green);">-₹0</span></div>
+                  <div class="sum-line" id="s-group-row" style="display:none;color:var(--green);"><span>Group Discount</span><span id="s-grp">-₹0</span></div>
+                  <div class="sum-line"><span class="key">F&amp;B</span><span id="s-fnb">₹0</span></div>
+                  <div class="sum-line"><span class="key">GST (18%)</span><span id="s-gst">₹0</span></div>
+                  <div class="sum-total-row">
+                    <span>Grand Total</span><span id="s-total" style="color:var(--green-dk);">₹0</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:8px;color:var(--text3);">
+                    <span>Your Earnings (5%)</span>
+                    <span id="s-earn" style="color:var(--amber);font-weight:700;">₹0</span>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" style="margin-top:18px;padding:14px;" onclick="goToStep2()">
+                  <i class="fas fa-arrow-right"></i> Continue to Order Details
+                </button>
+                <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px;">
+                  QR tickets issued instantly after payment
+                </div>
+              </div>
+
+              <!-- Tier progress -->
+              <div class="card" style="margin-top:16px;">
+                <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:10px;">🏆 Tier Progress</div>
+                <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Gold → Platinum in ₹60,000</div>
+                <div style="height:6px;background:var(--bg2);border-radius:6px;overflow:hidden;">
+                  <div style="width:68%;height:100%;background:linear-gradient(90deg,#f59e0b,#d97706);border-radius:6px;"></div>
+                </div>
+                <div style="font-size:11px;color:var(--text3);margin-top:6px;">₹4,40,000 spent of ₹5,00,000 target</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Order Details -->
+        <div id="step2" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;" class="two-col">
+            <div>
+              <div class="card" style="margin-bottom:20px;">
+                <div class="card-title"><i class="fas fa-building" style="color:var(--primary);"></i> Booking Details</div>
+                <div class="form-grid2">
+                  <div class="form-group">
+                    <label class="form-label">Your PO / Reference Number</label>
+                    <input type="text" id="po-ref" class="form-input" placeholder="e.g. PO-2026-0842" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Group / Client Name *</label>
+                    <input type="text" id="client-name" class="form-input" placeholder="e.g. Sharma Family Tour" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Client Contact Number</label>
+                    <input type="tel" id="client-phone" class="form-input" placeholder="+91 98765 43210" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Client Email (for e-tickets)</label>
+                    <input type="email" id="client-email" class="form-input" placeholder="client@example.com" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="card" style="margin-bottom:20px;">
+                <div class="card-title"><i class="fas fa-file-invoice" style="color:var(--amber);"></i> GST Invoice Details</div>
+                <div class="alert alert-info" style="margin-bottom:16px;">
+                  <i class="fas fa-info-circle"></i>
+                  <div>GSTIN details are pre-filled from your KYC profile. Edit only if billing to a different entity.</div>
+                </div>
+                <div class="form-grid2">
+                  <div class="form-group">
+                    <label class="form-label">Billing Entity Name</label>
+                    <input type="text" id="bill-name" class="form-input" value="Sharma Travels Pvt Ltd" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">GSTIN</label>
+                    <input type="text" id="bill-gstin" class="form-input" value="09ABCDE1234F1Z5" />
+                  </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label class="form-label">Billing Address</label>
+                    <input type="text" id="bill-addr" class="form-input" value="42, Sector 18, Noida, Uttar Pradesh – 201301" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">State</label>
+                    <select id="bill-state" class="form-input form-select">
+                      <option selected>Uttar Pradesh</option>
+                      <option>Delhi</option>
+                      <option>Haryana</option>
+                      <option>Maharashtra</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Invoice Type</label>
+                    <select id="inv-type" class="form-input form-select">
+                      <option value="b2b">B2B Tax Invoice</option>
+                      <option value="b2c">B2C Invoice</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-title"><i class="fas fa-credit-card" style="color:var(--green);"></i> Payment Method</div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                  <label style="display:flex;align-items:center;gap:12px;padding:14px;border:2px solid var(--primary);border-radius:var(--r-sm);cursor:pointer;background:var(--primary-lt);">
+                    <input type="radio" name="pay-method" value="credit" checked /> 
+                    <div>
+                      <div style="font-size:14px;font-weight:700;color:var(--ink);">💳 Credit Account</div>
+                      <div style="font-size:12px;color:var(--text3);">Available: <strong style="color:var(--green);">₹2,40,000</strong> · Instant debit</div>
+                    </div>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;">
+                    <input type="radio" name="pay-method" value="upi" /> 
+                    <div>
+                      <div style="font-size:14px;font-weight:700;color:var(--ink);">📱 UPI / Bank Transfer</div>
+                      <div style="font-size:12px;color:var(--text3);">NEFT/RTGS · Tickets issued after confirmation</div>
+                    </div>
+                  </label>
+                  <label style="display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--border);border-radius:var(--r-sm);cursor:pointer;">
+                    <input type="radio" name="pay-method" value="cheque" /> 
+                    <div>
+                      <div style="font-size:14px;font-weight:700;color:var(--ink);">🏦 Cheque / DD</div>
+                      <div style="font-size:12px;color:var(--text3);">Tickets held for 2 business days pending clearance</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary Sidebar -->
+            <div>
+              <div class="card order-summary">
+                <div class="card-title"><i class="fas fa-clipboard-list" style="color:var(--amber);"></i> Order Review</div>
+                <div id="step2-summary"></div>
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                  <button class="btn btn-ghost" style="flex:1;" onclick="goToStep1()"><i class="fas fa-arrow-left"></i> Back</button>
+                  <button class="btn btn-primary" style="flex:2;" onclick="goToStep3()"><i class="fas fa-eye"></i> Review Invoice</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Review & Pay -->
+        <div id="step3" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;" class="two-col">
+            <div>
+              <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div>Invoice preview below — click <strong>Confirm &amp; Pay</strong> to issue tickets instantly.</div>
+              </div>
+
+              <!-- Invoice Preview -->
+              <div class="invoice-box" id="invoice-preview">
+                <div class="invoice-header">
+                  <div>
+                    <div class="invoice-logo">🎢 Worlds of Wonder</div>
+                    <div style="font-size:12px;color:var(--text3);margin-top:4px;">EALCPL, Sector 38A, Noida, UP – 201303</div>
+                    <div style="font-size:12px;color:var(--text3);">GSTIN: 09EALCP1234G1Z7 · CIN: U92490UP1990PLC012345</div>
+                  </div>
+                  <div class="invoice-meta">
+                    <div class="invoice-title">TAX INVOICE</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--text2);margin-top:6px;">Invoice #: <span id="inv-num">WOW/P/2026/08421</span></div>
+                    <div style="font-size:12px;color:var(--text3);">Date: <span id="inv-date"></span></div>
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+                  <div class="invoice-section">
+                    <div class="invoice-section-title">Bill To</div>
+                    <div style="font-weight:700;" id="inv-bill-name">Sharma Travels Pvt Ltd</div>
+                    <div style="color:var(--text3);" id="inv-bill-gstin">GSTIN: 09ABCDE1234F1Z5</div>
+                    <div style="color:var(--text3);" id="inv-bill-addr">42, Sector 18, Noida, UP – 201301</div>
+                  </div>
+                  <div class="invoice-section">
+                    <div class="invoice-section-title">Order Details</div>
+                    <div id="inv-client-name" style="font-weight:700;">—</div>
+                    <div id="inv-visit-date" style="color:var(--text3);">Visit: —</div>
+                    <div id="inv-po" style="color:var(--text3);">PO: —</div>
+                  </div>
+                </div>
+
+                <table class="invoice-table" id="inv-line-table">
+                  <thead>
+                    <tr><th>Description</th><th>HSN</th><th>Qty</th><th>Rate (excl. GST)</th><th>GST 18%</th><th>Amount</th></tr>
+                  </thead>
+                  <tbody id="inv-lines"></tbody>
+                  <tfoot>
+                    <tr style="background:var(--bg2);font-weight:700;">
+                      <td colspan="2">Subtotal</td><td id="inv-total-qty">—</td><td id="inv-sub">—</td><td id="inv-gst-amt">—</td><td id="inv-sub-total">—</td>
+                    </tr>
+                    <tr class="invoice-grand">
+                      <td colspan="5" style="font-size:15px;font-weight:900;padding:14px;">GRAND TOTAL</td>
+                      <td style="font-size:15px;font-weight:900;" id="inv-grand">—</td>
+                    </tr>
+                  </tfoot>
+                </table>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
+                  <div>
+                    <div class="invoice-section-title">GST Breakdown</div>
+                    <table style="width:100%;font-size:12px;">
+                      <tr><td>CGST (9%)</td><td style="text-align:right;font-weight:700;" id="inv-cgst">—</td></tr>
+                      <tr><td>SGST (9%)</td><td style="text-align:right;font-weight:700;" id="inv-sgst">—</td></tr>
+                      <tr><td style="font-weight:700;">Total GST</td><td style="text-align:right;font-weight:900;color:var(--ink);" id="inv-total-gst">—</td></tr>
+                    </table>
+                  </div>
+                  <div style="text-align:right;">
+                    <div class="invoice-section-title">Partner Info</div>
+                    <div style="font-size:12px;font-weight:700;">Partner Tier: <span style="color:#d97706;">GOLD</span></div>
+                    <div style="font-size:12px;color:var(--text3);">Discount Applied: 12%</div>
+                    <div style="font-size:12px;color:var(--text3);">Commission: 5% on Net</div>
+                    <div style="font-size:12px;font-weight:700;color:var(--green);margin-top:6px;">Your Earning: <span id="inv-earn">—</span></div>
+                  </div>
+                </div>
+
+                <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.8;">
+                  <strong>Terms:</strong> Tickets are non-refundable once issued. Valid only for date specified. 
+                  Subject to park operating hours and safety guidelines. GST charged as CGST+SGST for intra-state (UP) transactions.
+                  <br>This is a system-generated invoice. Digital signature not required.
+                </div>
+              </div>
+            </div>
+
+            <!-- Pay button sidebar -->
+            <div>
+              <div class="card order-summary">
+                <div class="card-title">💳 Payment</div>
+                <div id="step3-summary" style="margin-bottom:16px;"></div>
+
+                <div style="background:var(--green-lt);border:1.5px solid var(--green);border-radius:var(--r-sm);padding:14px;margin-bottom:16px;">
+                  <div style="font-size:12px;color:var(--text3);">Paying via</div>
+                  <div style="font-size:15px;font-weight:800;color:var(--green-dk);margin-top:4px;">💳 Credit Account</div>
+                  <div style="font-size:12px;color:var(--text3);margin-top:4px;">Balance after: <span id="bal-after" style="font-weight:700;color:var(--ink);">—</span></div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" onclick="confirmOrder()">
+                  <i class="fas fa-lock"></i> Confirm &amp; Issue Tickets
+                </button>
+                <button class="btn btn-ghost btn-full" style="margin-top:10px;" onclick="goToStep2()">
+                  <i class="fas fa-arrow-left"></i> Back to Edit
+                </button>
+                <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px;">
+                  🔒 Secured by SSL · GST compliant · Instant QR issuance
+                </div>
+              </div>
+
+              <div class="card" style="margin-top:16px;">
+                <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:10px;">📋 Checklist</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--green);"><i class="fas fa-check-circle"></i> Visit date selected</div>
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--green);"><i class="fas fa-check-circle"></i> Tickets qty confirmed</div>
+                  <div style="display:flex;align-items:center;gap:8px;" id="chk-client"><i class="fas fa-check-circle" style="color:var(--text3);"></i> Client name entered</div>
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--green);"><i class="fas fa-check-circle"></i> GST details verified</div>
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--green);"><i class="fas fa-check-circle"></i> Payment method selected</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Vouchers Issued -->
+        <div id="step4" style="display:none;">
+          <div style="text-align:center;padding:40px 0 24px;">
+            <div style="font-size:80px;margin-bottom:16px;">🎉</div>
+            <div style="font-size:28px;font-weight:900;color:var(--ink);margin-bottom:8px;">Tickets Issued Successfully!</div>
+            <div style="font-size:15px;color:var(--text3);margin-bottom:4px;">Batch ID: <strong id="batch-id" style="color:var(--primary);">WOW-BATCH-2026-08421</strong></div>
+            <div style="font-size:13px;color:var(--text3);" id="issued-summary-line">—</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:28px;" id="voucher-grid"></div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title"><i class="fas fa-download" style="color:var(--primary);"></i> Download Options</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-blue" onclick="showToast('Downloading ZIP with all QR tickets…')">
+                <i class="fas fa-qrcode"></i> Download All QR (ZIP)
+              </button>
+              <button class="btn btn-ghost" onclick="showToast('Generating PDF ticket sheet…')">
+                <i class="fas fa-file-pdf"></i> PDF Ticket Sheet
+              </button>
+              <button class="btn btn-ghost" onclick="showToast('Sending e-tickets to client email…')">
+                <i class="fas fa-envelope"></i> Email to Client
+              </button>
+              <button class="btn btn-ghost" onclick="showToast('Opening GST invoice…')">
+                <i class="fas fa-file-invoice-dollar"></i> Download GST Invoice
+              </button>
+              <button class="btn btn-ghost" onclick="showToast('Forwarding via WhatsApp…')">
+                <i class="fab fa-whatsapp" style="color:#25d366;"></i> Share via WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-lg" onclick="resetOrder()">
+              <i class="fas fa-plus"></i> New Order
+            </button>
+            <a href="ticket-batches.html" class="btn btn-ghost btn-lg">
+              <i class="fas fa-layer-group"></i> View All Batches
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- === ORDER HISTORY TAB === -->
+      <div id="tab-history" style="display:none;">
+        <div class="card" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+            <div class="card-title" style="margin:0;"><i class="fas fa-history" style="color:var(--primary);"></i> Purchase History</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <input type="text" class="form-input" style="width:220px;" placeholder="🔍 Search orders…" />
+              <select class="form-input form-select" style="width:150px;">
+                <option>All Statuses</option>
+                <option>Issued</option>
+                <option>Pending</option>
+                <option>Cancelled</option>
+              </select>
+              <input type="month" class="form-input" style="width:160px;" value="2026-03" />
+              <button class="btn btn-ghost btn-sm"><i class="fas fa-download"></i> Export CSV</button>
+            </div>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="hist-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th><th>Date</th><th>Park</th><th>Client</th>
+                  <th>Tickets</th><th>Amount</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody"></tbody>
+            </table>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;color:var(--text3);">
+            <span>Showing 1–10 of 48 orders</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm">← Prev</button>
+              <button class="btn btn-primary btn-sm">1</button>
+              <button class="btn btn-ghost btn-sm">2</button>
+              <button class="btn btn-ghost btn-sm">3</button>
+              <button class="btn btn-ghost btn-sm">Next →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Chart -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-chart-bar" style="color:var(--amber);"></i> Monthly Order Volume</div>
+          <div style="height:280px;"><canvas id="history-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- === BULK UPLOAD TAB === -->
+      <div id="tab-bulk" style="display:none;">
+        <div class="alert alert-amber" style="margin-bottom:20px;">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>Bulk orders above ₹5,00,000 require account manager approval. Orders &lt; ₹5,00,000 are auto-approved for Gold tier partners.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" class="two-col">
+          <div class="card">
+            <div class="card-title"><i class="fas fa-file-upload" style="color:var(--primary);"></i> Upload Order File</div>
+            <div style="border:2px dashed var(--border2);border-radius:var(--r-md);padding:40px;text-align:center;margin-bottom:16px;cursor:pointer;background:var(--bg);" onclick="showToast('File browser opening…')">
+              <div style="font-size:40px;margin-bottom:12px;">📂</div>
+              <div style="font-size:14px;font-weight:700;color:var(--ink);">Drop CSV / Excel file here</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:4px;">or click to browse</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:8px;">Supported: .csv, .xlsx · Max 5MB</div>
+            </div>
+            <button class="btn btn-ghost btn-full" onclick="showToast('Template downloaded')">
+              <i class="fas fa-download"></i> Download Template (CSV)
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><i class="fas fa-list-check" style="color:var(--green);"></i> Bulk Order Format</div>
+            <div style="font-size:13px;color:var(--text2);line-height:2;">
+              Your CSV should include these columns:
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">visit_date</code> · YYYY-MM-DD
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">park_type</code> · water / amusement / combo
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">category</code> · adult / child / senior / da / af
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">quantity</code> · number
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">client_name</code> · text
+              <br><code style="background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:12px;">po_number</code> · optional
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- === PRICING TIERS TAB === -->
+      <div id="tab-pricing" style="display:none;">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title"><i class="fas fa-layer-group" style="color:var(--primary);"></i> Partner Tier Benefits</div>
+          <div style="overflow-x:auto;">
+            <table class="tier-table">
+              <thead>
+                <tr>
+                  <th>Tier</th><th>Qualification</th><th>Discount</th><th>Commission</th>
+                  <th>Credit Limit</th><th>Approval</th><th>Support</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tier-badge silver">🥈 Silver</span></td>
+                  <td>₹0 – ₹1L / month</td>
+                  <td><strong>10%</strong></td>
+                  <td>5% on net</td>
+                  <td>₹1,00,000</td>
+                  <td>24–48 hrs</td>
+                  <td>Email only</td>
+                </tr>
+                <tr style="background:var(--amber-lt);">
+                  <td><span class="tier-badge gold">🏅 Gold (You)</span></td>
+                  <td>₹1L – ₹5L / month</td>
+                  <td><strong style="color:var(--green);">12%</strong></td>
+                  <td>5% on net</td>
+                  <td>₹5,00,000</td>
+                  <td>Auto-approved</td>
+                  <td>Dedicated RM</td>
+                </tr>
+                <tr>
+                  <td><span class="tier-badge platinum">💎 Platinum</span></td>
+                  <td>₹5L+ / month</td>
+                  <td><strong style="color:var(--primary);">15%</strong></td>
+                  <td>5% on net + ₹2L bonus</td>
+                  <td>₹20,00,000</td>
+                  <td>Auto-approved</td>
+                  <td>Priority hotline</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px;" id="pricing-table-grid"></div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-calculator" style="color:var(--amber);"></i> Group Pricing Tiers (per person, incl. GST)</div>
+          <div style="overflow-x:auto;">
+            <table class="tier-table">
+              <thead>
+                <tr><th>Group Size</th><th>Water Park</th><th>Amusement Park</th><th>Combo</th><th>Extra Discount</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>20–49 pax</strong></td><td>₹799</td><td>₹799</td><td>₹1,299</td><td>—</td></tr>
+                <tr><td><strong>50–99 pax</strong></td><td>₹749</td><td>₹749</td><td>₹1,199</td><td>Additional 5%</td></tr>
+                <tr><td><strong>100–199 pax</strong></td><td>₹699</td><td>₹699</td><td>₹1,099</td><td>Additional 8%</td></tr>
+                <tr><td><strong>200+ pax</strong></td><td>₹649</td><td>₹649</td><td>₹999</td><td>Additional 12%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /p-content -->
+  </main>
+
 </div>
 
-<style>
-.park-sel-btn{padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#6b7280;transition:all .2s;}
-.park-sel-btn:hover{border-color:#22c55e;color:#166534;}
-.park-sel-btn--active{background:linear-gradient(135deg,#166534,#15803d);color:#fff;border-color:#166534;}
-.ticket-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f9fafb;border-radius:10px;}
-.ticket-row-label{font-size:14px;font-weight:700;color:#0a0f28;}
-.ticket-row-price{font-size:13px;color:#6b7280;margin-top:2px;}
-.qty-ctrl{display:flex;align-items:center;gap:10px;}
-.qty-btn{width:34px;height:34px;border-radius:50%;border:2px solid #e5e7eb;background:#fff;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.qty-btn:hover{border-color:#22c55e;background:#f0fdf4;}
-.qty-num{font-size:18px;font-weight:900;color:#0a0f28;min-width:28px;text-align:center;}
-.portal-input{width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;color:#0a0f28;outline:none;}
-.portal-input:focus{border-color:#1a56db;}
-.sum-line{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:8px;}
-</style>
+<!-- Toast notification -->
+<div id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:600;box-shadow:var(--s3);z-index:9999;display:none;max-width:320px;"></div>
 
 <script>
+// ===== DATA =====
 const PARKS = {
-  water:     { label:'Water Park 🌊',  adult:1299, child:999, senior:849, af:799, da:699 },
-  amusement: { label:'Amusement Park 🎢', adult:1199, child:899, senior:749, af:749, da:649 },
-  combo:     { label:'Combo – Both Parks 🎉', adult:1999, child:1499, senior:1399, af:1199, da:1099 }
+  water:     { label:'Water Park 🌊',     adult:1299, child:999,  senior:849, af:799,  da:699,  infant:0 },
+  amusement: { label:'Amusement Park 🎢', adult:1199, child:899,  senior:749, af:749,  da:649,  infant:0 },
+  combo:     { label:'Combo – Both Parks 🎉', adult:1999, child:1499, senior:1399, af:1199, da:1099, infant:0 },
+  season:    { label:'Annual Passport 🪪', silver:3499, gold:5999, platinum:9999 }
 };
 const CATS = [
-  { key:'adult',  label:'Adult',                desc:'Age 12+' },
-  { key:'child',  label:'Child',                desc:'Age 3–11 yrs' },
-  { key:'senior', label:'Senior Citizen',       desc:'Age 60+' },
-  { key:'af',     label:'Armed Forces',         desc:'Valid ID required' },
-  { key:'da',     label:'Differently Abled',    desc:'Valid ID required' },
+  { key:'adult',  label:'Adult',             desc:'Age 12+',           icon:'👤' },
+  { key:'child',  label:'Child',             desc:'Age 3–11 yrs',      icon:'🧒' },
+  { key:'senior', label:'Senior Citizen',    desc:'Age 60+ · Valid ID',icon:'👴' },
+  { key:'af',     label:'Armed Forces',      desc:'Valid ID required', icon:'🫡' },
+  { key:'da',     label:'Differently Abled', desc:'Valid ID required', icon:'♿' },
+  { key:'infant', label:'Infant',            desc:'Under 3 · Free',    icon:'👶' },
 ];
+const SEASON_CATS = [
+  { key:'silver',   label:'Silver Passport',   desc:'6-month validity', icon:'🥈' },
+  { key:'gold',     label:'Gold Passport',      desc:'12-month validity',icon:'🏅' },
+  { key:'platinum', label:'Platinum Passport',  desc:'Unlimited + VIP',  icon:'💎' },
+];
+const FNB = [
+  { key:'meal1', label:'Veg Combo Meal',    price:299, icon:'🥗' },
+  { key:'meal2', label:'Non-Veg Combo Meal',price:399, icon:'🍗' },
+  { key:'snack', label:'Snack Pack',         price:149, icon:'🍿' },
+  { key:'bev',   label:'Beverages (2 pcs)', price:99,  icon:'🥤' },
+];
+const PARTNER_DISC = 0.12;
 let curPark = 'water';
-const qty = {adult:0,child:0,senior:0,af:0,da:0};
-const DISC = 0.12;
+const qty = {adult:0,child:0,senior:0,af:0,da:0,infant:0,silver:0,gold:0,platinum:0};
+const fnbQty = {meal1:0,meal2:0,snack:0,bev:0};
+let currentStep = 1;
 
+// ===== PARK SELECTOR =====
 function selectPark(p) {
   curPark = p;
-  document.querySelectorAll('.park-sel-btn').forEach(b=>b.classList.remove('park-sel-btn--active'));
-  document.getElementById('btn-'+p).classList.add('park-sel-btn--active');
-  renderRows(); calcSummary();
+  document.querySelectorAll('.park-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pt-'+p).classList.add('active');
+  // Reset qty
+  Object.keys(qty).forEach(k=>qty[k]=0);
+  document.getElementById('season-validity').style.display = p==='season' ? 'flex' : 'none';
+  renderTicketRows();
+  calcSummary();
 }
 
-function renderRows() {
+function renderTicketRows() {
+  const cats = curPark === 'season' ? SEASON_CATS : CATS;
   const pk = PARKS[curPark];
-  document.getElementById('ticket-rows').innerHTML = CATS.map(c=>`
-    <div class="ticket-row">
-      <div>
-        <div class="ticket-row-label">${c.label}</div>
-        <div class="ticket-row-price">₹${pk[c.key].toLocaleString('en-IN')} per ticket &nbsp;·&nbsp; ${c.desc}</div>
+  document.getElementById('park-label').textContent = pk.label;
+  document.getElementById('ticket-rows').innerHTML = cats.map(c => {
+    const base = pk[c.key] || 0;
+    const discounted = Math.round(base * (1 - PARTNER_DISC));
+    const saved = base - discounted;
+    return `
+      <div class="tkt-row">
+        <div class="tkt-row-info">
+          <div class="name">${c.icon} ${c.label}</div>
+          <div class="desc">${c.desc}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;">
+          <div class="tkt-row-pricing">
+            ${base > 0 ? `<div class="rate">₹${discounted.toLocaleString('en-IN')}</div>
+            <div style="font-size:11px;color:var(--text3);text-decoration:line-through;">₹${base.toLocaleString('en-IN')}</div>
+            <div class="save">Save ₹${saved}</div>` : '<div class="rate" style="color:var(--green);">FREE</div>'}
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty('${c.key}',-1)">−</button>
+            <span class="qty-num" id="qty-${c.key}">${qty[c.key]}</span>
+            <button class="qty-btn" onclick="changeQty('${c.key}',1)">+</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // F&B
+  document.getElementById('fnb-rows').innerHTML = FNB.map(f=>`
+    <div class="tkt-row">
+      <div class="tkt-row-info">
+        <div class="name">${f.icon} ${f.label}</div>
+        <div class="desc">Per person add-on</div>
       </div>
-      <div class="qty-ctrl">
-        <button class="qty-btn" onclick="changeQty('${c.key}',-1)">−</button>
-        <div class="qty-num" id="qty-${c.key}">${qty[c.key]}</div>
-        <button class="qty-btn" onclick="changeQty('${c.key}',1)">+</button>
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div class="tkt-row-pricing"><div class="rate">₹${f.price}</div></div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeFnb('${f.key}',-1)">−</button>
+          <span class="qty-num" id="fnb-${f.key}">${fnbQty[f.key]}</span>
+          <button class="qty-btn" onclick="changeFnb('${f.key}',1)">+</button>
+        </div>
       </div>
     </div>`).join('');
 }
 
-function changeQty(cat, d) {
-  qty[cat] = Math.max(0, qty[cat]+d);
-  document.getElementById('qty-'+cat).textContent = qty[cat];
+function changeQty(k, d) {
+  qty[k] = Math.max(0, qty[k] + d);
+  const el = document.getElementById('qty-'+k);
+  if (el) el.textContent = qty[k];
+  calcSummary();
+}
+function changeFnb(k, d) {
+  fnbQty[k] = Math.max(0, fnbQty[k] + d);
+  const el = document.getElementById('fnb-'+k);
+  if (el) el.textContent = fnbQty[k];
   calcSummary();
 }
 
 function calcSummary() {
   const pk = PARKS[curPark];
-  let sub = 0;
-  CATS.forEach(c => { sub += qty[c.key] * pk[c.key]; });
-  const disc = Math.round(sub * DISC);
-  const afterDisc = sub - disc;
-  const gst = Math.round(afterDisc * 0.18 / 1.18);
-  const total = afterDisc;
+  let baseTotal = 0, totalPax = 0;
+  const sumLines = [];
 
-  document.getElementById('summary-park').textContent = pk.label;
-  const dv = document.getElementById('visit-date').value;
-  document.getElementById('summary-date').textContent = dv ? '📅 ' + new Date(dv).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'long',year:'numeric'}) : '📅 No date selected';
-
-  let lines = '';
-  CATS.forEach(c => {
-    if (qty[c.key] > 0) lines += `<div class="sum-line"><span>${qty[c.key]}× ${c.label}</span><span>₹${(qty[c.key]*pk[c.key]).toLocaleString('en-IN')}</span></div>`;
+  const cats = curPark === 'season' ? SEASON_CATS : CATS;
+  cats.forEach(c => {
+    const n = qty[c.key];
+    if (!n) return;
+    const base = pk[c.key] || 0;
+    const disc = Math.round(base * (1 - PARTNER_DISC));
+    baseTotal += disc * n;
+    if (c.key !== 'infant') totalPax += n;
+    sumLines.push(`<div class="sum-line"><span>${c.icon} ${c.label} × ${n}</span><span>₹${(disc*n).toLocaleString('en-IN')}</span></div>`);
   });
-  document.getElementById('summary-lines').innerHTML = lines || '<div style="font-size:13px;color:#9ca3af;">No tickets selected yet</div>';
 
-  document.getElementById('sum-sub').textContent  = '₹'+sub.toLocaleString('en-IN');
-  document.getElementById('sum-disc').textContent = '-₹'+disc.toLocaleString('en-IN');
-  document.getElementById('sum-gst').textContent  = '₹'+gst.toLocaleString('en-IN');
-  document.getElementById('sum-total').textContent= '₹'+total.toLocaleString('en-IN');
+  // Group tier
+  let groupDisc = 0, groupDiscPct = 0;
+  const box = document.getElementById('group-tier-box');
+  const row = document.getElementById('s-group-row');
+  if (totalPax >= 200) { groupDiscPct = 0.12; }
+  else if (totalPax >= 100) { groupDiscPct = 0.08; }
+  else if (totalPax >= 50)  { groupDiscPct = 0.05; }
+  else if (totalPax >= 20)  { groupDiscPct = 0; }
+
+  if (totalPax >= 20 && curPark !== 'season') {
+    box.style.display = 'block';
+    const nextTier = totalPax < 50 ? 50 : totalPax < 100 ? 100 : totalPax < 200 ? 200 : null;
+    const msg = groupDiscPct > 0 ? `Group pricing active: extra ${groupDiscPct*100}% off!` : 'Basic group rate applied';
+    document.getElementById('group-tier-msg').textContent = msg;
+    const pct = nextTier ? Math.round((totalPax / nextTier) * 100) : 100;
+    document.getElementById('group-tier-bar').style.width = pct + '%';
+    document.getElementById('group-tier-sub').textContent = nextTier ? `${nextTier - totalPax} more pax to unlock higher tier` : 'Maximum tier reached!';
+  } else {
+    box.style.display = 'none';
+  }
+
+  groupDisc = Math.round(baseTotal * groupDiscPct);
+  const afterGroupDisc = baseTotal - groupDisc;
+
+  // F&B
+  let fnbTotal = 0;
+  const fnbLines = [];
+  FNB.forEach(f => {
+    if (!fnbQty[f.key]) return;
+    fnbTotal += f.price * fnbQty[f.key];
+    fnbLines.push(`<div class="sum-line"><span>${f.icon} ${f.label} × ${fnbQty[f.key]}</span><span>₹${(f.price*fnbQty[f.key]).toLocaleString('en-IN')}</span></div>`);
+  });
+
+  const discAmt = Math.round(baseTotal * PARTNER_DISC / (1 - PARTNER_DISC));
+  const gstBase = afterGroupDisc + fnbTotal;
+  const gst = Math.round(gstBase * 0.18 / 1.18);
+  const grand = afterGroupDisc + fnbTotal;
+  const earn = Math.round(afterGroupDisc * 0.05);
+
+  document.getElementById('sum-park').textContent = pk.label;
+  const d = document.getElementById('visit-date').value;
+  document.getElementById('sum-date').textContent = d ? '📅 ' + new Date(d).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) : '📅 No date selected';
+  document.getElementById('sum-lines').innerHTML = sumLines.length ? sumLines.join('') : '<div style="font-size:13px;color:var(--text3);padding:8px 0;">No tickets selected yet</div>';
+
+  const fnbSection = document.getElementById('sum-fnb-section');
+  if (fnbLines.length) {
+    fnbSection.style.display = 'block';
+    document.getElementById('sum-fnb-lines').innerHTML = fnbLines.join('');
+  } else {
+    fnbSection.style.display = 'none';
+  }
+
+  document.getElementById('s-base').textContent = '₹' + baseTotal.toLocaleString('en-IN');
+  document.getElementById('s-disc').textContent = '-₹' + discAmt.toLocaleString('en-IN');
+  document.getElementById('s-fnb').textContent = '₹' + fnbTotal.toLocaleString('en-IN');
+  document.getElementById('s-gst').textContent = '₹' + gst.toLocaleString('en-IN');
+  document.getElementById('s-total').textContent = '₹' + grand.toLocaleString('en-IN');
+  document.getElementById('s-earn').textContent = '₹' + earn.toLocaleString('en-IN');
+
+  if (groupDisc > 0) {
+    row.style.display = 'flex';
+    document.getElementById('s-grp').textContent = '-₹' + groupDisc.toLocaleString('en-IN');
+  } else {
+    row.style.display = 'none';
+  }
 }
 
-function placeOrder() {
-  const total = Object.values(qty).reduce((s,v,i)=>s+v,0);
-  if (!total) { alert('Please select at least one ticket.'); return; }
-  if (!document.getElementById('visit-date').value) { alert('Please select a visit date.'); return; }
-  const ref = 'WOW-B' + Date.now().toString().slice(-6);
-  document.getElementById('order-ref').textContent = 'Batch Ref: ' + ref;
-  const m = document.getElementById('success-modal');
-  m.style.display = 'flex';
+// ===== STEP NAVIGATION =====
+function setStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+    const sc = document.getElementById('sc'+i);
+    const sl = document.getElementById('sl'+i);
+    if (!sc) return;
+    sc.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+    sc.innerHTML = i < n ? '<i class="fas fa-check" style="font-size:12px;"></i>' : i;
+    sl.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (i < 4) {
+      const line = document.getElementById('sline'+i);
+      if (line) line.className = 'step-line' + (i < n ? ' done' : '');
+    }
+  });
+  currentStep = n;
 }
 
-// Init
-const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate()+1);
-document.getElementById('visit-date').value = tomorrow.toISOString().split('T')[0];
-document.getElementById('visit-date').addEventListener('change', calcSummary);
-selectPark('water');
+function goToStep2() {
+  const totalPax = Object.values(qty).reduce((a,b)=>a+b,0);
+  if (!totalPax) { showToast('⚠️ Please add at least one ticket'); return; }
+  const d = document.getElementById('visit-date').value;
+  if (!d && curPark !== 'season') { showToast('⚠️ Please select a visit date'); return; }
+  buildStep2Summary();
+  setStep(2);
+}
+function goToStep1() { setStep(1); }
+function goToStep3() {
+  const cn = document.getElementById('client-name').value.trim();
+  if (!cn) { showToast('⚠️ Please enter client name'); document.getElementById('client-name').focus(); return; }
+  buildInvoicePreview();
+  buildStep3Summary();
+  setStep(3);
+}
+function goToStep2from3() { setStep(2); }
+
+function buildStep2Summary() {
+  const pk = PARKS[curPark];
+  const cats = curPark === 'season' ? SEASON_CATS : CATS;
+  let lines = '';
+  cats.forEach(c => { if (qty[c.key]) lines += `<div class="sum-line"><span>${c.label} × ${qty[c.key]}</span><span style="font-weight:700;">₹${(Math.round(pk[c.key]*(1-PARTNER_DISC))*qty[c.key]).toLocaleString('en-IN')}</span></div>`; });
+  document.getElementById('step2-summary').innerHTML = `<div style="font-size:14px;font-weight:800;color:var(--green-dk);margin-bottom:12px;">${pk.label}</div>${lines}<div class="sum-total-row" style="margin-top:12px;"><span>Grand Total</span><span style="color:var(--green-dk);">${document.getElementById('s-total').textContent}</span></div>`;
+}
+
+function buildStep3Summary() {
+  const total = document.getElementById('s-total').textContent;
+  const bal = 240000 - parseInt(total.replace(/[^0-9]/g,''));
+  document.getElementById('step3-summary').innerHTML = `
+    <div class="sum-line"><span>Grand Total</span><span style="font-weight:900;font-size:18px;color:var(--green-dk);">${total}</span></div>
+    <div class="sum-line"><span>Payment Method</span><span style="font-weight:700;">💳 Credit</span></div>`;
+  document.getElementById('bal-after').textContent = '₹' + Math.max(0,bal).toLocaleString('en-IN');
+}
+
+function buildInvoicePreview() {
+  const today = new Date();
+  document.getElementById('inv-date').textContent = today.toLocaleDateString('en-IN');
+  document.getElementById('inv-num').textContent = 'WOW/P/2026/' + Math.floor(10000+Math.random()*89999);
+
+  const bn = document.getElementById('bill-name').value;
+  const bg = document.getElementById('bill-gstin').value;
+  const ba = document.getElementById('bill-addr').value;
+  document.getElementById('inv-bill-name').textContent = bn;
+  document.getElementById('inv-bill-gstin').textContent = 'GSTIN: ' + bg;
+  document.getElementById('inv-bill-addr').textContent = ba;
+
+  const cn = document.getElementById('client-name').value;
+  const vd = document.getElementById('visit-date').value;
+  const po = document.getElementById('po-ref').value;
+  document.getElementById('inv-client-name').textContent = cn;
+  document.getElementById('inv-visit-date').textContent = 'Visit: ' + (vd ? new Date(vd).toLocaleDateString('en-IN') : '—');
+  document.getElementById('inv-po').textContent = po ? 'PO: ' + po : '';
+
+  const pk = PARKS[curPark];
+  const cats = curPark === 'season' ? SEASON_CATS : CATS;
+  let rows = '', totalQty = 0, subExGst = 0;
+  cats.forEach(c => {
+    if (!qty[c.key]) return;
+    const disc = Math.round(pk[c.key] * (1 - PARTNER_DISC));
+    const excl = Math.round(disc / 1.18);
+    const lineGst = disc - excl;
+    subExGst += excl * qty[c.key];
+    totalQty += qty[c.key];
+    rows += `<tr><td>${c.label} — ${pk.label}</td><td>998551</td><td>${qty[c.key]}</td><td>₹${excl.toLocaleString('en-IN')}</td><td>₹${(lineGst*qty[c.key]).toLocaleString('en-IN')}</td><td>₹${(disc*qty[c.key]).toLocaleString('en-IN')}</td></tr>`;
+  });
+  FNB.forEach(f => {
+    if (!fnbQty[f.key]) return;
+    const excl = Math.round(f.price / 1.05);
+    rows += `<tr><td>${f.label} (F&B)</td><td>996334</td><td>${fnbQty[f.key]}</td><td>₹${excl}</td><td>₹${(f.price-excl)*fnbQty[f.key]}</td><td>₹${f.price*fnbQty[f.key]}</td></tr>`;
+    subExGst += excl * fnbQty[f.key];
+    totalQty += fnbQty[f.key];
+  });
+  document.getElementById('inv-lines').innerHTML = rows;
+  const grandNum = parseInt(document.getElementById('s-total').textContent.replace(/[^0-9]/g,''));
+  const gstAmt = grandNum - subExGst;
+  document.getElementById('inv-total-qty').textContent = totalQty;
+  document.getElementById('inv-sub').textContent = '₹' + subExGst.toLocaleString('en-IN');
+  document.getElementById('inv-gst-amt').textContent = '₹' + gstAmt.toLocaleString('en-IN');
+  document.getElementById('inv-sub-total').textContent = '₹' + grandNum.toLocaleString('en-IN');
+  document.getElementById('inv-grand').textContent = '₹' + grandNum.toLocaleString('en-IN');
+  const half = Math.round(gstAmt/2);
+  document.getElementById('inv-cgst').textContent = '₹' + half.toLocaleString('en-IN');
+  document.getElementById('inv-sgst').textContent = '₹' + half.toLocaleString('en-IN');
+  document.getElementById('inv-total-gst').textContent = '₹' + gstAmt.toLocaleString('en-IN');
+  document.getElementById('inv-earn').textContent = document.getElementById('s-earn').textContent;
+}
+
+// ===== CONFIRM ORDER =====
+function confirmOrder() {
+  const batchId = 'WOW-BATCH-2026-' + Math.floor(10000+Math.random()*89999);
+  document.getElementById('batch-id').textContent = batchId;
+  const pk = PARKS[curPark];
+  const cats = curPark === 'season' ? SEASON_CATS : CATS;
+  let totalTkts = 0;
+  cats.forEach(c => { totalTkts += qty[c.key] || 0; });
+  document.getElementById('issued-summary-line').textContent = `${totalTkts} tickets issued · ${pk.label} · ${document.getElementById('s-total').textContent}`;
+
+  // Generate voucher cards
+  const voucherGrid = document.getElementById('voucher-grid');
+  voucherGrid.innerHTML = '';
+  const vd = document.getElementById('visit-date').value;
+  const dateStr = vd ? new Date(vd).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'Annual';
+  let voucherNum = 1;
+  cats.forEach(c => {
+    for (let i = 0; i < Math.min(qty[c.key], 3); i++) {
+      const code = 'WOW-' + batchId.split('-')[3] + '-' + String(voucherNum).padStart(4,'0');
+      voucherGrid.innerHTML += `
+        <div class="voucher-card">
+          <div class="voucher-top">
+            <div>
+              <div class="voucher-park">${pk.label}</div>
+              <div class="voucher-batch">Batch: ${batchId}</div>
+            </div>
+            <div class="voucher-qr">🔲</div>
+          </div>
+          <div class="voucher-info">
+            <div class="voucher-info-item">Category<span class="voucher-info-val">${c.label}</span></div>
+            <div class="voucher-info-item">Visit Date<span class="voucher-info-val">${dateStr}</span></div>
+            <div class="voucher-info-item">Amount<span class="voucher-info-val">₹${Math.round(pk[c.key]*(1-PARTNER_DISC)).toLocaleString('en-IN')}</span></div>
+          </div>
+          <div class="voucher-bottom">
+            <div class="voucher-code">${code}</div>
+            <div class="voucher-valid">Single entry · Non-transferable</div>
+          </div>
+        </div>`;
+      voucherNum++;
+      if (voucherNum > 6) break;
+    }
+    if (voucherNum > 6) return;
+  });
+  if (totalTkts > 6) {
+    voucherGrid.innerHTML += `<div style="display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:var(--r-lg);border:2px dashed var(--border2);padding:40px;font-size:15px;font-weight:700;color:var(--text3);">+${totalTkts-6} more tickets<br>in your batch download</div>`;
+  }
+  setStep(4);
+  showToast('✅ ' + totalTkts + ' tickets issued successfully!');
+}
+
+function resetOrder() {
+  Object.keys(qty).forEach(k=>qty[k]=0);
+  Object.keys(fnbQty).forEach(k=>fnbQty[k]=0);
+  curPark = 'water';
+  selectPark('water');
+  setStep(1);
+  document.getElementById('visit-date').value = '';
+  calcSummary();
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  const tbody = document.getElementById('history-tbody');
+  const orders = [];
+  const parks = ['Water Park','Amusement Park','Combo'];
+  const statuses = ['Issued','Issued','Issued','Pending','Cancelled'];
+  const clients = ['Delhi Public School','Sharma Family','Corporate Outing – Wipro','Family Package','TechCorp Team'];
+  for (let i = 0; i < 10; i++) {
+    const d = new Date(2026, 2, 28-i);
+    const amt = (Math.floor(Math.random()*40)+5)*1000;
+    const status = statuses[Math.floor(Math.random()*statuses.length)];
+    const badgeClass = status==='Issued'?'badge-green':status==='Pending'?'badge-amber':'badge-red';
+    orders.push(`<tr>
+      <td style="font-weight:700;color:var(--primary);">WOW/P/2026/${String(8421-i).padStart(5,'0')}</td>
+      <td>${d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
+      <td>${parks[i%3]}</td>
+      <td>${clients[i%5]}</td>
+      <td>${Math.floor(Math.random()*80)+10} pax</td>
+      <td style="font-weight:700;">₹${amt.toLocaleString('en-IN')}</td>
+      <td><span class="badge ${badgeClass}">${status}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Opening batch details…')">View</button>
+        ${status==='Issued'?'<button class="btn btn-ghost btn-sm" onclick="showToast(\'Downloading QR batch…\')"><i class="fas fa-download"></i></button>':''}
+      </td>
+    </tr>`);
+  }
+  tbody.innerHTML = orders.join('');
+}
+
+function renderHistoryChart() {
+  const ctx = document.getElementById('history-chart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets:[
+        {label:'Water Park',data:[42,58,71,65,80,94],backgroundColor:'rgba(0,85,179,.7)',borderRadius:4},
+        {label:'Amusement',data:[31,44,52,48,60,72],backgroundColor:'rgba(10,155,95,.7)',borderRadius:4},
+        {label:'Combo',data:[18,24,35,28,42,51],backgroundColor:'rgba(245,168,0,.7)',borderRadius:4},
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:false},y:{stacked:false,ticks:{callback:v=>v+' orders'}}}}
+  });
+}
+
+// ===== PRICING TABLE =====
+function renderPricingGrid() {
+  const el = document.getElementById('pricing-table-grid');
+  if (!el) return;
+  const items = [
+    { park:'🌊 Water Park', cats:[
+      {label:'Adult (12+)',          mrp:1299, discounted:1143},
+      {label:'Child (3–11)',         mrp:999,  discounted:879},
+      {label:'Senior Citizen (60+)', mrp:849,  discounted:747},
+      {label:'Armed Forces',         mrp:799,  discounted:703},
+      {label:'Differently Abled',    mrp:699,  discounted:615},
+    ]},
+    { park:'🎢 Amusement Park', cats:[
+      {label:'Adult (12+)',          mrp:1199, discounted:1055},
+      {label:'Child (3–11)',         mrp:899,  discounted:791},
+      {label:'Senior Citizen (60+)', mrp:749,  discounted:659},
+      {label:'Armed Forces',         mrp:749,  discounted:659},
+      {label:'Differently Abled',    mrp:649,  discounted:571},
+    ]},
+    { park:'🎉 Combo (Both)', cats:[
+      {label:'Adult (12+)',          mrp:1999, discounted:1759},
+      {label:'Child (3–11)',         mrp:1499, discounted:1319},
+      {label:'Senior Citizen (60+)', mrp:1399, discounted:1231},
+      {label:'Armed Forces',         mrp:1199, discounted:1055},
+      {label:'Differently Abled',    mrp:1099, discounted:967},
+    ]},
+  ];
+  el.innerHTML = items.map(pk=>`
+    <div class="card">
+      <div class="card-title" style="font-size:14px;">${pk.park}</div>
+      <table class="tier-table">
+        <thead><tr><th>Category</th><th>MRP</th><th style="color:var(--green);">Gold Rate</th></tr></thead>
+        <tbody>${pk.cats.map(c=>`<tr>
+          <td>${c.label}</td>
+          <td style="text-decoration:line-through;color:var(--text3);">₹${c.mrp}</td>
+          <td style="font-weight:800;color:var(--green-dk);">₹${c.discounted}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`).join('');
+}
+
+// ===== MAIN TAB SWITCH =====
+function switchMainTab(tab) {
+  ['buy','history','bulk','pricing'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+    document.getElementById('main-tab-'+t).classList.toggle('active', t===tab);
+  });
+  if (tab==='history') { renderHistory(); renderHistoryChart(); }
+  if (tab==='pricing') renderPricingGrid();
+}
+
+function showTab(t) { switchMainTab(t); }
+
+// ===== TOAST =====
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(()=>t.style.display='none', dur);
+}
+
+// ===== INIT =====
+(function init() {
+  const today = new Date();
+  today.setDate(today.getDate()+1);
+  document.getElementById('visit-date').value = today.toISOString().split('T')[0];
+  selectPark('water');
+  calcSummary();
+})();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="partner"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
