@@ -1,469 +1,770 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Wallet — Worlds of Wonder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Wallet card */
-    .wallet-hero{background:linear-gradient(135deg,#0a1628 0%,#0055B3 60%,#1a6dd4 100%);border-radius:24px;padding:36px 32px;position:relative;overflow:hidden;margin-bottom:32px;}
-    .wallet-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);}
-    .wallet-hero::after{content:'';position:absolute;bottom:-60px;right:40px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.03);}
-    .wallet-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:16px;}
-    .wallet-balance{font-size:48px;font-weight:900;color:#fff;font-family:'Poppins',sans-serif;letter-spacing:-.02em;position:relative;z-index:1;}
-    .wallet-balance sub{font-size:20px;vertical-align:middle;font-weight:600;opacity:.8;}
-    .wallet-label{font-size:13px;color:rgba(255,255,255,.55);margin-top:4px;position:relative;z-index:1;}
-    .wallet-stats{display:flex;gap:28px;margin-top:24px;position:relative;z-index:1;flex-wrap:wrap;}
-    .wstat{flex:1;min-width:100px;}
-    .wstat-val{font-size:20px;font-weight:800;color:#fff;}
-    .wstat-label{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;}
-    .wallet-actions{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1;}
-    .btn-wallet{padding:11px 22px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
-    .btn-add{background:#fff;color:#0055B3;}
-    .btn-withdraw{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);}
-    .btn-redeem{background:rgba(245,168,0,.8);color:#0a1628;}
-    .btn-add:hover{background:#e8f0fe;}
-    .btn-withdraw:hover{background:rgba(255,255,255,.2);}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WOW Wallet — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --brand:#ff6b35;--brand-dark:#e55a22;--brand-light:#fff3ee;
+  --navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f0f4f8;--white:#fff;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--slate);min-height:100vh;display:flex;}
 
-    /* Tabs */
-    .tab-nav{display:flex;gap:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:5px;margin-bottom:24px;flex-wrap:wrap;}
-    .tab-btn{flex:1;min-width:110px;padding:10px 14px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,.5);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;text-align:center;}
-    .tab-btn.active{background:rgba(0,85,179,.3);color:#60a5fa;}
-    .tab-pane{display:none;}
-    .tab-pane.active{display:block;}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:40;overflow-y:auto;}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-logo img{height:36px;width:auto;object-fit:contain;filter:none!important;}
+.sb-user{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--brand);display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;}
+.sb-uname{font-size:12.5px;font-weight:700;color:#fff;}
+.sb-utier{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;}
+.sb-nav{padding:12px 8px;flex:1;}
+.sb-section{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:8px 10px 4px;font-weight:700;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:600;transition:.15s;margin-bottom:1px;}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-link.active{background:rgba(255,107,53,.15);color:var(--brand);}
+.sb-link i{width:16px;text-align:center;font-size:13px;}
+.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
 
-    /* Transaction rows */
-    .txn-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05);}
-    .txn-row:last-child{border-bottom:none;}
-    .txn-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-    .txn-credit{background:rgba(16,185,129,.12);}
-    .txn-debit{background:rgba(239,68,68,.1);}
-    .txn-refund{background:rgba(245,168,0,.1);}
-    .txn-info{flex:1;}
-    .txn-title{font-size:14px;font-weight:700;color:#fff;}
-    .txn-meta{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px;}
-    .txn-amount{text-align:right;}
-    .txn-amount .amt{font-size:15px;font-weight:800;}
-    .credit-amt{color:#10b981;}
-    .debit-amt{color:#ef4444;}
-    .txn-amount .date{font-size:11px;color:rgba(255,255,255,.3);margin-top:3px;}
-    .txn-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(16,185,129,.12);color:#10b981;margin-left:6px;}
-    .txn-badge.pending{background:rgba(245,168,0,.12);color:#F5A800;}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;}
+.topbar-title{font-size:17px;font-weight:800;color:var(--navy);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:.15s;font-family:inherit;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-dark);}
+.btn-outline{background:var(--white);border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-ghost{background:transparent;border:none;color:var(--muted);padding:8px;}
 
-    /* Refund cards */
-    .refund-card{background:var(--clr-bg-card,#1a2235);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px;margin-bottom:14px;}
-    .refund-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-    .refund-booking{font-size:14px;font-weight:700;color:#fff;}
-    .refund-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
-    .status-pending{background:rgba(245,168,0,.12);color:#F5A800;}
-    .status-processed{background:rgba(16,185,129,.12);color:#10b981;}
-    .status-rejected{background:rgba(239,68,68,.1);color:#ef4444;}
-    .refund-detail-row{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.5);margin-bottom:6px;}
-    .refund-detail-row span:last-child{color:#fff;font-weight:600;}
-    .refund-timeline{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);}
-    .refund-step{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:12px;color:rgba(255,255,255,.4);}
-    .refund-step.done{color:rgba(255,255,255,.7);}
-    .refund-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;}
-    .refund-step.done .refund-dot{border-color:#10b981;background:rgba(16,185,129,.15);color:#10b981;}
+/* PAGE */
+.page-body{padding:24px 28px;max-width:1000px;}
 
-    /* Gift voucher */
-    .voucher-card{background:linear-gradient(135deg,#1a2235,#0a1628);border:1px solid rgba(245,168,0,.2);border-radius:20px;overflow:hidden;position:relative;margin-bottom:14px;}
-    .voucher-strip{height:6px;background:linear-gradient(90deg,#F5A800,#ff9800);}
-    .voucher-body{padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
-    .voucher-info{}
-    .voucher-code{font-family:'Poppins',sans-serif;font-size:22px;font-weight:800;letter-spacing:.15em;color:#fff;margin-bottom:6px;}
-    .voucher-desc{font-size:13px;color:rgba(255,255,255,.5);}
-    .voucher-value{text-align:right;}
-    .voucher-amount{font-size:32px;font-weight:900;color:#F5A800;font-family:'Poppins',sans-serif;}
-    .voucher-expiry{font-size:11px;color:rgba(255,255,255,.35);margin-top:4px;}
-    .voucher-actions{padding:14px 24px;background:rgba(0,0,0,.2);display:flex;gap:10px;flex-wrap:wrap;}
-    .btn-sm{padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
-    .btn-sm-primary{background:rgba(0,85,179,.5);color:#fff;}
-    .btn-sm-outline{background:transparent;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);}
+/* WALLET HERO CARD */
+.wallet-hero{background:linear-gradient(135deg,#0a1628 0%,#0f3460 60%,#1a5276 100%);border-radius:24px;padding:32px 36px;position:relative;overflow:hidden;margin-bottom:24px;}
+.wallet-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,.04);}
+.wallet-hero::after{content:'';position:absolute;bottom:-80px;right:60px;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.03);}
+.wh-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:20px;}
+.wh-chip i{color:#3b82f6;}
+.wh-balance-label{font-size:12px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.wh-balance{font-size:52px;font-weight:900;color:#fff;font-family:'Nunito',sans-serif;letter-spacing:-.02em;line-height:1;position:relative;z-index:1;}
+.wh-balance sup{font-size:22px;vertical-align:top;margin-top:10px;opacity:.75;}
+.wh-autoreload{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:5px 10px;font-size:11px;color:#6ee7b7;margin-top:10px;position:relative;z-index:1;}
+.wh-stats{display:flex;gap:32px;margin-top:24px;position:relative;z-index:1;flex-wrap:wrap;}
+.wh-stat-val{font-size:22px;font-weight:800;color:#fff;font-family:'Nunito',sans-serif;}
+.wh-stat-label{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;}
+.wallet-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;position:relative;z-index:1;}
+.wallet-action-btn{padding:11px 22px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:7px;}
+.wab-topup{background:#fff;color:#0a1628;}
+.wab-topup:hover{background:#e8f0fe;}
+.wab-withdraw{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.wab-withdraw:hover{background:rgba(255,255,255,.22);}
+.wab-history{background:rgba(255,107,53,.2);color:#fda47a;border:1px solid rgba(255,107,53,.3);}
 
-    /* Add money modal */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px;}
-    .modal-overlay.open{display:flex;}
-    .modal-box{background:#1a2235;border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px;max-width:440px;width:100%;position:relative;}
-    .modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.08);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
-    .modal-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:20px;}
-    .amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
-    .amt-btn{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;}
-    .amt-btn:hover,.amt-btn.selected{background:rgba(0,85,179,.2);border-color:rgba(0,85,179,.5);color:#60a5fa;}
-    .input-field{width:100%;padding:13px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;font-size:15px;font-family:inherit;margin-bottom:16px;outline:none;}
-    .input-field:focus{border-color:rgba(0,85,179,.6);}
-    .pay-methods{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
-    .pay-opt{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
-    .pay-opt.selected{background:rgba(0,85,179,.2);border-color:rgba(0,85,179,.5);color:#60a5fa;}
-    .btn-confirm{width:100%;padding:14px;background:var(--primary,#0055B3);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:all .2s;}
-    .btn-confirm:hover{background:#0068d9;}
+/* AUTO-RELOAD CARD */
+.autoreload-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.ar-icon{width:44px;height:44px;background:#d1fae5;border-radius:12px;display:grid;place-items:center;font-size:20px;flex-shrink:0;}
+.ar-info{flex:1;}
+.ar-title{font-size:14px;font-weight:800;color:var(--navy);}
+.ar-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.toggle-wrap{display:flex;align-items:center;gap:8px;}
+.toggle{width:44px;height:24px;background:#d1d5db;border-radius:12px;position:relative;cursor:pointer;border:none;transition:.2s;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{left:23px;}
+.toggle-label{font-size:12px;font-weight:700;color:var(--muted);}
 
-    @media(max-width:640px){
-      .wallet-balance{font-size:36px;}
-      .wstat-val{font-size:17px;}
-    }
-  </style>
+/* LAYOUT */
+.wallet-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+@media(max-width:860px){.wallet-layout{grid-template-columns:1fr;}}
+
+/* TRANSACTIONS */
+.panel{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;}
+.panel-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:14px;font-weight:800;color:var(--navy);}
+.panel-body{padding:0;}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);}
+.tbar-btn{flex:1;padding:12px;font-size:12px;font-weight:700;border:none;background:transparent;cursor:pointer;color:var(--muted);font-family:inherit;border-bottom:2px solid transparent;transition:.15s;}
+.tbar-btn.active{color:var(--brand);border-bottom-color:var(--brand);}
+.txn-list{padding:0 20px;}
+.txn{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);}
+.txn:last-child{border:none;}
+.txn-icon-wrap{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+.txn-credit{background:#d1fae5;}
+.txn-debit{background:#fee2e2;}
+.txn-refund{background:#fef3c7;}
+.txn-info{flex:1;}
+.txn-title{font-size:13px;font-weight:700;color:var(--slate);}
+.txn-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+.txn-amount{font-size:14px;font-weight:800;text-align:right;}
+.txn-amount.credit{color:var(--green);}
+.txn-amount.debit{color:var(--red);}
+.txn-date{font-size:10px;color:var(--muted);text-align:right;margin-top:2px;}
+
+/* CHART */
+.chart-wrap{padding:20px;height:200px;}
+
+/* RIGHT PANEL */
+.right-col{display:flex;flex-direction:column;gap:16px;}
+.quick-topup{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.qt-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:14px;}
+.topup-presets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.preset-btn{border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer;font-family:inherit;background:var(--white);transition:.15s;}
+.preset-btn:hover,.preset-btn.sel{border-color:var(--brand);background:var(--brand-light);}
+.preset-amt{font-size:16px;font-weight:900;color:var(--navy);font-family:'Nunito',sans-serif;}
+.preset-coins{font-size:10px;color:var(--green);margin-top:2px;}
+.custom-topup{display:flex;gap:8px;margin-bottom:14px;}
+.custom-topup input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:.15s;font-family:inherit;}
+.custom-topup input:focus{border-color:var(--brand);}
+.topup-methods{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.method-btn{flex:1;min-width:60px;padding:8px 6px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;font-size:10px;font-weight:700;font-family:inherit;background:var(--white);transition:.15s;}
+.method-btn:hover,.method-btn.active{border-color:var(--brand);background:var(--brand-light);color:var(--brand);}
+.method-btn i{display:block;font-size:16px;margin-bottom:3px;color:var(--muted);}
+.method-btn.active i{color:var(--brand);}
+
+.promo-row{display:flex;gap:6px;margin-bottom:10px;}
+.promo-row input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;transition:.15s;font-family:inherit;text-transform:uppercase;}
+.promo-row input:focus{border-color:var(--brand);}
+
+/* SUMMARY MINI CARD */
+.wallet-offers{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.offer-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.offer-item:last-child{border:none;}
+.offer-emoji{font-size:22px;flex-shrink:0;}
+.offer-text .ot{font-size:12px;font-weight:700;color:var(--slate);}
+.offer-text .os{font-size:11px;color:var(--muted);margin-top:2px;}
+.offer-badge{margin-left:auto;padding:3px 8px;background:var(--brand-light);color:var(--brand);font-size:9px;font-weight:800;border-radius:20px;flex-shrink:0;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.75);z-index:100;display:none;place-items:center;padding:20px;}
+.modal-overlay.open{display:grid;}
+.modal-box{background:var(--white);border-radius:20px;max-width:440px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3);}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-head h3{font-size:16px;font-weight:800;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:.15s;font-family:inherit;}
+.form-input:focus{border-color:var(--brand);}
+.success-overlay{text-align:center;padding:32px 24px;}
+.success-overlay .big{font-size:56px;margin-bottom:12px;}
+.success-overlay h3{font-size:20px;font-weight:900;margin-bottom:6px;}
+.success-overlay p{font-size:13px;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--slate);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:200;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:.25s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.page-body{padding:16px;}}
+</style>
 </head>
 <body>
-<div class="portal-layout">
 
-  <!-- Sidebar -->
-  <aside class="portal-sidebar" id="portal-sidebar">
-    <div class="portal-sidebar-logo">
-      <a href="../index.html"><img src="../images/logo.png" alt="WOW" /></a>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><a href="../index.html"><img src="../images/logo.png" alt="WOW"/></a></div>
+  <div class="sb-user">
+    <div class="sb-avatar">R</div>
+    <div><div class="sb-uname">Rajesh Kumar</div><div class="sb-utier">⭐ Silver Member</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a href="dashboard.html" class="sb-link"><i class="fa fa-th-large"></i> Dashboard</a>
+    <a href="my-bookings.html" class="sb-link"><i class="fa fa-calendar-check"></i> My Bookings</a>
+    <a href="tickets.html" class="sb-link"><i class="fa fa-ticket-alt"></i> My Tickets</a>
+    <a href="wow-passport.html" class="sb-link"><i class="fa fa-passport"></i> WOW Passport</a>
+    <div class="sb-section">Rewards</div>
+    <a href="loyalty.html" class="sb-link"><i class="fa fa-star"></i> Loyalty Points</a>
+    <a href="wallet.html" class="sb-link active"><i class="fa fa-wallet"></i> WOW Wallet</a>
+    <a href="offers.html" class="sb-link"><i class="fa fa-tags"></i> My Offers</a>
+    <div class="sb-section">Account</div>
+    <a href="notifications.html" class="sb-link"><i class="fa fa-bell"></i> Notifications <span class="sb-badge">3</span></a>
+    <a href="profile.html" class="sb-link"><i class="fa fa-user"></i> Profile</a>
+    <div class="sb-section">Quick Book</div>
+    <a href="../book/water-park.html" class="sb-link"><i class="fa fa-water" style="color:#0ea5e9;"></i> Water Park</a>
+    <a href="../book/amusement-park.html" class="sb-link"><i class="fa fa-dharmachakra" style="color:#7c3aed;"></i> Amusement Park</a>
+    <a href="../book/combo.html" class="sb-link"><i class="fa fa-ticket-alt" style="color:var(--brand);"></i> Combo Deal</a>
+    <div style="margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.07);">
+      <a href="../index.html" class="sb-link"><i class="fa fa-globe"></i> Public Site</a>
+      <a href="login.html" class="sb-link" style="color:rgba(239,68,68,.7);"><i class="fa fa-sign-out-alt"></i> Sign Out</a>
     </div>
-    <nav class="portal-nav">
-      <a href="dashboard.html" class="portal-nav-item">🏠 <span>Dashboard</span></a>
-      <a href="my-bookings.html" class="portal-nav-item">🎟 <span>My Bookings</span></a>
-      <a href="tickets.html" class="portal-nav-item">📲 <span>My Tickets</span></a>
-      <a href="passport.html" class="portal-nav-item">🪪 <span>My Passport</span></a>
-      <a href="wallet.html" class="portal-nav-item active">💳 <span>Wallet</span></a>
-      <a href="loyalty.html" class="portal-nav-item">⭐ <span>Loyalty & Rewards</span></a>
-      <a href="offers.html" class="portal-nav-item">🏷 <span>My Offers</span></a>
-      <a href="notifications.html" class="portal-nav-item">🔔 <span>Notifications</span></a>
-      <a href="profile.html" class="portal-nav-item">👤 <span>Profile</span></a>
-      <div style="flex:1;"></div>
-      <a href="../index.html" class="portal-nav-item" style="margin-top:auto;">🏟 <span>Back to Site</span></a>
-    </nav>
-  </aside>
+  </nav>
+</aside>
 
-  <!-- Main -->
-  <main class="portal-main">
-    <div class="portal-topbar">
-      <button class="portal-hamburger" onclick="document.getElementById('portal-sidebar').classList.toggle('open')" aria-label="Menu">
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      </button>
-      <div class="portal-topbar-title">💳 My Wallet</div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <a href="../book/water-park.html" class="btn-wallet btn-redeem" style="padding:9px 18px;font-size:13px;border-radius:11px;text-decoration:none;">🎟 Book Tickets</a>
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa fa-bars"></i></button>
+      <div class="topbar-title">WOW Wallet</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;color:var(--muted);">Sat, 28 Mar 2026</span>
+      <a href="notifications.html" class="btn btn-ghost"><i class="fa fa-bell"></i></a>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- WALLET HERO -->
+    <div class="wallet-hero">
+      <div class="wh-chip"><i class="fa fa-shield-alt"></i> Secure WOW Wallet · BBPS Enabled</div>
+      <div class="wh-balance-label">Available Balance</div>
+      <div class="wh-balance" id="wallet-balance"><sup>₹</sup><span id="balance-amt">850</span></div>
+      <div class="wh-autoreload"><i class="fa fa-sync-alt"></i> Auto-reload enabled · Triggers below ₹200</div>
+      <div class="wh-stats">
+        <div>
+          <div class="wh-stat-val">₹11,490</div>
+          <div class="wh-stat-label">Total Loaded</div>
+        </div>
+        <div>
+          <div class="wh-stat-val">₹10,640</div>
+          <div class="wh-stat-label">Total Spent</div>
+        </div>
+        <div>
+          <div class="wh-stat-val">₹312</div>
+          <div class="wh-stat-label">Refunds Received</div>
+        </div>
+        <div>
+          <div class="wh-stat-val">23</div>
+          <div class="wh-stat-label">Transactions</div>
+        </div>
+      </div>
+      <div class="wallet-btns">
+        <button class="wallet-action-btn wab-topup" onclick="openTopUp()"><i class="fa fa-plus-circle"></i> Add Money</button>
+        <button class="wallet-action-btn wab-withdraw" onclick="openWithdraw()"><i class="fa fa-arrow-circle-down"></i> Withdraw</button>
+        <button class="wallet-action-btn wab-history" onclick="scrollToHistory()"><i class="fa fa-list"></i> Full History</button>
       </div>
     </div>
 
-    <div class="portal-content">
-
-      <!-- Wallet hero -->
-      <div class="wallet-hero">
-        <div class="wallet-chip">💳 WOW Wallet</div>
-        <div class="wallet-balance"><sub>₹</sub><span id="wallet-balance-val">2,450</span></div>
-        <div class="wallet-label">Available Balance</div>
-        <div class="wallet-stats">
-          <div class="wstat">
-            <div class="wstat-val" id="total-credited">₹8,200</div>
-            <div class="wstat-label">Total Credited</div>
-          </div>
-          <div class="wstat">
-            <div class="wstat-val" id="total-spent">₹5,750</div>
-            <div class="wstat-label">Total Spent</div>
-          </div>
-          <div class="wstat">
-            <div class="wstat-val" id="vouchers-count">3</div>
-            <div class="wstat-label">Gift Vouchers</div>
-          </div>
-          <div class="wstat">
-            <div class="wstat-val" id="pending-refunds">₹500</div>
-            <div class="wstat-label">Pending Refunds</div>
-          </div>
-        </div>
-        <div class="wallet-actions">
-          <button class="btn-wallet btn-add" onclick="openAddMoney()">➕ Add Money</button>
-          <button class="btn-wallet btn-withdraw" onclick="showWithdraw()">🏦 Withdraw</button>
-          <a href="../book/water-park.html" class="btn-wallet btn-redeem" style="text-decoration:none;">🎟 Use Wallet</a>
-        </div>
+    <!-- AUTO-RELOAD CARD -->
+    <div class="autoreload-card">
+      <div class="ar-icon">🔄</div>
+      <div class="ar-info">
+        <div class="ar-title">Auto-Reload</div>
+        <div class="ar-sub">Automatically adds ₹500 to your wallet when balance falls below ₹200. Charged to saved UPI: rajesh@upi</div>
       </div>
-
-      <!-- Tabs -->
-      <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('transactions',this)">📋 Transactions</button>
-        <button class="tab-btn" onclick="switchTab('refunds',this)">🔄 Refunds</button>
-        <button class="tab-btn" onclick="switchTab('vouchers',this)">🎁 Gift Vouchers</button>
-        <button class="tab-btn" onclick="switchTab('analytics',this)">📊 Spend Analytics</button>
+      <div class="toggle-wrap">
+        <button class="toggle on" id="autoreload-toggle" onclick="toggleAutoReload()"></button>
+        <span class="toggle-label" id="autoreload-label">ON</span>
       </div>
-
-      <!-- Transactions tab -->
-      <div class="tab-pane active" id="tab-transactions">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);">Recent Transactions</div>
-          <select style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;padding:7px 14px;font-size:13px;font-family:inherit;outline:none;">
-            <option>All Time</option>
-            <option>This Month</option>
-            <option>Last 3 Months</option>
-          </select>
-        </div>
-        <div class="portal-card" style="padding:20px 24px;" id="txn-list"></div>
-      </div>
-
-      <!-- Refunds tab -->
-      <div class="tab-pane" id="tab-refunds">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);">Refund Requests</div>
-          <button class="btn-wallet btn-withdraw" onclick="openRefundRequest()" style="padding:9px 20px;font-size:13px;border-radius:11px;">+ Request Refund</button>
-        </div>
-        <div id="refunds-list"></div>
-        <div style="background:rgba(245,168,0,.06);border:1px solid rgba(245,168,0,.15);border-radius:14px;padding:16px 18px;font-size:13px;color:rgba(255,255,255,.55);line-height:1.7;margin-top:20px;">
-          <strong style="color:#F5A800;display:block;margin-bottom:4px;">📋 Refund Policy</strong>
-          Cancellations accepted up to 24 hrs before visit date. Refunds processed within 5–7 business days to original payment method. Wallet refunds are instant. No refunds for passport plans.
-        </div>
-      </div>
-
-      <!-- Gift Vouchers tab -->
-      <div class="tab-pane" id="tab-vouchers">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);">My Gift Vouchers</div>
-          <button class="btn-wallet btn-add" onclick="redeemVoucher()" style="padding:9px 20px;font-size:13px;border-radius:11px;background:#0055B3;color:#fff;">🎟 Redeem Voucher Code</button>
-        </div>
-        <div id="vouchers-list"></div>
-        <div style="background:var(--clr-bg-card,#1a2235);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:28px;text-align:center;margin-top:20px;">
-          <div style="font-size:36px;margin-bottom:12px;">🎁</div>
-          <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:8px;">Send a Gift Voucher</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.6;">Gift an unforgettable day at Worlds of Wonder. Available in ₹500, ₹1,000, ₹2,000 and ₹5,000 denominations.</div>
-          <button class="btn-wallet btn-add" style="background:#F5A800;color:#0a1628;margin:0 auto;border-radius:12px;" onclick="sendGift()">🎁 Send Gift Voucher</button>
-        </div>
-      </div>
-
-      <!-- Analytics tab -->
-      <div class="tab-pane" id="tab-analytics">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-          <div class="portal-card" style="padding:24px;">
-            <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:16px;">Monthly Spend Trend</div>
-            <div style="height:180px;"><canvas id="spend-chart"></canvas></div>
-          </div>
-          <div class="portal-card" style="padding:24px;">
-            <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:16px;">Spend by Category</div>
-            <div style="height:180px;"><canvas id="category-chart"></canvas></div>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
-          <div class="portal-card" style="padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:900;color:#10b981;">₹3,298</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;">Avg. per visit</div>
-          </div>
-          <div class="portal-card" style="padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:900;color:#F5A800;">7</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;">Total visits</div>
-          </div>
-          <div class="portal-card" style="padding:20px;text-align:center;">
-            <div style="font-size:32px;font-weight:900;color:#a78bfa;">₹950</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;">Savings via offers</div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /portal-content -->
-  </main>
-</div>
-
-<!-- Add Money Modal -->
-<div class="modal-overlay" id="add-money-modal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeAddMoney()">✕</button>
-    <div class="modal-title">➕ Add Money to Wallet</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.4);margin-bottom:16px;">Choose amount or enter custom</div>
-    <div class="amount-grid">
-      <button class="amt-btn" onclick="selectAmt(500,this)">₹500</button>
-      <button class="amt-btn" onclick="selectAmt(1000,this)">₹1,000</button>
-      <button class="amt-btn" onclick="selectAmt(2000,this)">₹2,000</button>
-      <button class="amt-btn" onclick="selectAmt(3000,this)">₹3,000</button>
-      <button class="amt-btn" onclick="selectAmt(5000,this)">₹5,000</button>
-      <button class="amt-btn" onclick="selectAmt(0,this)">Custom</button>
+      <button class="btn btn-outline btn-sm" onclick="editAutoReload()"><i class="fa fa-cog"></i> Edit Rules</button>
     </div>
-    <input class="input-field" id="custom-amount" type="number" placeholder="Enter amount (₹100 – ₹50,000)" min="100" max="50000" />
-    <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.3);margin-bottom:10px;">PAY VIA</div>
-    <div class="pay-methods">
-      <button class="pay-opt selected" onclick="selectPay(this)">📱 UPI</button>
-      <button class="pay-opt" onclick="selectPay(this)">💳 Card</button>
-      <button class="pay-opt" onclick="selectPay(this)">🏦 Net Banking</button>
-      <button class="pay-opt" onclick="selectPay(this)">💼 Wallet</button>
+
+    <!-- MAIN LAYOUT -->
+    <div class="wallet-layout">
+
+      <!-- LEFT: TRANSACTIONS -->
+      <div>
+        <div class="panel" id="history-section">
+          <div class="panel-head">
+            <div class="panel-title"><i class="fa fa-history" style="color:var(--brand);margin-right:6px;"></i> Transaction History</div>
+            <button class="btn btn-outline btn-sm" onclick="exportCSV()"><i class="fa fa-download"></i> Export</button>
+          </div>
+          <div class="tab-bar">
+            <button class="tbar-btn active" onclick="filterTxns('all',this)">All (23)</button>
+            <button class="tbar-btn" onclick="filterTxns('credit',this)">Credits (14)</button>
+            <button class="tbar-btn" onclick="filterTxns('debit',this)">Debits (7)</button>
+            <button class="tbar-btn" onclick="filterTxns('refund',this)">Refunds (2)</button>
+          </div>
+          <div class="txn-list" id="txn-list"></div>
+        </div>
+
+        <!-- SPEND CHART -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><i class="fa fa-chart-bar" style="color:var(--brand);margin-right:6px;"></i> Monthly Spend</div>
+            <select onchange="updateChart(this.value)" style="border:1.5px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;outline:none;">
+              <option value="6">Last 6 Months</option>
+              <option value="12">Last 12 Months</option>
+            </select>
+          </div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="spend-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: QUICK TOP-UP + OFFERS -->
+      <div class="right-col">
+
+        <div class="quick-topup">
+          <div class="qt-title">⚡ Quick Add Money</div>
+          <div class="topup-presets" id="presets">
+            <button class="preset-btn" onclick="selectPreset(this,200)">
+              <div class="preset-amt">₹200</div>
+              <div class="preset-coins">+10 coins</div>
+            </button>
+            <button class="preset-btn" onclick="selectPreset(this,500)">
+              <div class="preset-amt">₹500</div>
+              <div class="preset-coins">+25 coins</div>
+            </button>
+            <button class="preset-btn sel" onclick="selectPreset(this,1000)">
+              <div class="preset-amt">₹1,000</div>
+              <div class="preset-coins">+60 coins ✨</div>
+            </button>
+            <button class="preset-btn" onclick="selectPreset(this,2000)">
+              <div class="preset-amt">₹2,000</div>
+              <div class="preset-coins">+150 coins 🎉</div>
+            </button>
+          </div>
+          <div class="custom-topup">
+            <input type="number" id="custom-amt" placeholder="Or enter amount (min ₹50)" min="50" max="50000"/>
+          </div>
+          <div class="topup-methods" id="payment-methods">
+            <button class="method-btn active" onclick="selectMethod(this,'upi')"><i class="fa fa-mobile-alt"></i>UPI</button>
+            <button class="method-btn" onclick="selectMethod(this,'card')"><i class="fa fa-credit-card"></i>Card</button>
+            <button class="method-btn" onclick="selectMethod(this,'netbanking')"><i class="fa fa-university"></i>Net Bkg</button>
+            <button class="method-btn" onclick="selectMethod(this,'paytm')"><i class="fa fa-wallet"></i>Paytm</button>
+          </div>
+          <div class="promo-row">
+            <input type="text" id="wallet-promo" placeholder="Promo code (try WALLET10)"/>
+            <button class="btn btn-outline btn-sm" onclick="applyWalletPromo()">Apply</button>
+          </div>
+          <div id="promo-msg" style="font-size:11px;margin-bottom:10px;min-height:16px;"></div>
+          <button class="btn btn-brand" style="width:100%;" onclick="openTopUp()">
+            <i class="fa fa-plus"></i> Add <span id="add-amount">₹1,000</span> to Wallet
+          </button>
+        </div>
+
+        <div class="wallet-offers">
+          <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:12px;">🎁 Wallet Offers</div>
+          <div class="offer-item">
+            <div class="offer-emoji">💸</div>
+            <div class="offer-text">
+              <div class="ot">Add ₹1,000+ and get 60 bonus WOW Coins</div>
+              <div class="os">Valid till 31 Mar 2026</div>
+            </div>
+            <div class="offer-badge">AUTO</div>
+          </div>
+          <div class="offer-item">
+            <div class="offer-emoji">🎯</div>
+            <div class="offer-text">
+              <div class="ot">Use code WALLET10 for 10% cashback (max ₹100)</div>
+              <div class="os">First-time wallet load offer · Limited</div>
+            </div>
+            <div class="offer-badge">CODE</div>
+          </div>
+          <div class="offer-item">
+            <div class="offer-emoji">🏆</div>
+            <div class="offer-text">
+              <div class="ot">Load ₹2,000 for 150 WOW Coins + Silver badge</div>
+              <div class="os">Valid for Silver members only</div>
+            </div>
+            <div class="offer-badge">SILVER</div>
+          </div>
+          <div class="offer-item">
+            <div class="offer-emoji">🔔</div>
+            <div class="offer-text">
+              <div class="ot">Enable Auto-Reload and earn 20 bonus coins</div>
+              <div class="os">One-time reward · Credited within 24 hrs</div>
+            </div>
+            <div class="offer-badge">DONE ✓</div>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <button class="btn-confirm" onclick="confirmAddMoney()">Proceed to Pay</button>
+
   </div>
 </div>
 
-<script>
-/* ── Tab switcher ── */
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  btn.classList.add('active');
-  if(name==='analytics') setTimeout(initCharts, 100);
-}
+<!-- TOP-UP MODAL -->
+<div class="modal-overlay" id="topup-modal">
+  <div class="modal-box">
+    <div id="topup-form-section">
+      <div class="modal-head">
+        <h3>💳 Add Money to Wallet</h3>
+        <button class="btn btn-ghost" onclick="closeModal('topup-modal')"><i class="fa fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;">Adding to Wallet</div>
+            <div style="font-size:24px;font-weight:900;color:#065f46;font-family:'Nunito',sans-serif;" id="modal-amount">₹1,000</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:#166534;">+<span id="modal-coins">60</span> WOW Coins</div>
+            <div style="font-size:10px;color:#4ade80;margin-top:2px;">New Balance: ₹<span id="modal-new-balance">1,850</span></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select class="form-input" id="modal-method">
+            <option>UPI (rajesh@upi)</option>
+            <option>HDFC Credit Card ···4521</option>
+            <option>SBI Debit Card ···7890</option>
+            <option>Paytm Wallet</option>
+            <option>Net Banking</option>
+          </select>
+        </div>
+        <div class="form-group" id="upi-verify-row">
+          <label class="form-label">UPI ID</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" class="form-input" value="rajesh@upi" id="upi-id-input"/>
+            <button class="btn btn-outline btn-sm" onclick="verifyUPI()" style="white-space:nowrap;">Verify</button>
+          </div>
+          <div id="upi-status" style="font-size:11px;margin-top:4px;color:var(--green);">✓ Linked UPI ID verified</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:8px;padding:12px;font-size:12px;color:var(--muted);">
+          🔒 Your transaction is secured by 256-bit SSL encryption.<br>Powered by Razorpay · PCI-DSS Level 1 Compliant.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('topup-modal')">Cancel</button>
+        <button class="btn btn-brand" onclick="processTopUp()"><i class="fa fa-lock"></i> Pay &amp; Add Money</button>
+      </div>
+    </div>
+    <div id="topup-success-section" style="display:none;">
+      <div class="success-overlay">
+        <div class="big">🎉</div>
+        <h3>Money Added!</h3>
+        <p>₹<span id="success-amount">1,000</span> added to your WOW Wallet<br>New Balance: <strong>₹<span id="success-new-bal">1,850</span></strong></p>
+        <p style="margin-top:8px;color:var(--green);font-weight:700;">+<span id="success-coins">60</span> WOW Coins credited ⭐</p>
+        <button class="btn btn-brand" style="margin-top:20px;width:100%;" onclick="closeModal('topup-modal')">Done ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-/* ── Transaction data ── */
-const TRANSACTIONS = [
-  { type:'credit', icon:'💳', title:'Wallet Recharge', meta:'Added via UPI · HDFC Bank', amount:2000, date:'24 Mar 2026', badge:'' },
-  { type:'debit',  icon:'🎟', title:'Water Park Booking', meta:'2 Adults + 1 Child · WOW-2K9X-7Q4M', amount:-3298, date:'18 Mar 2026', badge:'' },
-  { type:'credit', icon:'🔄', title:'Refund Processed', meta:'Booking WOW-AB12-3456 · Cancellation', amount:1199, date:'10 Mar 2026', badge:'Refund' },
-  { type:'credit', icon:'⭐', title:'Loyalty Cashback', meta:'Tier bonus · WOW Gold status', amount:150, date:'5 Mar 2026', badge:'' },
-  { type:'debit',  icon:'🎉', title:'Combo Booking', meta:'3 Adults · WOW-5C7D-8E9F', amount:-5997, date:'22 Feb 2026', badge:'' },
-  { type:'credit', icon:'🎁', title:'Gift Voucher Redeemed', meta:'Code: GIFT-XMAS-2025', amount:500, date:'15 Feb 2026', badge:'Voucher' },
-  { type:'debit',  icon:'🪪', title:'Annual Passport', meta:'Ankit Sharma · Passport Plan', amount:-4999, date:'1 Jan 2026', badge:'' },
-  { type:'credit', icon:'💳', title:'Wallet Recharge', meta:'Added via Credit Card', amount:5000, date:'28 Dec 2025', badge:'' },
+<!-- WITHDRAW MODAL -->
+<div class="modal-overlay" id="withdraw-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>🏦 Withdraw to Bank</h3>
+      <button class="btn btn-ghost" onclick="closeModal('withdraw-modal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#9a3412;">
+        ⚠️ Withdrawals take 3–5 working days. Minimum withdrawal is ₹100. Money earned from cashback/coins cannot be withdrawn.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Withdraw Amount</label>
+        <input type="number" class="form-input" placeholder="Enter amount (min ₹100)" id="withdraw-amount" max="850"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bank Account</label>
+        <select class="form-input">
+          <option>HDFC Bank ···1234 (Savings)</option>
+          <option>SBI Bank ···5678 (Savings)</option>
+          <option>Add New Account</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('withdraw-modal')">Cancel</button>
+      <button class="btn btn-brand" onclick="processWithdraw()"><i class="fa fa-arrow-circle-down"></i> Withdraw</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTO-RELOAD SETTINGS MODAL -->
+<div class="modal-overlay" id="autoreload-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>🔄 Auto-Reload Settings</h3>
+      <button class="btn btn-ghost" onclick="closeModal('autoreload-modal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Trigger when balance falls below</label>
+        <select class="form-input" id="ar-threshold">
+          <option value="100">₹100</option>
+          <option value="200" selected>₹200</option>
+          <option value="300">₹300</option>
+          <option value="500">₹500</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reload Amount</label>
+        <select class="form-input" id="ar-amount">
+          <option value="200">₹200</option>
+          <option value="500" selected>₹500</option>
+          <option value="1000">₹1,000</option>
+          <option value="2000">₹2,000</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Source</label>
+        <select class="form-input">
+          <option>UPI: rajesh@upi ✓ Verified</option>
+          <option>HDFC Card ···4521</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('autoreload-modal')">Cancel</button>
+      <button class="btn btn-brand" onclick="saveAutoReload()"><i class="fa fa-save"></i> Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+let walletBalance = 850;
+let selectedPreset = 1000;
+let selectedMethod = 'upi';
+let promoDiscount = 0;
+
+const TXN_DATA = [
+  {type:'debit', icon:'🎟', title:'WOW Combo Tickets', meta:'Booking WOW-2025-49820 · 3 tickets', amount:-5397, date:'28 Mar 2026', time:'10:14 AM'},
+  {type:'credit', icon:'💳', title:'Top-Up via UPI', meta:'rajesh@upi · Ref# BBPS882920', amount:2000, date:'28 Mar 2026', time:'10:10 AM'},
+  {type:'credit', icon:'⭐', title:'WOW Coins Cashback', meta:'150 coins redeemed = ₹75', amount:75, date:'28 Mar 2026', time:'09:58 AM'},
+  {type:'debit', icon:'🍔', title:'F&B at Water Park', meta:'Food Court · Order #FC-4892', amount:-342, date:'15 Feb 2026', time:'1:30 PM'},
+  {type:'debit', icon:'🎢', title:'Amusement Park Tickets', meta:'Booking WOW-2025-38412 · 4 tickets', amount:-3996, date:'12 Feb 2026', time:'3:06 PM'},
+  {type:'credit', icon:'💳', title:'Top-Up via Card', meta:'HDFC ···4521 · Auto-reload triggered', amount:500, date:'11 Feb 2026', time:'8:00 PM'},
+  {type:'refund', icon:'↩️', title:'Cancellation Refund', meta:'Booking WOW-2025-08847', amount:312, date:'15 Oct 2025', time:'2:00 PM'},
+  {type:'debit', icon:'🌊', title:'Water Park Ticket', meta:'Booking WOW-2025-29991 · 1 ticket', amount:-1299, date:'10 Jan 2026', time:'9:22 AM'},
+  {type:'credit', icon:'💳', title:'Top-Up via UPI', meta:'rajesh@upi · Ref# BBPS776543', amount:1000, date:'10 Jan 2026', time:'9:20 AM'},
+  {type:'credit', icon:'🎁', title:'Referral Bonus', meta:'Friend joined WOW using your link', amount:100, date:'2 Jan 2026', time:'11:00 AM'},
 ];
 
-function renderTransactions() {
+let displayedTxns = [...TXN_DATA];
+
+// ── RENDER TRANSACTIONS ────────────────────────────────────
+function renderTxns() {
   const el = document.getElementById('txn-list');
-  el.innerHTML = TRANSACTIONS.map(t => `
-    <div class="txn-row">
-      <div class="txn-icon ${t.type==='credit'?'txn-credit':t.type==='refund'?'txn-refund':'txn-debit'}">${t.icon}</div>
+  el.innerHTML = displayedTxns.map(t => `
+    <div class="txn">
+      <div class="txn-icon-wrap txn-${t.type}">${t.icon}</div>
       <div class="txn-info">
-        <div class="txn-title">${t.title}${t.badge?`<span class="txn-badge${t.badge==='Pending'?' pending':''}">${t.badge}</span>`:''}</div>
+        <div class="txn-title">${t.title}</div>
         <div class="txn-meta">${t.meta}</div>
       </div>
-      <div class="txn-amount">
-        <div class="amt ${t.amount>0?'credit-amt':'debit-amt'}">${t.amount>0?'+':''} ₹${Math.abs(t.amount).toLocaleString('en-IN')}</div>
-        <div class="date">${t.date}</div>
+      <div>
+        <div class="txn-amount ${t.type}">${t.amount > 0 ? '+' : ''}₹${Math.abs(t.amount).toLocaleString('en-IN')}</div>
+        <div class="txn-date">${t.date} · ${t.time}</div>
       </div>
     </div>`).join('');
 }
 
-/* ── Refund data ── */
-const REFUNDS = [
-  { ref:'WOW-AB12-3456', park:'Water Park', date:'10 Mar 2026', amount:1199, status:'processed', reason:'Change of plans', steps:['Requested','Verified','Approved','Processed'] },
-  { ref:'WOW-GH89-0PQR', park:'Amusement Park', date:'22 Mar 2026', amount:500, status:'pending', reason:'Event cancelled', steps:['Requested','Verified'] },
-];
-
-function renderRefunds() {
-  const el = document.getElementById('refunds-list');
-  el.innerHTML = REFUNDS.map(r => {
-    const statusClass = {processed:'status-processed',pending:'status-pending',rejected:'status-rejected'}[r.status] || '';
-    const allSteps = ['Requested','Verified','Approved','Processed'];
-    const stepsDone = r.steps.length;
-    return `
-    <div class="refund-card">
-      <div class="refund-header">
-        <div>
-          <div class="refund-booking">${r.ref}</div>
-          <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:3px;">${r.park} · ₹${r.amount.toLocaleString('en-IN')}</div>
-        </div>
-        <span class="refund-status ${statusClass}">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span>
-      </div>
-      <div class="refund-detail-row"><span>Reason</span><span>${r.reason}</span></div>
-      <div class="refund-detail-row"><span>Amount</span><span>₹${r.amount.toLocaleString('en-IN')}</span></div>
-      <div class="refund-detail-row"><span>Requested On</span><span>${r.date}</span></div>
-      <div class="refund-timeline">
-        ${allSteps.map((s,i)=>`
-          <div class="refund-step ${i<stepsDone?'done':''}">
-            <div class="refund-dot">${i<stepsDone?'✓':i+1}</div>
-            <div><strong style="font-size:12px;">${s}</strong><div style="font-size:11px;">${i<stepsDone?(i===stepsDone-1?'Latest update':'Completed'):'Pending'}</div></div>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
+function filterTxns(filter, btn) {
+  document.querySelectorAll('.tbar-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (filter === 'all') displayedTxns = [...TXN_DATA];
+  else displayedTxns = TXN_DATA.filter(t => t.type === filter);
+  renderTxns();
 }
 
-/* ── Gift vouchers data ── */
-const VOUCHERS = [
-  { code:'GIFT-WOW-X72A', amount:500,  desc:'Happy Birthday Gift from Priya',  expiry:'31 Dec 2026', used:false },
-  { code:'CORP-WOW-B45Z', amount:1000, desc:'Corporate Gifting Programme · ABC Ltd', expiry:'30 Jun 2026', used:false },
-  { code:'PROMO-FEB500',  amount:250,  desc:'February Cashback Voucher',         expiry:'31 Mar 2026', used:true },
-];
+function exportCSV() {
+  showToast('📊 Downloading transaction history CSV…', 'success');
+}
 
-function renderVouchers() {
-  const el = document.getElementById('vouchers-list');
-  el.innerHTML = VOUCHERS.map(v => `
-    <div class="voucher-card" style="${v.used?'opacity:.5':''}">
-      <div class="voucher-strip"></div>
-      <div class="voucher-body">
-        <div class="voucher-info">
-          <div class="voucher-code">${v.code}</div>
-          <div class="voucher-desc">${v.desc}</div>
-        </div>
-        <div class="voucher-value">
-          <div class="voucher-amount">₹${v.amount.toLocaleString('en-IN')}</div>
-          <div class="voucher-expiry">Expires ${v.expiry}</div>
-        </div>
-      </div>
-      <div class="voucher-actions">
-        ${v.used
-          ? `<span style="font-size:12px;font-weight:700;color:rgba(255,255,255,.3);">✓ Already Used</span>`
-          : `<button class="btn-sm btn-sm-primary" onclick="useVoucher('${v.code}')">🎟 Use in Booking</button>
-             <button class="btn-sm btn-sm-outline" onclick="copyCode('${v.code}')">📋 Copy Code</button>
-             <button class="btn-sm btn-sm-outline" onclick="shareVoucher('${v.code}')">📤 Share</button>`
+// ── CHART ──────────────────────────────────────────────────
+let spendChart;
+function initChart() {
+  const ctx = document.getElementById('spend-chart').getContext('2d');
+  spendChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+      datasets: [
+        {
+          label: 'Top-Up',
+          data: [0, 0, 1000, 1000, 500, 2000],
+          backgroundColor: 'rgba(16,185,129,.7)',
+          borderRadius: 6,
+        },
+        {
+          label: 'Spent',
+          data: [0, 0, 3398, 1299, 4338, 5397],
+          backgroundColor: 'rgba(255,107,53,.7)',
+          borderRadius: 6,
         }
-      </div>
-    </div>`).join('');
-}
-
-/* ── Charts ── */
-let chartsInited = false;
-function initCharts() {
-  if(chartsInited) return;
-  chartsInited = true;
-  const cf = { family:"'Nunito',sans-serif", size:11 };
-  const grid = { color:'rgba(255,255,255,.06)' };
-
-  new Chart(document.getElementById('spend-chart'), {
-    type:'bar',
-    data:{
-      labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
-      datasets:[{
-        label:'Spent (₹)',data:[3298,0,4999,0,5997,3298],
-        backgroundColor:'rgba(0,85,179,.5)',borderColor:'rgba(0,85,179,.9)',borderRadius:6,borderWidth:2
-      }]
+      ]
     },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:cf},grid:{color:'rgba(255,255,255,.04)'}},
-              y:{ticks:{color:'rgba(255,255,255,.4)',font:cf,callback:v=>'₹'+v},grid}}}
-  });
-
-  new Chart(document.getElementById('category-chart'), {
-    type:'doughnut',
-    data:{
-      labels:['Tickets','Passport','Combo','Wallet Recharge'],
-      datasets:[{data:[55,25,15,5],backgroundColor:['#0055B3','#F5A800','#10b981','#a78bfa'],borderWidth:0}]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.5)',font:cf,padding:10}}}}
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 12 } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 }, callback: v => '₹' + v.toLocaleString('en-IN') } }
+      }
+    }
   });
 }
 
-/* ── Modal helpers ── */
-function openAddMoney(){document.getElementById('add-money-modal').classList.add('open');}
-function closeAddMoney(){document.getElementById('add-money-modal').classList.remove('open');}
-function selectAmt(val, btn){
-  document.querySelectorAll('.amt-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  document.getElementById('custom-amount').value = val||'';
-}
-function selectPay(btn){
-  document.querySelectorAll('.pay-opt').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-function confirmAddMoney(){
-  const amt = document.getElementById('custom-amount').value;
-  if(!amt||amt<100){alert('Please enter a valid amount (min ₹100)');return;}
-  closeAddMoney();
-  const bal = parseInt(document.getElementById('wallet-balance-val').textContent.replace(/,/g,''));
-  const newBal = (bal + parseInt(amt)).toLocaleString('en-IN');
-  document.getElementById('wallet-balance-val').textContent = newBal;
-  alert('✅ ₹'+parseInt(amt).toLocaleString('en-IN')+' added to your wallet!\n\nNew balance: ₹'+newBal);
+function updateChart(months) {
+  if (months == 12) {
+    spendChart.data.labels = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+    spendChart.data.datasets[0].data = [500,0,1000,0,500,0,0,0,1000,1000,500,2000];
+    spendChart.data.datasets[1].data = [1299,0,1999,799,2598,0,0,0,3398,1299,4338,5397];
+  } else {
+    spendChart.data.labels = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+    spendChart.data.datasets[0].data = [0,0,1000,1000,500,2000];
+    spendChart.data.datasets[1].data = [0,0,3398,1299,4338,5397];
+  }
+  spendChart.update();
 }
 
-function showWithdraw(){alert('🏦 Withdrawal is available for verified accounts with a linked bank account.\n\nMinimum withdrawal: ₹500 · Processed in 2-3 business days.\n\nPlease complete KYC in your profile to enable withdrawals.');}
-function openRefundRequest(){
-  const reason = prompt('Please describe your reason for refund:','Change of plans');
-  if(reason){alert('✅ Refund request submitted!\n\nYou will receive a confirmation email within 24 hours. Refunds are processed within 5–7 business days.');}
-}
-function redeemVoucher(){
-  const code = prompt('Enter your gift voucher code:','');
-  if(code){alert('🎁 Voucher "'+code+'" accepted!\n\nCredit added to your wallet. Check your balance above.');}
-}
-function sendGift(){alert('🎁 Opening gift voucher purchase flow...\n\nChoose denomination, recipient, and personalized message.\n\n(Full implementation via payment gateway in production)');}
-function useVoucher(code){window.location.href='../book/water-park.html?voucher='+code;}
-function copyCode(code){navigator.clipboard?.writeText(code).then(()=>alert('✅ Code '+code+' copied!'));}
-function shareVoucher(code){
-  const msg = 'Here is a gift voucher for Worlds of Wonder! Code: '+code+' — Visit worldsofwonder.in to redeem.';
-  if(navigator.share) navigator.share({title:'WOW Gift Voucher',text:msg});
-  else window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+// ── TOP-UP UI ──────────────────────────────────────────────
+function selectPreset(btn, amt) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selectedPreset = amt;
+  document.getElementById('custom-amt').value = '';
+  updateAddButton();
 }
 
-/* ── Init ── */
-renderTransactions();
-renderRefunds();
-renderVouchers();
+function selectMethod(btn, method) {
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedMethod = method;
+}
+
+function updateAddButton() {
+  const custom = parseInt(document.getElementById('custom-amt').value) || 0;
+  const amt = custom || selectedPreset;
+  const coins = Math.floor(amt / 1000 * 60);
+  document.getElementById('add-amount').textContent = '₹' + amt.toLocaleString('en-IN');
+  document.getElementById('modal-amount').textContent = '₹' + amt.toLocaleString('en-IN');
+  document.getElementById('modal-coins').textContent = coins;
+  document.getElementById('modal-new-balance').textContent = (walletBalance + amt - promoDiscount).toLocaleString('en-IN');
+}
+
+function applyWalletPromo() {
+  const code = document.getElementById('wallet-promo').value.trim().toUpperCase();
+  const msg = document.getElementById('promo-msg');
+  const custom = parseInt(document.getElementById('custom-amt').value) || 0;
+  const amt = custom || selectedPreset;
+  if (code === 'WALLET10') {
+    promoDiscount = Math.min(Math.round(amt * 0.1), 100);
+    msg.style.color = 'var(--green)';
+    msg.textContent = '✓ WALLET10 applied! 10% cashback up to ₹100 — saving ₹' + promoDiscount;
+  } else {
+    msg.style.color = 'var(--red)';
+    msg.textContent = '✗ Invalid promo code. Try WALLET10';
+    promoDiscount = 0;
+  }
+}
+
+// ── TOP-UP FLOW ────────────────────────────────────────────
+function openTopUp() {
+  const custom = parseInt(document.getElementById('custom-amt').value) || 0;
+  const amt = custom || selectedPreset;
+  const coins = Math.floor(amt / 1000 * 60);
+  document.getElementById('modal-amount').textContent = '₹' + amt.toLocaleString('en-IN');
+  document.getElementById('modal-coins').textContent = coins;
+  document.getElementById('modal-new-balance').textContent = (walletBalance + amt).toLocaleString('en-IN');
+  document.getElementById('topup-form-section').style.display = '';
+  document.getElementById('topup-success-section').style.display = 'none';
+  document.getElementById('topup-modal').classList.add('open');
+}
+
+function processTopUp() {
+  const custom = parseInt(document.getElementById('custom-amt').value) || 0;
+  const amt = custom || selectedPreset;
+  const coins = Math.floor(amt / 1000 * 60);
+  // Simulate processing
+  const btn = document.querySelector('#topup-modal .btn-brand:last-child');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing…'; }
+  setTimeout(() => {
+    walletBalance += amt;
+    document.getElementById('balance-amt').textContent = walletBalance.toLocaleString('en-IN');
+    document.getElementById('success-amount').textContent = amt.toLocaleString('en-IN');
+    document.getElementById('success-new-bal').textContent = walletBalance.toLocaleString('en-IN');
+    document.getElementById('success-coins').textContent = coins;
+    document.getElementById('topup-form-section').style.display = 'none';
+    document.getElementById('topup-success-section').style.display = '';
+    // Add to transaction history
+    TXN_DATA.unshift({
+      type:'credit', icon:'💳',
+      title:'Top-Up via ' + selectedMethod.toUpperCase(),
+      meta:'Ref# BBPS' + Math.floor(Math.random()*900000+100000),
+      amount: amt, date: 'Just now', time: ''
+    });
+    displayedTxns = [...TXN_DATA];
+    renderTxns();
+  }, 1800);
+}
+
+// ── WITHDRAW ──────────────────────────────────────────────
+function openWithdraw() {
+  document.getElementById('withdraw-modal').classList.add('open');
+}
+
+function processWithdraw() {
+  const amt = parseInt(document.getElementById('withdraw-amount').value);
+  if (!amt || amt < 100) { showToast('Minimum withdrawal is ₹100', 'error'); return; }
+  if (amt > walletBalance) { showToast('Insufficient balance', 'error'); return; }
+  walletBalance -= amt;
+  document.getElementById('balance-amt').textContent = walletBalance.toLocaleString('en-IN');
+  closeModal('withdraw-modal');
+  showToast('₹' + amt.toLocaleString('en-IN') + ' withdrawal initiated (3–5 working days)', 'success');
+}
+
+// ── AUTO-RELOAD ────────────────────────────────────────────
+let autoReloadOn = true;
+function toggleAutoReload() {
+  autoReloadOn = !autoReloadOn;
+  const t = document.getElementById('autoreload-toggle');
+  const l = document.getElementById('autoreload-label');
+  t.className = 'toggle' + (autoReloadOn ? ' on' : '');
+  l.textContent = autoReloadOn ? 'ON' : 'OFF';
+  showToast('Auto-reload ' + (autoReloadOn ? 'enabled ✓' : 'disabled'), autoReloadOn ? 'success' : '');
+}
+
+function editAutoReload() {
+  document.getElementById('autoreload-modal').classList.add('open');
+}
+
+function saveAutoReload() {
+  const threshold = document.getElementById('ar-threshold').value;
+  const amt = document.getElementById('ar-amount').value;
+  closeModal('autoreload-modal');
+  showToast('✓ Auto-reload set: reload ₹' + amt + ' below ₹' + threshold, 'success');
+}
+
+function scrollToHistory() {
+  document.getElementById('history-section').scrollIntoView({behavior:'smooth'});
+}
+
+// ── MODAL HELPERS ──────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  const btn = document.querySelector('#topup-modal .btn-brand:last-child');
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa fa-lock"></i> Pay & Add Money'; }
+}
+
+function verifyUPI() {
+  showToast('✓ UPI ID verified successfully', 'success');
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderTxns();
+  initChart();
+
+  document.getElementById('custom-amt').addEventListener('input', updateAddButton);
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+  });
+});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
