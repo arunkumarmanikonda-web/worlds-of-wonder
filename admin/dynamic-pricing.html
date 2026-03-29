@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Pricing — WOW Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="../js/wow-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{--bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--bg4:#212d42;--border:rgba(255,255,255,.08);--text:#e2e8f0;--muted:rgba(255,255,255,.45);--primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#a78bfa;--cyan:#22d3ee;--orange:#f97316;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;}
+    .adm-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    .adm-sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+    .adm-sidebar-logo a{font-size:22px;font-weight:900;color:#fff;text-decoration:none;}
+    .adm-nav{padding:14px;flex:1;}
+    .adm-nav-section{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;padding:14px 20px 6px;}
+    .adm-nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;transition:all .2s;margin-bottom:2px;}
+    .adm-nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+    .adm-nav-item.active{background:rgba(0,85,179,.25);color:#60a5fa;border-left:3px solid #0055B3;}
+    .adm-main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;}
+    .adm-topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px;}
+    .adm-topbar-title{font-size:20px;font-weight:900;color:#fff;}
+    .adm-content{padding:24px 28px;flex:1;}
+
+    /* Tabs */
+    .page-tabs{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:24px;flex-wrap:wrap;}
+    .page-tab{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;font-family:inherit;}
+    .page-tab:hover{color:#fff;}
+    .page-tab.active{background:var(--primary);color:#fff;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    /* Cards / Grid */
+    .section-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px;}
+    .section-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .section-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    @media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr;}}
+
+    /* KPI */
+    .kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+    @media(max-width:1000px){.kpi-strip{grid-template-columns:repeat(2,1fr);}}
+    .kpi-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .kpi-card.blue::before{background:var(--primary);}
+    .kpi-card.gold::before{background:var(--gold);}
+    .kpi-card.green::before{background:var(--green);}
+    .kpi-card.orange::before{background:var(--orange);}
+    .kpi-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+    .kpi-val{font-size:24px;font-weight:900;color:#fff;}
+    .kpi-sub{font-size:11px;color:var(--muted);margin-top:5px;}
+
+    /* Forms */
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:block;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#fff;font-family:inherit;outline:none;transition:border .2s;}
+    .form-input:focus{border-color:rgba(0,85,179,.6);}
+    .form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13.5px;color:#fff;font-family:inherit;outline:none;cursor:pointer;}
+    .form-select option{background:#1a2235;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+    @media(max-width:700px){.form-row,.form-row-3{grid-template-columns:1fr;}}
+    .btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-primary:hover{background:#0066d6;}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important;}
+    .btn-ghost:hover{background:rgba(255,255,255,.1);}
+    .btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2)!important;}
+    .btn-success{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.2)!important;}
+    .btn-gold{background:rgba(245,168,0,.15);color:var(--gold);border:1px solid rgba(245,168,0,.3)!important;}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+
+    /* Price Rule Cards */
+    .rule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+    .rule-card{background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;}
+    .rule-card:hover{border-color:rgba(0,85,179,.4);}
+    .rule-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+    .rule-name{font-size:14px;font-weight:800;color:#fff;}
+    .rule-type-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+    .rule-detail{font-size:12px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+    .rule-multiplier{font-size:20px;font-weight:900;margin-top:10px;}
+    .rule-active-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+    .rule-footer{display:flex;gap:8px;margin-top:12px;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;}
+
+    /* Calendar */
+    .calendar-wrap{background:var(--bg4);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .cal-title{font-size:16px;font-weight:800;color:#fff;}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+    .cal-day-header{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase;}
+    .cal-cell{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:1px solid transparent;position:relative;}
+    .cal-cell:hover{border-color:rgba(255,255,255,.2);}
+    .cal-cell.empty{background:transparent;cursor:default;}
+    .cal-cell.normal{background:rgba(16,185,129,.1);color:#10b981;}
+    .cal-cell.peak{background:rgba(245,168,0,.18);color:#F5A800;}
+    .cal-cell.surge{background:rgba(239,68,68,.18);color:#ef4444;}
+    .cal-cell.blackout{background:rgba(255,255,255,.04);color:rgba(255,255,255,.25);cursor:not-allowed;}
+    .cal-cell.holiday{background:rgba(167,139,250,.18);color:#a78bfa;}
+    .cal-cell.weekend{background:rgba(249,115,22,.15);color:#f97316;}
+    .cal-cell.today{border-color:#0055B3!important;box-shadow:0 0 0 2px rgba(0,85,179,.4);}
+    .cal-cell .price-tag{font-size:9px;font-weight:700;margin-top:2px;opacity:.8;}
+    .cal-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+    .legend-dot{width:10px;height:10px;border-radius:3px;}
+
+    /* Price Matrix Table */
+    .price-table{width:100%;border-collapse:collapse;}
+    .price-table th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:rgba(255,255,255,.03);}
+    .price-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.05);}
+    .price-table tr:last-child td{border-bottom:none;}
+    .price-table tr:hover td{background:rgba(255,255,255,.02);}
+    .price-input{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 10px;font-size:13px;color:#fff;font-family:inherit;width:80px;text-align:center;outline:none;}
+    .price-input:focus{border-color:rgba(0,85,179,.6);}
+    .price-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+    .badge-base{background:rgba(16,185,129,.12);color:#10b981;}
+    .badge-peak{background:rgba(245,168,0,.15);color:#F5A800;}
+    .badge-surge{background:rgba(239,68,68,.15);color:#ef4444;}
+
+    /* Toggle Switch */
+    .toggle-wrap{display:flex;align-items:center;gap:10px;}
+    .toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:24px;transition:.3s;}
+    .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+    .toggle input:checked + .toggle-slider{background:var(--green);}
+    .toggle input:checked + .toggle-slider:before{transform:translateX(20px);}
+    .toggle-label{font-size:13px;font-weight:600;color:var(--text);}
+
+    /* Surge Alert */
+    .surge-alert{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .surge-alert-icon{font-size:24px;}
+    .surge-alert-text{flex:1;}
+    .surge-alert-title{font-size:14px;font-weight:800;color:#ef4444;margin-bottom:2px;}
+    .surge-alert-sub{font-size:12px;color:var(--muted);}
+    .info-box{background:rgba(0,85,179,.08);border:1px solid rgba(0,85,179,.2);border-radius:10px;padding:12px 16px;font-size:12px;color:rgba(100,160,255,.85);margin-bottom:16px;}
+
+    /* Chart */
+    .chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+    .chart-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;}
+
+    /* Bulk override table */
+    .override-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .override-row:last-child{border-bottom:none;}
+    .override-label{font-size:13px;font-weight:600;color:#fff;}
+    .override-sub{font-size:11px;color:var(--muted);}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:18px;}
+    .divider{height:1px;background:var(--border);margin:14px 0;}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><span style="color:#60a5fa;">W</span>OW <span style="color:var(--gold);font-size:14px;font-weight:700;">Admin</span></a>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Operations</div>
+    <a href="index.html"          class="adm-nav-item">📊 Dashboard</a>
+    <a href="ops-dashboard.html"  class="adm-nav-item">🎡 Ops Command Centre</a>
+    <a href="bookings.html"       class="adm-nav-item">🎟️ Booking Management</a>
+    <a href="gate.html"           class="adm-nav-item">🚪 Gate Redemption</a>
+    <div class="adm-nav-section">Revenue</div>
+    <a href="revenue-analytics.html" class="adm-nav-item">📈 Revenue Analytics</a>
+    <a href="dynamic-pricing.html"   class="adm-nav-item active">💲 Dynamic Pricing</a>
+    <a href="gst-engine.html"        class="adm-nav-item">🧾 GST Engine</a>
+    <a href="invoices.html"          class="adm-nav-item">🗂️ Invoices</a>
+    <div class="adm-nav-section">Products</div>
+    <a href="ticketing-engine.html"  class="adm-nav-item">🎫 Ticketing Engine</a>
+    <a href="passport-engine.html"   class="adm-nav-item">🛂 Passport Engine</a>
+    <a href="fnb-packages.html"      class="adm-nav-item">🍔 F&B Packages</a>
+    <a href="loyalty-engine.html"    class="adm-nav-item">⭐ Loyalty Engine</a>
+    <a href="offers.html"            class="adm-nav-item">🎁 Offers</a>
+    <div class="adm-nav-section">Platform</div>
+    <a href="crm.html"           class="adm-nav-item">🤝 CRM</a>
+    <a href="user-management.html" class="adm-nav-item">👥 Users</a>
+    <a href="super-admin.html"   class="adm-nav-item">🔱 Super Admin</a>
+    <div style="padding:16px;border-top:1px solid var(--border);margin-top:auto;">
+      <a href="../index.html" class="adm-nav-item">🌐 View Site</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="adm-main">
+  <div class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title">💲 Dynamic Pricing Engine</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Peak/off-peak rules · surge pricing · blackout dates · bulk overrides</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <div class="toggle-wrap">
+        <label class="toggle"><input type="checkbox" id="masterToggle" checked onchange="toggleMaster(this)"><span class="toggle-slider"></span></label>
+        <span class="toggle-label" id="masterLabel">Dynamic Pricing: ON</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveAllPrices()">💾 Save All Changes</button>
+    </div>
+  </div>
+
+  <div class="adm-content">
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-card blue">
+        <div class="kpi-label">Current Base Price (Adult)</div>
+        <div class="kpi-val">₹1,299</div>
+        <div class="kpi-sub">Water Park · GST 18% incl.</div>
+      </div>
+      <div class="kpi-card gold">
+        <div class="kpi-label">Active Surge Multiplier</div>
+        <div class="kpi-val" id="currentMultiplier">1.25×</div>
+        <div class="kpi-sub">Weekend + Holiday active</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Revenue Uplift (MTD)</div>
+        <div class="kpi-val">+₹4.2L</div>
+        <div class="kpi-sub">↑ 14% vs fixed pricing</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Blackout Days (This Month)</div>
+        <div class="kpi-val" id="blackoutCount">3</div>
+        <div class="kpi-sub">Holi, maintenance, Easter</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="page-tabs">
+      <button class="page-tab active" onclick="switchTab('pricing')">📋 Pricing Rules</button>
+      <button class="page-tab" onclick="switchTab('calendar')">📅 Pricing Calendar</button>
+      <button class="page-tab" onclick="switchTab('matrix')">🏷️ Price Matrix</button>
+      <button class="page-tab" onclick="switchTab('surge')">⚡ Surge Engine</button>
+      <button class="page-tab" onclick="switchTab('bulk')">📦 Bulk Overrides</button>
+      <button class="page-tab" onclick="switchTab('history')">📜 Change History</button>
+    </div>
+
+    <!-- ─── TAB: PRICING RULES ─── -->
+    <div class="tab-content active" id="tab-pricing">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#fff;">Pricing Rules</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Define when and how prices change automatically</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openRuleModal()">＋ New Rule</button>
+      </div>
+
+      <div class="rule-grid" id="rulesContainer"></div>
+    </div>
+
+    <!-- ─── TAB: PRICING CALENDAR ─── -->
+    <div class="tab-content" id="tab-calendar">
+      <div class="info-box">
+        💡 Click any date to set a price rule or blackout. Dates inherit the highest-priority active rule for that day.
+      </div>
+
+      <div class="two-col">
+        <div class="calendar-wrap">
+          <div class="cal-header">
+            <button class="btn btn-ghost btn-sm" onclick="prevMonth()">‹</button>
+            <div class="cal-title" id="calTitle">April 2026</div>
+            <button class="btn btn-ghost btn-sm" onclick="nextMonth()">›</button>
+          </div>
+          <div class="cal-grid" id="calDayHeaders"></div>
+          <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
+          <div class="cal-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,.3);"></div> Normal</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(249,115,22,.25);"></div> Weekend</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(245,168,0,.3);"></div> Peak</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,.3);"></div> Surge</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(167,139,250,.3);"></div> Holiday</div>
+            <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,.08);"></div> Blackout</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-card">
+            <div class="section-title">📅 Selected Day Override</div>
+            <div class="section-sub" id="selectedDayLabel">Click a date to configure</div>
+            <div id="dayOverrideForm" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">Day Type</label>
+                <select class="form-select" id="dayType">
+                  <option value="normal">Normal (base price)</option>
+                  <option value="weekend">Weekend (+25%)</option>
+                  <option value="peak">Peak Season (+40%)</option>
+                  <option value="surge">Surge (+60%)</option>
+                  <option value="holiday">Holiday (+50%)</option>
+                  <option value="blackout">Blackout (unavailable)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Custom Multiplier</label>
+                <input type="number" class="form-input" id="customMultiplier" step="0.05" min="0.5" max="3" placeholder="e.g. 1.35" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Note (internal)</label>
+                <input type="text" class="form-input" id="dayNote" placeholder="e.g. Holi festival, maintenance…" />
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary btn-sm" onclick="saveDayOverride()">Save Override</button>
+                <button class="btn btn-ghost btn-sm" onclick="clearDayOverride()">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">📌 Upcoming Overrides</div>
+            <div style="font-size:12px;" id="upcomingOverrides">
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                <div><div style="font-weight:700;color:#fff;">14 Apr — Good Friday</div><div style="color:var(--muted);">Holiday (+50%)</div></div>
+                <span class="price-badge badge-peak">×1.50</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                <div><div style="font-weight:700;color:#fff;">1 May — Labour Day</div><div style="color:var(--muted);">Peak (+40%)</div></div>
+                <span class="price-badge badge-peak">×1.40</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                <div><div style="font-weight:700;color:#fff;">26 Apr — Maintenance</div><div style="color:var(--muted);">Blackout</div></div>
+                <span class="price-badge" style="background:rgba(255,255,255,.06);color:var(--muted);">Closed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: PRICE MATRIX ─── -->
+    <div class="tab-content" id="tab-matrix">
+      <div class="info-box">
+        💡 Edit prices directly in the table. Changes are live immediately. All prices are GST-inclusive (18%).
+      </div>
+
+      <div class="section-card" style="overflow-x:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div><div class="section-title">Base Price Matrix</div><div style="font-size:12px;color:var(--muted);">GST-inclusive · Effective immediately on save</div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="resetMatrix()">↺ Reset to Defaults</button>
+            <button class="btn btn-primary btn-sm" onclick="saveMatrix()">💾 Save Matrix</button>
+          </div>
+        </div>
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Water Park</th>
+              <th>Amusement Park</th>
+              <th>Combo</th>
+              <th>Group (20–49)</th>
+              <th>Group (50–99)</th>
+              <th>Group (100+)</th>
+            </tr>
+          </thead>
+          <tbody id="priceMatrixBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Multiplier Preview -->
+      <div class="section-card">
+        <div class="section-title">🔮 Price Simulation</div>
+        <div class="section-sub">See what a guest would pay under different conditions</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Park Type</label>
+            <select class="form-select" id="simPark" onchange="runSimulation()">
+              <option value="water">Water Park</option>
+              <option value="amusement">Amusement Park</option>
+              <option value="combo">Combo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="simCat" onchange="runSimulation()">
+              <option value="adult">Adult (12+)</option>
+              <option value="child">Child (3–11)</option>
+              <option value="senior">Senior (60+)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Day Type</label>
+            <select class="form-select" id="simDay" onchange="runSimulation()">
+              <option value="1.0">Normal (1×)</option>
+              <option value="1.25">Weekend (1.25×)</option>
+              <option value="1.4">Peak (1.40×)</option>
+              <option value="1.6">Surge (1.60×)</option>
+              <option value="1.5">Holiday (1.50×)</option>
+            </select>
+          </div>
+        </div>
+        <div style="background:var(--bg4);border-radius:12px;padding:16px;display:flex;gap:24px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">BASE PRICE</div>
+            <div style="font-size:22px;font-weight:900;color:#fff;" id="simBase">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">MULTIPLIER</div>
+            <div style="font-size:22px;font-weight:900;color:var(--gold);" id="simMult">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">FINAL PRICE</div>
+            <div style="font-size:28px;font-weight:900;color:#10b981;" id="simFinal">—</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">GST COMPONENT</div>
+            <div style="font-size:22px;font-weight:900;color:var(--cyan);" id="simGst">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: SURGE ENGINE ─── -->
+    <div class="tab-content" id="tab-surge">
+      <div class="surge-alert">
+        <div class="surge-alert-icon">⚡</div>
+        <div class="surge-alert-text">
+          <div class="surge-alert-title">Surge Pricing Active — This Weekend</div>
+          <div class="surge-alert-sub">29–30 Mar 2026 · Multiplier: 1.25× · Expected +₹62K revenue uplift</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deactivateSurge()">Deactivate</button>
+      </div>
+
+      <div class="two-col">
+        <div class="section-card">
+          <div class="section-title">⚡ Surge Triggers</div>
+          <div class="section-sub">Auto-activate surge when conditions are met</div>
+
+          <div id="surgeTriggers">
+            <div style="background:var(--bg4);border-radius:10px;padding:14px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">Occupancy Surge</div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Trigger when capacity ≥</label>
+                  <input type="number" class="form-input" value="80" min="50" max="100" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Price Multiplier</label>
+                  <input type="number" class="form-input" value="1.25" step="0.05" min="1" max="2" />
+                </div>
+              </div>
+            </div>
+
+            <div style="background:var(--bg4);border-radius:10px;padding:14px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">Weekend Auto-Surge</div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Days</label>
+                  <select class="form-select"><option>Saturday & Sunday</option><option>Friday–Sunday</option></select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Multiplier</label>
+                  <input type="number" class="form-input" value="1.20" step="0.05" />
+                </div>
+              </div>
+            </div>
+
+            <div style="background:var(--bg4);border-radius:10px;padding:14px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">School Holiday Surge</div>
+                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">From</label>
+                  <input type="date" class="form-input" value="2026-04-01" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">To</label>
+                  <input type="date" class="form-input" value="2026-04-15" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Multiplier</label>
+                <input type="number" class="form-input" value="1.35" step="0.05" />
+              </div>
+            </div>
+
+            <div style="background:var(--bg4);border-radius:10px;padding:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:700;color:#fff;">Last-Minute Discount</div>
+                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="section-sub" style="margin-bottom:10px;">Apply discount when capacity &lt; threshold on visit day</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Capacity Below</label>
+                  <input type="number" class="form-input" value="30" min="10" max="70" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Discount %</label>
+                  <input type="number" class="form-input" value="15" min="5" max="40" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <button class="btn btn-primary" onclick="saveSurgeTriggers()">💾 Save Surge Rules</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-card">
+            <div class="section-title">📊 Surge Impact (Last 30 Days)</div>
+            <div style="height:220px;"><canvas id="surgeChart"></canvas></div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">🌡️ Demand Forecast</div>
+            <div class="section-sub">AI-estimated demand for next 14 days</div>
+            <div id="demandForecast"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: BULK OVERRIDES ─── -->
+    <div class="tab-content" id="tab-bulk">
+      <div class="section-card">
+        <div class="section-title">📦 Bulk Price Override</div>
+        <div class="section-sub">Apply a percentage change or fixed amount to multiple products at once</div>
+
+        <div class="form-row" style="margin-bottom:16px;">
+          <div class="form-group">
+            <label class="form-label">Override Type</label>
+            <select class="form-select" id="bulkOverrideType" onchange="updateBulkPreview()">
+              <option value="pct">Percentage Change (% ±)</option>
+              <option value="flat">Flat Rupee Change (₹ ±)</option>
+              <option value="fixed">Set Fixed Price</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" id="bulkValueLabel">Change (%)</label>
+            <div style="display:flex;gap:8px;">
+              <select class="form-select" id="bulkSign" style="width:70px;flex-shrink:0;">
+                <option value="1">+</option>
+                <option value="-1">−</option>
+              </select>
+              <input type="number" class="form-input" id="bulkValue" value="10" min="0" max="100" oninput="updateBulkPreview()" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apply To</label>
+            <select class="form-select" id="bulkApplyTo">
+              <option value="all">All Products</option>
+              <option value="water">Water Park Only</option>
+              <option value="amusement">Amusement Only</option>
+              <option value="combo">Combo Only</option>
+              <option value="adults">Adult Category Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:8px 0;display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;">
+            <span>Product</span><span>Current</span><span>Change</span><span>New Price</span><span></span>
+          </div>
+          <div id="bulkOverrideRows"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-ghost" onclick="resetBulkPreview()">↺ Reset</button>
+          <button class="btn btn-primary" onclick="applyBulkOverride()">✔ Apply Bulk Override</button>
+        </div>
+      </div>
+
+      <!-- Scheduled Overrides -->
+      <div class="section-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div><div class="section-title">📆 Scheduled Price Changes</div><div style="font-size:12px;color:var(--muted);">Price changes that go live automatically on a future date</div></div>
+          <button class="btn btn-primary btn-sm" onclick="openScheduleModal()">＋ Schedule Change</button>
+        </div>
+        <div id="scheduledChanges"></div>
+      </div>
+    </div>
+
+    <!-- ─── TAB: HISTORY ─── -->
+    <div class="tab-content" id="tab-history">
+      <div class="section-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div><div class="section-title">📜 Price Change History</div><div style="font-size:12px;color:var(--muted);">Full audit trail of all pricing changes</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportHistory()">⬇ Export CSV</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="price-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Changed By</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /adm-content -->
+</div><!-- /adm-main -->
+
+<!-- Rule Modal -->
+<div class="modal-overlay" id="ruleModal">
+  <div class="modal">
+    <div class="modal-title" id="ruleModalTitle">＋ New Pricing Rule</div>
+    <div class="form-group">
+      <label class="form-label">Rule Name</label>
+      <input class="form-input" id="rm_name" placeholder="e.g. Summer Weekend Surge" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Rule Type</label>
+        <select class="form-select" id="rm_type">
+          <option value="peak">Peak Season</option>
+          <option value="weekend">Weekend</option>
+          <option value="holiday">Holiday</option>
+          <option value="surge">Real-time Surge</option>
+          <option value="offpeak">Off-Peak Discount</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority (1 = highest)</label>
+        <input type="number" class="form-input" id="rm_priority" value="1" min="1" max="10" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Start Date</label>
+        <input type="date" class="form-input" id="rm_start" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input type="date" class="form-input" id="rm_end" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price Multiplier</label>
+        <input type="number" class="form-input" id="rm_mult" step="0.05" value="1.25" min="0.5" max="3" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Applies To</label>
+        <select class="form-select" id="rm_applies">
+          <option>All Parks</option>
+          <option>Water Park Only</option>
+          <option>Amusement Park Only</option>
+          <option>Combo Only</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="rm_desc" placeholder="Internal description…" />
+    </div>
+    <div class="form-group">
+      <div class="toggle-wrap">
+        <label class="toggle"><input type="checkbox" id="rm_active" checked><span class="toggle-slider"></span></label>
+        <span class="toggle-label">Rule Active</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('ruleModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRule()">Save Rule</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Change Modal -->
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal">
+    <div class="modal-title">📆 Schedule Price Change</div>
+    <div class="form-group">
+      <label class="form-label">Effective Date</label>
+      <input type="date" class="form-input" id="sch_date" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Product</label>
+        <select class="form-select" id="sch_product">
+          <option>Water Park — Adult</option>
+          <option>Water Park — Child</option>
+          <option>Amusement Park — Adult</option>
+          <option>Combo — Adult</option>
+          <option>All Products</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Price (₹)</label>
+        <input type="number" class="form-input" id="sch_price" placeholder="e.g. 1399" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reason</label>
+      <input class="form-input" id="sch_reason" placeholder="e.g. Annual price revision" />
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('scheduleModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveScheduledChange()">Schedule Change</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Tab Switcher ── */
+function switchTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ── Master Toggle ── */
+function toggleMaster(el){
+  document.getElementById('masterLabel').textContent='Dynamic Pricing: '+(el.checked?'ON':'OFF');
+  document.getElementById('currentMultiplier').textContent=el.checked?'1.25×':'1.00×';
+}
+
+/* ── Pricing Rules ── */
+const RULES_DEFAULTS = [
+  {id:1, name:'School Summer Holidays', type:'peak', start:'2026-04-10', end:'2026-04-20', mult:1.40, applies:'All Parks', priority:1, active:true, desc:'April school holiday season'},
+  {id:2, name:'Weekend Surge',          type:'weekend', start:'Every Sat', end:'Every Sun', mult:1.25, applies:'All Parks', priority:2, active:true, desc:'Auto-applied every weekend'},
+  {id:3, name:'Diwali Festival Week',   type:'holiday', start:'2026-10-18', end:'2026-10-25', mult:1.60, applies:'All Parks', priority:1, active:true, desc:'Diwali peak demand'},
+  {id:4, name:'Off-Peak Weekday Deal',  type:'offpeak', start:'Mon–Thu', end:'(non-holiday)', mult:0.90, applies:'All Parks', priority:5, active:true, desc:'10% discount on weekdays'},
+  {id:5, name:'Monsoon Special',        type:'offpeak', start:'2026-07-01', end:'2026-09-15', mult:0.80, applies:'Water Park Only', priority:4, active:false, desc:'20% off during monsoon'},
+  {id:6, name:'Republic Day Special',   type:'holiday', start:'2027-01-26', end:'2027-01-26', mult:1.45, applies:'All Parks', priority:1, active:true, desc:'Republic Day holiday'},
+];
+let rules = [...RULES_DEFAULTS];
+
+const TYPE_COLORS={peak:'rgba(245,168,0,.2)',weekend:'rgba(249,115,22,.2)',holiday:'rgba(167,139,250,.2)',surge:'rgba(239,68,68,.2)',offpeak:'rgba(16,185,129,.15)'};
+const TYPE_TEXT  ={peak:'#F5A800',weekend:'#f97316',holiday:'#a78bfa',surge:'#ef4444',offpeak:'#10b981'};
+const TYPE_LABEL ={peak:'Peak Season',weekend:'Weekend',holiday:'Holiday',surge:'Surge',offpeak:'Off-Peak'};
+
+function renderRules(){
+  document.getElementById('rulesContainer').innerHTML=rules.map(r=>`
+    <div class="rule-card">
+      <div class="rule-header">
+        <div>
+          <div class="rule-name">${r.name}</div>
+          <div style="margin-top:4px;">
+            <span class="rule-type-badge" style="background:${TYPE_COLORS[r.type]};color:${TYPE_TEXT[r.type]};">${TYPE_LABEL[r.type]}</span>
+            <span style="font-size:10px;color:var(--muted);margin-left:8px;">P${r.priority}</span>
+          </div>
+        </div>
+        <label class="toggle"><input type="checkbox" ${r.active?'checked':''} onchange="toggleRule(${r.id},this)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="rule-detail">📅 <span>${r.start} → ${r.end}</span></div>
+      <div class="rule-detail">🎡 <span>${r.applies}</span></div>
+      <div class="rule-detail">📝 <span style="color:rgba(255,255,255,.5);">${r.desc}</span></div>
+      <div class="rule-multiplier" style="color:${r.mult>=1?'#F5A800':'#10b981'};">${r.mult}× <span style="font-size:13px;color:var(--muted);font-weight:600;">${r.mult>=1?'(+'+(((r.mult-1)*100).toFixed(0))+'%)':'(-'+((1-r.mult)*100).toFixed(0)+'%)'}</span></div>
+      <div class="rule-footer">
+        <button class="btn btn-ghost btn-sm" onclick="editRule(${r.id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRule(${r.id})">🗑 Delete</button>
+        <span style="margin-left:auto;display:flex;align-items:center;font-size:11px;color:${r.active?'#10b981':'var(--muted)'};">
+          <span class="rule-active-dot" style="background:${r.active?'#10b981':'rgba(255,255,255,.2)'}"></span>
+          ${r.active?'Active':'Inactive'}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+function toggleRule(id,el){ const r=rules.find(x=>x.id===id); if(r) r.active=el.checked; renderRules(); }
+function deleteRule(id){ if(confirm('Delete this pricing rule?')) { rules=rules.filter(x=>x.id!==id); renderRules(); } }
+function editRule(id){ const r=rules.find(x=>x.id===id); if(!r) return; document.getElementById('rm_name').value=r.name; document.getElementById('rm_type').value=r.type; document.getElementById('rm_priority').value=r.priority; document.getElementById('rm_mult').value=r.mult; document.getElementById('rm_desc').value=r.desc; document.getElementById('rm_active').checked=r.active; document.getElementById('ruleModalTitle').textContent='✏️ Edit Rule'; document.getElementById('ruleModal').classList.add('show'); }
+function openRuleModal(){ document.getElementById('rm_name').value=''; document.getElementById('rm_type').value='peak'; document.getElementById('rm_priority').value=3; document.getElementById('rm_mult').value=1.25; document.getElementById('rm_desc').value=''; document.getElementById('rm_active').checked=true; document.getElementById('ruleModalTitle').textContent='＋ New Pricing Rule'; document.getElementById('ruleModal').classList.add('show'); }
+function saveRule(){ const name=document.getElementById('rm_name').value.trim(); if(!name){alert('Please enter a rule name.');return;} const newRule={id:Date.now(),name,type:document.getElementById('rm_type').value,start:'Custom',end:'Custom',mult:+document.getElementById('rm_mult').value,applies:document.getElementById('rm_applies').value,priority:+document.getElementById('rm_priority').value,active:document.getElementById('rm_active').checked,desc:document.getElementById('rm_desc').value}; rules.push(newRule); rules.sort((a,b)=>a.priority-b.priority); renderRules(); document.getElementById('ruleModal').classList.remove('show'); addHistory('Admin','New Rule: '+name,'create','—',newRule.mult+'×'); }
+
+/* ── Calendar ── */
+let calYear=2026, calMonth=3;
+const CAL_OVERRIDES={};
+const PRESET_OVERRIDES={'2026-04-01':'peak','2026-04-06':'surge','2026-04-07':'surge','2026-04-12':'surge','2026-04-13':'surge','2026-04-14':'holiday','2026-04-18':'weekend','2026-04-19':'weekend','2026-04-25':'weekend','2026-04-26':'blackout'};
+let selectedDay=null;
+
+const DAY_TYPES={normal:{mult:1.0,label:'Normal'},weekend:{mult:1.25,label:'Weekend'},peak:{mult:1.40,label:'Peak'},surge:{mult:1.60,label:'Surge'},holiday:{mult:1.50,label:'Holiday'},blackout:{mult:0,label:'Closed'}};
+const PRICE_MAP={normal:1299,weekend:1624,peak:1819,surge:2078,holiday:1949,blackout:0};
+
+function renderCalendar(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calTitle').textContent=months[calMonth]+' '+calYear;
+  const headers=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  document.getElementById('calDayHeaders').innerHTML=headers.map(h=>`<div class="cal-day-header">${h}</div>`).join('');
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  const grid=document.getElementById('calGrid');
+  let cells=[];
+  for(let i=0;i<firstDay;i++) cells.push('<div class="cal-cell empty"></div>');
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dow=new Date(calYear,calMonth,d).getDay();
+    let type=CAL_OVERRIDES[dateStr]||PRESET_OVERRIDES[dateStr]||(dow===0||dow===6?'weekend':'normal');
+    const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const price=PRICE_MAP[type]||PRICE_MAP.normal;
+    cells.push(`<div class="cal-cell ${type} ${isToday?'today':''}" onclick="selectDay('${dateStr}','${type}')" title="${dateStr}">
+      <span>${d}</span>
+      ${type!=='blackout'?`<span class="price-tag">₹${price>=1000?(price/1000).toFixed(1)+'K':price}</span>`:'<span class="price-tag">✕</span>'}
+    </div>`);
+  }
+  grid.innerHTML=cells.join('');
+}
+function prevMonth(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function nextMonth(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+function selectDay(date, type){
+  selectedDay=date;
+  document.getElementById('selectedDayLabel').textContent='Configuring: '+new Date(date+'T00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('dayType').value=type;
+  document.getElementById('customMultiplier').value=DAY_TYPES[type]?.mult||1;
+  document.getElementById('dayNote').value='';
+  document.getElementById('dayOverrideForm').style.display='block';
+}
+function saveDayOverride(){
+  if(!selectedDay) return;
+  const type=document.getElementById('dayType').value;
+  CAL_OVERRIDES[selectedDay]=type;
+  renderCalendar();
+  addHistory('Admin','Day Override: '+selectedDay,'override','—',type);
+  alert('✅ Day override saved for '+selectedDay);
+}
+function clearDayOverride(){
+  if(selectedDay) delete CAL_OVERRIDES[selectedDay];
+  renderCalendar();
+}
+
+/* ── Price Matrix ── */
+const MATRIX={
+  adult:  {water:1299, amusement:1199, combo:1999, g20:1099, g50:1049, g100:999},
+  child:  {water:899,  amusement:799,  combo:1399, g20:749,  g50:699,  g100:649},
+  senior: {water:975,  amusement:899,  combo:1499, g20:899,  g50:849,  g100:799},
+  armed:  {water:909,  amusement:839,  combo:1399, g20:849,  g50:799,  g100:749},
+  abled:  {water:649,  amusement:599,  combo:999,  g20:599,  g50:549,  g100:499},
+};
+const CAT_LABELS={adult:'Adult (12+)',child:'Child (3–11)',senior:'Senior (60+)',armed:'Armed Forces',abled:'Differently Abled'};
+const ORIGINAL_MATRIX=JSON.parse(JSON.stringify(MATRIX));
+
+function renderMatrix(){
+  const cols=['water','amusement','combo','g20','g50','g100'];
+  document.getElementById('priceMatrixBody').innerHTML=Object.entries(MATRIX).map(([cat,prices])=>`
+    <tr>
+      <td style="font-weight:700;color:#fff;">${CAT_LABELS[cat]}</td>
+      ${cols.map(col=>`<td><input type="number" class="price-input" value="${prices[col]}" data-cat="${cat}" data-col="${col}" onchange="matrixChanged(this)" /></td>`).join('')}
+    </tr>
+  `).join('');
+}
+function matrixChanged(el){ MATRIX[el.dataset.cat][el.dataset.col]=+el.value; }
+function saveMatrix(){ alert('✅ Price matrix saved!\nAPI: PATCH /api/pricing/matrix'); addHistory('Admin','Full Matrix Update','bulk','—','See matrix'); }
+function resetMatrix(){ if(confirm('Reset all prices to defaults?')){ Object.assign(MATRIX,JSON.parse(JSON.stringify(ORIGINAL_MATRIX))); renderMatrix(); } }
+
+/* ── Price Simulation ── */
+const SIM_PRICES={water:{adult:1299,child:899,senior:975},amusement:{adult:1199,child:799,senior:899},combo:{adult:1999,child:1399,senior:1499}};
+function runSimulation(){
+  const park=document.getElementById('simPark').value;
+  const cat=document.getElementById('simCat').value;
+  const mult=+document.getElementById('simDay').value;
+  const base=SIM_PRICES[park]?.[cat]||1299;
+  const final=Math.round(base*mult);
+  const gst=Math.round(final*18/118);
+  document.getElementById('simBase').textContent='₹'+base.toLocaleString('en-IN');
+  document.getElementById('simMult').textContent=mult+'×';
+  document.getElementById('simFinal').textContent='₹'+final.toLocaleString('en-IN');
+  document.getElementById('simGst').textContent='₹'+gst.toLocaleString('en-IN');
+}
+
+/* ── Surge Chart ── */
+function initSurgeChart(){
+  new Chart(document.getElementById('surgeChart'),{
+    type:'bar',
+    data:{
+      labels:['W1','W2','W3','W4','W1','W2','W3','W4'],
+      datasets:[
+        {label:'Normal Revenue',data:[8.2,9.1,8.7,9.4,10.1,9.8,11.2,10.6],backgroundColor:'rgba(0,85,179,.5)'},
+        {label:'Surge Uplift',  data:[1.1,2.3,0.8,3.1,2.6,1.9,4.2,3.8],  backgroundColor:'rgba(245,168,0,.7)'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'rgba(255,255,255,.6)',font:{size:10}}}},
+      scales:{x:{stacked:true,ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{stacked:true,ticks:{color:'rgba(255,255,255,.4)',font:{size:10},callback:v=>'₹'+v+'L'},grid:{color:'rgba(255,255,255,.04)'}}}
+    }
+  });
+}
+
+/* ── Demand Forecast ── */
+function renderDemandForecast(){
+  const days=['Sat 28','Sun 29','Mon 30','Tue 31','Wed 1','Thu 2','Fri 3','Sat 4','Sun 5','Mon 6','Tue 7','Wed 8','Thu 9','Fri 10'];
+  const pcts=[92,88,41,38,45,42,55,94,91,48,44,47,50,62];
+  document.getElementById('demandForecast').innerHTML=days.map((d,i)=>{
+    const pct=pcts[i];
+    const color=pct>=80?'#ef4444':pct>=60?'#F5A800':'#10b981';
+    const type=pct>=80?'🔴 HIGH':pct>=60?'🟡 MED':'🟢 LOW';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <div style="width:60px;font-size:11px;font-weight:700;color:var(--muted);">${d}</div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:6px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;"></div>
+      </div>
+      <div style="width:28px;font-size:11px;font-weight:700;color:${color};">${pct}%</div>
+      <div style="font-size:10px;color:var(--muted);width:55px;">${type}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Bulk Overrides ── */
+const BULK_PRODUCTS=[
+  {name:'Water Park',cat:'Adult',base:1299},{name:'Water Park',cat:'Child',base:899},
+  {name:'Amusement Park',cat:'Adult',base:1199},{name:'Amusement Park',cat:'Child',base:799},
+  {name:'Combo',cat:'Adult',base:1999},{name:'Combo',cat:'Child',base:1399},
+  {name:'Group 20–49',cat:'Adult',base:1099},{name:'Group 50–99',cat:'Adult',base:1049},
+];
+function updateBulkPreview(){
+  const type=document.getElementById('bulkOverrideType').value;
+  const val=+document.getElementById('bulkValue').value||0;
+  const sign=+document.getElementById('bulkSign').value;
+  document.getElementById('bulkValueLabel').textContent=type==='pct'?'Change (%)':type==='flat'?'Change (₹)':'Fixed Price (₹)';
+  document.getElementById('bulkOverrideRows').innerHTML=BULK_PRODUCTS.map(p=>{
+    let newPrice;
+    if(type==='pct') newPrice=Math.round(p.base*(1+(sign*val/100)));
+    else if(type==='flat') newPrice=p.base+(sign*val);
+    else newPrice=val||p.base;
+    const diff=newPrice-p.base;
+    const diffStr=diff>0?`<span style="color:#ef4444;">+₹${diff}</span>`:diff<0?`<span style="color:#10b981;">−₹${Math.abs(diff)}</span>`:`<span style="color:var(--muted);">—</span>`;
+    return `<div class="override-row">
+      <div><div class="override-label">${p.name}</div><div class="override-sub">${p.cat}</div></div>
+      <div style="font-weight:700;">₹${p.base.toLocaleString('en-IN')}</div>
+      <div>${diffStr}</div>
+      <div style="font-weight:800;color:var(--gold);">₹${newPrice.toLocaleString('en-IN')}</div>
+      <div><input type="checkbox" checked /></div>
+    </div>`;
+  }).join('');
+}
+function resetBulkPreview(){ document.getElementById('bulkValue').value=0; updateBulkPreview(); }
+function applyBulkOverride(){ if(confirm('Apply bulk price override to selected products?')){ alert('✅ Bulk override applied!\nAPI: PATCH /api/pricing/bulk'); addHistory('Admin','Bulk Override','bulk','Various',document.getElementById('bulkOverrideType').value+' '+document.getElementById('bulkValue').value); } }
+
+/* ── Scheduled Changes ── */
+const scheduledChanges=[
+  {date:'2026-04-10',product:'All Products',price:'Summer peak rates',reason:'School holidays',status:'scheduled'},
+  {date:'2026-06-01',product:'Water Park — Adult',price:'₹1,399',reason:'Annual revision',status:'scheduled'},
+];
+function renderScheduledChanges(){
+  document.getElementById('scheduledChanges').innerHTML=scheduledChanges.length===0?
+    '<div style="text-align:center;padding:30px;color:var(--muted);">No scheduled changes</div>':
+    scheduledChanges.map((c,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-weight:700;color:#fff;font-size:13px;">${c.product} · ${c.price}</div>
+        <div style="font-size:11px;color:var(--muted);">Effective: ${c.date} · Reason: ${c.reason}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <span style="background:rgba(245,168,0,.15);color:var(--gold);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">🕐 Scheduled</span>
+        <button class="btn btn-danger btn-sm" onclick="cancelScheduled(${i})">Cancel</button>
+      </div>
+    </div>`).join('');
+}
+function openScheduleModal(){ document.getElementById('scheduleModal').classList.add('show'); }
+function saveScheduledChange(){
+  const date=document.getElementById('sch_date').value;
+  const product=document.getElementById('sch_product').value;
+  const price='₹'+document.getElementById('sch_price').value;
+  const reason=document.getElementById('sch_reason').value;
+  if(!date||!price||price==='₹'){alert('Fill in all fields.');return;}
+  scheduledChanges.push({date,product,price,reason,status:'scheduled'});
+  renderScheduledChanges();
+  document.getElementById('scheduleModal').classList.remove('show');
+  addHistory('Admin','Scheduled Change: '+product,'schedule','—',price+' on '+date);
+}
+function cancelScheduled(i){ if(confirm('Cancel this scheduled change?')) { scheduledChanges.splice(i,1); renderScheduledChanges(); } }
+
+/* ── Change History ── */
+const historyData=[];
+function addHistory(by,product,type,old_val,new_val){
+  historyData.unshift({ts:new Date().toLocaleString('en-IN'),by,product,type,old_val,new_val,reason:'Admin action'});
+  renderHistory();
+}
+function renderHistory(){
+  const INITIAL_HISTORY=[
+    {ts:'28 Mar 2026, 10:32',by:'Vikram (Admin)',product:'Water Park Adult',type:'manual',old_val:'₹1,199',new_val:'₹1,299',reason:'Annual price revision'},
+    {ts:'25 Mar 2026, 14:15',by:'Priya (Revenue Mgr)',product:'All Products',type:'bulk',old_val:'Various',new_val:'+10%',reason:'Weekend surge activation'},
+    {ts:'20 Mar 2026, 09:00',by:'System',product:'Weekend Rule',type:'auto',old_val:'1.20×',new_val:'1.25×',reason:'Rule update'},
+    {ts:'15 Mar 2026, 11:45',by:'Rajesh (GM)',product:'Combo Pack',type:'manual',old_val:'₹1,799',new_val:'₹1,999',reason:'Value revision'},
+    {ts:'01 Mar 2026, 08:00',by:'System',product:'Peak Season',type:'auto',old_val:'Off',new_val:'On',reason:'Scheduled activation'},
+  ];
+  const all=[...historyData,...INITIAL_HISTORY];
+  document.getElementById('historyBody').innerHTML=all.map(h=>`
+    <tr>
+      <td style="font-size:12px;color:var(--muted);">${h.ts}</td>
+      <td>${h.by}</td>
+      <td style="font-weight:600;">${h.product}</td>
+      <td><span class="price-badge ${h.type==='auto'?'badge-base':h.type==='bulk'?'badge-peak':'badge-surge'}">${h.type}</span></td>
+      <td style="color:var(--muted);">${h.old_val}</td>
+      <td style="color:var(--gold);font-weight:700;">${h.new_val}</td>
+      <td style="font-size:12px;color:var(--muted);">${h.reason}</td>
+    </tr>
+  `).join('');
+}
+function exportHistory(){ alert('Exporting price change history as CSV…'); }
+
+function deactivateSurge(){ if(confirm('Deactivate weekend surge pricing?')) alert('Surge pricing deactivated for this weekend.'); }
+function saveSurgeTriggers(){ alert('✅ Surge trigger rules saved!'); }
+function saveAllPrices(){ alert('✅ All pricing changes saved successfully!\nChanges will take effect for new bookings immediately.'); }
+
+/* ── Close Modals ── */
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('show'); });
+});
+
+/* ── Init ── */
+renderRules();
+renderCalendar();
+renderMatrix();
+runSimulation();
+initSurgeChart();
+renderDemandForecast();
+updateBulkPreview();
+renderScheduledChanges();
+renderHistory();
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
