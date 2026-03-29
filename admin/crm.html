@@ -1,836 +1,844 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>CRM &amp; Sales Pipeline — WOW Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="../css/wow-design-system.css"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-.seg-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:12px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
-.seg-school{background:#e0f4ff;color:#007BB5;}
-.seg-corp{background:var(--purple-lt);color:var(--purple);}
-.seg-bday{background:var(--accent-lt);color:var(--accent-dk);}
-.seg-ta{background:var(--green-lt);color:var(--green);}
-.seg-gen{background:var(--bg3);color:var(--text2);}
-.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.priority-high{background:var(--red);}
-.priority-med{background:var(--amber);}
-.priority-low{background:var(--green);}
-.kanban-col-header.prospect{background:#EEF2F8;color:var(--text2);}
-.kanban-col-header.qualified{background:#EBF3FF;color:var(--primary);}
-.kanban-col-header.quote{background:#FFFBEB;color:var(--amber);}
-.kanban-col-header.negotiation{background:var(--purple-lt);color:var(--purple);}
-.kanban-col-header.won{background:var(--green-lt);color:var(--green);}
-.kanban-col-header.lost{background:var(--red-lt);color:var(--red);}
-.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;}
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CRM & Sales Pipeline — WOW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="../js/wow-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{--bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--bg4:#212d42;--border:rgba(255,255,255,.08);--text:#e2e8f0;--muted:rgba(255,255,255,.45);--primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#a78bfa;--cyan:#22d3ee;--orange:#f97316;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;}
+    /* sidebar */
+    .adm-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    .adm-sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+    .adm-sidebar-logo a{font-size:22px;font-weight:900;color:#fff;text-decoration:none;}
+    .adm-nav{padding:14px;flex:1;}
+    .adm-nav-section{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;padding:14px 20px 6px;}
+    .adm-nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;transition:all .2s;margin-bottom:2px;}
+    .adm-nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+    .adm-nav-item.active{background:rgba(0,85,179,.25);color:#60a5fa;border-left:3px solid var(--primary);}
+    /* main */
+    .adm-main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;}
+    .adm-topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px;}
+    .adm-topbar-title{font-size:20px;font-weight:900;color:#fff;}
+    .adm-content{padding:24px 28px;flex:1;}
+    /* tabs */
+    .page-tabs{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:24px;flex-wrap:wrap;}
+    .page-tab{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;font-family:inherit;}
+    .page-tab:hover{color:#fff;}
+    .page-tab.active{background:var(--primary);color:#fff;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    /* kpi */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+    @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+    .kpi-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .kpi-card.blue::before{background:var(--primary);}
+    .kpi-card.gold::before{background:var(--gold);}
+    .kpi-card.green::before{background:var(--green);}
+    .kpi-card.purple::before{background:var(--purple);}
+    .kpi-card.orange::before{background:var(--orange);}
+    .kpi-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+    .kpi-val{font-size:24px;font-weight:900;color:#fff;}
+    .kpi-delta{font-size:11px;margin-top:5px;font-weight:600;}
+    .kpi-delta.up{color:var(--green);}
+    .kpi-delta.dn{color:var(--red);}
+    /* kanban */
+    .kanban-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;min-height:520px;}
+    .kanban-col{width:260px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
+    .kanban-col-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .kanban-col-title{font-size:13px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;}
+    .kanban-count{font-size:11px;font-weight:700;background:rgba(255,255,255,.1);border-radius:20px;padding:2px 8px;color:var(--muted);}
+    .kanban-col-value{font-size:11px;color:var(--gold);font-weight:700;}
+    .kanban-cards{padding:10px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+    .lead-card{background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s;}
+    .lead-card:hover{border-color:rgba(0,85,179,.4);transform:translateY(-1px);}
+    .lead-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+    .lead-name{font-size:13px;font-weight:800;color:#fff;}
+    .lead-org{font-size:11px;color:var(--muted);margin-top:2px;}
+    .lead-value{font-size:12px;font-weight:800;color:var(--gold);}
+    .lead-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+    .tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.07);color:var(--muted);}
+    .tag.water{background:rgba(0,85,179,.2);color:#60a5fa;}
+    .tag.amusement{background:rgba(245,168,0,.15);color:#F5A800;}
+    .tag.group{background:rgba(167,139,250,.15);color:#a78bfa;}
+    .tag.passport{background:rgba(34,211,238,.15);color:#22d3ee;}
+    .tag.corporate{background:rgba(249,115,22,.15);color:#f97316;}
+    .tag.school{background:rgba(16,185,129,.15);color:#10b981;}
+    .lead-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);}
+    .lead-owner{font-size:10px;color:var(--muted);}
+    .lead-date{font-size:10px;color:var(--muted);}
+    .add-card-btn{margin:10px;padding:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.1);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;}
+    .add-card-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+    /* contacts table */
+    .table-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .table-title{font-size:14px;font-weight:800;color:#fff;}
+    table{width:100%;border-collapse:collapse;}
+    th{padding:11px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.03);white-space:nowrap;}
+    td{padding:11px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:rgba(255,255,255,.025);}
+    .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-hot{background:rgba(239,68,68,.15);color:#ef4444;}
+    .badge-warm{background:rgba(245,168,0,.15);color:#F5A800;}
+    .badge-cold{background:rgba(100,116,139,.15);color:#94a3b8;}
+    .badge-won{background:rgba(16,185,129,.15);color:#10b981;}
+    .badge-lost{background:rgba(239,68,68,.08);color:rgba(239,68,68,.6);}
+    /* forms */
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:block;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;font-family:inherit;outline:none;transition:border .2s;}
+    .form-input:focus{border-color:rgba(0,85,179,.6);}
+    .form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;font-family:inherit;outline:none;cursor:pointer;}
+    .form-select option{background:#1a2235;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-primary:hover{background:#0066d6;}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important;}
+    .btn-ghost:hover{background:rgba(255,255,255,.1);}
+    .btn-success{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)!important;}
+    .btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)!important;}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+    /* drawer */
+    .drawer{position:fixed;right:0;top:0;height:100vh;width:500px;max-width:100vw;background:var(--bg2);border-left:1px solid var(--border);z-index:200;transform:translateX(110%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column;}
+    .drawer.open{transform:translateX(0);}
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:199;display:none;backdrop-filter:blur(2px);}
+    .drawer-overlay.show{display:block;}
+    .drawer-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1;}
+    .drawer-body{padding:20px 24px;flex:1;}
+    /* activity feed */
+    .activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--bg4);}
+    .activity-content{flex:1;}
+    .activity-title{font-size:13px;font-weight:700;color:#fff;}
+    .activity-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+    /* pipeline progress */
+    .pipeline-stages{display:flex;gap:0;margin-bottom:24px;}
+    .p-stage{flex:1;text-align:center;position:relative;}
+    .p-stage::after{content:'›';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:18px;color:rgba(255,255,255,.2);z-index:1;}
+    .p-stage:last-child::after{display:none;}
+    .p-stage-inner{background:var(--bg3);border:1px solid var(--border);padding:12px 8px;margin:0 2px;}
+    .p-stage:first-child .p-stage-inner{border-radius:10px 0 0 10px;}
+    .p-stage:last-child .p-stage-inner{border-radius:0 10px 10px 0;}
+    .p-stage.active .p-stage-inner{background:rgba(0,85,179,.2);border-color:rgba(0,85,179,.4);}
+    .p-stage-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+    .p-stage.active .p-stage-label{color:#60a5fa;}
+    .p-stage-count{font-size:18px;font-weight:900;color:#fff;}
+    .p-stage-val{font-size:11px;color:var(--gold);font-weight:700;}
+    /* two-col */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    @media(max-width:1000px){.two-col{grid-template-columns:1fr;}}
+    .section-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+    .section-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:14px;}
+    /* modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:18px;}
+    /* search bar */
+    .search-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .search-input{flex:1;min-width:200px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:13px;color:#fff;font-family:inherit;outline:none;}
+    .search-input::placeholder{color:var(--muted);}
+    .filter-select{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:13px;color:#fff;font-family:inherit;cursor:pointer;outline:none;}
+    .filter-select option{background:#1a2235;}
+    /* chart row */
+    .chart-row{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:24px;}
+    @media(max-width:1000px){.chart-row{grid-template-columns:1fr;}}
+    .chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;}
+    .chart-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;}
+    /* avatar */
+    .avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(0,85,179,.4),rgba(0,85,179,.1));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#60a5fa;flex-shrink:0;}
+    /* score bar */
+    .score-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:5px;overflow:hidden;}
+    .score-fill{height:100%;border-radius:3px;}
+    textarea{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:#fff;padding:10px;font-family:inherit;font-size:13px;resize:vertical;outline:none;width:100%;}
+    textarea:focus{border-color:rgba(0,85,179,.5);}
+    .divider{height:1px;background:var(--border);margin:14px 0;}
+    .detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;}
+    .detail-row:last-child{border-bottom:none;}
+    .detail-label{color:var(--muted);font-size:12px;}
+    .detail-value{font-weight:600;color:#fff;text-align:right;}
+  </style>
 </head>
 <body>
-<div class="adm-layout">
 
 <!-- SIDEBAR -->
 <aside class="adm-sidebar">
   <div class="adm-sidebar-logo">
-    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;"/></a>
-    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+    <a href="../index.html"><span style="color:#60a5fa;">W</span>OW <span style="color:var(--gold);font-size:14px;font-weight:700;">Admin</span></a>
   </div>
   <nav class="adm-nav">
-    <div class="adm-nav-section">Overview</div>
-    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
-    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
-    <div class="adm-nav-section">Commerce</div>
-    <a href="inventory.html" class="adm-nav-item"><span class="nav-icon">📦</span> Inventory</a>
-    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
-    <a href="passport-admin.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
-    <a href="loyalty-admin.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
-    <div class="adm-nav-section">B2B &amp; Sales</div>
-    <a href="crm.html" class="adm-nav-item active"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
-    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
     <div class="adm-nav-section">Operations</div>
-    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
-    <div class="adm-nav-section">Finance</div>
-    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
-    <div class="adm-nav-section">Content &amp; System</div>
-    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
-    <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
-    <a href="config.html" class="adm-nav-item"><span class="nav-icon">⚙️</span> System Config</a>
-    <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
-  </nav>
-  <div class="adm-sidebar-footer">
-    <div class="adm-sidebar-user">
-      <div class="adm-user-avatar">SE</div>
-      <div><div class="adm-user-name">Sales Exec</div><div class="adm-user-role">CRM Access</div></div>
+    <a href="index.html"          class="adm-nav-item">📊 Dashboard</a>
+    <a href="ops-dashboard.html"  class="adm-nav-item">🎡 Ops Command Centre</a>
+    <a href="bookings.html"       class="adm-nav-item">🎟️ Booking Management</a>
+    <a href="gate.html"           class="adm-nav-item">🚪 Gate Redemption</a>
+    <a href="call-center.html"    class="adm-nav-item">📞 Call Centre</a>
+    <div class="adm-nav-section">Revenue</div>
+    <a href="revenue-analytics.html" class="adm-nav-item">📈 Revenue Analytics</a>
+    <a href="dynamic-pricing.html"   class="adm-nav-item">💲 Dynamic Pricing</a>
+    <a href="finance.html"           class="adm-nav-item">💰 Finance</a>
+    <a href="gst-engine.html"        class="adm-nav-item">🧾 GST Engine</a>
+    <div class="adm-nav-section">CRM</div>
+    <a href="crm.html"               class="adm-nav-item active">🤝 CRM & Pipeline</a>
+    <a href="partners.html"          class="adm-nav-item">🏢 Partners</a>
+    <a href="ta-approvals.html"      class="adm-nav-item">✈️ TA Approvals</a>
+    <div class="adm-nav-section">Products</div>
+    <a href="ticketing-engine.html"  class="adm-nav-item">🎫 Ticketing Engine</a>
+    <a href="passport-engine.html"   class="adm-nav-item">🛂 Passport Engine</a>
+    <a href="fnb-packages.html"      class="adm-nav-item">🍔 F&B Packages</a>
+    <a href="offers.html"            class="adm-nav-item">🎁 Offers</a>
+    <div class="adm-nav-section">Platform</div>
+    <a href="user-management.html"   class="adm-nav-item">👥 Users</a>
+    <a href="super-admin.html"       class="adm-nav-item">🔱 Super Admin</a>
+    <a href="audit-logs.html"        class="adm-nav-item">📋 Audit Logs</a>
+    <div style="padding:16px;border-top:1px solid var(--border);margin-top:auto;">
+      <a href="../index.html" class="adm-nav-item">🌐 View Site</a>
     </div>
-  </div>
+  </nav>
 </aside>
 
-<main class="adm-main">
+<!-- MAIN -->
+<div class="adm-main">
   <div class="adm-topbar">
     <div>
       <div class="adm-topbar-title">🤝 CRM &amp; Sales Pipeline</div>
-      <div class="adm-topbar-sub">Leads · Opportunities · Quotes · Tasks · Reports</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Leads · Contacts · Deals · Activities · Corporate &amp; Group Sales</div>
     </div>
-    <div class="adm-topbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openModal('import-modal')">📥 Import CSV</button>
-      <button class="btn btn-ghost btn-sm" onclick="openModal('lead-modal')">+ New Lead</button>
-      <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">📋 New Quote</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm" onclick="exportLeads()">⬇ Export</button>
+      <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">＋ New Lead</button>
     </div>
   </div>
 
   <div class="adm-content">
 
-    <!-- KPI row -->
-    <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr);margin-bottom:20px;">
-      <div class="kpi-card blue"><div class="kpi-icon" style="background:var(--primary-lt);color:var(--primary);">🔍</div><div class="kpi-value">8</div><div class="kpi-label">Prospecting</div></div>
-      <div class="kpi-card blue"><div class="kpi-icon" style="background:#dbeafe;color:#1d4ed8;">🎯</div><div class="kpi-value">11</div><div class="kpi-label">Qualified</div></div>
-      <div class="kpi-card amber"><div class="kpi-icon" style="background:var(--amber-lt);color:var(--amber);">📋</div><div class="kpi-value">9</div><div class="kpi-label">Quote Sent</div></div>
-      <div class="kpi-card purple"><div class="kpi-icon" style="background:var(--purple-lt);color:var(--purple);">🤝</div><div class="kpi-value">7</div><div class="kpi-label">Negotiation</div></div>
-      <div class="kpi-card green"><div class="kpi-icon" style="background:var(--green-lt);color:var(--green);">✅</div><div class="kpi-value">₹8.2L</div><div class="kpi-label">Won This Month</div></div>
-      <div class="kpi-card" style="border-left:3px solid var(--primary);"><div class="kpi-icon" style="background:var(--primary-lt);color:var(--primary);">💼</div><div class="kpi-value">₹28.4L</div><div class="kpi-label">Total Pipeline</div><div class="kpi-delta up">▲ 68% win rate</div></div>
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-label">Total Leads</div><div class="kpi-val">284</div><div class="kpi-delta up">↑ 23% this month</div></div>
+      <div class="kpi-card gold"><div class="kpi-label">Pipeline Value</div><div class="kpi-val">₹48.6L</div><div class="kpi-delta up">↑ 18% MoM</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Won This Month</div><div class="kpi-val">38</div><div class="kpi-delta up">Win rate: 42%</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Avg Deal Size</div><div class="kpi-val">₹1.28L</div><div class="kpi-delta up">↑ ₹12K vs last month</div></div>
+      <div class="kpi-card orange"><div class="kpi-label">Overdue Follow-ups</div><div class="kpi-val">12</div><div class="kpi-delta dn">Needs attention</div></div>
     </div>
 
     <!-- Tabs -->
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('pipeline',this)">🔄 Pipeline</button>
-      <button class="tab-btn" onclick="switchTab('leads',this)">📥 Leads (42)</button>
-      <button class="tab-btn" onclick="switchTab('quotes',this)">📋 Quotes (18)</button>
-      <button class="tab-btn" onclick="switchTab('tasks',this)">✅ My Tasks (7)</button>
-      <button class="tab-btn" onclick="switchTab('reports',this)">📊 Reports</button>
+    <div class="page-tabs">
+      <button class="page-tab active" onclick="switchTab('pipeline')">📋 Pipeline</button>
+      <button class="page-tab" onclick="switchTab('contacts')">👥 Contacts</button>
+      <button class="page-tab" onclick="switchTab('deals')">💼 Deals</button>
+      <button class="page-tab" onclick="switchTab('activities')">📅 Activities</button>
+      <button class="page-tab" onclick="switchTab('analytics')">📊 Analytics</button>
     </div>
 
-    <!-- PIPELINE TAB -->
-    <div id="tab-pipeline" class="tab-pane active">
-      <div class="filter-row">
-        <span style="font-size:12px;font-weight:700;color:var(--muted);">Filter by:</span>
-        <button class="filter-pill active" onclick="filterPipeline('all',this)">All Segments</button>
-        <button class="filter-pill" onclick="filterPipeline('SCHOOL',this)">🏫 Schools</button>
-        <button class="filter-pill" onclick="filterPipeline('CORPORATE',this)">🏢 Corporate</button>
-        <button class="filter-pill" onclick="filterPipeline('BIRTHDAY',this)">🎂 Birthday</button>
-        <button class="filter-pill" onclick="filterPipeline('B2B_TA',this)">✈️ Travel Agents</button>
-        <div style="margin-left:auto;display:flex;gap:8px;">
-          <select class="form-control" style="width:160px;font-size:12px;padding:6px 10px;" onchange="filterByExec(this.value)">
-            <option value="">All Executives</option>
-            <option>Rohan Verma</option>
-            <option>Priya Kapoor</option>
-            <option>Amit Sharma</option>
-          </select>
-        </div>
-      </div>
+    <!-- ─── PIPELINE KANBAN ─── -->
+    <div class="tab-content active" id="tab-pipeline">
 
-      <div class="kanban" id="kanban-board">
-        <!-- Prospecting -->
-        <div class="kanban-col">
-          <div class="kanban-col-header prospect">🔍 Prospecting <span class="kanban-count">8</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" onclick="openLeadDetail('LD-001')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">Infosys Annual Day</div>
-              </div>
-              <div class="kanban-card-sub">Infosys Ltd · Corporate · 300 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹2,40,000</span>
-                <span class="seg-badge seg-corp">Corp</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 15 · Assigned: Rohan</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-002')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-med"></div>
-                <div class="kanban-card-title">DPS RK Puram Trip</div>
-              </div>
-              <div class="kanban-card-sub">Delhi Public School · School · 200 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹84,000</span>
-                <span class="seg-badge seg-school">School</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 22 · Assigned: Priya</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-003')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-low"></div>
-                <div class="kanban-card-title">Rainbow Tours Group</div>
-              </div>
-              <div class="kanban-card-sub">Rainbow Tours · Travel Agent</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹1,20,000</span>
-                <span class="seg-badge seg-ta">TA</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 May 5 · Assigned: Amit</div>
-            </div>
-          </div>
-        </div>
+      <!-- Stage Summary Bar -->
+      <div class="pipeline-stages" id="pipelineStages"></div>
 
-        <!-- Qualified -->
-        <div class="kanban-col">
-          <div class="kanban-col-header qualified">🎯 Qualified <span class="kanban-count">11</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" onclick="openLeadDetail('LD-004')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">HDFC Bank Picnic</div>
-              </div>
-              <div class="kanban-card-sub">HDFC Bank · Corporate · 600 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹4,80,000</span>
-                <span class="seg-badge seg-corp">Corp</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 10 · Assigned: Rohan</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-005')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-med"></div>
-                <div class="kanban-card-title">KV Sector 14 Trip</div>
-              </div>
-              <div class="kanban-card-sub">Kendriya Vidyalaya · School · 120 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹1,56,000</span>
-                <span class="seg-badge seg-school">School</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 18 · Assigned: Priya</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-006')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">Arjun's 10th Bday</div>
-              </div>
-              <div class="kanban-card-sub">Private · Birthday · 80 guests</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹64,000</span>
-                <span class="seg-badge seg-bday">Birthday</span>
-              </div>
-              <div class="kanban-card-date" style="margin-top:6px;">📅 Apr 20 · Assigned: Priya</div>
-            </div>
-          </div>
-        </div>
+      <!-- Kanban Board -->
+      <div class="kanban-board" id="kanbanBoard"></div>
+    </div>
 
-        <!-- Quote Sent -->
-        <div class="kanban-col">
-          <div class="kanban-col-header quote">📋 Quote Sent <span class="kanban-count">9</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" onclick="openLeadDetail('LD-007')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">Wipro Team Outing</div>
-              </div>
-              <div class="kanban-card-sub">Wipro Ltd · Corporate · 400 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹3,20,000</span>
-                <span class="seg-badge seg-corp">Corp</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--muted);">📄 QT-2026-0284 · Sent Apr 1</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-008')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-med"></div>
-                <div class="kanban-card-title">MakeMyTrip MICE</div>
-              </div>
-              <div class="kanban-card-sub">MakeMyTrip · MICE Group</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹5,60,000</span>
-                <span class="seg-badge seg-ta">TA</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--muted);">📄 QT-2026-0279 · Sent Mar 28</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Negotiation -->
-        <div class="kanban-col">
-          <div class="kanban-col-header negotiation">🤝 Negotiation <span class="kanban-count">7</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" onclick="openLeadDetail('LD-009')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">TCS Foundation Day</div>
-              </div>
-              <div class="kanban-card-sub">TCS · Corporate · 800 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹6,40,000</span>
-                <span class="seg-badge seg-corp">Corp</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--amber);">⚠️ Discount approval pending (22%)</div>
-            </div>
-            <div class="kanban-card" onclick="openLeadDetail('LD-010')">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div class="priority-dot priority-high"></div>
-                <div class="kanban-card-title">Yatra Bulk Contract</div>
-              </div>
-              <div class="kanban-card-sub">Yatra Corporate · Reseller</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value">₹4,20,000</span>
-                <span class="seg-badge seg-ta">Reseller</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--muted);">Annual contract negotiation</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Won -->
-        <div class="kanban-col">
-          <div class="kanban-col-header won">✅ Won <span class="kanban-count">7</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" style="border-left:3px solid var(--green);" onclick="openLeadDetail('LD-011')">
-              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">🎉 Axis Bank Outing</div>
-              <div class="kanban-card-sub">Axis Bank · Corporate · 250 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value" style="color:var(--green);">₹2,00,000</span>
-                <span class="badge badge-success">Confirmed</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Booking WOW-2026-09820</div>
-            </div>
-            <div class="kanban-card" style="border-left:3px solid var(--green);" onclick="openLeadDetail('LD-012')">
-              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">🎉 Amity School Group</div>
-              <div class="kanban-card-sub">Amity Noida · School · 450 pax</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value" style="color:var(--green);">₹2,08,000</span>
-                <span class="badge badge-success">Confirmed</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--green);">✓ Booking WOW-2026-09818</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lost -->
-        <div class="kanban-col">
-          <div class="kanban-col-header lost">❌ Lost <span class="kanban-count">3</span></div>
-          <div class="kanban-body">
-            <div class="kanban-card" style="border-left:3px solid var(--red);opacity:.7;">
-              <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px;">HCL Team Event</div>
-              <div class="kanban-card-sub">HCL Technologies · Corporate</div>
-              <div class="kanban-card-meta">
-                <span class="kanban-card-value" style="color:var(--red);">₹3,60,000</span>
-                <span class="badge badge-danger">Lost</span>
-              </div>
-              <div style="margin-top:6px;font-size:11px;color:var(--red);">Reason: Budget — went to competitor</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /pipeline tab -->
-
-    <!-- LEADS TAB -->
-    <div id="tab-leads" class="tab-pane">
-      <div class="filter-row">
-        <div class="search-bar" style="flex:1;max-width:320px;position:relative;">
-          <svg class="search-bar-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="form-control" style="padding-left:36px;" placeholder="Search leads…"/>
-        </div>
-        <select class="form-control" style="width:140px;font-size:12px;padding:7px 10px;">
-          <option>All Sources</option>
-          <option>Web Form</option>
-          <option>Call Centre</option>
-          <option>Walk-in</option>
-          <option>CSV Import</option>
+    <!-- ─── CONTACTS ─── -->
+    <div class="tab-content" id="tab-contacts">
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="🔍 Search contacts…" oninput="filterContacts(this.value)" id="contactSearch"/>
+        <select class="filter-select" id="contactTypeFilter" onchange="filterContacts('')">
+          <option value="">All Types</option>
+          <option>Corporate</option><option>School</option><option>Travel Agent</option><option>Individual</option><option>Birthday</option>
         </select>
-        <select class="form-control" style="width:140px;font-size:12px;padding:7px 10px;">
-          <option>All Segments</option>
-          <option>School</option>
-          <option>Corporate</option>
-          <option>Birthday</option>
-          <option>Travel Agent</option>
+        <select class="filter-select" id="contactStatusFilter" onchange="filterContacts('')">
+          <option value="">All Status</option>
+          <option>Hot</option><option>Warm</option><option>Cold</option><option>Won</option><option>Lost</option>
         </select>
-        <button class="btn btn-ghost btn-sm" onclick="openModal('import-modal')">📥 Import</button>
-        <button class="btn btn-primary btn-sm" onclick="openModal('lead-modal')">+ New Lead</button>
+        <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">＋ Add Contact</button>
       </div>
-      <div class="tbl-wrap">
-        <table class="tbl">
-          <thead>
-            <tr>
-              <th>Lead Ref</th><th>Contact</th><th>Organisation</th>
-              <th>Segment</th><th>Pax</th><th>Date</th><th>Status</th>
-              <th>Priority</th><th>Assigned</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="leads-tbody">
-            <tr>
-              <td><strong>LD-2026-0042</strong></td>
-              <td><div style="font-size:13px;font-weight:600;">Ravi Malhotra</div><div style="font-size:11px;color:var(--muted);">+91 98765 43210</div></td>
-              <td>Infosys Ltd</td>
-              <td><span class="seg-badge seg-corp">Corporate</span></td>
-              <td>300</td><td>Apr 15</td>
-              <td><span class="badge badge-primary">Qualified</span></td>
-              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-high"></div>High</div></td>
-              <td>Rohan V</td>
-              <td class="tbl-actions">
-                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0042')">View</button>
-                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>LD-2026-0041</strong></td>
-              <td><div style="font-size:13px;font-weight:600;">Ms. Kavitha</div><div style="font-size:11px;color:var(--muted);">+91 87654 32109</div></td>
-              <td>DPS RK Puram</td>
-              <td><span class="seg-badge seg-school">School</span></td>
-              <td>200</td><td>Apr 22</td>
-              <td><span class="badge badge-warning">Proposal Sent</span></td>
-              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-med"></div>Medium</div></td>
-              <td>Priya K</td>
-              <td class="tbl-actions">
-                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0041')">View</button>
-                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>LD-2026-0040</strong></td>
-              <td><div style="font-size:13px;font-weight:600;">Sunita Bhatia</div><div style="font-size:11px;color:var(--muted);">+91 76543 21098</div></td>
-              <td>—</td>
-              <td><span class="seg-badge seg-bday">Birthday</span></td>
-              <td>80</td><td>Apr 20</td>
-              <td><span class="badge badge-primary">Qualified</span></td>
-              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-high"></div>High</div></td>
-              <td>Priya K</td>
-              <td class="tbl-actions">
-                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0040')">View</button>
-                <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">Quote</a>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>LD-2026-0039</strong></td>
-              <td><div style="font-size:13px;font-weight:600;">Manoj Tiwari</div><div style="font-size:11px;color:var(--muted);">+91 65432 10987</div></td>
-              <td>Rainbow Tours</td>
-              <td><span class="seg-badge seg-ta">Travel Agent</span></td>
-              <td>—</td><td>May 5</td>
-              <td><span class="badge badge-neutral">New</span></td>
-              <td><div style="display:flex;align-items:center;gap:5px;"><div class="priority-dot priority-low"></div>Low</div></td>
-              <td>Amit S</td>
-              <td class="tbl-actions">
-                <button class="btn btn-ghost btn-sm" onclick="openLeadDetail('LD-2026-0039')">View</button>
-                <button class="btn btn-ghost btn-sm" onclick="assignLead('LD-2026-0039')">Assign</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pagination">
-        <span>Showing 4 of 42 leads</span>
-        <div class="pagination-btns">
-          <button class="page-btn">←</button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">3</button>
-          <button class="page-btn">→</button>
+      <div class="table-wrap">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>Contact</th><th>Organisation</th><th>Type</th><th>Est. Group</th><th>Pipeline Value</th><th>Lead Score</th><th>Status</th><th>Owner</th><th>Last Activity</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="contactsBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- QUOTES TAB -->
-    <div id="tab-quotes" class="tab-pane">
-      <div class="filter-row">
-        <button class="filter-pill active">All</button>
-        <button class="filter-pill">Draft</button>
-        <button class="filter-pill">Sent</button>
-        <button class="filter-pill">Accepted</button>
-        <button class="filter-pill">Expired</button>
-        <div style="margin-left:auto;">
-          <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">+ New Quote</a>
-        </div>
+    <!-- ─── DEALS ─── -->
+    <div class="tab-content" id="tab-deals">
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="🔍 Search deals…"/>
+        <select class="filter-select">
+          <option>All Stages</option><option>Proposal Sent</option><option>Negotiation</option><option>Won</option><option>Lost</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">＋ New Deal</button>
       </div>
-      <div class="tbl-wrap">
-        <table class="tbl">
-          <thead>
-            <tr><th>Quote Ref</th><th>Client</th><th>Park</th><th>Visit Date</th><th>Pax</th><th>Amount</th><th>Discount</th><th>Approval</th><th>Status</th><th>Actions</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>QT-2026-0284</strong></td><td>Wipro Ltd</td><td><span class="badge badge-teal">Combo</span></td>
-              <td>Apr 14</td><td>400</td><td>₹3,20,000</td>
-              <td><span style="color:var(--amber);font-weight:700;">15%</span></td>
-              <td><span class="badge badge-neutral">Not Required</span></td>
-              <td><span class="badge badge-warning">Sent</span></td>
-              <td class="tbl-actions">
-                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
-                <button class="btn btn-primary btn-sm" onclick="convertToBooking('QT-2026-0284')">Convert</button>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>QT-2026-0279</strong></td><td>MakeMyTrip</td><td><span class="badge badge-teal">Combo</span></td>
-              <td>Apr 30</td><td>700</td><td>₹5,60,000</td>
-              <td><span style="color:var(--red);font-weight:700;">22%</span></td>
-              <td><span class="badge badge-danger">Pending</span></td>
-              <td><span class="badge badge-warning">Sent</span></td>
-              <td class="tbl-actions">
-                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
-                <button class="btn btn-accent btn-sm" onclick="approveDiscount('QT-2026-0279')">Approve Disc</button>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>QT-2026-0271</strong></td><td>Amity Noida</td><td><span class="badge badge-primary">Water Park</span></td>
-              <td>Apr 15</td><td>450</td><td>₹2,08,000</td>
-              <td><span style="color:var(--green);font-weight:700;">10%</span></td>
-              <td><span class="badge badge-neutral">Not Required</span></td>
-              <td><span class="badge badge-success">Accepted</span></td>
-              <td class="tbl-actions">
-                <a href="bookings.html" class="btn btn-success btn-sm">View Booking</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="table-wrap">
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr>
+              <th>Deal Name</th><th>Contact</th><th>Value</th><th>Stage</th><th>Close Date</th><th>Probability</th><th>Owner</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="dealsBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- TASKS TAB -->
-    <div id="tab-tasks" class="tab-pane">
-      <div class="flex justify-between mb-16" style="gap:12px;flex-wrap:wrap;">
-        <div class="tab-bar" style="border-bottom:none;margin-bottom:0;">
-          <button class="tab-btn active">My Tasks</button>
-          <button class="tab-btn">Team Tasks</button>
-          <button class="tab-btn">Overdue (2)</button>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="openModal('task-modal')">+ Add Task</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;" id="tasks-list">
-        <div class="card" style="padding:14px 18px;">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-12">
-              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
-              <div>
-                <div style="font-size:13px;font-weight:700;">Follow up with Wipro re: QT-2026-0284</div>
-                <div style="font-size:11px;color:var(--muted);">Lead: Wipro Team Outing · Assigned: Rohan V</div>
+    <!-- ─── ACTIVITIES ─── -->
+    <div class="tab-content" id="tab-activities">
+      <div class="two-col">
+        <div>
+          <div class="section-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="section-title" style="margin:0;">📅 Activity Feed</div>
+              <div style="display:flex;gap:8px;">
+                <select class="filter-select" style="padding:6px 10px;font-size:12px;">
+                  <option>All Activities</option><option>Calls</option><option>Emails</option><option>Meetings</option><option>Notes</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="openActivityModal()">＋ Log Activity</button>
               </div>
             </div>
-            <div class="flex items-center gap-12">
-              <span class="badge badge-danger">Overdue · Apr 3</span>
-              <button class="btn btn-ghost btn-sm">Edit</button>
-            </div>
+            <div id="activityFeed"></div>
           </div>
         </div>
-        <div class="card" style="padding:14px 18px;">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-12">
-              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
-              <div>
-                <div style="font-size:13px;font-weight:700;">Send revised quote to TCS</div>
-                <div style="font-size:11px;color:var(--muted);">Lead: TCS Foundation Day · Due: Apr 8</div>
-              </div>
-            </div>
-            <div class="flex items-center gap-12">
-              <span class="badge badge-warning">Due Today</span>
-              <button class="btn btn-ghost btn-sm">Edit</button>
-            </div>
+        <div>
+          <div class="section-card">
+            <div class="section-title">📋 Today's Tasks</div>
+            <div id="todayTasks"></div>
           </div>
-        </div>
-        <div class="card" style="padding:14px 18px;">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-12">
-              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;" checked/>
-              <div style="opacity:.5;text-decoration:line-through;">
-                <div style="font-size:13px;font-weight:700;">Call HDFC Bank contact</div>
-                <div style="font-size:11px;color:var(--muted);">Completed Apr 5</div>
-              </div>
-            </div>
-            <div class="flex items-center gap-12">
-              <span class="badge badge-success">Done</span>
-            </div>
-          </div>
-        </div>
-        <div class="card" style="padding:14px 18px;">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-12">
-              <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);cursor:pointer;"/>
-              <div>
-                <div style="font-size:13px;font-weight:700;">Onboard Rainbow Tours as TA partner</div>
-                <div style="font-size:11px;color:var(--muted);">Lead: Rainbow Tours · Due: Apr 12</div>
-              </div>
-            </div>
-            <div class="flex items-center gap-12">
-              <span class="badge badge-neutral">Upcoming</span>
-              <button class="btn btn-ghost btn-sm">Edit</button>
-            </div>
+          <div class="section-card">
+            <div class="section-title">📆 Upcoming Follow-ups</div>
+            <div id="followUps"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- REPORTS TAB -->
-    <div id="tab-reports" class="tab-pane">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Pipeline Value by Stage</div></div>
-          <div class="chart-wrap" style="height:260px;"><canvas id="pipelineValueChart"></canvas></div>
+    <!-- ─── ANALYTICS ─── -->
+    <div class="tab-content" id="tab-analytics">
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">📈 Pipeline Value by Stage</div>
+          <div style="height:220px;"><canvas id="pipelineChart"></canvas></div>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">Leads by Source</div></div>
-          <div class="chart-wrap" style="height:260px;"><canvas id="leadSourceChart"></canvas></div>
+        <div class="chart-card">
+          <div class="chart-title">🍩 Leads by Type</div>
+          <div style="height:220px;"><canvas id="leadTypeChart"></canvas></div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div class="card">
-          <div class="card-header"><div class="card-title">Win Rate by Exec</div></div>
-          <div class="chart-wrap" style="height:220px;"><canvas id="winRateChart"></canvas></div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">📊 Monthly Win/Loss Trend</div>
+          <div style="height:200px;"><canvas id="winLossChart"></canvas></div>
         </div>
-        <div class="card">
-          <div class="card-header"><div class="card-title">Monthly Revenue Closed</div></div>
-          <div class="chart-wrap" style="height:220px;"><canvas id="closedRevenueChart"></canvas></div>
+        <div class="chart-card">
+          <div class="chart-title">🏆 Top Sales Agents</div>
+          <div style="height:200px;" id="agentLeaderboard"></div>
         </div>
       </div>
     </div>
 
-  </div><!-- /adm-content -->
-</main>
+  </div>
 </div>
 
-<!-- ═══ MODALS ═══ -->
+<!-- Lead Detail Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="leadDrawer">
+  <div class="drawer-header">
+    <div>
+      <div style="font-size:17px;font-weight:900;color:#fff;" id="drawerName">Lead Details</div>
+      <div id="drawerBadge" style="margin-top:4px;"></div>
+    </div>
+    <button onclick="closeDrawer()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
 
 <!-- New Lead Modal -->
-<div class="modal-overlay" id="lead-modal">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div class="modal-title">+ New Lead</div>
-      <button class="modal-close" onclick="closeModal('lead-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row thirds">
-        <div class="form-group"><label class="form-label">Contact Name <span class="req">*</span></label><input class="form-control" placeholder="Full name"/></div>
-        <div class="form-group"><label class="form-label">Mobile <span class="req">*</span></label><input class="form-control" placeholder="+91 XXXXX XXXXX"/></div>
-        <div class="form-group"><label class="form-label">Email</label><input class="form-control" placeholder="email@company.com" type="email"/></div>
-      </div>
-      <div class="form-row thirds">
-        <div class="form-group"><label class="form-label">Organisation</label><input class="form-control" placeholder="Company / School name"/></div>
-        <div class="form-group">
-          <label class="form-label">Segment <span class="req">*</span></label>
-          <select class="form-control"><option>School</option><option>Corporate</option><option>Birthday</option><option>Travel Agent</option><option>Reseller</option><option>General</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Source <span class="req">*</span></label>
-          <select class="form-control"><option>Web Form</option><option>Call Centre</option><option>Walk-in</option><option>Referral</option><option>Event</option><option>CSV Import</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Estimated Pax</label><input class="form-control" type="number" placeholder="e.g. 200"/></div>
-        <div class="form-group"><label class="form-label">Preferred Date</label><input class="form-control" type="date"/></div>
-        <div class="form-group">
-          <label class="form-label">Park Preference</label>
-          <select class="form-control"><option>Undecided</option><option>Water Park</option><option>Amusement Park</option><option>Combo</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Priority</label>
-          <select class="form-control"><option>Medium</option><option>High</option><option>Low</option></select>
-        </div>
-      </div>
-      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-control" rows="3" placeholder="Any specific requirements, budget range, special requests…"></textarea></div>
-      <div class="form-group">
-        <label class="form-label">Assign To</label>
-        <select class="form-control"><option>Auto-assign</option><option>Rohan Verma</option><option>Priya Kapoor</option><option>Amit Sharma</option></select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('lead-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveLead()">Create Lead &amp; Assign</button>
-    </div>
-  </div>
-</div>
-
-<!-- Lead Detail Modal -->
-<div class="modal-overlay" id="lead-detail-modal">
-  <div class="modal modal-xl">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="lead-detail-title">Lead: LD-2026-0042</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:3px;">Infosys Annual Day · Corporate · 300 pax</div>
-      </div>
-      <div class="flex gap-8">
-        <a href="../sales/quote-builder.html" class="btn btn-primary btn-sm">📋 Create Quote</a>
-        <button class="modal-close" onclick="closeModal('lead-detail-modal')">✕</button>
-      </div>
-    </div>
-    <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-      <!-- Left: Lead Info -->
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Contact Information</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Contact</span><strong>Ravi Malhotra</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Mobile</span><strong>+91 98765 43210</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Email</span><strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="562437203f783b163f383039252f257835393b">[email&#160;protected]</a></strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Organisation</span><strong>Infosys Ltd</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Pax</span><strong>300</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Preferred Date</span><strong>April 15, 2026</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Park</span><strong><span class="badge badge-teal">Combo</span></strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Status</span><strong><span class="badge badge-primary">Qualified</span></strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Priority</span><strong style="color:var(--red);">🔴 High</strong></div>
-          <div class="flex justify-between" style="font-size:13px;"><span style="color:var(--muted);">Assigned To</span><strong>Rohan Verma</strong></div>
-        </div>
-        <div class="divider"></div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Update Status</div>
-        <div class="form-group">
-          <select class="form-control">
-            <option>New</option><option>Contacted</option><option selected>Qualified</option><option>Proposal Sent</option><option>Negotiation</option><option>Won</option><option>Lost</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <textarea class="form-control" rows="2" placeholder="Add note…"></textarea>
-        </div>
-        <button class="btn btn-primary btn-sm w-full" style="justify-content:center;" onclick="updateLeadStatus()">Update Lead</button>
-      </div>
-      <!-- Right: Activity Timeline -->
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Activity Timeline</div>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-dot" style="background:var(--primary-lt);border-color:var(--primary);">📋</div>
-            <div class="tl-content">
-              <div class="tl-title">Quote QT-2026-0284 sent</div>
-              <div class="tl-sub">Wipro Team Outing — ₹3,20,000</div>
-              <div class="tl-time">Apr 1, 2026 · 2:30 PM</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot" style="background:var(--green-lt);border-color:var(--green);">📞</div>
-            <div class="tl-content">
-              <div class="tl-title">Phone call — Discovery</div>
-              <div class="tl-sub">Discussed requirements, 300 pax, April dates</div>
-              <div class="tl-time">Mar 29, 2026 · 11:00 AM</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot" style="background:var(--accent-lt);border-color:var(--accent);">📧</div>
-            <div class="tl-content">
-              <div class="tl-title">Email sent — Introduction</div>
-              <div class="tl-sub">Sent park brochure and pricing</div>
-              <div class="tl-time">Mar 27, 2026 · 9:15 AM</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot">🆕</div>
-            <div class="tl-content">
-              <div class="tl-title">Lead created from Web Form</div>
-              <div class="tl-sub">Assigned to Rohan Verma</div>
-              <div class="tl-time">Mar 26, 2026 · 4:45 PM</div>
-            </div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Linked Quotes</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="card" style="padding:12px 14px;">
-            <div class="flex justify-between items-center">
-              <div>
-                <div style="font-size:13px;font-weight:700;">QT-2026-0284</div>
-                <div style="font-size:11px;color:var(--muted);">v1 · ₹3,20,000 · Apr 14</div>
-              </div>
-              <div class="flex gap-6">
-                <span class="badge badge-warning">Sent</span>
-                <a href="../sales/quote-builder.html" class="btn btn-ghost btn-sm">Edit</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Import CSV Modal -->
-<div class="modal-overlay" id="import-modal">
+<div class="modal-overlay" id="newLeadModal">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">📥 Import Leads from CSV</div>
-      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    <div class="modal-title">＋ New Lead / Contact</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="nl_name" placeholder="Contact name"/></div>
+      <div class="form-group"><label class="form-label">Organisation *</label><input class="form-input" id="nl_org" placeholder="Company / school name"/></div>
     </div>
-    <div class="modal-body">
-      <div class="alert alert-info">Template format: Name, Mobile, Email, Organisation, Segment, Pax, Date, Notes</div>
-      <div class="upload-zone" id="csv-dropzone" onclick="document.getElementById('csv-file').click()">
-        <div class="upload-zone-icon">📄</div>
-        <div class="upload-zone-text">Drop your CSV file here, or click to browse</div>
-        <div class="upload-zone-hint">Supports .csv · Max 5MB · Up to 1,000 rows</div>
-      </div>
-      <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSVUpload(this)"/>
-      <div id="csv-preview" style="margin-top:14px;display:none;">
-        <div class="alert alert-success">✅ 24 leads ready to import — 2 duplicates flagged</div>
-      </div>
-      <div class="form-group" style="margin-top:12px;">
-        <label class="form-label">Assign all imported leads to:</label>
-        <select class="form-control"><option>Auto-assign by round-robin</option><option>Rohan Verma</option><option>Priya Kapoor</option><option>Amit Sharma</option></select>
-      </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="nl_phone" placeholder="+91 XXXXX XXXXX"/></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="nl_email" placeholder="contact@org.com"/></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancel</button>
-      <a href="#" class="btn btn-ghost btn-sm">⬇ Download Template</a>
-      <button class="btn btn-primary" onclick="importLeads()">Import Leads</button>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Lead Type</label><select class="form-select" id="nl_type"><option>Corporate</option><option>School</option><option>Travel Agent</option><option>Individual</option><option>Birthday</option><option>Reseller</option></select></div>
+      <div class="form-group"><label class="form-label">Est. Group Size</label><input type="number" class="form-input" id="nl_size" placeholder="e.g. 50" min="1"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Park Interest</label><select class="form-select" id="nl_park"><option>Water Park</option><option>Amusement Park</option><option>Combo</option><option>Annual Passport</option></select></div>
+      <div class="form-group"><label class="form-label">Assign To</label><select class="form-select" id="nl_owner"><option>Vikram Singh</option><option>Priya Sharma</option><option>Akash Gupta</option><option>Meera Patel</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes</label><textarea id="nl_notes" rows="3" placeholder="Initial requirements, source, referral…"></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-ghost" onclick="closeNewLeadModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">Save Lead</button>
     </div>
   </div>
 </div>
 
-<div class="toast-container" id="toast-container"></div>
+<!-- Activity Modal -->
+<div class="modal-overlay" id="activityModal">
+  <div class="modal" style="width:460px;">
+    <div class="modal-title">📝 Log Activity</div>
+    <div class="form-group"><label class="form-label">Activity Type</label>
+      <select class="form-select" id="act_type">
+        <option>📞 Call</option><option>📧 Email</option><option>🤝 Meeting</option><option>📝 Note</option><option>📄 Proposal Sent</option><option>🎯 Demo Given</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Related Lead</label><select class="form-select" id="act_lead"></select></div>
+    <div class="form-group"><label class="form-label">Summary *</label><input class="form-input" id="act_summary" placeholder="Brief summary of the activity"/></div>
+    <div class="form-group"><label class="form-label">Next Action</label><input class="form-input" id="act_next" placeholder="e.g. Send quote by Friday"/></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Follow-up Date</label><input type="date" class="form-input" id="act_followup"/></div>
+      <div class="form-group"><label class="form-label">Outcome</label><select class="form-select" id="act_outcome"><option>Interested</option><option>Needs Follow-up</option><option>Not Interested</option><option>Converted</option><option>Closed Lost</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('activityModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveActivity()">Log Activity</button>
+    </div>
+  </div>
+</div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* Tab switching */
-function switchTab(id,btn){
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  btn.classList.add('active');
-  if(id==='reports') initReportCharts();
+<script>
+/* ── Data ── */
+const OWNERS = ['Vikram Singh','Priya Sharma','Akash Gupta','Meera Patel','Rohit Mehta'];
+const TYPES  = ['Corporate','School','Travel Agent','Individual','Birthday','Reseller'];
+const PARKS  = ['Water Park','Amusement Park','Combo','Annual Passport'];
+const STAGES = [
+  {id:'new',     label:'New Lead',      color:'#60a5fa', icon:'🆕'},
+  {id:'contact', label:'Contacted',     color:'#a78bfa', icon:'📞'},
+  {id:'qualify', label:'Qualified',     color:'#f59e0b', icon:'✅'},
+  {id:'proposal',label:'Proposal Sent', color:'#F5A800', icon:'📄'},
+  {id:'negotiat',label:'Negotiation',   color:'#f97316', icon:'🤝'},
+  {id:'won',     label:'Won',           color:'#10b981', icon:'🎉'},
+];
+const ORGS = ['Infosys Ltd','DPS Noida','MakeMyTrip','Tata Consultancy','Global Education','Byju\'s','Wipro Group','Delhi Public School','EduTech Corp','IndusInd Bank','HDFC Securities','Cognizant','Reliance Retail','Tech Mahindra','JLL India'];
+
+function ri(a){ return a[Math.floor(Math.random()*a.length)]; }
+function rn(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+const ALL_LEADS = Array.from({length:60},(_,i)=>{
+  const stage = ri(STAGES).id;
+  const type  = ri(TYPES);
+  const size  = type==='Corporate'?rn(50,300):type==='School'?rn(100,500):type==='Birthday'?rn(20,60):rn(20,150);
+  const price = type==='School'?799:type==='Corporate'?1199:type==='Individual'?1299:1099;
+  const value = size*price*(1+(Math.random()*.3));
+  const names = ['Rajesh Kumar','Priya Sharma','Arjun Singh','Meera Patel','Vikram Gupta','Sunita Devi','Amit Joshi','Kavita Rao','Rohit Mehta','Deepa Nair','Sanjay Verma','Ananya Iyer','Kiran Bose','Neha Tiwari','Akash Malhotra'];
+  const d=new Date('2026-03-01');d.setDate(d.getDate()+rn(-30,30));
+  const scores=['Hot','Warm','Cold'];
+  const scoreW=[4,3,1];
+  let status=stage==='won'?'Won':stage==='lost'?'Lost':ri(['Hot','Warm','Cold']);
+  return {
+    id:i, name:ri(names), org:ri(ORGS), type, phone:'+91 9'+String(rn(100000000,999999999)),
+    email:'contact@'+ri(['gmail.com','corp.in','edu.org']),
+    stage, size, value:Math.round(value/100)*100,
+    park:ri(PARKS), owner:ri(OWNERS), status,
+    lastActivity:d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}),
+    score: rn(30,99), created: d
+  };
+});
+
+let currentLeads = [...ALL_LEADS];
+
+/* ── Pipeline Summary Bar ── */
+function renderPipelineStages(){
+  const stageCounts = {};
+  STAGES.forEach(s=>{ stageCounts[s.id]={count:0,value:0}; });
+  ALL_LEADS.forEach(l=>{ if(stageCounts[l.stage]){ stageCounts[l.stage].count++; stageCounts[l.stage].value+=l.value; } });
+  document.getElementById('pipelineStages').innerHTML = STAGES.map(s=>`
+    <div class="p-stage">
+      <div class="p-stage-inner">
+        <div class="p-stage-label">${s.icon} ${s.label}</div>
+        <div class="p-stage-count">${stageCounts[s.id].count}</div>
+        <div class="p-stage-val">₹${(stageCounts[s.id].value/100000).toFixed(1)}L</div>
+      </div>
+    </div>`).join('');
 }
 
-/* Filter pills */
-function filterPipeline(seg,el){
-  document.querySelectorAll('.filter-row .filter-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  showToast('Filtered: '+el.textContent,'info');
+/* ── Kanban Board ── */
+function renderKanban(){
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = STAGES.map(s=>{
+    const cards = ALL_LEADS.filter(l=>l.stage===s.id);
+    const totalVal = cards.reduce((a,b)=>a+b.value,0);
+    return `
+    <div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="kanban-col-title">
+          <span style="color:${s.color};">${s.icon}</span> ${s.label}
+          <span class="kanban-count">${cards.length}</span>
+        </div>
+        <span class="kanban-col-value">₹${(totalVal/100000).toFixed(1)}L</span>
+      </div>
+      <div class="kanban-cards">
+        ${cards.slice(0,6).map(l=>`
+        <div class="lead-card" onclick="openDrawer(${l.id})">
+          <div class="lead-card-header">
+            <div>
+              <div class="lead-name">${l.name}</div>
+              <div class="lead-org">${l.org}</div>
+            </div>
+            <div class="lead-value">₹${(l.value/1000).toFixed(0)}K</div>
+          </div>
+          <div class="lead-tags">
+            <span class="tag ${l.type.toLowerCase().split(' ')[0]}">${l.type}</span>
+            <span class="tag">${l.park.split(' ')[0]}</span>
+            <span class="tag">${l.size} pax</span>
+          </div>
+          <div class="lead-footer">
+            <span class="lead-owner">👤 ${l.owner.split(' ')[0]}</span>
+            <span class="lead-date">${l.lastActivity}</span>
+          </div>
+        </div>`).join('')}
+        ${cards.length>6?`<div style="text-align:center;font-size:11px;color:var(--muted);padding:6px 0;">+${cards.length-6} more</div>`:''}
+      </div>
+      <div class="add-card-btn" onclick="openNewLeadModal()">＋ Add Lead</div>
+    </div>`;
+  }).join('');
 }
-function filterByExec(v){}
 
-/* Modal */
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-function openLeadDetail(ref){
-  document.getElementById('lead-detail-title').textContent='Lead: '+ref;
-  openModal('lead-detail-modal');
+/* ── Contacts Table ── */
+function renderContacts(leads){
+  document.getElementById('contactsBody').innerHTML = leads.map(l=>`
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="avatar">${l.name[0]}</div>
+          <div>
+            <div style="font-weight:700;color:#fff;font-size:13px;cursor:pointer;" onclick="openDrawer(${l.id})">${l.name}</div>
+            <div style="font-size:11px;color:var(--muted);">${l.email}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-weight:600;">${l.org}</td>
+      <td><span class="tag ${l.type.toLowerCase().split(' ')[0]}" style="font-size:11px;">${l.type}</span></td>
+      <td>${l.size} pax</td>
+      <td style="color:var(--gold);font-weight:700;">₹${(l.value/1000).toFixed(0)}K</td>
+      <td>
+        <div style="font-size:12px;font-weight:700;color:${l.score>=70?'#10b981':l.score>=40?'#F5A800':'#94a3b8'};">${l.score}/100</div>
+        <div class="score-bar"><div class="score-fill" style="width:${l.score}%;background:${l.score>=70?'#10b981':l.score>=40?'#F5A800':'#64748b'};"></div></div>
+      </td>
+      <td><span class="badge badge-${l.status.toLowerCase()}">${l.status}</span></td>
+      <td style="font-size:12px;color:var(--muted);">${l.owner.split(' ')[0]}</td>
+      <td style="font-size:12px;color:var(--muted);">${l.lastActivity}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <button class="btn btn-ghost btn-sm" onclick="openDrawer(${l.id})">View</button>
+          <button class="btn btn-sm" style="background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.2);" onclick="markWon(${l.id})">Won</button>
+        </div>
+      </td>
+    </tr>`).join('');
 }
 
-/* Actions */
-function saveLead(){ closeModal('lead-modal'); showToast('Lead created & assigned successfully','success'); }
-function updateLeadStatus(){ closeModal('lead-detail-modal'); showToast('Lead status updated','success'); }
-function convertToBooking(q){ showToast('Booking created from '+q,'success'); }
-function approveDiscount(q){ showToast('Discount approval request escalated to Sales Head','info'); }
-function assignLead(l){ showToast('Lead reassigned','success'); }
-function importLeads(){ closeModal('import-modal'); showToast('24 leads imported successfully','success'); }
-function handleCSVUpload(el){ if(el.files[0]) document.getElementById('csv-preview').style.display='block'; }
-
-/* Report Charts — only init when tab is active */
-let reportChartsInited=false;
-function initReportCharts(){
-  if(reportChartsInited) return;
-  reportChartsInited=true;
-  const PRIMARY='#0055B3',TEAL='#007BB5',GOLD='#F5A800',GREEN='#0A9B5F',PURPLE='#5E35B1',RED='#DC2626';
-
-  new Chart(document.getElementById('pipelineValueChart').getContext('2d'),{
-    type:'bar',
-    data:{labels:['Prospect','Qualified','Quote Sent','Negotiation','Won'],datasets:[{data:[3.8,9.2,12.6,10.8,8.2],backgroundColor:[PRIMARY,'#1A6FD4',GOLD,PURPLE,GREEN],borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>'₹'+v+'L'}}}}
+function filterContacts(q){
+  const type   = document.getElementById('contactTypeFilter').value;
+  const status = document.getElementById('contactStatusFilter').value;
+  const search = q || document.getElementById('contactSearch').value;
+  currentLeads = ALL_LEADS.filter(l=>{
+    if(type   && l.type!==type)   return false;
+    if(status && l.status!==status) return false;
+    if(search && ![l.name,l.org,l.phone].some(s=>s.toLowerCase().includes(search.toLowerCase()))) return false;
+    return true;
   });
+  renderContacts(currentLeads);
+}
 
-  new Chart(document.getElementById('leadSourceChart').getContext('2d'),{
+/* ── Deals Table ── */
+const DEAL_STAGES_LIST=['Proposal Sent','Negotiation','Won','Lost'];
+function renderDeals(){
+  const deals = ALL_LEADS.filter(l=>['proposal','negotiat','won'].includes(l.stage));
+  document.getElementById('dealsBody').innerHTML = deals.map(l=>`
+    <tr>
+      <td style="font-weight:700;color:#fff;">${l.org} — ${l.park}</td>
+      <td>${l.name}</td>
+      <td style="color:var(--gold);font-weight:700;">₹${(l.value/1000).toFixed(0)}K</td>
+      <td><span class="badge ${l.stage==='won'?'badge-won':l.stage==='negotiat'?'badge-warm':'badge-hot'}">${l.stage==='won'?'Won':l.stage==='negotiat'?'Negotiation':'Proposal Sent'}</span></td>
+      <td style="font-size:12px;color:var(--muted);">${l.lastActivity}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;background:rgba(255,255,255,.08);border-radius:4px;height:5px;"><div style="width:${l.score}%;background:${l.score>=70?'#10b981':'#F5A800'};height:5px;border-radius:4px;"></div></div>
+          <span style="font-size:11px;color:var(--muted);">${l.score}%</span>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--muted);">${l.owner.split(' ')[0]}</td>
+      <td><div style="display:flex;gap:5px;"><button class="btn btn-ghost btn-sm" onclick="openDrawer(${l.id})">View</button><button class="btn btn-success btn-sm" onclick="markWon(${l.id})">Mark Won</button></div></td>
+    </tr>`).join('');
+}
+
+/* ── Activity Feed ── */
+const ACTIVITIES_DATA=[
+  {icon:'📞',color:'#60a5fa',title:'Call with Infosys Ltd',sub:'Vikram Singh · Group of 200 · Very interested in Combo pack',time:'Today, 2:34 PM',type:'Call'},
+  {icon:'📧',color:'#a78bfa',title:'Proposal sent to DPS Noida',sub:'Priya Sharma · School trip 450 pax · Awaiting approval',time:'Today, 11:15 AM',type:'Email'},
+  {icon:'🤝',color:'#10b981',title:'Meeting — MakeMyTrip partnership',sub:'Akash Gupta · Annual quota discussion · Positive outcome',time:'Yesterday, 3:00 PM',type:'Meeting'},
+  {icon:'🎉',color:'#10b981',title:'Deal Won — Wipro Group',sub:'₹4.8L · 400 pax Combo · Meera Patel closed',time:'Yesterday, 1:20 PM',type:'Won'},
+  {icon:'📄',color:'#F5A800',title:'Quote sent to HDFC Securities',sub:'Rohit Mehta · 80 pax Water Park · Follow-up in 2 days',time:'27 Mar, 5:00 PM',type:'Email'},
+  {icon:'📞',color:'#60a5fa',title:'Follow-up call — EduTech Corp',sub:'Vikram Singh · School outing 120 pax · Requested discount',time:'27 Mar, 2:15 PM',type:'Call'},
+  {icon:'📝',color:'#94a3b8',title:'Note — Tata Consultancy',sub:'Priya Sharma · Decision pending CFO approval until 5 Apr',time:'26 Mar, 4:45 PM',type:'Note'},
+  {icon:'📞',color:'#60a5fa',title:'Cold call — New corporate lead',sub:'Akash Gupta · JLL India · 60 pax team outing enquiry',time:'26 Mar, 11:00 AM',type:'Call'},
+];
+
+function renderActivityFeed(){
+  document.getElementById('activityFeed').innerHTML = ACTIVITIES_DATA.map(a=>`
+    <div class="activity-item">
+      <div class="activity-icon" style="background:${a.color}22;color:${a.color};">${a.icon}</div>
+      <div class="activity-content">
+        <div class="activity-title">${a.title}</div>
+        <div class="activity-meta">${a.sub}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;">🕐 ${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTodayTasks(){
+  const tasks=[
+    {done:false,text:'Call back Infosys follow-up',owner:'Vikram',priority:'high'},
+    {done:false,text:'Send revised quote to DPS Noida',owner:'Priya',priority:'high'},
+    {done:true, text:'Log meeting notes — MakeMyTrip',owner:'Akash',priority:'med'},
+    {done:false,text:'Check HDFC proposal status',owner:'Rohit',priority:'med'},
+    {done:false,text:'Update pipeline — 3 stale leads',owner:'Meera',priority:'low'},
+  ];
+  document.getElementById('todayTasks').innerHTML = tasks.map((t,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${i},this)" style="cursor:pointer;"/>
+      <span style="flex:1;font-size:13px;color:${t.done?'var(--muted)':'#fff'};text-decoration:${t.done?'line-through':''};font-weight:${t.done?400:600};">${t.text}</span>
+      <span style="font-size:10px;color:var(--muted);">${t.owner}</span>
+      <span style="width:8px;height:8px;border-radius:50%;background:${t.priority==='high'?'#ef4444':t.priority==='med'?'#F5A800':'#64748b'};flex-shrink:0;"></span>
+    </div>`).join('');
+}
+
+function toggleTask(i,el){ el.parentElement.querySelector('span').style.textDecoration=el.checked?'line-through':''; el.parentElement.querySelector('span').style.color=el.checked?'var(--muted)':'#fff'; }
+
+function renderFollowUps(){
+  const fus=[
+    {name:'Infosys Ltd',date:'29 Mar',owner:'Vikram',type:'Call',value:'₹4.8L'},
+    {name:'DPS Noida',date:'30 Mar',owner:'Priya',type:'Email',value:'₹3.2L'},
+    {name:'HDFC Securities',date:'31 Mar',owner:'Rohit',type:'Call',value:'₹88K'},
+    {name:'EduTech Corp',date:'2 Apr',owner:'Vikram',type:'Meeting',value:'₹96K'},
+    {name:'JLL India',date:'5 Apr',owner:'Akash',type:'Call',value:'₹64K'},
+  ];
+  document.getElementById('followUps').innerHTML = fus.map(f=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">${f.name}</div>
+        <div style="font-size:11px;color:var(--muted);">${f.type} · ${f.owner} · ${f.date}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--gold);">${f.value}</span>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;padding:4px 9px;">Log</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Analytics Charts ── */
+function initAnalyticsCharts(){
+  new Chart(document.getElementById('pipelineChart'),{
+    type:'bar',
+    data:{
+      labels:STAGES.map(s=>s.label),
+      datasets:[{label:'Pipeline Value (₹L)',data:[3.2,6.8,9.4,12.1,8.6,8.5],backgroundColor:STAGES.map(s=>s.color+'88'),borderColor:STAGES.map(s=>s.color),borderWidth:2,borderRadius:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10},callback:v=>'₹'+v+'L'},grid:{color:'rgba(255,255,255,.04)'}}}}
+  });
+  new Chart(document.getElementById('leadTypeChart'),{
     type:'doughnut',
-    data:{labels:['Web Form','Call Centre','Walk-in','Referral','CSV Import','Event'],datasets:[{data:[38,24,12,14,8,4],backgroundColor:[PRIMARY,TEAL,GOLD,GREEN,PURPLE,RED],borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{font:{size:11},usePointStyle:true}}}}
+    data:{labels:TYPES,datasets:[{data:[28,18,14,10,6,4],backgroundColor:['#0055B3','#10b981','#a78bfa','#60a5fa','#f97316','#F5A800'],borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'right',labels:{color:'rgba(255,255,255,.6)',font:{size:10},boxWidth:10,padding:6}}}}
   });
-
-  new Chart(document.getElementById('winRateChart').getContext('2d'),{
+  new Chart(document.getElementById('winLossChart'),{
     type:'bar',
-    data:{labels:['Rohan V','Priya K','Amit S','Sneha R','Vikas M'],datasets:[{label:'Win Rate %',data:[72,68,61,75,55],backgroundColor:[PRIMARY,TEAL,GOLD,GREEN,PURPLE],borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{max:100,ticks:{callback:v=>v+'%'}}}}
+    data:{
+      labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets:[
+        {label:'Won',data:[18,22,15,28,32,38],backgroundColor:'rgba(16,185,129,.6)',borderRadius:4},
+        {label:'Lost',data:[12,9,18,11,14,8],backgroundColor:'rgba(239,68,68,.4)',borderRadius:4}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,.6)',font:{size:10}}}},scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}}}
   });
-
-  new Chart(document.getElementById('closedRevenueChart').getContext('2d'),{
-    type:'line',
-    data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar','Apr'],datasets:[{label:'Revenue Closed',data:[4.2,6.8,12.1,5.4,7.8,9.2,8.2],borderColor:GREEN,backgroundColor:'rgba(10,155,95,.1)',tension:.4,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'L'}}}}
-  });
+  const agents=[
+    {name:'Vikram Singh',won:14,value:'₹18.4L',pct:92},
+    {name:'Priya Sharma',won:11,value:'₹14.2L',pct:78},
+    {name:'Meera Patel',won:8,value:'₹9.8L',pct:61},
+    {name:'Akash Gupta',won:6,value:'₹7.2L',pct:45},
+    {name:'Rohit Mehta',won:5,value:'₹4.8L',pct:38},
+  ];
+  document.getElementById('agentLeaderboard').innerHTML=agents.map((a,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <span style="font-size:13px;font-weight:900;color:${i===0?'#F5A800':i===1?'#94a3b8':i===2?'#CD7C3A':'var(--muted)'};width:20px;">${i+1}</span>
+      <div class="avatar" style="width:30px;height:30px;font-size:12px;">${a.name[0]}</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;color:#fff;">${a.name}</div>
+        <div style="height:4px;background:rgba(255,255,255,.07);border-radius:3px;margin-top:4px;"><div style="width:${a.pct}%;height:4px;background:#0055B3;border-radius:3px;"></div></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);">${a.value}</div>
+        <div style="font-size:10px;color:var(--muted);">${a.won} won</div>
+      </div>
+    </div>`).join('');
 }
 
-/* Toast */
-function showToast(msg,type='info'){
-  const icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
-  const t=document.createElement('div');
-  t.className=`toast ${type}`;
-  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
-  document.getElementById('toast-container').appendChild(t);
-  setTimeout(()=>t.remove(),4000);
+/* ── Lead Drawer ── */
+function openDrawer(id){
+  const l=ALL_LEADS.find(x=>x.id===id);
+  document.getElementById('drawerName').textContent=l.name;
+  document.getElementById('drawerBadge').innerHTML=`<span class="badge badge-${l.status.toLowerCase()}">${l.status}</span> <span class="tag ${l.type.toLowerCase().split(' ')[0]}" style="margin-left:4px;">${l.type}</span>`;
+  const stage=STAGES.find(s=>s.id===l.stage);
+  document.getElementById('drawerBody').innerHTML=`
+    <div style="background:linear-gradient(135deg,rgba(0,85,179,.2),rgba(0,85,179,.08));border:1px solid rgba(0,85,179,.3);border-radius:14px;padding:18px;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:4px;">${l.org}</div>
+      <div style="font-size:13px;color:var(--muted);">📞 ${l.phone} · 📧 ${l.email}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:12px;">
+        <div><span style="color:var(--muted);">Park Interest</span><br><span style="font-weight:700;">${l.park}</span></div>
+        <div><span style="color:var(--muted);">Group Size</span><br><span style="font-weight:700;">${l.size} pax</span></div>
+        <div><span style="color:var(--muted);">Est. Value</span><br><span style="font-weight:800;color:var(--gold);">₹${(l.value/1000).toFixed(0)}K</span></div>
+        <div><span style="color:var(--muted);">Owner</span><br><span style="font-weight:700;">${l.owner}</span></div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Stage Progress</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        ${STAGES.map(s=>`<div style="flex:1;min-width:40px;padding:6px 4px;border-radius:6px;text-align:center;background:${s.id===l.stage?s.color+'33':'rgba(255,255,255,.04)'};border:1px solid ${s.id===l.stage?s.color+'66':'rgba(255,255,255,.06)'};font-size:9px;font-weight:700;color:${s.id===l.stage?s.color:'var(--muted)'};">${s.icon}<br>${s.label.split(' ')[0]}</div>`).join('')}
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <select class="form-select" style="font-size:12px;padding:7px 10px;" id="stageSelect">
+          ${STAGES.map(s=>`<option value="${s.id}" ${s.id===l.stage?'selected':''}>${s.label}</option>`).join('')}
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="updateStage(${l.id})">Update Stage</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="btn btn-primary btn-sm" onclick="openActivityModal()">📝 Log Activity</button>
+      <button class="btn btn-ghost btn-sm" onclick="sendEmail('${l.email}')">📧 Send Email</button>
+      <button class="btn btn-success btn-sm" onclick="markWon(${l.id})">🎉 Mark Won</button>
+      <button class="btn btn-danger btn-sm" onclick="markLost(${l.id})">✗ Mark Lost</button>
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Recent Activity</div>
+      ${ACTIVITIES_DATA.slice(0,3).map(a=>`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;"><span>${a.icon}</span><div><div style="color:#fff;font-weight:600;">${a.title}</div><div style="color:var(--muted);">${a.time}</div></div></div>`).join('')}
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Add Note</div>
+      <textarea rows="3" placeholder="Add a note for this lead…"></textarea>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px;">Save Note</button>
+    </div>
+  `;
+  document.getElementById('leadDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('show');
 }
+
+function closeDrawer(){
+  document.getElementById('leadDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('show');
+}
+
+function updateStage(id){
+  const l=ALL_LEADS.find(x=>x.id===id);
+  const newStage=document.getElementById('stageSelect').value;
+  l.stage=newStage;
+  renderKanban();
+  renderPipelineStages();
+  const stageName=STAGES.find(s=>s.id===newStage).label;
+  alert(`✅ ${l.name} moved to "${stageName}"`);
+}
+
+function markWon(id){
+  const l=ALL_LEADS.find(x=>x.id===id);
+  l.stage='won'; l.status='Won';
+  alert(`🎉 Deal Won!\n${l.name} — ${l.org}\nValue: ₹${(l.value/1000).toFixed(0)}K\n\nAPI: PATCH /api/crm/leads/${id} {"stage":"won"}`);
+  closeDrawer(); renderKanban(); renderPipelineStages(); renderContacts(ALL_LEADS);
+}
+
+function markLost(id){
+  const l=ALL_LEADS.find(x=>x.id===id);
+  if(!confirm(`Mark this deal as Lost?\n${l.name} — ${l.org}`)) return;
+  l.stage='lost'; l.status='Lost';
+  closeDrawer(); renderKanban(); renderPipelineStages(); renderContacts(ALL_LEADS);
+}
+
+function sendEmail(email){ alert(`Opening email composer for ${email}…\nIntegration: SendGrid / SES`); }
+
+/* ── New Lead Modal ── */
+function openNewLeadModal(){
+  document.getElementById('newLeadModal').classList.add('show');
+  ['nl_name','nl_org','nl_phone','nl_email','nl_notes'].forEach(id=>document.getElementById(id).value='');
+}
+function closeNewLeadModal(){ document.getElementById('newLeadModal').classList.remove('show'); }
+function saveLead(){
+  const name=document.getElementById('nl_name').value.trim();
+  const org=document.getElementById('nl_org').value.trim();
+  if(!name||!org){alert('Please fill in Name and Organisation.');return;}
+  const size=+document.getElementById('nl_size').value||30;
+  const park=document.getElementById('nl_park').value;
+  const price=park==='Combo'?1999:park==='Annual Passport'?4999:park==='Amusement Park'?1199:1299;
+  ALL_LEADS.unshift({id:ALL_LEADS.length+100,name,org,type:document.getElementById('nl_type').value,phone:document.getElementById('nl_phone').value,email:document.getElementById('nl_email').value,stage:'new',size,value:size*price,park,owner:document.getElementById('nl_owner').value,status:'Warm',lastActivity:'Today',score:50,created:new Date()});
+  renderKanban();renderPipelineStages();renderContacts(ALL_LEADS);renderDeals();
+  closeNewLeadModal();
+  alert('✅ Lead saved: '+name+' ('+org+')');
+}
+
+/* ── Activity Modal ── */
+function openActivityModal(){
+  const sel=document.getElementById('act_lead');
+  sel.innerHTML=ALL_LEADS.slice(0,20).map(l=>`<option value="${l.id}">${l.name} — ${l.org}</option>`).join('');
+  const tom=new Date();tom.setDate(tom.getDate()+2);
+  document.getElementById('act_followup').value=tom.toISOString().split('T')[0];
+  document.getElementById('activityModal').classList.add('show');
+}
+function saveActivity(){
+  const summary=document.getElementById('act_summary').value.trim();
+  if(!summary){alert('Please enter a summary.');return;}
+  ACTIVITIES_DATA.unshift({icon:'📝',color:'#a78bfa',title:document.getElementById('act_type').value+' — '+ALL_LEADS.find(l=>l.id==+document.getElementById('act_lead').value)?.org,sub:summary,time:'Just now',type:'Note'});
+  renderActivityFeed();
+  document.getElementById('activityModal').classList.remove('show');
+}
+
+function exportLeads(){ alert(`Exporting ${ALL_LEADS.length} leads as CSV…\nAPI: GET /api/crm/leads/export`); }
+
+/* ── Tabs ── */
+function switchTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='analytics') initAnalyticsCharts();
+}
+
+/* ── Close modals ── */
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('show');});
+});
+
+/* ── Init ── */
+renderPipelineStages();
+renderKanban();
+renderContacts(ALL_LEADS);
+renderDeals();
+renderActivityFeed();
+renderTodayTasks();
+renderFollowUps();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
