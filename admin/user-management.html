@@ -6,6 +6,7 @@
 <title>User Management & Rights — WOW Super Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -316,7 +317,7 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;
     </div>
     <div class="form-group"><label>Reporting To</label>
       <select id="f_reportsTo">
-        <option>Super Admin (<template class="__cf_email__" data-cfemail="fc9d9791bc959298959d9b89909085d29f9391">[email&#160;protected]</template>)</option>
+        <option>Super Admin (<template class="__cf_email__" data-cfemail="9cfdf7f1dcf5f2f8f5fdfbe9f0f0e5b2fff3f1">[email&#160;protected]</template>)</option>
         <option>Head of Sales</option>
         <option>Passport Head</option>
         <option>Ops Manager</option>
@@ -587,5 +588,6 @@ function showToast(msg, type='success') {
 renderUsers(users);
 renderRightsGrid();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
