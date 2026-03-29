@@ -415,7 +415,20 @@
 </section>
 
 </div><!-- /app -->
+<script src="js/wow-content-control.js"></script>
 <script src="js/wow-modules.js"></script>
 <script src="js/shell.js"></script>
+<script>
+(function () {
+  if (typeof WOWContent !== 'undefined') {
+    var pCfg = WOWContent.getProductCfg();
+    if (pCfg.COMBO_DAY && pCfg.COMBO_DAY.enabled === false) {
+      document.getElementById('app').innerHTML = '<div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;"><div style="font-size:56px;margin-bottom:16px;">&#127942;</div><h2 style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#003D82;margin-bottom:12px;">Combo Package Unavailable</h2><p style="font-size:16px;color:#6B7280;max-width:480px;margin-bottom:28px;">The Combo package is currently unavailable. Check our individual park options or contact us.</p><a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:#003D82;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;">&#8592; Back to Home</a></div>';
+      return;
+    }
+    WOWContent.apply();
+  }
+})();
+</script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
