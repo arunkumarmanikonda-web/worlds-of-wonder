@@ -3,35 +3,133 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Inventory — WOW Admin</title>
+<title>Inventory &amp; Capacity — WOW Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-.inv-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px; }
-.inv-item { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;position:relative; }
-.inv-item.low { border-color:var(--red); }
-.inv-item.warn { border-color:var(--amber); }
-.inv-item.ok { border-color:var(--green); }
-.inv-item-name { font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px; }
-.inv-item-cat { font-size:11px;color:var(--muted); }
-.inv-progress { height:6px;background:var(--bg3);border-radius:6px;margin:10px 0; }
-.inv-progress-fill { height:100%;border-radius:6px;transition:width .3s; }
-.stock-val { font-size:28px;font-weight:900;font-family:'Nunito',sans-serif; }
-.stock-lbl { font-size:11px;color:var(--muted); }
-.inv-action-row { display:flex;gap:6px;margin-top:10px; }
-.adm-table { width:100%;border-collapse:collapse; }
-.adm-table th { background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left; }
-.adm-table td { padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px; }
+/* ===== Tab system ===== */
+.tab-bar{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r-sm);padding:4px;margin-bottom:24px;flex-wrap:wrap;}
+.tab-btn{padding:9px 16px;border-radius:6px;font-size:13px;font-weight:700;border:none;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
+.tab-btn.active{background:var(--white);color:var(--ink);box-shadow:var(--s1);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* ===== KPI strip ===== */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+.kpi-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-card.blue::before{background:var(--primary);}
+.kpi-card.green::before{background:var(--green);}
+.kpi-card.amber::before{background:var(--amber);}
+.kpi-card.red::before{background:var(--red);}
+.kpi-card.teal::before{background:var(--teal);}
+.kpi-val{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;line-height:1;}
+.kpi-lbl{font-size:11px;color:var(--text2);margin-top:5px;}
+.kpi-sub{font-size:11px;margin-top:3px;}
+
+/* ===== Capacity Rings ===== */
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+.zone-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:20px;text-align:center;}
+.zone-name{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.zone-sub{font-size:11px;color:var(--text2);margin-bottom:14px;}
+.ring-container{position:relative;width:100px;height:100px;margin:0 auto 14px;}
+.ring-canvas{width:100px;height:100px;}
+.ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-pct{font-size:20px;font-weight:900;font-family:'Nunito',sans-serif;}
+.ring-of{font-size:10px;color:var(--text2);}
+.zone-bar{height:6px;background:var(--bg2);border-radius:6px;overflow:hidden;margin:8px 0;}
+.zone-bar-fill{height:100%;border-radius:6px;transition:width .4s;}
+.zone-stat{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);}
+.zone-status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}
+.status-open{background:var(--green-lt);color:var(--green);}
+.status-busy{background:var(--amber-lt);color:#92400e;}
+.status-full{background:var(--red-lt);color:var(--red);}
+.status-closed{background:var(--bg2);color:var(--text2);}
+
+/* ===== Inventory grid ===== */
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
+.inv-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:18px;position:relative;}
+.inv-card.critical{border-color:var(--red);}
+.inv-card.warn{border-color:var(--amber);}
+.inv-card.ok{border-color:var(--green);}
+.inv-card-name{font-size:14px;font-weight:800;color:var(--ink);}
+.inv-card-cat{font-size:11px;color:var(--text2);margin-top:2px;}
+.inv-progress{height:7px;background:var(--bg2);border-radius:6px;margin:12px 0 8px;overflow:hidden;}
+.inv-progress-fill{height:100%;border-radius:6px;}
+.inv-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);}
+.inv-actions{display:flex;gap:6px;margin-top:12px;}
+
+/* ===== Ride Status ===== */
+.ride-table{width:100%;border-collapse:collapse;}
+.ride-table th{background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left;border-bottom:2px solid var(--border);}
+.ride-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;}
+.ride-table tbody tr:hover td{background:var(--bg);}
+.ride-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;}
+.dot-green{background:var(--green);}
+.dot-amber{background:var(--amber);}
+.dot-red{background:var(--red);}
+.dot-gray{background:#94a3b8;}
+
+/* ===== Allocation ===== */
+.alloc-table{width:100%;border-collapse:collapse;font-size:13px;}
+.alloc-table th{background:var(--bg2);padding:10px 14px;font-weight:700;color:var(--text2);text-align:left;}
+.alloc-table td{padding:9px 14px;border-bottom:1px solid var(--border);}
+.alloc-table tbody tr:hover td{background:var(--bg);}
+.alloc-bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-top:4px;}
+.alloc-bar-fill{height:100%;border-radius:4px;}
+
+/* ===== Form ===== */
+.form-label{font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px;}
+.form-input{width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;background:var(--white);color:var(--ink);outline:none;font-family:'Inter',sans-serif;}
+.form-input:focus{border-color:var(--primary);}
+.form-group{margin-bottom:14px;}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+/* ===== Drawer ===== */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;display:none;}
+.drawer{position:fixed;top:0;right:-480px;width:460px;height:100vh;background:var(--white);z-index:401;transition:right .3s;box-shadow:var(--s3);overflow-y:auto;padding:28px;}
+.drawer.open{right:0;}
+
+/* ===== Alert ===== */
+.alert{padding:12px 16px;border-radius:var(--r-sm);font-size:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
+.alert-red{background:var(--red-lt);border-left:4px solid var(--red);color:var(--red);}
+.alert-amber{background:var(--amber-lt);border-left:4px solid var(--amber);color:#92400e;}
+.alert-info{background:var(--primary-lt);border-left:4px solid var(--primary);color:var(--primary-dk);}
+.alert-green{background:var(--green-lt);border-left:4px solid var(--green);color:var(--green-dk);}
+
+/* ===== Locker grid ===== */
+.locker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:20px;}
+.locker-cell{padding:10px;border-radius:8px;text-align:center;cursor:pointer;transition:all .2s;border:1.5px solid var(--border);}
+.locker-cell.free{background:var(--green-lt);border-color:var(--green);}
+.locker-cell.occupied{background:var(--red-lt);border-color:var(--red);}
+.locker-cell.reserved{background:var(--amber-lt);border-color:var(--amber);}
+.locker-cell.maint{background:var(--bg2);border-color:var(--border2);}
+.locker-num{font-size:12px;font-weight:800;color:var(--ink);}
+.locker-status{font-size:10px;font-weight:600;margin-top:2px;}
+
+/* Override adm-main padding */
+@media(max-width:900px){
+  .kpi-strip{grid-template-columns:repeat(2,1fr);}
+  .form-grid2,.form-grid3{grid-template-columns:1fr;}
+  .drawer{width:100%;}
+}
 </style>
 </head>
 <body>
 <div class="adm-layout">
+<!-- Sidebar -->
 <aside class="adm-sidebar">
   <div class="adm-sidebar-logo">
-    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;"/></a>
-    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW" style="filter:none!important;height:38px;"/></a>
+    <div class="adm-sidebar-badge">
+      <div class="adm-sidebar-badge-title">WOW Admin</div>
+      <div class="adm-sidebar-badge-sub">EALCPL Platform</div>
+    </div>
   </div>
   <nav class="adm-nav">
     <div class="adm-nav-section">Overview</div>
@@ -39,8 +137,8 @@
     <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
     <a href="tickets.html" class="adm-nav-item"><span class="nav-icon">🎟</span> Tickets Issued</a>
     <div class="adm-nav-section">Commerce</div>
-    <a href="inventory.html" class="adm-nav-item active"><span class="nav-icon">📦</span> Inventory</a>
-    <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="inventory.html" class="adm-nav-item active"><span class="nav-icon">📦</span> Inventory &amp; Capacity</a>
+    <a href="dynamic-pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Dynamic Pricing</a>
     <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
     <a href="fnb-packages.html" class="adm-nav-item"><span class="nav-icon">🥗</span> F&amp;B Packages</a>
     <div class="adm-nav-section">Operations</div>
@@ -50,143 +148,982 @@
     <div class="adm-nav-section">Finance</div>
     <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
     <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
-    <div class="adm-nav-section">Content &amp; System</div>
-    <a href="cms.html" class="adm-nav-item"><span class="nav-icon">🖼</span> CMS</a>
+    <div class="adm-nav-section">Analytics</div>
+    <a href="revenue-analytics.html" class="adm-nav-item"><span class="nav-icon">📈</span> Revenue Analytics</a>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📊</span> All Reports</a>
+    <div class="adm-nav-section">System</div>
     <a href="users.html" class="adm-nav-item"><span class="nav-icon">👥</span> Users &amp; Roles</a>
     <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
-    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📈</span> All Reports</a>
     <div style="margin-top:auto;"></div>
     <a href="../index.html" class="adm-nav-item"><span class="nav-icon">🌐</span> Public Site</a>
   </nav>
   <div class="adm-sidebar-footer">
-    <div class="adm-sidebar-user"><div class="adm-user-avatar">SA</div><div><div class="adm-user-name">Super Admin</div><div class="adm-user-role">EALCPL · All Access</div></div></div>
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">OA</div>
+      <div><div class="adm-user-name">Ops Admin</div><div class="adm-user-role">EALCPL · All Access</div></div>
+    </div>
   </div>
 </aside>
+
+<!-- Main -->
 <main class="adm-main">
   <div class="adm-topbar">
-    <div><div class="adm-topbar-title">📦 Inventory Management</div><div class="adm-topbar-sub">Stock levels · Replenishment alerts · Category management</div></div>
+    <div>
+      <div class="adm-topbar-title">📦 Inventory &amp; Capacity Management</div>
+      <div class="adm-topbar-sub">Park zones · Ride slots · Lockers · F&amp;B stock · Daily allocation</div>
+    </div>
     <div class="adm-topbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="addItem()"><i class="fa fa-plus"></i> Add Item</button>
-      <button class="btn btn-primary btn-sm" onclick="exportInventory()"><i class="fa fa-download"></i> Export</button>
+      <button class="btn btn-ghost btn-sm" onclick="openAdjustDrawer()"><i class="fas fa-sliders-h"></i> Adjust Stock</button>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('Generating inventory report…')"><i class="fas fa-file-export"></i> Export</button>
+      <button class="btn btn-primary btn-sm" onclick="openAllocationDrawer()"><i class="fas fa-calendar-day"></i> Daily Allocation</button>
     </div>
   </div>
+
   <div class="adm-content">
 
-    <!-- KPI strip -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
-      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;">
-        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;">142</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Total SKUs</div>
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-card blue">
+        <div class="kpi-val" id="kpi-capacity">3,200</div>
+        <div class="kpi-lbl">Today's Capacity</div>
+        <div class="kpi-sub" style="color:var(--primary);">Water + Amusement</div>
       </div>
-      <div style="background:var(--white);border:1.5px solid var(--red);border-radius:var(--r-md);padding:16px;text-align:center;">
-        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--red);">8</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Critical Low Stock</div>
+      <div class="kpi-card green">
+        <div class="kpi-val" id="kpi-admitted">1,847</div>
+        <div class="kpi-lbl">Currently Admitted</div>
+        <div class="kpi-sub" style="color:var(--green);">57.7% of capacity</div>
       </div>
-      <div style="background:var(--white);border:1.5px solid var(--amber);border-radius:var(--r-md);padding:16px;text-align:center;">
-        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--amber);">14</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Reorder Needed</div>
+      <div class="kpi-card amber">
+        <div class="kpi-val" id="kpi-low">8</div>
+        <div class="kpi-lbl">Critical Low Stock</div>
+        <div class="kpi-sub" style="color:var(--amber);">Needs reorder</div>
       </div>
-      <div style="background:var(--white);border:1.5px solid var(--green);border-radius:var(--r-md);padding:16px;text-align:center;">
-        <div style="font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--green);">120</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Adequate Stock</div>
+      <div class="kpi-card teal">
+        <div class="kpi-val" id="kpi-lockers">342</div>
+        <div class="kpi-lbl">Lockers Available</div>
+        <div class="kpi-sub" style="color:var(--teal);">out of 600 total</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-val" id="kpi-rides-down">3</div>
+        <div class="kpi-lbl">Rides Offline</div>
+        <div class="kpi-sub" style="color:var(--red);">Maintenance / Safety check</div>
       </div>
     </div>
 
-    <!-- Category Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-      <button class="btn btn-primary btn-sm" onclick="filterCat(this,'')">All</button>
-      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'F&B')">🥗 F&B</button>
-      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Merchandise')">🛍 Merchandise</button>
-      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Costumes')">👗 Costumes</button>
-      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Safety')">🦺 Safety</button>
-      <button class="btn btn-ghost btn-sm" onclick="filterCat(this,'Lockers')">🔒 Lockers</button>
+    <!-- Critical Alerts -->
+    <div id="alert-strip"></div>
+
+    <!-- Main Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tb-zones"   onclick="switchTab('zones')">🗺 Park Zones</button>
+      <button class="tab-btn"        id="tb-rides"   onclick="switchTab('rides')">🎢 Ride Slots</button>
+      <button class="tab-btn"        id="tb-stock"   onclick="switchTab('stock')">📦 Stock / SKUs</button>
+      <button class="tab-btn"        id="tb-lockers" onclick="switchTab('lockers')">🔒 Lockers</button>
+      <button class="tab-btn"        id="tb-fnb"     onclick="switchTab('fnb')">🥗 F&amp;B Inventory</button>
+      <button class="tab-btn"        id="tb-alloc"   onclick="switchTab('alloc')">📅 Daily Allocation</button>
+      <button class="tab-btn"        id="tb-movement"onclick="switchTab('movement')">🔄 Stock Movements</button>
     </div>
 
-    <!-- Inventory Grid -->
-    <div class="inv-grid" id="inv-grid"></div>
+    <!-- ===== ZONES TAB ===== -->
+    <div class="tab-content active" id="tc-zones">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--ink);">🗺 Live Zone Capacity</div>
+          <div style="font-size:12px;color:var(--text2);">Real-time occupancy across all park sections</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;"></div><span style="font-size:12px;margin-right:10px;">Open</span>
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block;"></div><span style="font-size:12px;margin-right:10px;">Busy (&gt;70%)</span>
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;"></div><span style="font-size:12px;">Near Full (&gt;90%)</span>
+        </div>
+      </div>
 
-    <!-- Recent Movements -->
-    <div class="card">
-      <div class="card-header"><span class="section-title" style="margin:0;">📋 Recent Stock Movements</span></div>
-      <table class="adm-table">
-        <thead><tr><th>Time</th><th>Item</th><th>Action</th><th>Qty</th><th>By</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td style="color:var(--muted);">10:30</td><td>Life Jackets (Small)</td><td><span class="badge badge-green" style="font-size:10px;">Restock</span></td><td>+50</td><td>Suresh Kumar</td><td>Morning restock</td></tr>
-          <tr><td style="color:var(--muted);">10:15</td><td>Sunscreen Lotion 100ml</td><td><span class="badge badge-red" style="font-size:10px;">Issue</span></td><td>-120</td><td>System</td><td>Dispensed at entry gates</td></tr>
-          <tr><td style="color:var(--muted);">09:50</td><td>Costume Set — Superhero</td><td><span class="badge badge-blue" style="font-size:10px;">Reserved</span></td><td>-5</td><td>Events Team</td><td>School booking DPS</td></tr>
-          <tr><td style="color:var(--muted);">09:30</td><td>Locker Keys (A-Block)</td><td><span class="badge badge-green" style="font-size:10px;">Restock</span></td><td>+200</td><td>IT Dept</td><td>New batch received</td></tr>
-          <tr><td style="color:var(--muted);">09:00</td><td>Mineral Water 500ml</td><td><span class="badge badge-amber" style="font-size:10px;">Consumed</span></td><td>-480</td><td>F&B System</td><td>Auto-deducted from POS</td></tr>
-        </tbody>
-      </table>
+      <!-- Water Park zones -->
+      <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">🌊 Water Park</div>
+      <div class="zone-grid" id="water-zones"></div>
+
+      <!-- Amusement zones -->
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin:20px 0 10px;text-transform:uppercase;letter-spacing:.05em;">🎢 Amusement Park</div>
+      <div class="zone-grid" id="amusement-zones"></div>
+
+      <!-- Common areas -->
+      <div style="font-size:13px;font-weight:700;color:var(--text2);margin:20px 0 10px;text-transform:uppercase;letter-spacing:.05em;">🏢 Common Areas</div>
+      <div class="zone-grid" id="common-zones"></div>
+
+      <!-- Capacity trend chart -->
+      <div class="card">
+        <div class="card-header"><span class="section-title" style="margin:0;">📈 Capacity Trend — Today</span></div>
+        <div style="height:280px;"><canvas id="capacity-chart"></canvas></div>
+      </div>
     </div>
 
-  </div>
+    <!-- ===== RIDES TAB ===== -->
+    <div class="tab-content" id="tc-rides">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">🎢 Ride Status &amp; Slot Management</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="filterRides('')">All</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRides('operational')">✅ Operational</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRides('maintenance')">🔧 Maintenance</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterRides('offline')">🔴 Offline</button>
+          <button class="btn btn-primary btn-sm" onclick="openRideDrawer()"><i class="fas fa-plus"></i> Add Ride</button>
+        </div>
+      </div>
+
+      <!-- Summary pills -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+        <span id="pill-op" style="background:var(--green-lt);color:var(--green);padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;">✅ 0 Operational</span>
+        <span id="pill-maint" style="background:var(--amber-lt);color:#92400e;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;">🔧 0 Maintenance</span>
+        <span id="pill-off" style="background:var(--red-lt);color:var(--red);padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;">🔴 0 Offline</span>
+        <span id="pill-closed" style="background:var(--bg2);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;">⚫ 0 Closed Today</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="rides-sections">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px;">🌊 Water Park Rides</div>
+          <div style="overflow-x:auto;"><table class="ride-table" id="water-rides-table">
+            <thead><tr><th>Ride</th><th>Status</th><th>Capacity/hr</th><th>Queue</th><th>Last Check</th><th>Action</th></tr></thead>
+            <tbody id="water-rides-tbody"></tbody>
+          </table></div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px;">🎢 Amusement Park Rides</div>
+          <div style="overflow-x:auto;"><table class="ride-table" id="amusement-rides-table">
+            <thead><tr><th>Ride</th><th>Status</th><th>Capacity/hr</th><th>Queue</th><th>Last Check</th><th>Action</th></tr></thead>
+            <tbody id="amusement-rides-tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STOCK TAB ===== -->
+    <div class="tab-content" id="tc-stock">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">📦 Stock / SKU Management</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" class="form-input" style="width:220px;" placeholder="🔍 Search items…" oninput="filterStock(this.value)" />
+          <select class="form-input" style="width:160px;" onchange="filterStockCat(this.value)">
+            <option value="">All Categories</option>
+            <option>Safety</option><option>F&amp;B</option><option>Merchandise</option>
+            <option>Costumes</option><option>Lockers</option><option>Consumables</option>
+          </select>
+          <select class="form-input" style="width:150px;" onchange="filterStockLevel(this.value)">
+            <option value="">All Levels</option>
+            <option value="critical">🔴 Critical</option>
+            <option value="warn">🟡 Reorder</option>
+            <option value="ok">🟢 Adequate</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openAddItemDrawer()"><i class="fas fa-plus"></i> Add Item</button>
+        </div>
+      </div>
+      <div class="inv-grid" id="inv-grid"></div>
+      <div style="font-size:13px;color:var(--text2);" id="stock-count"></div>
+    </div>
+
+    <!-- ===== LOCKERS TAB ===== -->
+    <div class="tab-content" id="tc-lockers">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">🔒 Locker Management</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select class="form-input" style="width:160px;" id="locker-block-sel" onchange="renderLockers()">
+            <option value="A">Block A (Water Park)</option>
+            <option value="B">Block B (Amusement)</option>
+            <option value="C">Block C (Common)</option>
+            <option value="VIP">VIP Lockers</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Generating locker report…')"><i class="fas fa-download"></i> Export</button>
+          <button class="btn btn-primary btn-sm" onclick="releaseAllExpired()"><i class="fas fa-unlock"></i> Release Expired</button>
+        </div>
+      </div>
+
+      <!-- Locker stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;" id="locker-stats"></div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap;font-size:12px;">
+        <span><span class="locker-cell free" style="display:inline-block;width:14px;height:14px;vertical-align:middle;border-radius:3px;"></span> Free</span>
+        <span><span class="locker-cell occupied" style="display:inline-block;width:14px;height:14px;vertical-align:middle;border-radius:3px;"></span> Occupied</span>
+        <span><span class="locker-cell reserved" style="display:inline-block;width:14px;height:14px;vertical-align:middle;border-radius:3px;"></span> Reserved</span>
+        <span><span class="locker-cell maint" style="display:inline-block;width:14px;height:14px;vertical-align:middle;border-radius:3px;"></span> Maintenance</span>
+      </div>
+      <div class="locker-grid" id="locker-grid"></div>
+
+      <!-- Locker audit -->
+      <div class="card">
+        <div class="card-header"><span class="section-title" style="margin:0;">📋 Recent Locker Activity</span></div>
+        <table class="ride-table">
+          <thead><tr><th>Time</th><th>Locker</th><th>Block</th><th>Action</th><th>Guest</th><th>Duration</th></tr></thead>
+          <tbody id="locker-audit"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== F&B TAB ===== -->
+    <div class="tab-content" id="tc-fnb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">🥗 F&amp;B Inventory</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Exporting F&B stock report…')"><i class="fas fa-download"></i> Export</button>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Opening reorder form…')"><i class="fas fa-cart-plus"></i> Reorder</button>
+        </div>
+      </div>
+
+      <!-- Outlet selector -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="out-all" onclick="selectOutlet('all', this)">All Outlets</button>
+        <button class="btn btn-ghost btn-sm" id="out-ww" onclick="selectOutlet('ww', this)">🍕 Water World Kitchen</button>
+        <button class="btn btn-ghost btn-sm" id="out-funfood" onclick="selectOutlet('funfood', this)">🍟 Fun Food Court</button>
+        <button class="btn btn-ghost btn-sm" id="out-snack" onclick="selectOutlet('snack', this)">🧁 Snack Kiosks</button>
+        <button class="btn btn-ghost btn-sm" id="out-beverage" onclick="selectOutlet('beverage', this)">🥤 Beverage Stations</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+        <div>
+          <div class="inv-grid" id="fnb-inv-grid"></div>
+        </div>
+        <div>
+          <!-- Consumption chart -->
+          <div class="card" style="margin-bottom:16px;">
+            <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;">📊 Today's Consumption</div>
+            <div style="height:220px;"><canvas id="fnb-chart"></canvas></div>
+          </div>
+
+          <!-- Top movers -->
+          <div class="card">
+            <div style="font-size:14px;font-weight:800;color:var(--ink);margin-bottom:12px;">🔥 Top Moving Items</div>
+            <div id="top-movers"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DAILY ALLOCATION TAB ===== -->
+    <div class="tab-content" id="tc-alloc">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">📅 Daily Capacity Allocation</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input type="date" class="form-input" style="width:180px;" id="alloc-date" />
+          <button class="btn btn-ghost btn-sm" onclick="loadAllocation()"><i class="fas fa-sync"></i> Load</button>
+          <button class="btn btn-primary btn-sm" onclick="saveAllocation()"><i class="fas fa-save"></i> Save Allocation</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <div class="card-title">🌊 Water Park Allocation</div>
+          <div id="water-alloc-form"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🎢 Amusement Park Allocation</div>
+          <div id="amusement-alloc-form"></div>
+        </div>
+      </div>
+
+      <!-- Allocation overview table -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title">📋 7-Day Allocation Overview</div>
+        <div style="overflow-x:auto;">
+          <table class="alloc-table" id="alloc-overview"></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MOVEMENTS TAB ===== -->
+    <div class="tab-content" id="tc-movement">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);">🔄 Stock Movement Log</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input type="text" class="form-input" style="width:200px;" placeholder="🔍 Search…" />
+          <select class="form-input" style="width:150px;">
+            <option>All Actions</option><option>Restock</option><option>Issue</option>
+            <option>Consumed</option><option>Reserved</option><option>Damaged</option>
+          </select>
+          <input type="date" class="form-input" style="width:160px;" />
+          <button class="btn btn-ghost btn-sm"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="ride-table" id="movement-table">
+          <thead><tr><th>Time</th><th>Item</th><th>Category</th><th>Action</th><th>Qty Change</th><th>Balance</th><th>By</th><th>Notes</th></tr></thead>
+          <tbody id="movement-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /adm-content -->
 </main>
 </div>
 
+<!-- Drawer: Stock Adjustment -->
+<div class="drawer-overlay" id="adj-overlay" onclick="closeDrawers()"></div>
+<div class="drawer" id="adj-drawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div style="font-size:18px;font-weight:800;color:var(--ink);">📦 Stock Adjustment</div>
+    <button class="btn btn-ghost btn-sm" onclick="closeDrawers()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Item</label>
+    <select id="adj-item" class="form-input"></select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Action</label>
+    <select id="adj-action" class="form-input">
+      <option value="add">➕ Add Stock (Restock)</option>
+      <option value="remove">➖ Remove Stock (Issue/Consume)</option>
+      <option value="reserve">📌 Reserve</option>
+      <option value="damage">⚠️ Mark Damaged</option>
+      <option value="set">🔧 Set Exact Quantity</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Quantity</label>
+    <input type="number" id="adj-qty" class="form-input" min="1" value="10" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Notes / Reason</label>
+    <input type="text" id="adj-notes" class="form-input" placeholder="e.g. Morning restock from warehouse" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Authorised By</label>
+    <input type="text" id="adj-auth" class="form-input" value="Ops Admin" />
+  </div>
+  <button class="btn btn-primary" style="width:100%;" onclick="saveAdjustment()"><i class="fas fa-save"></i> Save Adjustment</button>
+</div>
+
+<!-- Drawer: Daily Allocation -->
+<div class="drawer-overlay" id="alloc-overlay" onclick="closeDrawers()"></div>
+<div class="drawer" id="alloc-drawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div style="font-size:18px;font-weight:800;color:var(--ink);">📅 Quick Allocation</div>
+    <button class="btn btn-ghost btn-sm" onclick="closeDrawers()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Date</label>
+    <input type="date" id="quick-alloc-date" class="form-input" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Water Park Capacity</label>
+    <input type="number" id="quick-water-cap" class="form-input" value="1800" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Amusement Park Capacity</label>
+    <input type="number" id="quick-amus-cap" class="form-input" value="1400" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Group Slots Reserved</label>
+    <input type="number" id="quick-group-slots" class="form-input" value="200" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Partner / B2B Quota</label>
+    <input type="number" id="quick-b2b-quota" class="form-input" value="300" />
+  </div>
+  <div class="form-group">
+    <label class="form-label">Day Type</label>
+    <select id="quick-day-type" class="form-input">
+      <option>Regular</option><option>Weekend</option><option>Holiday</option><option>Blackout</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" style="width:100%;" onclick="saveQuickAllocation()"><i class="fas fa-save"></i> Apply Allocation</button>
+</div>
+
+<!-- Drawer: Add Ride -->
+<div class="drawer-overlay" id="ride-overlay" onclick="closeDrawers()"></div>
+<div class="drawer" id="ride-drawer">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+    <div style="font-size:18px;font-weight:800;color:var(--ink);">🎢 Add / Edit Ride</div>
+    <button class="btn btn-ghost btn-sm" onclick="closeDrawers()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="form-grid2">
+    <div class="form-group" style="grid-column:span 2;">
+      <label class="form-label">Ride Name</label>
+      <input type="text" class="form-input" placeholder="e.g. Tornado Twister" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Park Section</label>
+      <select class="form-input"><option>Water Park</option><option>Amusement Park</option></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Capacity / Hour</label>
+      <input type="number" class="form-input" value="200" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Min Height (cm)</label>
+      <input type="number" class="form-input" value="120" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Max Weight (kg)</label>
+      <input type="number" class="form-input" value="120" />
+    </div>
+    <div class="form-group" style="grid-column:span 2;">
+      <label class="form-label">Status</label>
+      <select class="form-input">
+        <option>Operational</option><option>Maintenance</option><option>Offline</option><option>Seasonal Closure</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn btn-primary" style="width:100%;" onclick="showToast('Ride saved successfully'); closeDrawers();">Save Ride</button>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--r-sm);font-size:13px;font-weight:600;box-shadow:var(--s3);z-index:9999;display:none;max-width:320px;"></div>
+
 <script>
-const inventory = [
-  {name:'Life Jackets (Large)',    cat:'Safety',      stock:84,  max:200, unit:'Pcs',  low:50},
-  {name:'Life Jackets (Medium)',   cat:'Safety',      stock:62,  max:200, unit:'Pcs',  low:50},
-  {name:'Life Jackets (Small)',    cat:'Safety',      stock:18,  max:150, unit:'Pcs',  low:40},
-  {name:'Goggles (Swimming)',      cat:'Safety',      stock:124, max:300, unit:'Pcs',  low:60},
-  {name:'Sunscreen Lotion 100ml',  cat:'F&B',         stock:220, max:1000,unit:'Btls', low:200},
-  {name:'Mineral Water 500ml',     cat:'F&B',         stock:1840,max:5000,unit:'Btls', low:1000},
-  {name:'Soft Drinks 250ml',       cat:'F&B',         stock:940, max:3000,unit:'Cans', low:500},
-  {name:'Costume Set — Superhero', cat:'Costumes',    stock:12,  max:50,  unit:'Sets', low:10},
-  {name:'Costume Set — Princess',  cat:'Costumes',    stock:8,   max:40,  unit:'Sets', low:10},
-  {name:'Locker Keys (A-Block)',   cat:'Lockers',     stock:200, max:400, unit:'Keys', low:80},
-  {name:'Locker Keys (B-Block)',   cat:'Lockers',     stock:45,  max:300, unit:'Keys', low:60},
-  {name:'WOW T-Shirts (Kids)',     cat:'Merchandise', stock:84,  max:500, unit:'Pcs',  low:100},
-  {name:'WOW T-Shirts (Adult)',    cat:'Merchandise', stock:62,  max:500, unit:'Pcs',  low:100},
-  {name:'WOW Caps',                cat:'Merchandise', stock:141, max:400, unit:'Pcs',  low:80},
-  {name:'Photo Print Packages',    cat:'Merchandise', stock:240, max:500, unit:'Pkgs', low:100},
-  {name:'First Aid Kits',          cat:'Safety',      stock:22,  max:40,  unit:'Kits', low:10},
+// ===== DATA =====
+const WATER_ZONES = [
+  {name:'Main Wave Pool',     cap:600, occ:412, status:'open',   icon:'🌊'},
+  {name:'Lazy River',         cap:300, occ:287, status:'busy',   icon:'🛶'},
+  {name:'Speed Slides',       cap:180, occ:168, status:'full',   icon:'🎿'},
+  {name:'Kids Splash Zone',   cap:250, occ:184, status:'open',   icon:'👦'},
+  {name:'Tornado Twister',    cap:120, occ:0,   status:'closed', icon:'🌀'},
+  {name:'Rain Disco',         cap:200, occ:134, status:'open',   icon:'💧'},
+];
+const AMUS_ZONES = [
+  {name:'Roller Coaster Area',cap:400, occ:298, status:'busy',   icon:'🎢'},
+  {name:'Family Rides Zone',  cap:350, occ:198, status:'open',   icon:'🎠'},
+  {name:'Thrill Rides Zone',  cap:250, occ:231, status:'full',   icon:'⚡'},
+  {name:'Kids Land',          cap:300, occ:167, status:'open',   icon:'🎪'},
+  {name:'4D Cinema',          cap:150, occ:120, status:'busy',   icon:'🎬'},
+];
+const COMMON_ZONES = [
+  {name:'Entry Plaza',        cap:1000,occ:680, status:'open',   icon:'🏛'},
+  {name:'Food Court',         cap:500, occ:310, status:'open',   icon:'🍕'},
+  {name:'Souvenir Hub',       cap:200, occ:89,  status:'open',   icon:'🛍'},
+  {name:'Parking (Cars)',     cap:800, occ:620, status:'busy',   icon:'🚗'},
 ];
 
-let currentCat = '';
+const WATER_RIDES = [
+  {name:'Wave Pool Pumps',  cap:600, queue:18,  status:'operational', last:'09:30'},
+  {name:'Lazy River',       cap:300, queue:42,  status:'operational', last:'09:45'},
+  {name:'Aqua Twister',     cap:240, queue:85,  status:'operational', last:'10:00'},
+  {name:'Speed Slides ×4',  cap:480, queue:120, status:'operational', last:'10:15'},
+  {name:'Kids Splash Pad',  cap:250, queue:0,   status:'operational', last:'09:00'},
+  {name:'Tornado Twister',  cap:120, queue:0,   status:'maintenance', last:'08:00'},
+  {name:'Body Slides ×3',   cap:360, queue:56,  status:'operational', last:'10:20'},
+  {name:'Rain Disco Dome',  cap:200, queue:34,  status:'operational', last:'09:55'},
+];
+const AMUS_RIDES = [
+  {name:'Roller Coaster',   cap:280, queue:95,  status:'operational', last:'10:00'},
+  {name:'Giant Wheel',      cap:120, queue:45,  status:'operational', last:'09:50'},
+  {name:'Bumper Cars ×12',  cap:180, queue:30,  status:'operational', last:'09:30'},
+  {name:'Rock n Roll',      cap:160, queue:0,   status:'maintenance', last:'07:00'},
+  {name:'Log Flume',        cap:240, queue:55,  status:'operational', last:'10:10'},
+  {name:'Drop Tower',       cap:60,  queue:0,   status:'offline',     last:'—'},
+  {name:'Tilt-a-Whirl',     cap:80,  queue:18,  status:'operational', last:'09:45'},
+  {name:'Mini Train',       cap:200, queue:12,  status:'operational', last:'09:00'},
+  {name:'4D Cinema',        cap:150, queue:30,  status:'operational', last:'10:30'},
+];
 
-function stockLevel(stock, max) { return Math.round(stock/max*100); }
-function stockClass(stock, max, low) { if(stock <= low*0.5) return 'low'; if(stock <= low) return 'warn'; return 'ok'; }
-function stockColor(stock, max, low) { if(stock <= low*0.5) return 'var(--red)'; if(stock <= low) return 'var(--amber)'; return 'var(--green)'; }
+const INVENTORY = [
+  {name:'Life Jackets (L)',       cat:'Safety',      stock:84,  max:200, low:50,  unit:'Pcs',  icon:'🦺'},
+  {name:'Life Jackets (M)',       cat:'Safety',      stock:62,  max:200, low:50,  unit:'Pcs',  icon:'🦺'},
+  {name:'Life Jackets (S)',       cat:'Safety',      stock:12,  max:150, low:40,  unit:'Pcs',  icon:'🦺'},
+  {name:'Swimming Goggles',       cat:'Safety',      stock:124, max:300, low:60,  unit:'Pcs',  icon:'🥽'},
+  {name:'First Aid Kits',         cat:'Safety',      stock:22,  max:40,  low:10,  unit:'Kits', icon:'🩹'},
+  {name:'Sunscreen 100ml',        cat:'Consumables', stock:220, max:1000,low:200, unit:'Btls', icon:'🧴'},
+  {name:'Mineral Water 500ml',    cat:'F&B',         stock:1840,max:5000,low:1000,unit:'Btls', icon:'💧'},
+  {name:'Soft Drinks 250ml',      cat:'F&B',         stock:940, max:3000,low:500, unit:'Cans', icon:'🥤'},
+  {name:'Burger Buns (pkt)',      cat:'F&B',         stock:180, max:500, low:100, unit:'Pkts', icon:'🍔'},
+  {name:'Disposable Plates',      cat:'Consumables', stock:2400,max:5000,low:1000,unit:'Pcs',  icon:'🍽'},
+  {name:'Costume – Superhero',    cat:'Costumes',    stock:12,  max:50,  low:10,  unit:'Sets', icon:'🦸'},
+  {name:'Costume – Princess',     cat:'Costumes',    stock:8,   max:40,  low:10,  unit:'Sets', icon:'👸'},
+  {name:'Locker Keys A-Block',    cat:'Lockers',     stock:200, max:400, low:80,  unit:'Keys', icon:'🔑'},
+  {name:'Locker Keys B-Block',    cat:'Lockers',     stock:45,  max:300, low:60,  unit:'Keys', icon:'🔑'},
+  {name:'WOW T-Shirts (Kids)',    cat:'Merchandise', stock:84,  max:500, low:100, unit:'Pcs',  icon:'👕'},
+  {name:'WOW T-Shirts (Adult)',   cat:'Merchandise', stock:62,  max:500, low:100, unit:'Pcs',  icon:'👕'},
+  {name:'WOW Caps',               cat:'Merchandise', stock:141, max:400, low:80,  unit:'Pcs',  icon:'🧢'},
+  {name:'Photo Print Packages',   cat:'Merchandise', stock:240, max:500, low:100, unit:'Pkgs', icon:'📸'},
+  {name:'Hand Sanitizer 500ml',   cat:'Consumables', stock:38,  max:200, low:50,  unit:'Btls', icon:'🧼'},
+  {name:'Garbage Bags (roll)',    cat:'Consumables', stock:90,  max:300, low:60,  unit:'Rolls',icon:'🗑'},
+];
 
-function renderInventory(data) {
-  document.getElementById('inv-grid').innerHTML = data.map(item => {
-    const pct = stockLevel(item.stock, item.max);
-    const cls = stockClass(item.stock, item.max, item.low);
-    const col = stockColor(item.stock, item.max, item.low);
+const FNB_ITEMS = [
+  {name:'Veg Burger Patties',  outlet:'ww',       stock:180, max:400, low:80,  unit:'Pcs'},
+  {name:'Chicken Burger Patties', outlet:'ww',    stock:120, max:300, low:60,  unit:'Pcs'},
+  {name:'French Fries (kg)',   outlet:'funfood',  stock:48,  max:120, low:30,  unit:'Kg'},
+  {name:'Samosa (batch)',      outlet:'funfood',  stock:200, max:500, low:100, unit:'Pcs'},
+  {name:'Nachos Pack',         outlet:'snack',    stock:85,  max:200, low:40,  unit:'Pcs'},
+  {name:'Popcorn Tubs',        outlet:'snack',    stock:160, max:400, low:80,  unit:'Tubs'},
+  {name:'Cola 600ml PET',      outlet:'beverage', stock:840, max:2000,low:400, unit:'Btls'},
+  {name:'Fresh Lime Soda',     outlet:'beverage', stock:120, max:400, low:80,  unit:'Ltrs'},
+  {name:'Ice Cream Scoops',    outlet:'snack',    stock:210, max:500, low:100, unit:'Scoops'},
+  {name:'Mineral Water 1L',    outlet:'beverage', stock:620, max:2000,low:400, unit:'Btls'},
+  {name:'Veg Pizza Slice',     outlet:'funfood',  stock:96,  max:200, low:40,  unit:'Slices'},
+  {name:'Mango Shake',         outlet:'beverage', stock:75,  max:200, low:50,  unit:'Cups'},
+];
+
+// ===== HELPERS =====
+function pct(s,m){return Math.round(s/m*100);}
+function lvl(s,m,l){return s<=l*0.5?'critical':s<=l?'warn':'ok';}
+function col(s,m,l){return s<=l*0.5?'var(--red)':s<=l?'var(--amber)':'var(--green)';}
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tc-'+tab).classList.add('active');
+  document.getElementById('tb-'+tab).classList.add('active');
+  if(tab==='zones') renderCapacityChart();
+  if(tab==='rides') renderRides();
+  if(tab==='stock') renderStock(INVENTORY);
+  if(tab==='lockers') renderLockers();
+  if(tab==='fnb') renderFnb('all');
+  if(tab==='alloc') renderAllocation();
+  if(tab==='movement') renderMovements();
+}
+
+// ===== ZONES =====
+function zoneStatus(occ,cap){
+  const p=occ/cap;
+  if(occ===0) return 'closed';
+  if(p>=0.9) return 'full';
+  if(p>=0.7) return 'busy';
+  return 'open';
+}
+function zoneColor(s){return s==='full'?'var(--red)':s==='busy'?'var(--amber)':s==='closed'?'#94a3b8':'var(--green)';}
+function zoneLabel(s){return s==='full'?'Near Full':s==='busy'?'Busy':s==='closed'?'Closed Today':'Open';}
+function zoneBadgeClass(s){return s==='full'?'status-full':s==='busy'?'status-busy':s==='closed'?'status-closed':'status-open';}
+
+function renderZoneGrid(zones, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = zones.map(z => {
+    const p = z.occ/z.cap*100;
+    const st = z.status || zoneStatus(z.occ,z.cap);
+    const col2 = zoneColor(st);
     return `
-      <div class="inv-item ${cls}">
-        <div class="inv-item-name">${item.name}</div>
-        <div class="inv-item-cat"><span class="badge badge-blue" style="font-size:10px;">${item.cat}</span></div>
-        <div class="inv-progress"><div class="inv-progress-fill" style="width:${pct}%;background:${col};"></div></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div><span class="stock-val" style="color:${col};">${item.stock}</span> <span class="stock-lbl">${item.unit}</span></div>
-          <div style="text-align:right;font-size:11px;color:var(--muted);">Max: ${item.max} · Low: ${item.low}<br/><b>${pct}%</b> capacity</div>
+      <div class="zone-card">
+        <div style="font-size:28px;margin-bottom:6px;">${z.icon}</div>
+        <div class="zone-name">${z.name}</div>
+        <div class="zone-sub">Capacity: ${z.cap.toLocaleString('en-IN')}</div>
+        <div class="ring-container">
+          <canvas class="ring-canvas" id="ring-${containerId}-${z.name.replace(/\s/g,'')}"></canvas>
+          <div class="ring-label">
+            <div class="ring-pct" style="color:${col2};">${Math.round(p)}%</div>
+            <div class="ring-of">${z.occ.toLocaleString()}/${z.cap.toLocaleString()}</div>
+          </div>
         </div>
-        ${cls!=='ok'?`<div style="font-size:11px;font-weight:700;color:${col};margin-top:6px;">${cls==='low'?'🚨 Critical — Order immediately!':'⚠️ Below reorder point'}</div>`:''}
-        <div class="inv-action-row">
-          <button class="btn btn-ghost btn-sm" style="font-size:11px;flex:1;" onclick="restock('${item.name}')"><i class="fa fa-plus"></i> Restock</button>
-          <button class="btn btn-ghost btn-sm" style="font-size:11px;flex:1;" onclick="editItem('${item.name}')"><i class="fa fa-edit"></i> Edit</button>
+        <div class="zone-bar"><div class="zone-bar-fill" style="width:${Math.min(p,100)}%;background:${col2};"></div></div>
+        <div class="zone-stat"><span>${z.occ} admitted</span><span>${z.cap-z.occ} free</span></div>
+        <span class="zone-status-badge ${zoneBadgeClass(st)}">${zoneLabel(st)}</span>
+      </div>`;
+  }).join('');
+
+  // Draw ring charts
+  zones.forEach(z => {
+    const id = 'ring-'+containerId+'-'+z.name.replace(/\s/g,'');
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    const p = Math.min(z.occ/z.cap*100, 100);
+    const st = z.status || zoneStatus(z.occ,z.cap);
+    const ringCol = zoneColor(st);
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+      type:'doughnut',
+      data:{
+        datasets:[{data:[p,100-p],backgroundColor:[ringCol,'#eef2f8'],borderWidth:0,hoverOffset:0}]
+      },
+      options:{cutout:'75%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:600}}
+    });
+  });
+}
+
+function renderCapacityChart() {
+  const ctx = document.getElementById('capacity-chart');
+  if (!ctx || ctx.dataset.drawn) return;
+  ctx.dataset.drawn = '1';
+  const hours = ['9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM','6PM'];
+  new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:hours,
+      datasets:[
+        {label:'Water Park',data:[120,380,820,1180,1420,1580,1620,1580,1420,980],borderColor:'#0055B3',backgroundColor:'rgba(0,85,179,.1)',fill:true,tension:.4,pointRadius:4},
+        {label:'Amusement',data:[80,280,620,890,1080,1190,1240,1200,1050,740],borderColor:'#0A9B5F',backgroundColor:'rgba(10,155,95,.1)',fill:true,tension:.4,pointRadius:4},
+        {label:'Combined Cap',data:[3200,3200,3200,3200,3200,3200,3200,3200,3200,3200],borderColor:'#E53E3E',borderDash:[6,4],fill:false,pointRadius:0,tension:0}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}},
+      scales:{y:{suggestedMax:3500,title:{display:true,text:'Visitors'}}}
+    }
+  });
+}
+
+// ===== RIDES =====
+function renderRides(filter='') {
+  let op=0,maint=0,off=0,closed=0;
+  const allRides = [...WATER_RIDES,...AMUS_RIDES];
+  allRides.forEach(r=>{
+    if(r.status==='operational') op++;
+    else if(r.status==='maintenance') maint++;
+    else if(r.status==='offline') off++;
+    else closed++;
+  });
+  document.getElementById('pill-op').textContent = '✅ '+op+' Operational';
+  document.getElementById('pill-maint').textContent = '🔧 '+maint+' Maintenance';
+  document.getElementById('pill-off').textContent = '🔴 '+off+' Offline';
+  document.getElementById('pill-closed').textContent = '⚫ '+closed+' Closed';
+
+  const renderBody = (rides, tbodyId) => {
+    const tbody = document.getElementById(tbodyId);
+    const filtered = filter ? rides.filter(r=>r.status===filter) : rides;
+    tbody.innerHTML = filtered.map(r => {
+      const dotCls = r.status==='operational'?'dot-green':r.status==='maintenance'?'dot-amber':r.status==='offline'?'dot-red':'dot-gray';
+      const statusLabel = r.status.charAt(0).toUpperCase()+r.status.slice(1);
+      const queueColor = r.queue>80?'var(--red)':r.queue>40?'var(--amber)':'var(--green)';
+      return `<tr>
+        <td style="font-weight:700;">${r.name}</td>
+        <td><span class="ride-dot ${dotCls}"></span>${statusLabel}</td>
+        <td>${r.cap}/hr</td>
+        <td style="color:${queueColor};font-weight:700;">${r.queue ? r.queue+' mins' : '—'}</td>
+        <td style="color:var(--text2);">${r.last}</td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Updating ${r.name} status…')" style="font-size:11px;">Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Opening ${r.name} log…')" style="font-size:11px;">Log</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:20px;">No rides match filter</td></tr>';
+  };
+  renderBody(WATER_RIDES,'water-rides-tbody');
+  renderBody(AMUS_RIDES,'amusement-rides-tbody');
+}
+
+function filterRides(f) { renderRides(f); }
+
+// ===== STOCK =====
+let stockFilter = '', stockCat = '', stockLevel = '';
+function renderStock(items) {
+  const filtered = items.filter(i => {
+    if(stockFilter && !i.name.toLowerCase().includes(stockFilter)) return false;
+    if(stockCat && i.cat !== stockCat) return false;
+    if(stockLevel && lvl(i.stock,i.max,i.low) !== stockLevel) return false;
+    return true;
+  });
+  document.getElementById('stock-count').textContent = `Showing ${filtered.length} of ${INVENTORY.length} items`;
+  document.getElementById('inv-grid').innerHTML = filtered.map(item=>{
+    const p = pct(item.stock,item.max);
+    const c = col(item.stock,item.max,item.low);
+    const cls = lvl(item.stock,item.max,item.low);
+    return `
+      <div class="inv-card ${cls}">
+        <div style="font-size:22px;margin-bottom:8px;">${item.icon}</div>
+        <div class="inv-card-name">${item.name}</div>
+        <div class="inv-card-cat">${item.cat} · ${item.unit}</div>
+        <div class="inv-progress"><div class="inv-progress-fill" style="width:${p}%;background:${c};"></div></div>
+        <div class="inv-nums">
+          <span style="font-size:22px;font-weight:900;font-family:'Nunito',sans-serif;color:${c};">${item.stock}</span>
+          <div style="text-align:right;font-size:11px;color:var(--text2);">
+            <div>Max: ${item.max} ${item.unit}</div>
+            <div>Reorder at: ${item.low}</div>
+          </div>
         </div>
-      </div>
-    `;
+        ${cls!=='ok'?`<div class="alert ${cls==='critical'?'alert-red':'alert-amber'}" style="margin-top:10px;padding:8px 10px;font-size:11px;"><i class="fas fa-${cls==='critical'?'exclamation-triangle':'bell'}"></i> ${cls==='critical'?'Critical – reorder now!':'Reorder needed'}</div>`:''}
+        <div class="inv-actions">
+          <button class="btn btn-ghost btn-sm" onclick="quickRestock('${item.name}')"><i class="fas fa-plus"></i> Restock</button>
+          <button class="btn btn-ghost btn-sm" onclick="openAdjustDrawer('${item.name}')"><i class="fas fa-edit"></i></button>
+        </div>
+      </div>`;
+  }).join('') || '<div style="padding:40px;text-align:center;color:var(--text2);">No items match filter</div>';
+}
+function filterStock(v){stockFilter=v.toLowerCase();renderStock(INVENTORY);}
+function filterStockCat(v){stockCat=v;renderStock(INVENTORY);}
+function filterStockLevel(v){stockLevel=v;renderStock(INVENTORY);}
+function quickRestock(name){showToast('Opening restock form for '+name+'…');}
+
+// ===== LOCKERS =====
+function renderLockers() {
+  const block = document.getElementById('locker-block-sel').value;
+  const counts = {A:{total:400,free:162,occupied:208,reserved:20,maint:10},
+                  B:{total:120,free:58,occupied:52,reserved:6,maint:4},
+                  C:{total:60,free:42,occupied:14,reserved:2,maint:2},
+                  VIP:{total:20,free:8,occupied:10,reserved:2,maint:0}};
+  const c = counts[block]||counts.A;
+
+  // Stats
+  document.getElementById('locker-stats').innerHTML = `
+    <div class="kpi-card green" style="text-align:center;padding:14px;">
+      <div class="kpi-val" style="color:var(--green);">${c.free}</div>
+      <div class="kpi-lbl">Free</div>
+    </div>
+    <div class="kpi-card red" style="text-align:center;padding:14px;">
+      <div class="kpi-val" style="color:var(--red);">${c.occupied}</div>
+      <div class="kpi-lbl">Occupied</div>
+    </div>
+    <div class="kpi-card amber" style="text-align:center;padding:14px;">
+      <div class="kpi-val" style="color:var(--amber);">${c.reserved}</div>
+      <div class="kpi-lbl">Reserved</div>
+    </div>
+    <div class="kpi-card" style="text-align:center;padding:14px;">
+      <div class="kpi-val">${c.maint}</div>
+      <div class="kpi-lbl">Maintenance</div>
+    </div>`;
+
+  // Grid
+  const grid = document.getElementById('locker-grid');
+  grid.innerHTML = '';
+  const statuses = ['free','occupied','occupied','reserved','maint'];
+  const prefixes = {A:'A',B:'B',C:'C',VIP:'V'};
+  const prefix = prefixes[block]||'L';
+  for (let i=1; i<=Math.min(c.total,80); i++) {
+    const r = Math.random();
+    const st = r < c.free/c.total ? 'free' : r < (c.free+c.occupied)/c.total ? 'occupied' : r < (c.free+c.occupied+c.reserved)/c.total ? 'reserved' : 'maint';
+    const labels = {free:'Free',occupied:'In Use',reserved:'Reserved',maint:'Maint.'};
+    grid.innerHTML += `<div class="locker-cell ${st}" onclick="showToast('Locker ${prefix}-${String(i).padStart(3,'0')}: ${labels[st]}')">
+      <div class="locker-num">${prefix}-${String(i).padStart(3,'0')}</div>
+      <div class="locker-status" style="color:${st==='free'?'var(--green)':st==='occupied'?'var(--red)':st==='reserved'?'#92400e':'var(--text2)'};">${labels[st]}</div>
+    </div>`;
+  }
+  if (c.total > 80) {
+    grid.innerHTML += `<div style="grid-column:span 4;text-align:center;font-size:12px;color:var(--text2);padding:10px;">… and ${c.total-80} more lockers</div>`;
+  }
+
+  // Audit log
+  const actions = ['Assigned','Released','Released (expired)','Marked maintenance','Reserved'];
+  const guests = ['Priya Sharma','Rahul Verma','School Group','Kiran Patel','Amit Joshi'];
+  document.getElementById('locker-audit').innerHTML = Array.from({length:8},(_, i)=>{
+    const num = String(Math.floor(Math.random()*c.total)+1).padStart(3,'0');
+    const action = actions[i%actions.length];
+    const dur = Math.floor(Math.random()*4+1)+'h '+Math.floor(Math.random()*59)+'m';
+    return `<tr>
+      <td style="color:var(--text2);">${10-i}:${String(i*7%60).padStart(2,'0')} AM</td>
+      <td style="font-weight:700;">${prefix}-${num}</td>
+      <td>Block ${block}</td>
+      <td><span class="badge ${action.includes('Released')?'badge-green':action.includes('Maint')?'badge-amber':'badge-blue'}">${action}</span></td>
+      <td>${guests[i%guests.length]}</td>
+      <td>${action.includes('Assigned')||action.includes('Released')?dur:'—'}</td>
+    </tr>`;
   }).join('');
 }
 
-function filterCat(btn, cat) {
-  document.querySelectorAll('.adm-topbar-actions .btn, .adm-content .btn-sm').forEach(b => b.classList.remove('btn-primary'));
-  btn.className = btn.className.replace('btn-ghost','btn-primary');
-  currentCat = cat;
-  renderInventory(cat ? inventory.filter(i => i.cat === cat) : inventory);
+function releaseAllExpired() { showToast('12 expired lockers released successfully'); renderLockers(); }
+
+// ===== F&B =====
+let curOutlet = 'all';
+function selectOutlet(outlet, btn) {
+  curOutlet = outlet;
+  document.querySelectorAll('[id^="out-"]').forEach(b=>b.className='btn btn-ghost btn-sm');
+  btn.className = 'btn btn-primary btn-sm';
+  renderFnb(outlet);
+}
+function renderFnb(outlet) {
+  const items = outlet==='all' ? FNB_ITEMS : FNB_ITEMS.filter(i=>i.outlet===outlet);
+  document.getElementById('fnb-inv-grid').innerHTML = items.map(item=>{
+    const p = pct(item.stock,item.max);
+    const c = col(item.stock,item.max,item.low);
+    const cls = lvl(item.stock,item.max,item.low);
+    return `
+      <div class="inv-card ${cls}" style="padding:14px;">
+        <div class="inv-card-name">${item.name}</div>
+        <div class="inv-card-cat">${item.unit}</div>
+        <div class="inv-progress"><div class="inv-progress-fill" style="width:${p}%;background:${c};"></div></div>
+        <div class="inv-nums">
+          <span style="font-size:20px;font-weight:900;color:${c};">${item.stock}</span>
+          <div style="font-size:11px;color:var(--text2);text-align:right;">Max: ${item.max}<br>Min: ${item.low}</div>
+        </div>
+        ${cls!=='ok'?`<div style="font-size:11px;color:${c};font-weight:700;margin-top:6px;">${cls==='critical'?'⚠️ Critical!':'⚡ Reorder'}</div>`:''}
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px;width:100%;" onclick="showToast('Adding stock for ${item.name}…')">+ Restock</button>
+      </div>`;
+  }).join('');
+
+  // Render FnB chart (only once)
+  const ctx = document.getElementById('fnb-chart');
+  if (ctx && !ctx.dataset.drawn) {
+    ctx.dataset.drawn = '1';
+    new Chart(ctx, {
+      type:'doughnut',
+      data:{
+        labels:['Cola','Water','Burger','Fries','Ice Cream','Other'],
+        datasets:[{data:[320,280,180,150,90,80],backgroundColor:['#0055B3','#007BB5','#0A9B5F','#F5A800','#E8670A','#5E35B1'],borderWidth:0}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}
+    });
+  }
+
+  const movers = [
+    {name:'Mineral Water 500ml',sold:480,icon:'💧'},
+    {name:'Cola 600ml',sold:320,icon:'🥤'},
+    {name:'French Fries',sold:210,icon:'🍟'},
+    {name:'Ice Cream',sold:190,icon:'🍦'},
+    {name:'Veg Burger',sold:140,icon:'🍔'},
+  ];
+  document.getElementById('top-movers').innerHTML = movers.map((m,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <span style="font-size:18px;">${m.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;">${m.name}</div>
+        <div style="height:4px;background:var(--bg2);border-radius:4px;margin-top:4px;"><div style="width:${Math.round(m.sold/480*100)}%;height:100%;background:var(--primary);border-radius:4px;"></div></div>
+      </div>
+      <span style="font-size:12px;font-weight:700;color:var(--text2);">${m.sold} sold</span>
+    </div>`).join('');
 }
 
-function restock(name) { const qty = prompt(`Restock "${name}" — Enter quantity:`,'50'); if(qty) alert(`Restocking ${qty} units of ${name}...`); }
-function editItem(name) { alert(`Opening edit form for: ${name}`); }
-function addItem() { alert('Opening Add Inventory Item form...'); }
-function exportInventory() { alert('Exporting inventory as CSV...'); }
+// ===== ALLOCATION =====
+const ALLOC_ZONES = [
+  {key:'online',label:'Online / App'},
+  {key:'b2b',label:'B2B / Partners'},
+  {key:'group',label:'Group Bookings'},
+  {key:'walkin',label:'Walk-in (Gate)'},
+  {key:'vip',label:'VIP / Passes'},
+];
+function renderAllocationForm(containerId, park) {
+  const defaults = park==='water' ? [900,300,200,300,100] : [700,200,150,250,100];
+  document.getElementById(containerId).innerHTML = ALLOC_ZONES.map((z,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div style="min-width:160px;font-size:13px;font-weight:600;color:var(--text);">${z.label}</div>
+      <input type="number" class="form-input" style="max-width:120px;" id="${park}-alloc-${z.key}" value="${defaults[i]}" onchange="updateAllocBar('${park}')"/>
+      <div style="flex:1;">
+        <div class="alloc-bar"><div class="alloc-bar-fill" id="${park}-bar-${z.key}" style="width:${Math.round(defaults[i]/1800*100)}%;background:var(--primary);"></div></div>
+      </div>
+      <span id="${park}-pct-${z.key}" style="font-size:11px;color:var(--text2);min-width:35px;">${Math.round(defaults[i]/(park==='water'?1800:1400)*100)}%</span>
+    </div>`).join('') +
+    `<div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;">
+      <span>Total Allocated</span>
+      <span id="${park}-alloc-total" style="color:var(--green);">${defaults.reduce((a,b)=>a+b,0)}</span>
+    </div>`;
+}
 
-renderInventory(inventory);
+function updateAllocBar(park) {
+  let total = 0;
+  ALLOC_ZONES.forEach(z=>{
+    const val = parseInt(document.getElementById(park+'-alloc-'+z.key).value)||0;
+    total += val;
+    const max = park==='water'?1800:1400;
+    document.getElementById(park+'-bar-'+z.key).style.width = Math.min(val/max*100,100)+'%';
+    document.getElementById(park+'-pct-'+z.key).textContent = Math.round(val/max*100)+'%';
+  });
+  const el = document.getElementById(park+'-alloc-total');
+  el.textContent = total;
+  el.style.color = total > (park==='water'?1800:1400) ? 'var(--red)' : 'var(--green)';
+}
+
+function renderAllocation() {
+  const today = new Date();
+  document.getElementById('alloc-date').value = today.toISOString().split('T')[0];
+  document.getElementById('quick-alloc-date').value = today.toISOString().split('T')[0];
+  renderAllocationForm('water-alloc-form','water');
+  renderAllocationForm('amusement-alloc-form','amusement');
+
+  // 7-day overview
+  const days = Array.from({length:7},(_, i)=>{
+    const d = new Date(); d.setDate(d.getDate()+i);
+    return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  });
+  const types = ['Regular','Weekend','Weekend','Regular','Regular','Holiday','Regular'];
+  const wCaps = [1800,2400,2400,1800,1800,3000,1800];
+  const aCaps = [1400,1800,1800,1400,1400,2200,1400];
+  const tableEl = document.getElementById('alloc-overview');
+  tableEl.innerHTML = `<thead><tr><th>Date</th><th>Day Type</th><th>Water Cap</th><th>Amus. Cap</th><th>Total</th><th>Group Slots</th><th>B2B Quota</th><th>Status</th></tr></thead>
+  <tbody>${days.map((d,i)=>`<tr>
+    <td style="font-weight:700;">${d}</td>
+    <td><span class="badge badge-${types[i]==='Holiday'?'red':types[i]==='Weekend'?'blue':'gray'}">${types[i]}</span></td>
+    <td>${wCaps[i].toLocaleString('en-IN')}</td>
+    <td>${aCaps[i].toLocaleString('en-IN')}</td>
+    <td style="font-weight:700;">${(wCaps[i]+aCaps[i]).toLocaleString('en-IN')}</td>
+    <td>${Math.round((wCaps[i]+aCaps[i])*0.07)}</td>
+    <td>${Math.round((wCaps[i]+aCaps[i])*0.10)}</td>
+    <td><span class="badge ${i===0?'badge-green':'badge-blue'}">${i===0?'Live':'Scheduled'}</span></td>
+  </tr>`).join('')}</tbody>`;
+}
+
+function loadAllocation() { showToast('Allocation loaded for '+document.getElementById('alloc-date').value); }
+function saveAllocation() { showToast('✅ Allocation saved successfully'); }
+
+// ===== MOVEMENTS =====
+function renderMovements() {
+  const actions=['Restock','Issue','Consumed','Reserved','Damaged','Transfer'];
+  const items=INVENTORY.map(i=>i.name);
+  const staff=['Suresh Kumar','Priya Singh','IT System','F&B Supervisor','Gate Ops','Warehouse'];
+  document.getElementById('movement-tbody').innerHTML = Array.from({length:20},(_,i)=>{
+    const item=items[i%items.length];
+    const action=actions[i%actions.length];
+    const qty=(i%2===0?'+':'-')+String(Math.floor(Math.random()*200)+5);
+    const bal=Math.floor(Math.random()*500)+50;
+    const badgeCls=action==='Restock'?'badge-green':action==='Damaged'?'badge-red':action==='Consumed'?'badge-amber':'badge-blue';
+    const cat=INVENTORY.find(x=>x.name===item)?.cat||'—';
+    return `<tr>
+      <td style="color:var(--text2);">${String(10+Math.floor(i/2)).padStart(2,'0')}:${String(i*7%60).padStart(2,'0')}</td>
+      <td style="font-weight:700;">${item}</td>
+      <td><span class="badge badge-gray" style="font-size:10px;">${cat}</span></td>
+      <td><span class="badge ${badgeCls}">${action}</span></td>
+      <td style="font-weight:700;color:${qty.startsWith('+')?'var(--green)':'var(--red)'};">${qty}</td>
+      <td>${bal}</td>
+      <td>${staff[i%staff.length]}</td>
+      <td style="color:var(--text2);">Auto-logged</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== DRAWERS =====
+function openAdjustDrawer(name) {
+  document.getElementById('adj-item').innerHTML = INVENTORY.map(i=>`<option ${i.name===name?'selected':''}>${i.name}</option>`).join('');
+  document.getElementById('adj-overlay').style.display='block';
+  document.getElementById('adj-drawer').classList.add('open');
+}
+function openAllocationDrawer() {
+  document.getElementById('alloc-overlay').style.display='block';
+  document.getElementById('alloc-drawer').classList.add('open');
+}
+function openAddItemDrawer() { showToast('Opening add item form…'); }
+function openRideDrawer() {
+  document.getElementById('ride-overlay').style.display='block';
+  document.getElementById('ride-drawer').classList.add('open');
+}
+function closeDrawers() {
+  document.querySelectorAll('.drawer-overlay').forEach(o=>o.style.display='none');
+  document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('open'));
+}
+function saveAdjustment() {
+  const item = document.getElementById('adj-item').value;
+  const action = document.getElementById('adj-action').value;
+  const qty = document.getElementById('adj-qty').value;
+  showToast(`✅ Stock adjusted: ${item} (${action}: ${qty})`);
+  closeDrawers();
+}
+function saveQuickAllocation() {
+  showToast('✅ Daily allocation applied successfully');
+  closeDrawers();
+}
+
+// ===== ALERTS =====
+function renderAlerts() {
+  const critical = INVENTORY.filter(i=>lvl(i.stock,i.max,i.low)==='critical');
+  const warn = INVENTORY.filter(i=>lvl(i.stock,i.max,i.low)==='warn');
+  let html = '';
+  if (critical.length) html += `<div class="alert alert-red"><i class="fas fa-exclamation-triangle"></i><div><strong>Critical Stock Alert:</strong> ${critical.map(i=>i.name).join(', ')} — Reorder immediately!</div></div>`;
+  if (warn.length) html += `<div class="alert alert-amber"><i class="fas fa-bell"></i><div><strong>Reorder Warning:</strong> ${warn.length} items approaching minimum levels.</div></div>`;
+  const fullZones = [...WATER_ZONES,...AMUS_ZONES].filter(z=>zoneStatus(z.occ,z.cap)==='full');
+  if (fullZones.length) html += `<div class="alert alert-red"><i class="fas fa-users"></i><div><strong>Zone Capacity Alert:</strong> ${fullZones.map(z=>z.name).join(', ')} at near-full capacity. Consider flow management.</div></div>`;
+  document.getElementById('alert-strip').innerHTML = html;
+}
+
+// ===== TOAST =====
+function showToast(msg, dur=3000) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
+}
+
+// ===== INIT =====
+(function init() {
+  renderZoneGrid(WATER_ZONES, 'water-zones');
+  renderZoneGrid(AMUS_ZONES, 'amusement-zones');
+  renderZoneGrid(COMMON_ZONES, 'common-zones');
+  renderCapacityChart();
+  renderAlerts();
+  renderStock(INVENTORY);
+
+  // Pre-fill adj select
+  document.getElementById('adj-item').innerHTML = INVENTORY.map(i=>`<option>${i.name}</option>`).join('');
+
+  // Live ticker for admitted count
+  setInterval(()=>{
+    const el = document.getElementById('kpi-admitted');
+    const cur = parseInt(el.textContent.replace(',',''));
+    const delta = Math.floor(Math.random()*10)-4;
+    el.textContent = Math.max(0,Math.min(3200,cur+delta)).toLocaleString('en-IN');
+  }, 4000);
+})();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
