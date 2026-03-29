@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Banner Manager — Worlds of Wonder Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="../js/wow-auth.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -248,13 +249,18 @@
 <!-- ── Admin Header ─────────────────────────────────────────── -->
 <div class="adm-header">
   <div class="adm-header-brand">
-    <img src="../images/logo.png" alt="Worlds of Wonder" class="adm-header-logo" style="filter:none!important;opacity:1!important;" />
+    <img src="../images/logo.png" alt="Worlds of Wonder" class="adm-header-logo" style="filter:none!important;opacity:1!important;"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+    <div style="display:none;align-items:center;gap:6px;font-family:'Poppins',sans-serif;font-weight:800;font-size:16px;color:#C9A84C;letter-spacing:1px;">
+      <span style="background:linear-gradient(135deg,#C9A84C,#F0D080);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WOW</span>
+    </div>
     <div>
       <div class="adm-header-title">Banner Manager</div>
       <div class="adm-header-sub">Worlds of Wonder — Content Management</div>
     </div>
   </div>
   <div class="adm-header-actions">
+    <a href="super-admin.html" class="btn btn-outline btn-sm" title="Open in Super Admin panel">🛡 Super Admin</a>
     <a href="../index.html" target="_blank" class="btn btn-outline btn-sm">↗ View Live Site</a>
     <button class="btn btn-green btn-sm" onclick="saveConfig()">💾 Save &amp; Publish</button>
   </div>
@@ -770,5 +776,6 @@ function toast(msg, type = '') {
   applySettingsToUI();
 })();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
