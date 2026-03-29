@@ -3,448 +3,1281 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Sales ERP Dashboard — Worlds of Wonder</title>
+<title>Sales ERP — WOW Passport Portal</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/wow-passport-api.js"></script>
 <style>
-:root{--brand:#ff6b35;--brand-dark:#e85a22;--teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;--purple:#7c3aed;--indigo:#4f46e5;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f0f4f8;--white:#fff;--sidebar:260px;}
+:root{--brand:#C9A84C;--brand2:#F0D080;--brand3:#9A6F2A;--teal:#00b4d8;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f0f4f8;--white:#fff;--sidebar:260px;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
 .shell{display:flex;min-height:100vh;}
+/* Sidebar */
 .sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
-.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
-.sidebar-logo .mark{width:40px;height:40px;background:linear-gradient(135deg,var(--brand),var(--purple));border-radius:10px;display:grid;place-items:center;font-weight:900;color:#fff;font-size:14px;}
-.sidebar-logo span{font-weight:700;font-size:14px;color:#fff;display:block;}
-.sidebar-logo small{font-size:10px;color:rgba(255,255,255,.5);}
-.nav-section{padding:14px 0 6px;}
-.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);padding:0 18px 6px;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.sidebar-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
+.logo-mark{width:40px;height:40px;background:linear-gradient(135deg,var(--brand3),var(--brand));border-radius:10px;display:grid;place-items:center;color:#0a0a14;font-weight:900;font-size:13px;flex-shrink:0;}
+.logo-text span{font-weight:700;font-size:13px;color:#fff;display:block;}
+.logo-text small{font-size:10px;color:rgba(255,255,255,.4);}
+.nav-section{padding:12px 0 4px;}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);padding:0 16px 5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:rgba(255,255,255,.65);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
 .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--brand);}
-.nav-item i{width:18px;text-align:center;font-size:13px;}
+.nav-item i{width:16px;text-align:center;font-size:12px;}
+.agent-badge{margin:14px 12px;padding:12px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:10px;}
+.agent-badge .ab-name{font-size:12px;font-weight:700;color:var(--brand);}
+.agent-badge .ab-role{font-size:10px;color:rgba(255,255,255,.4);}
+.agent-badge .ab-status{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--green);margin-top:4px;}
+/* Main */
 .main{margin-left:var(--sidebar);flex:1;}
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-left{display:flex;align-items:center;gap:16px;}
-.topbar-title{font-size:17px;font-weight:800;}
-.search-box{display:flex;align-items:center;gap:8px;background:#f1f5f9;border-radius:8px;padding:8px 14px;width:260px;}
-.search-box input{background:none;border:none;outline:none;font-size:13px;width:100%;}
-.topbar-right{display:flex;align-items:center;gap:12px;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
-.btn-brand{background:var(--brand);color:#fff;}
-.btn-brand:hover{background:var(--brand-dark);}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-left{display:flex;align-items:center;gap:14px;}
+.tb-title{font-size:16px;font-weight:800;}
+.tb-search{display:flex;align-items:center;gap:8px;background:#f1f5f9;border-radius:8px;padding:7px 13px;width:240px;}
+.tb-search input{background:none;border:none;outline:none;font-size:12px;width:100%;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-brand{background:var(--brand);color:#0a0a14;}
+.btn-brand:hover{background:var(--brand3);}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
 .btn-outline:hover{border-color:var(--brand);color:var(--brand);}
-.btn-sm{padding:5px 11px;font-size:12px;}
-.content{padding:24px 28px;}
-.metric-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
-.metric-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
+.btn-sm{padding:5px 11px;font-size:11px;}
+.btn-green{background:#d1fae5;color:#065f46;}
+.btn-red{background:#fee2e2;color:#991b1b;}
+/* Content */
+.content{padding:22px 24px;}
+/* Metric cards */
+.metric-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.metric-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:15px 16px;position:relative;overflow:hidden;}
 .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.mc-brand::before{background:var(--brand);}
+.mc-gold::before{background:linear-gradient(90deg,var(--brand3),var(--brand));}
 .mc-green::before{background:var(--green);}
 .mc-teal::before{background:var(--teal);}
 .mc-purple::before{background:var(--purple);}
-.mc-yellow::before{background:var(--yellow);}
-.metric-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-.metric-val{font-size:24px;font-weight:800;margin:5px 0 3px;}
-.metric-delta{font-size:11px;color:var(--green);font-weight:600;}
-.tab-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:22px;width:fit-content;flex-wrap:wrap;}
-.tab{padding:8px 15px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
-.tab.active{background:var(--brand);color:#fff;}
+.mc-amber::before{background:var(--amber);}
+.mc-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.mc-val{font-size:22px;font-weight:800;margin:4px 0 2px;}
+.mc-delta{font-size:10px;font-weight:600;}
+.delta-up{color:var(--green);}
+.delta-dn{color:var(--red);}
+/* Tab bar */
+.tab-bar{display:flex;gap:3px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.tab.active{background:var(--brand);color:#0a0a14;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
-.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
-.card-title{font-size:14px;font-weight:700;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+/* Cards */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:13px;font-weight:700;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+/* Tables */
 .tbl-wrap{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
 tbody tr{border-bottom:1px solid var(--border);}
 tbody tr:last-child{border:none;}
-tbody td{padding:11px 14px;vertical-align:middle;}
+tbody td{padding:10px 12px;vertical-align:middle;}
 tbody tr:hover{background:#f9fafb;}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.badge-green{background:#d1fae5;color:#065f46;}
-.badge-yellow{background:#fef9c3;color:#854d0e;}
-.badge-red{background:#fee2e2;color:#991b1b;}
-.badge-blue{background:#dbeafe;color:#1e40af;}
-.badge-purple{background:#ede9fe;color:#5b21b6;}
-.badge-orange{background:#ffedd5;color:#9a3412;}
-.funnel{display:flex;flex-direction:column;gap:6px;}
-.funnel-stage{border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;}
-.leaderboard{display:flex;flex-direction:column;gap:10px;}
-.lb-row{display:flex;align-items:center;gap:12px;padding:10px;background:#f8fafc;border-radius:10px;}
-.lb-rank{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;flex-shrink:0;}
-.progress-bar{height:7px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:4px;}
-.progress-fill{height:100%;border-radius:20px;transition:width .6s;}
-.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.bg-green{background:#d1fae5;color:#065f46;}
+.bg-amber{background:#fef9c3;color:#854d0e;}
+.bg-red{background:#fee2e2;color:#991b1b;}
+.bg-blue{background:#dbeafe;color:#1e40af;}
+.bg-purple{background:#ede9fe;color:#5b21b6;}
+.bg-gold{background:rgba(201,168,76,.15);color:var(--brand3);border:1px solid rgba(201,168,76,.3);}
+.bg-gray{background:#f1f5f9;color:#475569;}
+/* Agent card */
+.agent-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.ac-header{display:flex;gap:12px;align-items:center;}
+.ac-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0;}
+.ac-name{font-size:13px;font-weight:700;}
+.ac-role{font-size:11px;color:var(--muted);}
+.ac-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.acs-item{text-align:center;background:#f8fafc;border-radius:8px;padding:8px;}
+.acs-val{font-size:14px;font-weight:800;color:var(--brand3);}
+.acs-label{font-size:9px;color:var(--muted);text-transform:uppercase;}
+.progress-bar{height:6px;background:var(--border);border-radius:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--brand3),var(--brand));}
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:10px;padding:9px;background:#f8fafc;border-radius:10px;margin-bottom:8px;}
+.lb-rank{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:11px;flex-shrink:0;}
+/* KYC queue */
+.kyc-item{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:#f8fafc;}
+.kyc-photo{width:44px;height:52px;border-radius:6px;object-fit:cover;border:2px solid var(--border);background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+/* Activity */
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
 .activity-item:last-child{border:none;}
-.activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.activity-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;}
 .modal-overlay.show{display:grid;}
-.modal{background:var(--white);border-radius:16px;width:90%;max-width:620px;max-height:90vh;overflow-y:auto;padding:28px;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.modal-title{font-size:17px;font-weight:700;}
-.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
-.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
-label{font-size:12px;font-weight:600;color:var(--slate);}
-input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:100%;transition:.15s;}
-input:focus,select:focus{outline:none;border-color:var(--brand);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.modal{background:var(--white);border-radius:16px;width:90%;max-width:580px;max-height:90vh;overflow-y:auto;padding:24px;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.modal-title{font-size:16px;font-weight:700;}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);}
+.form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+label{font-size:11px;font-weight:600;color:var(--slate);}
+input,select,textarea{padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:100%;outline:none;transition:.15s;}
+input:focus,select:focus{border-color:var(--brand);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+/* Notification banner */
+.notif-banner{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.nb-icon{width:40px;height:40px;border-radius:50%;background:rgba(201,168,76,.15);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;}
+/* Quick action buttons */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.qa-btn{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:.15s;text-decoration:none;color:var(--slate);}
+.qa-btn:hover{border-color:var(--brand);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.qa-icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:.95rem;}
+.qa-label{font-size:11px;font-weight:700;}
 @media(max-width:1100px){.metric-row{grid-template-columns:repeat(3,1fr);}.grid-3{grid-template-columns:1fr 1fr;}}
-@media(max-width:700px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.metric-row,.grid-2,.grid-3{grid-template-columns:1fr;}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.metric-row,.grid-2,.grid-3,.quick-actions{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 <div class="shell">
+<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="mark"><i class="fa fa-chart-line" style="font-size:14px;"></i></div>
-    <div><span>Sales ERP</span><small>Worlds of Wonder</small></div>
+    <div class="logo-mark"><i class="fas fa-passport" style="font-size:14px;"></i></div>
+    <div class="logo-text"><span>WOW Sales ERP</span><small>Passport Portal</small></div>
   </div>
+
+  <div class="agent-badge">
+    <div class="ab-name" id="sb-agent-name">Sales Manager</div>
+    <div class="ab-role" id="sb-agent-role">Passport Sales · Manager</div>
+    <div class="ab-status"><i class="fas fa-circle" style="font-size:6px;"></i> Online</div>
+  </div>
+
   <nav>
     <div class="nav-section">
-      <div class="nav-label">CRM</div>
-      <a class="nav-item active" href="erp-dashboard.html"><i class="fa fa-th-large"></i>Dashboard</a>
-      <a class="nav-item" href="#" onclick="switchTab('pipeline',event)"><i class="fa fa-funnel-dollar"></i>Pipeline</a>
-      <a class="nav-item" href="#" onclick="switchTab('accounts',event)"><i class="fa fa-building"></i>Accounts</a>
-      <a class="nav-item" href="#" onclick="switchTab('contacts',event)"><i class="fa fa-address-book"></i>Contacts</a>
-      <a class="nav-item" href="#" onclick="switchTab('activities',event)"><i class="fa fa-tasks"></i>Activities</a>
+      <div class="nav-label">Operations</div>
+      <a class="nav-item active" href="erp-dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a class="nav-item" href="passport-kyc.html"><i class="fas fa-user-plus"></i> New Passport Sale</a>
+      <a class="nav-item" href="#" onclick="switchTab('passports',event)"><i class="fas fa-passport"></i> Passports Issued</a>
+      <a class="nav-item" href="#" onclick="switchTab('kyc-queue',event)"><i class="fas fa-id-card"></i> KYC Queue</a>
+      <a class="nav-item" href="#" onclick="switchTab('payments',event)"><i class="fas fa-rupee-sign"></i> Payments</a>
     </div>
     <div class="nav-section">
-      <div class="nav-label">Revenue</div>
-      <a class="nav-item" href="#" onclick="switchTab('bookings',event)"><i class="fa fa-ticket-alt"></i>Bookings</a>
-      <a class="nav-item" href="#" onclick="switchTab('targets',event)"><i class="fa fa-bullseye"></i>Targets</a>
-      <a class="nav-item" href="#" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i>Reports</a>
+      <div class="nav-label">Team</div>
+      <a class="nav-item" href="#" onclick="switchTab('agents',event)"><i class="fas fa-users"></i> Sales Agents</a>
+      <a class="nav-item" href="#" onclick="switchTab('targets',event)"><i class="fas fa-bullseye"></i> Targets</a>
+      <a class="nav-item" href="#" onclick="switchTab('leaderboard',event)"><i class="fas fa-trophy"></i> Leaderboard</a>
     </div>
     <div class="nav-section">
-      <div class="nav-label">Portals</div>
-      <a class="nav-item" href="../admin/index.html"><i class="fa fa-cog"></i>Admin Back-office</a>
-      <a class="nav-item" href="../ta/index.html"><i class="fa fa-plane"></i>TA Portal</a>
-      <a class="nav-item" href="../reseller/index.html"><i class="fa fa-store"></i>Reseller Portal</a>
+      <div class="nav-label">Analytics</div>
+      <a class="nav-item" href="#" onclick="switchTab('reports',event)"><i class="fas fa-chart-bar"></i> Reports</a>
+      <a class="nav-item" href="#" onclick="switchTab('activity',event)"><i class="fas fa-history"></i> Activity Feed</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Config</div>
+      <a class="nav-item" href="../admin/passport-engine.html"><i class="fas fa-cog"></i> Passport Config</a>
+      <a class="nav-item" href="../admin/index.html"><i class="fas fa-building"></i> Admin Back-office</a>
+      <a class="nav-item" href="gate-scanner.html"><i class="fas fa-passport"></i> Gate Scanner</a>
+      <a class="nav-item" href="passport-login.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
   </nav>
 </aside>
 
+<!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-left">
-    <div class="topbar-title"><i class="fa fa-chart-line" style="color:var(--brand);margin-right:8px;"></i>Sales ERP</div>
-    <div class="search-box"><i class="fa fa-search" style="color:var(--muted);"></i><input placeholder="Search accounts, deals…"/></div>
+  <div class="tb-left">
+    <div class="tb-title"><i class="fas fa-passport" style="color:var(--brand);margin-right:8px;"></i>Passport Sales ERP</div>
+    <div class="tb-search"><i class="fas fa-search" style="color:var(--muted);font-size:11px;"></i><input placeholder="Search passports, customers, agents…" id="global-search" oninput="globalSearch(this.value)"/></div>
   </div>
-  <div class="topbar-right">
-    <button class="btn btn-outline btn-sm"><i class="fa fa-bell"></i> <span class="badge badge-red" style="padding:0 5px;font-size:10px;margin:0;">3</span></button>
-    <button class="btn btn-brand btn-sm" onclick="openDealModal()"><i class="fa fa-plus"></i> New Deal</button>
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
-      <img src="https://api.dicebear.com/7.x/initials/svg?seed=SM" width="28" height="28" style="border-radius:50%;"/>
-      <div><div style="font-size:12px;font-weight:700;">Sales Manager</div><div style="font-size:10px;color:var(--muted);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="35545e58755c5b515c54524059594c1b565a58">[email&#160;protected]</a></div></div>
+  <div class="tb-right">
+    <button class="btn btn-outline btn-sm" onclick="switchTab('kyc-queue',event)"><i class="fas fa-bell"></i> <span class="badge bg-red" style="padding:0 5px;font-size:10px;margin:0;" id="queue-badge">0</span></button>
+    <a href="passport-kyc.html" class="btn btn-brand btn-sm"><i class="fas fa-plus"></i> New Sale</a>
+    <button class="btn btn-outline btn-sm" onclick="openAddAgentModal()"><i class="fas fa-user-plus"></i> Add Agent</button>
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 11px;background:#f1f5f9;border-radius:20px;cursor:pointer;" id="topbar-agent">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--brand3),var(--brand));display:grid;place-items:center;font-size:11px;font-weight:800;color:#0a0a14;" id="tb-avatar">SM</div>
+      <div><div style="font-size:11px;font-weight:700;" id="tb-name">Sales Manager</div><div style="font-size:10px;color:var(--muted);" id="tb-role">Manager</div></div>
     </div>
   </div>
 </div>
 
 <div class="content">
+
+<!-- Notification banner -->
+<div class="notif-banner" id="notif-banner">
+  <div class="nb-icon">📋</div>
+  <div>
+    <strong style="font-size:12px;">3 KYC records pending review</strong> · 
+    <span style="font-size:11px;color:var(--muted);">2 payment reconciliations due today</span>
+  </div>
+  <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="switchTab('kyc-queue',event)">Review Now</button>
+</div>
+
+<!-- Quick actions -->
+<div class="quick-actions">
+  <a href="passport-kyc.html" class="qa-btn">
+    <div class="qa-icon" style="background:rgba(201,168,76,.12);color:var(--brand3);"><i class="fas fa-user-plus"></i></div>
+    <div class="qa-label">New KYC</div>
+  </a>
+  <a href="passport-payment.html" class="qa-btn">
+    <div class="qa-icon" style="background:rgba(34,197,94,.12);color:#065f46;"><i class="fas fa-rupee-sign"></i></div>
+    <div class="qa-label">Collect Payment</div>
+  </a>
+  <div class="qa-btn" onclick="switchTab('passports',event)">
+    <div class="qa-icon" style="background:rgba(59,130,246,.12);color:#1e40af;"><i class="fas fa-passport"></i></div>
+    <div class="qa-label">View Passports</div>
+  </div>
+  <div class="qa-btn" onclick="openAddAgentModal()">
+    <div class="qa-icon" style="background:rgba(124,58,237,.12);color:#5b21b6;"><i class="fas fa-users"></i></div>
+    <div class="qa-label">Manage Agents</div>
+  </div>
+  <a href="gate-scanner.html" class="qa-btn">
+    <div class="qa-icon" style="background:rgba(239,68,68,.1);color:#991b1b;"><i class="fas fa-qrcode"></i></div>
+    <div class="qa-label">Gate Scanner</div>
+  </a>
+</div>
+
+<!-- Metrics -->
 <div class="metric-row">
-  <div class="metric-card mc-brand"><div class="metric-label">Revenue MTD</div><div class="metric-val" style="color:var(--brand);">₹86.4L</div><div class="metric-delta">↑ 24% vs last month</div></div>
-  <div class="metric-card mc-green"><div class="metric-label">Deals Closed</div><div class="metric-val" style="color:var(--green);">142</div><div class="metric-delta">↑ 18 this week</div></div>
-  <div class="metric-card mc-teal"><div class="metric-label">Pipeline Value</div><div class="metric-val" style="color:var(--teal);">₹2.4Cr</div><div class="metric-delta">134 open deals</div></div>
-  <div class="metric-card mc-purple"><div class="metric-label">New Accounts</div><div class="metric-val" style="color:var(--purple);">38</div><div class="metric-delta">↑ 12 this month</div></div>
-  <div class="metric-card mc-yellow"><div class="metric-label">Avg Deal Size</div><div class="metric-val" style="color:#ca8a04;">₹60.8K</div><div class="metric-delta">↑ ₹4.2K vs target</div></div>
+  <div class="metric-card mc-gold"><div class="mc-label">Revenue MTD</div><div class="mc-val" style="color:var(--brand3);">₹14.8L</div><div class="mc-delta delta-up">↑ 31% vs last month</div></div>
+  <div class="metric-card mc-green"><div class="mc-label">Passports Issued</div><div class="mc-val" style="color:var(--green);">186</div><div class="mc-delta delta-up">↑ 24 this week</div></div>
+  <div class="metric-card mc-teal"><div class="mc-label">Active Agents</div><div class="mc-val" style="color:var(--teal);">12</div><div class="mc-delta" style="color:var(--muted);">3 online now</div></div>
+  <div class="metric-card mc-purple"><div class="mc-label">KYC Pending</div><div class="mc-val" style="color:var(--purple);" id="metric-kyc-pending">3</div><div class="mc-delta" style="color:var(--amber);">⚠ Needs review</div></div>
+  <div class="metric-card mc-amber"><div class="mc-label">Avg Commission</div><div class="mc-val" style="color:#ca8a04;">₹2.4K</div><div class="mc-delta delta-up">↑ ₹180 vs last week</div></div>
 </div>
 
+<!-- Tab bar -->
 <div class="tab-bar">
-  <div class="tab active" id="tab-btn-overview" onclick="switchTab('overview',event)"><i class="fa fa-home"></i> Overview</div>
-  <div class="tab" id="tab-btn-pipeline" onclick="switchTab('pipeline',event)"><i class="fa fa-funnel-dollar"></i> Pipeline</div>
-  <div class="tab" id="tab-btn-accounts" onclick="switchTab('accounts',event)"><i class="fa fa-building"></i> Accounts</div>
-  <div class="tab" id="tab-btn-contacts" onclick="switchTab('contacts',event)"><i class="fa fa-address-book"></i> Contacts</div>
-  <div class="tab" id="tab-btn-activities" onclick="switchTab('activities',event)"><i class="fa fa-tasks"></i> Activities</div>
-  <div class="tab" id="tab-btn-bookings" onclick="switchTab('bookings',event)"><i class="fa fa-ticket-alt"></i> Bookings</div>
-  <div class="tab" id="tab-btn-targets" onclick="switchTab('targets',event)"><i class="fa fa-bullseye"></i> Targets</div>
-  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i> Reports</div>
+  <div class="tab active" id="tab-btn-overview" onclick="switchTab('overview',event)"><i class="fas fa-home"></i> Overview</div>
+  <div class="tab" id="tab-btn-passports" onclick="switchTab('passports',event)"><i class="fas fa-passport"></i> Passports</div>
+  <div class="tab" id="tab-btn-kyc-queue" onclick="switchTab('kyc-queue',event)"><i class="fas fa-id-card"></i> KYC Queue</div>
+  <div class="tab" id="tab-btn-payments" onclick="switchTab('payments',event)"><i class="fas fa-rupee-sign"></i> Payments</div>
+  <div class="tab" id="tab-btn-agents" onclick="switchTab('agents',event)"><i class="fas fa-users"></i> Agents</div>
+  <div class="tab" id="tab-btn-targets" onclick="switchTab('targets',event)"><i class="fas fa-bullseye"></i> Targets</div>
+  <div class="tab" id="tab-btn-leaderboard" onclick="switchTab('leaderboard',event)"><i class="fas fa-trophy"></i> Leaderboard</div>
+  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',event)"><i class="fas fa-chart-bar"></i> Reports</div>
+  <div class="tab" id="tab-btn-activity" onclick="switchTab('activity',event)"><i class="fas fa-history"></i> Activity</div>
+  <div class="tab" id="tab-btn-bulk" onclick="switchTab('bulk',event)"><i class="fas fa-layer-group"></i> Bulk Issue</div>
 </div>
 
-<!-- OVERVIEW -->
+<!-- ===== OVERVIEW ===== -->
 <div id="tab-overview" class="tab-panel active">
-  <div class="grid-2" style="margin-bottom:18px;">
-    <div class="card"><div class="card-header"><span class="card-title">Revenue Trend (6M)</span></div><div style="height:230px;"><canvas id="rev-trend"></canvas></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Revenue by Channel</span></div><div style="height:230px;"><canvas id="channel-chart"></canvas></div></div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card"><div class="card-hdr"><span class="card-title">Revenue Trend (6M)</span><select class="btn btn-outline btn-sm" style="width:auto;font-size:11px;" onchange="updateRevChart(this.value)"><option>Monthly</option><option>Weekly</option></select></div><div style="height:220px;"><canvas id="rev-chart"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Sales by Plan</span></div><div style="height:220px;"><canvas id="plan-chart"></canvas></div></div>
   </div>
   <div class="grid-2">
     <div class="card">
-      <div class="card-header"><span class="card-title">Sales Funnel</span></div>
-      <div class="funnel">
-        <div class="funnel-stage" style="background:#eff6ff;"><span>Leads (380)</span><strong style="color:#1e40af;">100%</strong></div>
-        <div class="funnel-stage" style="background:#dbeafe;"><span>Qualified (214)</span><strong style="color:#1e40af;">56%</strong></div>
-        <div class="funnel-stage" style="background:#bfdbfe;"><span>Proposals (142)</span><strong style="color:#1e40af;">37%</strong></div>
-        <div class="funnel-stage" style="background:#93c5fd;"><span>Negotiation (88)</span><strong style="color:#1e40af;">23%</strong></div>
-        <div class="funnel-stage" style="background:var(--brand);color:#fff;"><span>Closed Won (142)</span><strong>37%</strong></div>
-      </div>
+      <div class="card-hdr"><span class="card-title">Sales Funnel</span></div>
+      <div id="funnel-wrap" style="display:flex;flex-direction:column;gap:5px;"></div>
     </div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Team Leaderboard (MTD)</span></div>
-      <div class="leaderboard" id="leaderboard"></div>
+      <div class="card-hdr"><span class="card-title">Top Agents (This Month)</span></div>
+      <div id="top-agents-list"></div>
     </div>
   </div>
 </div>
 
-<!-- PIPELINE -->
-<div id="tab-pipeline" class="tab-panel">
+<!-- ===== BULK ISSUANCE ===== -->
+<div id="tab-bulk" class="tab-panel">
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-hdr">
+      <span class="card-title"><i class="fas fa-layer-group" style="color:var(--brand);"></i> Bulk Passport Issuance</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="downloadBulkTemplate()"><i class="fas fa-download"></i> Download Template</button>
+        <button class="btn btn-brand btn-sm" onclick="document.getElementById('bulk-csv-file').click()"><i class="fas fa-upload"></i> Upload CSV</button>
+        <input type="file" id="bulk-csv-file" accept=".csv" style="display:none;" onchange="handleBulkCsvUpload(this)"/>
+      </div>
+    </div>
+    <!-- Info banner -->
+    <div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <i class="fas fa-info-circle" style="color:var(--brand);"></i>
+      <div style="font-size:12px;color:var(--muted);">
+        Upload a CSV file with customer details to issue multiple passports at once. All records are validated, KYC saved, payments recorded, and digital passports issued automatically.
+        <strong style="color:var(--slate);"> Max 200 records per batch.</strong>
+      </div>
+    </div>
+    <!-- Manual add row -->
+    <div style="background:#f8fafc;border:1.5px dashed var(--border);border-radius:12px;padding:18px;margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus-circle" style="color:var(--brand);"></i> Add Record Manually</div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name *</label><input id="bl-fname" placeholder="Ravi"/></div>
+        <div class="form-group"><label>Last Name *</label><input id="bl-lname" placeholder="Sharma"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Mobile *</label><input id="bl-mobile" placeholder="9876543210" maxlength="10" type="tel"/></div>
+        <div class="form-group"><label>Email *</label><input id="bl-email" placeholder="ravi@example.com" type="email"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Date of Birth</label><input id="bl-dob" type="date"/></div>
+        <div class="form-group"><label>Gender</label>
+          <select id="bl-gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Plan *</label>
+          <select id="bl-plan">
+            <option value="">Select Plan</option>
+            <option>Water Park Passport</option>
+            <option>Amusement Passport</option>
+            <option>Combo Passport</option>
+            <option>Family Passport (4)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Payment Mode *</label>
+          <select id="bl-mode">
+            <option value="">Select Mode</option>
+            <option>Cash</option>
+            <option>UPI / QR</option>
+            <option>Card / POS</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>City</label><input id="bl-city" placeholder="Delhi"/></div>
+        <div class="form-group"><label>State</label><input id="bl-state" placeholder="Delhi"/></div>
+      </div>
+      <button class="btn btn-brand btn-sm" onclick="addBulkRow()" style="margin-top:4px;"><i class="fas fa-plus"></i> Add to Batch</button>
+    </div>
+    <!-- Batch table -->
+    <div class="tbl-wrap" id="bulk-table-wrap" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:700;">Batch Records (<span id="bulk-count">0</span>)</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="clearBulkBatch()"><i class="fas fa-trash"></i> Clear All</button>
+          <button class="btn btn-brand btn-sm" onclick="processBulkIssuance()" id="btn-process-bulk"><i class="fas fa-rocket"></i> Issue All Passports</button>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>#</th><th>Name</th><th>Mobile</th><th>Email</th><th>Plan</th><th>Mode</th><th>City</th><th>Status</th><th></th></tr></thead>
+        <tbody id="bulk-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Results card -->
+  <div class="card" id="bulk-results-card" style="display:none;">
+    <div class="card-hdr">
+      <span class="card-title"><i class="fas fa-check-circle" style="color:var(--green);"></i> Issuance Results</span>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('bulk-results-card').style.display='none'">Dismiss</button>
+    </div>
+    <div id="bulk-results-body"></div>
+    <!-- Summary -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div style="text-align:center;background:#d1fae5;border-radius:10px;padding:14px;">
+        <div style="font-size:1.5rem;font-weight:900;color:#065f46;" id="bulk-success-count">0</div>
+        <div style="font-size:11px;color:#065f46;font-weight:600;">Issued Successfully</div>
+      </div>
+      <div style="text-align:center;background:#fee2e2;border-radius:10px;padding:14px;">
+        <div style="font-size:1.5rem;font-weight:900;color:#991b1b;" id="bulk-fail-count">0</div>
+        <div style="font-size:11px;color:#991b1b;font-weight:600;">Failed</div>
+      </div>
+      <div style="text-align:center;background:rgba(201,168,76,.15);border-radius:10px;padding:14px;">
+        <div style="font-size:1.5rem;font-weight:900;color:var(--brand3);" id="bulk-total-rev">₹0</div>
+        <div style="font-size:11px;color:var(--brand3);font-weight:600;">Total Revenue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress overlay -->
+  <div id="bulk-progress-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;place-items:center;">
+    <div style="background:#fff;border-radius:20px;padding:36px;text-align:center;min-width:320px;">
+      <div style="font-size:2rem;margin-bottom:12px;">⚙️</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Processing Bulk Issuance</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;" id="bulk-progress-text">Preparing records…</div>
+      <div style="background:var(--border);border-radius:20px;height:10px;overflow:hidden;">
+        <div id="bulk-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--brand3),var(--brand));border-radius:20px;width:0%;transition:width .3s;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;"><span id="bulk-prog-num">0</span> / <span id="bulk-prog-total">0</span> processed</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PASSPORTS ===== -->
+<div id="tab-passports" class="tab-panel">
   <div class="card">
-    <div class="card-header"><span class="card-title">Deal Pipeline</span>
+    <div class="card-hdr">
+      <span class="card-title">All Issued Passports</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="filter-plan" class="btn btn-outline btn-sm" style="width:auto;" onchange="renderPassports()"><option value="">All Plans</option><option>Combo Passport</option><option>Water Park Passport</option><option>Amusement Passport</option><option>Family Passport</option></select>
+        <select id="filter-status" class="btn btn-outline btn-sm" style="width:auto;" onchange="renderPassports()"><option value="">All Status</option><option>Active</option><option>Expired</option><option>Suspended</option></select>
+        <input type="search" id="pp-search" placeholder="Search name / ID…" style="padding:5px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:180px;" oninput="renderPassports()"/>
+        <button class="btn btn-outline btn-sm" onclick="exportCsv()"><i class="fas fa-download"></i> Export</button>
+      </div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Passport ID</th><th>Customer</th><th>Mobile</th><th>Plan</th><th>Amount</th><th>Mode</th><th>Agent</th><th>Issued</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="passports-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ===== KYC QUEUE ===== -->
+<div id="tab-kyc-queue" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr">
+      <span class="card-title">KYC Pending Review</span>
       <div style="display:flex;gap:8px;">
-        <select style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:auto;" id="pipeline-filter" onchange="renderPipeline()">
-          <option value="all">All Stages</option><option value="inquiry">Inquiry</option><option value="proposal">Proposal</option><option value="negotiation">Negotiation</option><option value="won">Won</option><option value="lost">Lost</option>
-        </select>
-        <button class="btn btn-brand btn-sm" onclick="openDealModal()"><i class="fa fa-plus"></i> New Deal</button>
+        <span class="badge bg-amber" id="kyc-count-badge">3 Pending</span>
+        <button class="btn btn-brand btn-sm" onclick="approveAllKyc()"><i class="fas fa-check-double"></i> Approve All</button>
       </div>
     </div>
-    <div class="tbl-wrap"><table><thead><tr><th>Deal Name</th><th>Account</th><th>Type</th><th>Pax</th><th>Value</th><th>Stage</th><th>Owner</th><th>Close Date</th><th>Actions</th></tr></thead><tbody id="pipeline-body"></tbody></table></div>
+    <div id="kyc-queue-list"></div>
   </div>
 </div>
 
-<!-- ACCOUNTS -->
-<div id="tab-accounts" class="tab-panel">
+<!-- ===== PAYMENTS ===== -->
+<div id="tab-payments" class="tab-panel">
   <div class="card">
-    <div class="card-header"><span class="card-title">B2B Accounts</span>
-      <div style="display:flex;gap:8px;"><input type="search" placeholder="Search accounts…" style="width:200px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;" oninput="searchAccounts(this.value)"/><button class="btn btn-brand btn-sm"><i class="fa fa-plus"></i> New Account</button></div>
+    <div class="card-hdr">
+      <span class="card-title">Payment Transactions</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <select id="pay-method-filter" class="btn btn-outline btn-sm" style="width:auto;" onchange="renderPayments()"><option value="">All Methods</option><option>Cash</option><option>UPI / QR</option><option>Card / POS</option></select>
+        <input type="date" id="pay-date-filter" class="btn btn-outline btn-sm" style="width:auto;" onchange="renderPayments()"/>
+        <button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Export</button>
+      </div>
     </div>
-    <div class="tbl-wrap"><table><thead><tr><th>Account</th><th>Type</th><th>Industry</th><th>City</th><th>Deals</th><th>Revenue</th><th>Last Activity</th><th>Status</th><th>Actions</th></tr></thead><tbody id="accounts-body"></tbody></table></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Txn ID</th><th>Customer</th><th>Plan</th><th>Amount</th><th>GST</th><th>Method</th><th>Agent</th><th>Date & Time</th><th>Status</th></tr></thead>
+      <tbody id="payments-body"></tbody>
+    </table></div>
+    <div style="margin-top:14px;display:flex;gap:12px;font-size:12px;">
+      <div style="padding:10px 16px;background:#f8fafc;border-radius:8px;"><strong style="color:var(--green);">₹8,46,520</strong> Cash Collected</div>
+      <div style="padding:10px 16px;background:#f8fafc;border-radius:8px;"><strong style="color:var(--teal);">₹4,12,750</strong> UPI Received</div>
+      <div style="padding:10px 16px;background:#f8fafc;border-radius:8px;"><strong style="color:var(--purple);">₹2,18,900</strong> Card Charged</div>
+    </div>
   </div>
 </div>
 
-<!-- CONTACTS -->
-<div id="tab-contacts" class="tab-panel">
-  <div class="card">
-    <div class="card-header"><span class="card-title">Contacts</span><button class="btn btn-brand btn-sm"><i class="fa fa-user-plus"></i> Add Contact</button></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Designation</th><th>Account</th><th>Mobile</th><th>Email</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead><tbody id="contacts-body"></tbody></table></div>
+<!-- ===== AGENTS ===== -->
+<div id="tab-agents" class="tab-panel">
+  <div class="card-hdr" style="margin-bottom:14px;">
+    <span></span>
+    <button class="btn btn-brand btn-sm" onclick="openAddAgentModal()"><i class="fas fa-plus"></i> Add Agent</button>
   </div>
+  <div class="grid-3" id="agents-grid"></div>
 </div>
 
-<!-- ACTIVITIES -->
-<div id="tab-activities" class="tab-panel">
-  <div class="grid-2">
-    <div class="card"><div class="card-header"><span class="card-title">Upcoming Tasks</span><button class="btn btn-brand btn-sm"><i class="fa fa-plus"></i> Add</button></div><div id="tasks-list" style="display:flex;flex-direction:column;gap:10px;"></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Activity Feed</span></div><div id="activity-feed"></div></div>
-  </div>
-</div>
-
-<!-- BOOKINGS -->
-<div id="tab-bookings" class="tab-panel">
-  <div class="card">
-    <div class="card-header"><span class="card-title">All Bookings (CRM View)</span><button class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Export CSV</button></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Booking ID</th><th>Account</th><th>Contact</th><th>Type</th><th>Pax</th><th>Date</th><th>Value</th><th>Channel</th><th>Status</th></tr></thead><tbody id="crm-bookings-body"></tbody></table></div>
-  </div>
-</div>
-
-<!-- TARGETS -->
+<!-- ===== TARGETS ===== -->
 <div id="tab-targets" class="tab-panel">
-  <div class="card" style="margin-bottom:18px;"><div class="card-header"><span class="card-title">Q1 FY2025–26 Targets</span></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;" id="targets-grid"></div></div>
-  <div class="card"><div class="card-header"><span class="card-title">Rep-level Targets</span></div><div class="tbl-wrap"><table><thead><tr><th>Sales Rep</th><th>Target</th><th>Achieved</th><th>%</th><th>Deals</th><th>Progress</th></tr></thead><tbody id="rep-targets-body"></tbody></table></div></div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-hdr"><span class="card-title">Q1 FY2025–26 Team Targets</span><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i> Edit Targets</button></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;" id="q-targets"></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Agent-wise Targets</span></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Agent</th><th>Target (₹)</th><th>Achieved (₹)</th><th>%</th><th>Passports</th><th>Progress</th><th>Status</th></tr></thead>
+      <tbody id="target-body"></tbody>
+    </table></div>
+  </div>
 </div>
 
-<!-- REPORTS -->
+<!-- ===== LEADERBOARD ===== -->
+<div id="tab-leaderboard" class="tab-panel">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">🏆 Sales Leaderboard (MTD)</span></div>
+      <div id="leaderboard-full"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Commission Earned</span></div>
+      <div style="height:280px;"><canvas id="commission-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORTS ===== -->
 <div id="tab-reports" class="tab-panel">
-  <div class="grid-2" style="margin-bottom:18px;">
-    <div class="card"><div class="card-header"><span class="card-title">Win / Loss Analysis</span></div><div style="height:260px;"><canvas id="win-loss-chart"></canvas></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Revenue by Segment</span></div><div style="height:260px;"><canvas id="segment-chart"></canvas></div></div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card"><div class="card-hdr"><span class="card-title">Daily Sales Trend</span></div><div style="height:250px;"><canvas id="daily-sales-chart"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Revenue by Location</span></div><div style="height:250px;"><canvas id="location-chart"></canvas></div></div>
   </div>
   <div class="grid-2">
-    <div class="card"><div class="card-header"><span class="card-title">Deal Volume Trend</span></div><div style="height:220px;"><canvas id="deals-trend"></canvas></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Avg Deal Size by Type</span></div><div style="height:220px;"><canvas id="deal-size-chart"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Payment Method Mix</span></div><div style="height:220px;"><canvas id="payment-mix-chart"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Plan Breakdown</span></div><div style="height:220px;"><canvas id="plan-breakdown-chart"></canvas></div></div>
   </div>
 </div>
 
-</div></div></div>
+<!-- ===== ACTIVITY ===== -->
+<div id="tab-activity" class="tab-panel">
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Activity Feed</span><button class="btn btn-outline btn-sm"><i class="fas fa-filter"></i> Filter</button></div>
+    <div id="activity-feed"></div>
+  </div>
+</div>
 
-<!-- DEAL MODAL -->
-<div class="modal-overlay" id="deal-modal">
+</div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end shell -->
+
+<!-- Add Agent Modal -->
+<div class="modal-overlay" id="agent-modal">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Create New Deal</div><button class="modal-close" onclick="closeModal('deal-modal')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Deal Name</label><input type="text" id="dm-name" placeholder="e.g. TCS Outing 2025"/></div><div class="form-group"><label>Account</label><input type="text" id="dm-account" placeholder="Company name"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Type</label><select id="dm-type"><option>Corporate</option><option>Group</option><option>School</option><option>Birthday</option><option>TA</option></select></div><div class="form-group"><label>Pax</label><input type="number" id="dm-pax" placeholder="50"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Deal Value (₹)</label><input type="number" id="dm-value" placeholder="150000"/></div><div class="form-group"><label>Close Date</label><input type="date" id="dm-date"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Stage</label><select id="dm-stage"><option value="inquiry">Inquiry</option><option value="proposal">Proposal Sent</option><option value="negotiation">Negotiation</option><option value="won">Won</option></select></div><div class="form-group"><label>Owner</label><select id="dm-owner"><option>Ravi Kumar</option><option>Priya Sharma</option><option>Arjun Mehta</option><option>Sneha Patel</option></select></div></div>
-    <div class="form-group"><label>Notes</label><textarea id="dm-notes" placeholder="Key requirements…" style="min-height:70px;"></textarea></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('deal-modal')">Cancel</button><button class="btn btn-brand" onclick="saveDeal()"><i class="fa fa-save"></i> Save Deal</button></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Create Sales Agent Account</div>
+      <button class="modal-close" onclick="closeModal('agent-modal')">✕</button>
+    </div>
+    <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:11px;margin-bottom:14px;color:#92400e;">
+      <i class="fas fa-info-circle"></i> Agent credentials (Login ID + PIN) will be sent via SMS immediately after creation.
+    </div>
+    <div id="agent-success" style="display:none;background:#d1fae5;border:1px solid #6ee7b7;border-radius:8px;padding:12px;font-size:12px;color:#065f46;margin-bottom:12px;"></div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name *</label><input id="ag-fname" placeholder="Ravi"/></div>
+      <div class="form-group"><label>Last Name *</label><input id="ag-lname" placeholder="Sharma"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Mobile Number *</label><input id="ag-mobile" placeholder="9876543210" maxlength="10" type="tel"/></div>
+      <div class="form-group"><label>Email Address</label><input id="ag-email" placeholder="ravi@example.com" type="email"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Role *</label>
+        <select id="ag-role">
+          <option value="">Select Role</option>
+          <option value="agent">Sales Agent</option>
+          <option value="senior">Senior Agent</option>
+          <option value="team_lead">Team Lead</option>
+          <option value="manager">Sales Manager</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Sales Location *</label>
+        <select id="ag-location">
+          <option>Main Entrance (Gate 1)</option>
+          <option>Water Park Counter</option>
+          <option>Amusement Counter</option>
+          <option>Corporate Sales Office</option>
+          <option>Mobile Field Sales</option>
+          <option>Online / Tele-sales</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Monthly Target (₹)</label><input id="ag-target" placeholder="100000" type="number"/></div>
+      <div class="form-group"><label>Commission Rate (%)</label><input id="ag-commission" placeholder="3" type="number" min="1" max="15"/></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+      <button class="btn btn-outline" onclick="closeModal('agent-modal')">Cancel</button>
+      <button class="btn btn-brand" onclick="createAgent()"><i class="fas fa-user-plus"></i> Create Agent</button>
+    </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-let deals=[
-  {id:1,name:'TCS Annual Outing',account:'Tata Consultancy Services',type:'Corporate',pax:300,value:569700,stage:'proposal',owner:'Ravi Kumar',closeDate:'2025-04-15'},
-  {id:2,name:'Infosys Family Day',account:'Infosys Ltd',type:'Corporate',pax:200,value:379800,stage:'won',owner:'Priya Sharma',closeDate:'2025-03-28'},
-  {id:3,name:'Green Valley School Tour',account:'Green Valley School',type:'School',pax:85,value:67150,stage:'inquiry',owner:'Arjun Mehta',closeDate:'2025-04-18'},
-  {id:4,name:'Gupta Birthday Bash',account:'Gupta Family',type:'Birthday',pax:40,value:63960,stage:'negotiation',owner:'Sneha Patel',closeDate:'2025-04-10'},
-  {id:5,name:'Horizon Holidays Group',account:'Horizon Holidays',type:'TA',pax:150,value:194850,stage:'won',owner:'Ravi Kumar',closeDate:'2025-03-22'},
-  {id:6,name:'Wipro Team Day Out',account:'Wipro Technologies',type:'Corporate',pax:500,value:949500,stage:'negotiation',owner:'Priya Sharma',closeDate:'2025-05-05'},
-];
-const accounts=[
-  {name:'Tata Consultancy Services',type:'Corporate',industry:'IT Services',city:'Noida',deals:3,revenue:1520000,last:'2 days ago',status:'active'},
-  {name:'Infosys Ltd',type:'Corporate',industry:'IT Services',city:'Bengaluru',deals:2,revenue:780000,last:'1 week ago',status:'active'},
-  {name:'Horizon Holidays Pvt Ltd',type:'Travel Agent',industry:'Tourism',city:'Delhi',deals:8,revenue:420000,last:'1 day ago',status:'active'},
-  {name:'Green Valley School',type:'Education',industry:'Education',city:'Noida',deals:1,revenue:67150,last:'3 days ago',status:'active'},
-  {name:'Wipro Technologies',type:'Corporate',industry:'IT Services',city:'Bengaluru',deals:2,revenue:950000,last:'Today',status:'prospect'},
-];
-const contacts=[
-  {name:'Rajesh Mehta',desig:'HR Manager',account:'TCS',mobile:'+91 98765 43210',email:'r.mehta@tcs.com',source:'LinkedIn',status:'hot'},
-  {name:'Priya Nair',desig:'Admin Head',account:'Infosys',mobile:'+91 87654 32109',email:'p.nair@infosys.com',source:'Referral',status:'warm'},
-  {name:'Suresh Gupta',desig:'Director',account:'Green Valley',mobile:'+91 76543 21098',email:'s.gupta@gvs.edu',source:'Cold Call',status:'warm'},
-  {name:'Anjali Kapoor',desig:'Event Manager',account:'Wipro',mobile:'+91 65432 10987',email:'a.kapoor@wipro.com',source:'Website',status:'hot'},
-];
-const crmBk=[
-  {id:'WOW-2025-48920',account:'Horizon Holidays',contact:'Ravi Kapoor',type:'Water Park',pax:120,date:'2025-04-05',value:95880,channel:'Travel Agent',status:'confirmed'},
-  {id:'WOW-2025-47821',account:'Infosys Ltd',contact:'Priya Nair',type:'Combo',pax:200,date:'2025-03-28',value:259800,channel:'Direct',status:'checked-in'},
-  {id:'WOW-2025-46920',account:'TCS',contact:'Rajesh Mehta',type:'Corporate',pax:300,date:'2025-03-22',value:569700,channel:'Direct',status:'completed'},
-];
-const targets=[
-  {label:'Q1 Revenue',target:2500000,achieved:1720000,icon:'fa-rupee-sign',color:'var(--brand)'},
-  {label:'Corporate Deals',target:50,achieved:34,icon:'fa-building',color:'var(--teal)'},
-  {label:'New Accounts',target:80,achieved:38,icon:'fa-user-plus',color:'var(--purple)'},
-];
-const repTargets=[
-  {rep:'Ravi Kumar',target:800000,achieved:680000,deals:42},
-  {rep:'Priya Sharma',target:700000,achieved:520000,deals:31},
-  {rep:'Arjun Mehta',target:500000,achieved:310000,deals:22},
-  {rep:'Sneha Patel',target:400000,achieved:210000,deals:15},
-];
-const lbData=[
-  {name:'Ravi Kumar',rev:'₹6.8L',deals:42,pct:85},
-  {name:'Priya Sharma',rev:'₹5.2L',deals:31,pct:74},
-  {name:'Arjun Mehta',rev:'₹3.1L',deals:22,pct:62},
-  {name:'Sneha Patel',rev:'₹2.1L',deals:15,pct:53},
-];
-const taskData=[
-  {title:'Follow-up — TCS outing proposal',due:'Today, 3 PM',priority:'high',done:false},
-  {title:'Send F&B quote to Wipro',due:'Tomorrow, 10 AM',priority:'high',done:false},
-  {title:'Call — Anjali Kapoor (Wipro)',due:'Tomorrow, 2 PM',priority:'medium',done:false},
-  {title:'Monthly report to management',due:'31 Mar 2025',priority:'low',done:true},
-];
-const actData=[
-  {text:'Deal "Infosys Family Day" marked Won — ₹3.8L',time:'10 min ago',color:'var(--green)'},
-  {text:'New account added: Wipro Technologies',time:'2 hr ago',color:'var(--teal)'},
-  {text:'Proposal sent to TCS for 300 pax outing',time:'4 hr ago',color:'var(--brand)'},
-  {text:'Call logged: Anjali Kapoor · 15 min',time:'6 hr ago',color:'var(--purple)'},
-  {text:'Booking confirmed: Horizon Holidays 120 pax',time:'1 day ago',color:'var(--yellow)'},
+<!-- Passport Detail Modal -->
+<div class="modal-overlay" id="passport-detail-modal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-hdr">
+      <div class="modal-title">Passport Details</div>
+      <button class="modal-close" onclick="closeModal('passport-detail-modal')">✕</button>
+    </div>
+    <div id="passport-detail-content"></div>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid var(--brand);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;display:none;"></div>
+
+<script>
+// ===== DATA =====
+let agents = [
+  {id:'WOW-SA-2401',fname:'Ravi',lname:'Kumar',mobile:'9876543210',email:'ravi@wow.com',role:'Senior Agent',location:'Main Entrance',target:200000,achieved:186420,passports:37,commission:5593,status:'online',color:'#7c3aed'},
+  {id:'WOW-SA-2402',fname:'Priya',lname:'Sharma',mobile:'9876543211',email:'priya@wow.com',role:'Sales Agent',location:'Water Park Counter',target:150000,achieved:112750,passports:22,commission:3383,status:'online',color:'#0891b2'},
+  {id:'WOW-SA-2403',fname:'Arjun',lname:'Mehta',mobile:'9876543212',email:'arjun@wow.com',role:'Senior Agent',location:'Corporate Sales',target:300000,achieved:264800,passports:53,commission:7944,status:'busy',color:'#059669'},
+  {id:'WOW-SA-2404',fname:'Sneha',lname:'Patel',mobile:'9876543213',email:'sneha@wow.com',role:'Sales Agent',location:'Mobile Field',target:120000,achieved:98400,passports:19,commission:2952,status:'offline',color:'#db2777'},
+  {id:'WOW-SA-2405',fname:'Vikram',lname:'Singh',mobile:'9876543214',email:'vikram@wow.com',role:'Team Lead',location:'Amusement Counter',target:250000,achieved:198600,passports:41,commission:5958,status:'online',color:'#d97706'},
+  {id:'WOW-SM-0091',fname:'Sunita',lname:'Verma',mobile:'9876543215',email:'sunita@wow.com',role:'Sales Manager',location:'Corporate Office',target:500000,achieved:412500,passports:null,commission:0,status:'online',color:'#7c3aed'},
 ];
 
-function renderLeaderboard(){
-  const ranks=['🥇','🥈','🥉','4th'];
-  document.getElementById('leaderboard').innerHTML=lbData.map((r,i)=>`
-  <div class="lb-row"><div class="lb-rank" style="background:${i===0?'#ffd60a':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--border)'};color:var(--navy);">${ranks[i]}</div>
-  <img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(r.name)}" width="32" height="32" style="border-radius:50%;flex-shrink:0;"/>
-  <div style="flex:1;"><div style="font-size:13px;font-weight:700;">${r.name} <span style="font-size:11px;color:var(--muted);">${r.deals} deals</span></div>
-  <div class="progress-bar"><div class="progress-fill" style="width:${r.pct}%;background:${i===0?'var(--yellow)':i===1?'#94a3b8':'var(--green)'};"></div></div></div>
-  <div style="font-weight:800;font-size:13px;color:var(--green);">${r.rev}</div></div>`).join('');
-}
-function renderPipeline(){
-  const f=document.getElementById('pipeline-filter')?.value||'all';
-  const list=f==='all'?deals:deals.filter(d=>d.stage===f);
-  const sm={inquiry:'badge-blue',proposal:'badge-yellow',negotiation:'badge-orange',won:'badge-green',lost:'badge-red'};
-  document.getElementById('pipeline-body').innerHTML=list.map(d=>`
-  <tr><td><strong>${d.name}</strong></td><td>${d.account}</td><td>${d.type}</td><td>${d.pax}</td>
-  <td><strong>₹${d.value.toLocaleString('en-IN')}</strong></td>
-  <td><span class="badge ${sm[d.stage]||'badge-blue'}">${d.stage}</span></td>
-  <td>${d.owner}</td><td>${d.closeDate}</td>
-  <td><button class="btn btn-outline btn-sm"><i class="fa fa-edit"></i></button></td></tr>`).join('');
-}
-function renderAccounts(list){
-  const src=list||accounts;
-  const sm={active:'badge-green',prospect:'badge-blue',inactive:'badge-red'};
-  document.getElementById('accounts-body').innerHTML=src.map(a=>`
-  <tr><td><strong>${a.name}</strong></td><td>${a.type}</td><td>${a.industry}</td><td>${a.city}</td>
-  <td>${a.deals}</td><td>₹${a.revenue.toLocaleString('en-IN')}</td><td>${a.last}</td>
-  <td><span class="badge ${sm[a.status]}">${a.status}</span></td>
-  <td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>`).join('');
-}
-function searchAccounts(q){const s=q.toLowerCase();renderAccounts(accounts.filter(a=>a.name.toLowerCase().includes(s)||a.type.toLowerCase().includes(s)));}
-function renderContacts(){
-  const sm={hot:'badge-red',warm:'badge-yellow',cold:'badge-blue'};
-  document.getElementById('contacts-body').innerHTML=contacts.map(c=>`
-  <tr><td><div style="display:flex;align-items:center;gap:8px;"><img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(c.name)}" width="28" height="28" style="border-radius:50%;"/><strong>${c.name}</strong></div></td>
-  <td>${c.desig}</td><td>${c.account}</td><td>${c.mobile}</td><td>${c.email}</td><td>${c.source}</td>
-  <td><span class="badge ${sm[c.status]||'badge-blue'}">${c.status}</span></td>
-  <td><button class="btn btn-outline btn-sm"><i class="fa fa-phone"></i></button></td></tr>`).join('');
-}
-function renderTasks(){
-  document.getElementById('tasks-list').innerHTML=taskData.map((t,i)=>`
-  <div style="display:flex;align-items:center;gap:10px;padding:10px;background:${t.done?'#f0fdf4':'#f8fafc'};border-radius:8px;${t.done?'opacity:.7;':''}">
-    <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${i})" style="cursor:pointer;"/>
-    <div style="flex:1;"><div style="font-size:13px;font-weight:600;${t.done?'text-decoration:line-through;color:var(--muted);':''}">${t.title}</div>
-    <div style="font-size:11px;color:var(--muted);">Due: ${t.due}</div></div>
-    <span class="badge ${t.priority==='high'?'badge-red':t.priority==='medium'?'badge-yellow':'badge-blue'}">${t.priority}</span>
-  </div>`).join('');
-}
-function toggleTask(i){taskData[i].done=!taskData[i].done;renderTasks();}
-function renderActivityFeed(){
-  document.getElementById('activity-feed').innerHTML=actData.map(a=>`
-  <div class="activity-item"><div class="activity-dot" style="background:${a.color};"></div>
-  <div><div style="font-size:13px;">${a.text}</div><div style="font-size:10px;color:var(--muted);">${a.time}</div></div></div>`).join('');
-}
-function renderCRMBookings(){
-  const sm={confirmed:'badge-blue','checked-in':'badge-green',completed:'badge-purple'};
-  document.getElementById('crm-bookings-body').innerHTML=crmBk.map(b=>`
-  <tr><td><code style="font-size:11px;">${b.id}</code></td><td>${b.account}</td><td>${b.contact}</td><td>${b.type}</td><td>${b.pax}</td><td>${b.date}</td>
-  <td><strong>₹${b.value.toLocaleString('en-IN')}</strong></td><td>${b.channel}</td>
-  <td><span class="badge ${sm[b.status]||'badge-blue'}">${b.status}</span></td></tr>`).join('');
-}
-function renderTargets(){
-  const fmt=n=>n>=100000?'₹'+(n/100000).toFixed(1)+'L':n>=1000?'₹'+(n/1000).toFixed(0)+'K':n;
-  document.getElementById('targets-grid').innerHTML=targets.map(t=>{
-    const pct=Math.round(t.achieved/t.target*100);
-    return `<div style="background:#f8fafc;border-radius:12px;padding:18px;"><i class="fa ${t.icon}" style="color:${t.color};font-size:22px;margin-bottom:8px;display:block;"></i>
-    <div style="font-size:13px;font-weight:700;">${t.label}</div>
-    <div style="font-size:22px;font-weight:800;color:${t.color};margin:6px 0;">${fmt(t.achieved)}</div>
-    <div style="font-size:11px;color:var(--muted);">of ${fmt(t.target)} target</div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${t.color};"></div></div>
-    <div style="font-size:11px;font-weight:700;color:${t.color};margin-top:4px;">${pct}% achieved</div></div>`;
-  }).join('');
-  document.getElementById('rep-targets-body').innerHTML=repTargets.map(r=>{
-    const pct=Math.round(r.achieved/r.target*100);
-    return `<tr><td><div style="display:flex;align-items:center;gap:8px;"><img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(r.rep)}" width="28" height="28" style="border-radius:50%;"/><strong>${r.rep}</strong></div></td>
-    <td>₹${r.target.toLocaleString('en-IN')}</td><td>₹${r.achieved.toLocaleString('en-IN')}</td>
-    <td style="font-weight:700;color:${pct>=70?'var(--green)':'var(--yellow)'};">${pct}%</td><td>${r.deals}</td>
-    <td><div class="progress-bar" style="width:180px;"><div class="progress-fill" style="width:${pct}%;background:${pct>=70?'var(--green)':'var(--yellow)'};"></div></div></td></tr>`;
-  }).join('');
-}
+let passports = [
+  {id:'WOW-PAX-241001',name:'Rahul Sharma',mobile:'9811234567',plan:'Combo Passport',amount:7999,mode:'Cash',agent:'Ravi Kumar',issued:'28 Mar 2026',expiry:'28 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241002',name:'Priya Gupta',mobile:'9922345678',plan:'Water Park Passport',amount:4999,mode:'UPI / QR',agent:'Priya Sharma',issued:'27 Mar 2026',expiry:'27 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241003',name:'Ankit Singh',mobile:'9833456789',plan:'Family Passport (4)',amount:14999,mode:'Card / POS',agent:'Arjun Mehta',issued:'26 Mar 2026',expiry:'26 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241004',name:'Deepa Nair',mobile:'9744567890',plan:'Amusement Passport',amount:5999,mode:'Cash',agent:'Sneha Patel',issued:'25 Mar 2026',expiry:'25 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241005',name:'Karan Mehta',mobile:'9655678901',plan:'Combo Passport',amount:7999,mode:'UPI / QR',agent:'Vikram Singh',issued:'24 Mar 2026',expiry:'24 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241006',name:'Sunita Joshi',mobile:'9566789012',plan:'Water Park Passport',amount:4999,mode:'Cash',agent:'Ravi Kumar',issued:'23 Mar 2026',expiry:'23 Mar 2027',status:'Active'},
+  {id:'WOW-PAX-241007',name:'Rajan Pillai',mobile:'9477890123',plan:'Combo Passport',amount:7999,mode:'Card / POS',agent:'Arjun Mehta',issued:'22 Mar 2026',expiry:'22 Mar 2027',status:'Suspended'},
+  {id:'WOW-PAX-241008',name:'Neha Agarwal',mobile:'9388901234',plan:'Family Passport (4)',amount:14999,mode:'UPI / QR',agent:'Vikram Singh',issued:'20 Mar 2026',expiry:'20 Mar 2027',status:'Active'},
+];
 
-function switchTab(id,e){
-  if(e)e.preventDefault();
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+let kycQueue = [
+  {id:'KYC-001',name:'Mohit Bansal',mobile:'9312345678',plan:'Combo Passport',photo:null,agent:'Ravi Kumar',submitted:'28 Mar 2026 14:22',status:'pending'},
+  {id:'KYC-002',name:'Asha Kapoor',mobile:'9213456789',plan:'Family Passport',photo:null,agent:'Priya Sharma',submitted:'28 Mar 2026 12:08',status:'pending'},
+  {id:'KYC-003',name:'Suresh Yadav',mobile:'9114567890',plan:'Amusement Passport',photo:null,agent:'Arjun Mehta',submitted:'27 Mar 2026 16:45',status:'pending'},
+];
+
+let payments = [
+  {txn:'WOW-TXN-K3F1A2',name:'Rahul Sharma',plan:'Combo',amount:7999,gst:1220,mode:'Cash',agent:'Ravi Kumar',datetime:'28 Mar 2026 15:30',status:'Confirmed'},
+  {txn:'WOW-TXN-K2E0B1',name:'Priya Gupta',plan:'Water Park',amount:4999,gst:763,mode:'UPI / QR',agent:'Priya Sharma',datetime:'27 Mar 2026 11:20',status:'Confirmed'},
+  {txn:'WOW-TXN-J1D9C0',name:'Ankit Singh',plan:'Family (4)',amount:14999,gst:2288,mode:'Card / POS',agent:'Arjun Mehta',datetime:'26 Mar 2026 13:45',status:'Confirmed'},
+  {txn:'WOW-TXN-I0C8B9',name:'Deepa Nair',plan:'Amusement',amount:5999,gst:915,mode:'Cash',agent:'Sneha Patel',datetime:'25 Mar 2026 10:15',status:'Confirmed'},
+  {txn:'WOW-TXN-H9B7A8',name:'Karan Mehta',plan:'Combo',amount:7999,gst:1220,mode:'UPI / QR',agent:'Vikram Singh',datetime:'24 Mar 2026 14:00',status:'Confirmed'},
+];
+
+// ===== TABS =====
+function switchTab(name, e){
+  if(e){ e.preventDefault(); }
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  const b=document.getElementById('tab-btn-'+id);if(b)b.classList.add('active');
-  if(id==='overview')initOv();
-  if(id==='pipeline')renderPipeline();
-  if(id==='accounts')renderAccounts();
-  if(id==='contacts')renderContacts();
-  if(id==='activities'){renderTasks();renderActivityFeed();}
-  if(id==='bookings')renderCRMBookings();
-  if(id==='targets')renderTargets();
-  if(id==='reports')initRp();
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const btn = document.getElementById('tab-btn-'+name);
+  const panel = document.getElementById('tab-'+name);
+  if(btn) btn.classList.add('active');
+  if(panel) panel.classList.add('active');
+  // Render on demand
+  if(name==='passports') renderPassports();
+  if(name==='kyc-queue') renderKycQueue();
+  if(name==='payments') renderPayments();
+  if(name==='agents') renderAgents();
+  if(name==='targets') renderTargets();
+  if(name==='leaderboard') renderLeaderboard();
+  if(name==='reports') renderReports();
+  if(name==='activity') renderActivity();
 }
 
-let ovInited=false,rpInited=false;
-function initOv(){
-  renderLeaderboard();
-  if(ovInited)return;ovInited=true;
-  new Chart(document.getElementById('rev-trend'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Revenue ₹L',data:[42,58,86,63,74,86.4],borderColor:'var(--brand)',backgroundColor:'rgba(255,107,53,.1)',tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  new Chart(document.getElementById('channel-chart'),{type:'doughnut',data:{labels:['Direct','Travel Agent','Corporate B2B','Walk-in'],datasets:[{data:[35,30,25,10],backgroundColor:['#ff6b35','#00b4d8','#7c3aed','#06d6a0']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
+// ===== INIT =====
+window.onload = function(){
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{"name":"Sales Manager","id":"WOW-SM-0091","role":"manager"}');
+  document.getElementById('sb-agent-name').textContent = agent.name||'Sales Manager';
+  document.getElementById('sb-agent-role').textContent = (agent.role||'manager').replace('_',' ');
+  document.getElementById('tb-name').textContent = agent.name||'Sales Manager';
+  document.getElementById('tb-role').textContent = agent.role||'Manager';
+  const initials = (agent.name||'SM').split(' ').map(n=>n[0]).join('').toUpperCase().substr(0,2);
+  document.getElementById('tb-avatar').textContent = initials;
+  document.getElementById('queue-badge').textContent = kycQueue.length;
+  document.getElementById('metric-kyc-pending').textContent = kycQueue.length;
+  renderOverviewCharts();
+  renderTopAgents();
+  renderFunnel();
+};
+
+// ===== CHARTS =====
+function renderOverviewCharts(){
+  // Revenue trend
+  const ctx1 = document.getElementById('rev-chart').getContext('2d');
+  new Chart(ctx1, {
+    type:'line',
+    data:{
+      labels:['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets:[{label:'Revenue (₹L)',data:[8.2,9.5,11.8,10.2,13.4,14.8],borderColor:getComputedStyle(document.documentElement).getPropertyValue('--brand'),backgroundColor:'rgba(201,168,76,.1)',fill:true,tension:.4,pointBackgroundColor:'#C9A84C'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'L',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+  // Plan donut
+  const ctx2 = document.getElementById('plan-chart').getContext('2d');
+  new Chart(ctx2, {
+    type:'doughnut',
+    data:{
+      labels:['Combo','Water Park','Amusement','Family'],
+      datasets:[{data:[42,28,18,12],backgroundColor:['#C9A84C','#3b82f6','#7c3aed','#22c55e'],borderWidth:0}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11}}}}}
+  });
 }
-function initRp(){
-  if(rpInited)return;rpInited=true;
-  new Chart(document.getElementById('win-loss-chart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Won',data:[24,28,38,22,31,18],backgroundColor:'var(--green)'},{label:'Lost',data:[8,10,12,9,7,6],backgroundColor:'var(--red)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}}}});
-  new Chart(document.getElementById('segment-chart'),{type:'doughnut',data:{labels:['Corporate','School','Birthday','Group','TA'],datasets:[{data:[40,15,10,20,15],backgroundColor:['#ff6b35','#06d6a0','#ffd60a','#00b4d8','#7c3aed']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
-  new Chart(document.getElementById('deals-trend'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Deals',data:[32,38,50,31,38,24],borderColor:'var(--teal)',tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  new Chart(document.getElementById('deal-size-chart'),{type:'bar',data:{labels:['Corporate','School','Birthday','Group'],datasets:[{label:'Avg ₹',data:[95000,4200,2800,12000],backgroundColor:['#ff6b35','#06d6a0','#ffd60a','#00b4d8']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+
+function renderFunnel(){
+  const stages = [
+    {label:'Enquiries',val:520,pct:'100%',bg:'#eff6ff',color:'#1e40af'},
+    {label:'KYC Started',val:312,pct:'60%',bg:'#dbeafe',color:'#1e40af'},
+    {label:'KYC Completed',val:248,pct:'48%',bg:'#bfdbfe',color:'#1e40af'},
+    {label:'Payment Collected',val:206,pct:'40%',bg:'#93c5fd',color:'#1e40af'},
+    {label:'Passport Issued',val:186,pct:'36%',bg:'#C9A84C',color:'#0a0a14'},
+  ];
+  document.getElementById('funnel-wrap').innerHTML = stages.map(s=>`
+    <div style="background:${s.bg};border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:${s.color};">
+      <span>${s.label} (${s.val})</span><strong>${s.pct}</strong>
+    </div>`).join('');
 }
-function openDealModal(){document.getElementById('deal-modal').classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-function saveDeal(){
-  const name=document.getElementById('dm-name').value.trim();
-  if(!name){alert('Deal name required.');return;}
-  deals.push({id:deals.length+1,name,account:document.getElementById('dm-account').value,type:document.getElementById('dm-type').value,pax:+document.getElementById('dm-pax').value||0,value:+document.getElementById('dm-value').value||0,stage:document.getElementById('dm-stage').value,owner:document.getElementById('dm-owner').value,closeDate:document.getElementById('dm-date').value});
-  closeModal('deal-modal');switchTab('pipeline',null);
+
+function renderTopAgents(){
+  const sorted = [...agents].filter(a=>a.passports!==undefined && typeof a.passports === 'number').sort((a,b)=>b.passports-a.passports).slice(0,5);
+  const max = sorted[0]?.passports||1;
+  document.getElementById('top-agents-list').innerHTML = sorted.map((a,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank" style="background:${['#f59e0b','#94a3b8','#cd7f32','var(--border)','var(--border)'][i]};color:${i<3?'#fff':'var(--muted)'};">${i+1}</div>
+      <div style="width:32px;height:32px;border-radius:50%;background:${a.color};display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">${a.fname[0]}${a.lname[0]}</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;">${a.fname} ${a.lname}</div>
+        <div class="progress-bar" style="margin-top:4px;"><div class="progress-fill" style="width:${Math.round((a.passports/max)*100)}%;"></div></div>
+      </div>
+      <div style="text-align:right;"><div style="font-size:13px;font-weight:800;color:var(--brand3);">${a.passports}</div><div style="font-size:10px;color:var(--muted);">passports</div></div>
+    </div>`).join('');
 }
-setTimeout(initOv,100);
+
+function updateRevChart(){ /* placeholder */ }
+
+// ===== PASSPORTS =====
+function renderPassports(){
+  const planF = document.getElementById('filter-plan').value;
+  const statusF = document.getElementById('filter-status').value;
+  const search = (document.getElementById('pp-search').value||'').toLowerCase();
+  let data = passports;
+  if(planF) data = data.filter(p=>p.plan===planF);
+  if(statusF) data = data.filter(p=>p.status===statusF);
+  if(search) data = data.filter(p=>p.name.toLowerCase().includes(search)||p.id.toLowerCase().includes(search)||p.mobile.includes(search));
+  const statusColors = {Active:'bg-green',Expired:'bg-red',Suspended:'bg-amber'};
+  document.getElementById('passports-body').innerHTML = data.map(p=>`
+    <tr>
+      <td><span style="font-family:monospace;font-size:11px;">${p.id}</span></td>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.mobile}</td>
+      <td><span class="badge bg-gold">${p.plan}</span></td>
+      <td>₹${p.amount.toLocaleString('en-IN')}</td>
+      <td>${p.mode}</td>
+      <td>${p.agent}</td>
+      <td>${p.issued}</td>
+      <td>${p.expiry}</td>
+      <td><span class="badge ${statusColors[p.status]||'bg-gray'}">${p.status}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="viewPassport('${p.id}')"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-outline btn-sm" onclick="suspendPassport('${p.id}')"><i class="fas fa-ban"></i></button></td>
+    </tr>`).join('') || '<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--muted);">No passports found</td></tr>';
+}
+
+function viewPassport(id){
+  const p = passports.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('passport-detail-content').innerHTML = `
+    <div class="form-row" style="margin-bottom:10px;"><div><strong style="font-size:11px;color:var(--muted);">PASSPORT ID</strong><br/><span style="font-family:monospace;font-weight:700;">${p.id}</span></div><div style="text-align:right;"><span class="badge ${p.status==='Active'?'bg-green':'bg-red'}">${p.status}</span></div></div>
+    ${[['Customer',p.name],['Mobile',p.mobile],['Plan',p.plan],['Amount Paid','₹'+p.amount.toLocaleString('en-IN')],['Payment Mode',p.mode],['Agent',p.agent],['Issue Date',p.issued],['Expiry Date',p.expiry]].map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--muted);">${k}</span><strong>${v}</strong></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:16px;"><button class="btn btn-brand" style="flex:1;" onclick="closeModal('passport-detail-modal')"><i class="fas fa-check"></i> Close</button><button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print</button></div>`;
+  document.getElementById('passport-detail-modal').classList.add('show');
+}
+
+function suspendPassport(id){
+  const p = passports.find(x=>x.id===id);
+  if(!p) return;
+  p.status = p.status==='Active' ? 'Suspended' : 'Active';
+  renderPassports();
+  showToast(p.status==='Active'?'Passport reactivated':'Passport suspended');
+}
+
+function exportCsv(){
+  showToast('CSV export: '+passports.length+' records prepared for download');
+}
+
+// ===== KYC QUEUE =====
+function renderKycQueue(){
+  document.getElementById('kyc-count-badge').textContent = kycQueue.length+' Pending';
+  document.getElementById('queue-badge').textContent = kycQueue.length;
+  document.getElementById('metric-kyc-pending').textContent = kycQueue.length;
+  if(!kycQueue.length){
+    document.getElementById('kyc-queue-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">✅ All KYC records reviewed</div>';
+    return;
+  }
+  document.getElementById('kyc-queue-list').innerHTML = kycQueue.map((k,i)=>`
+    <div class="kyc-item" id="kyc-${k.id}">
+      <div class="kyc-photo">${k.photo?`<img src="${k.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;"/>`:'👤'}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;">${k.name}</div>
+        <div style="font-size:11px;color:var(--muted);">${k.mobile} · ${k.plan}</div>
+        <div style="font-size:11px;color:var(--muted);">Agent: ${k.agent} · Submitted: ${k.submitted}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-green btn-sm" onclick="approveKyc('${k.id}')"><i class="fas fa-check"></i> Approve</button>
+        <button class="btn btn-red btn-sm" onclick="rejectKyc('${k.id}')"><i class="fas fa-times"></i> Reject</button>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Opening KYC details…')"><i class="fas fa-eye"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function approveKyc(id){
+  kycQueue = kycQueue.filter(k=>k.id!==id);
+  renderKycQueue();
+  showToast('KYC approved! Passport will be issued.');
+}
+
+function rejectKyc(id){
+  kycQueue = kycQueue.filter(k=>k.id!==id);
+  renderKycQueue();
+  showToast('KYC rejected. Agent notified.');
+}
+
+function approveAllKyc(){
+  kycQueue = [];
+  renderKycQueue();
+  showToast('All KYC records approved!');
+}
+
+// ===== PAYMENTS =====
+function renderPayments(){
+  const modeF = document.getElementById('pay-method-filter').value;
+  let data = payments;
+  if(modeF) data = data.filter(p=>p.mode===modeF);
+  const statusColors = {Confirmed:'bg-green',Pending:'bg-amber',Failed:'bg-red'};
+  document.getElementById('payments-body').innerHTML = data.map(p=>`
+    <tr>
+      <td><span style="font-family:monospace;font-size:11px;">${p.txn}</span></td>
+      <td>${p.name}</td>
+      <td><span class="badge bg-gold">${p.plan}</span></td>
+      <td>₹${p.amount.toLocaleString('en-IN')}</td>
+      <td>₹${p.gst.toLocaleString('en-IN')}</td>
+      <td>${p.mode}</td>
+      <td>${p.agent}</td>
+      <td>${p.datetime}</td>
+      <td><span class="badge ${statusColors[p.status]||'bg-gray'}">${p.status}</span></td>
+    </tr>`).join('');
+}
+
+// ===== AGENTS =====
+function renderAgents(){
+  const statusColors = {online:var_green_class,busy:amber_class,offline:gray_class};
+  const statusCol = {online:'bg-green',busy:'bg-amber',offline:'bg-gray'};
+  document.getElementById('agents-grid').innerHTML = agents.map(a=>`
+    <div class="agent-card">
+      <div class="ac-header">
+        <div class="ac-avatar" style="background:${a.color};">${a.fname[0]}${a.lname[0]}</div>
+        <div style="flex:1;">
+          <div class="ac-name">${a.fname} ${a.lname}</div>
+          <div class="ac-role">${a.role} · ${a.location}</div>
+          <div style="margin-top:4px;"><span class="badge ${statusCol[a.status]}">${a.status}</span></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:var(--muted);">ID</div>
+          <div style="font-size:11px;font-weight:700;color:var(--brand3);">${a.id}</div>
+        </div>
+      </div>
+      <div class="ac-stats">
+        <div class="acs-item"><div class="acs-val" style="color:var(--brand3);">₹${(a.achieved/100000).toFixed(1)}L</div><div class="acs-label">Revenue</div></div>
+        <div class="acs-item"><div class="acs-val" style="color:var(--green);">${a.passports||'—'}</div><div class="acs-label">Passports</div></div>
+        <div class="acs-item"><div class="acs-val" style="color:var(--purple);">₹${(a.commission/1000).toFixed(1)}K</div><div class="acs-label">Commission</div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;"><span>Target Progress</span><span>${Math.round((a.achieved/a.target)*100)}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,Math.round((a.achieved/a.target)*100))}%;"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="showToast('Opening ${a.fname} profile…')"><i class="fas fa-user"></i> Profile</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="showToast('SMS sent to ${a.mobile}')"><i class="fas fa-sms"></i> Message</button>
+        <button class="btn btn-red btn-sm" onclick="deactivateAgent('${a.id}')"><i class="fas fa-ban"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// Placeholder for CSS class strings used in JS
+var var_green_class = '';
+var amber_class = '';
+var gray_class = '';
+
+function deactivateAgent(id){ showToast('Agent deactivated. They will be notified.'); }
+
+// ===== TARGETS =====
+function renderTargets(){
+  const teamTargets = [
+    {label:'Q1 Revenue Target',target:'₹60L',achieved:'₹47L',icon:'fa-rupee-sign',pct:'78%'},
+    {label:'Passports Target',target:'700',achieved:'542',icon:'fa-passport',pct:'77%'},
+    {label:'New Customers',target:'500',achieved:'398',icon:'fa-users',pct:'80%'},
+    {label:'Commission Pool',target:'₹4L',achieved:'₹3.1L',icon:'fa-medal',pct:'78%'},
+  ];
+  document.getElementById('q-targets').innerHTML = teamTargets.map(t=>`
+    <div style="padding:14px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;"><i class="fas ${t.icon}" style="color:var(--brand);"></i> ${t.label}</div>
+      <div style="font-size:1.3rem;font-weight:800;color:var(--brand3);">${t.achieved}</div>
+      <div style="font-size:10px;color:var(--muted);">of ${t.target} · ${t.pct}</div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:${t.pct};"></div></div>
+    </div>`).join('');
+
+  document.getElementById('target-body').innerHTML = agents.filter(a=>a.passports!==undefined&&typeof a.passports==='number').map(a=>{
+    const pct = Math.min(100,Math.round((a.achieved/a.target)*100));
+    const statusBadge = pct>=100?'bg-green':pct>=70?'bg-amber':'bg-red';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:28px;height:28px;border-radius:50%;background:${a.color};display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;">${a.fname[0]}${a.lname[0]}</div><strong>${a.fname} ${a.lname}</strong></div></td>
+      <td>₹${a.target.toLocaleString('en-IN')}</td>
+      <td>₹${a.achieved.toLocaleString('en-IN')}</td>
+      <td>${pct}%</td>
+      <td>${a.passports}</td>
+      <td><div class="progress-bar" style="width:120px;"><div class="progress-fill" style="width:${pct}%;"></div></div></td>
+      <td><span class="badge ${statusBadge}">${pct>=100?'Achieved':pct>=70?'On Track':'At Risk'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== LEADERBOARD =====
+function renderLeaderboard(){
+  const sorted = [...agents].filter(a=>typeof a.passports==='number').sort((a,b)=>b.passports-a.passports);
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('leaderboard-full').innerHTML = sorted.map((a,i)=>`
+    <div class="lb-row">
+      <div style="width:30px;text-align:center;font-size:1.1rem;">${medals[i]||'#'+(i+1)}</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:${a.color};display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">${a.fname[0]}${a.lname[0]}</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;">${a.fname} ${a.lname}</div>
+        <div style="font-size:10px;color:var(--muted);">${a.role} · ${a.location}</div>
+        <div class="progress-bar" style="margin-top:4px;"><div class="progress-fill" style="width:${Math.round((a.achieved/agents.sort((x,y)=>y.achieved-x.achieved)[0].achieved)*100)}%;"></div></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:13px;font-weight:800;color:var(--brand3);">₹${(a.achieved/100000).toFixed(1)}L</div>
+        <div style="font-size:10px;color:var(--muted);">${a.passports} passports · ₹${(a.commission/1000).toFixed(1)}K comm.</div>
+      </div>
+    </div>`).join('');
+
+  // Commission chart
+  const ctx = document.getElementById('commission-chart').getContext('2d');
+  const sorted2 = [...agents].filter(a=>typeof a.commission==='number'&&a.commission>0).sort((a,b)=>b.commission-a.commission);
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:sorted2.map(a=>a.fname),
+      datasets:[{label:'Commission (₹)',data:sorted2.map(a=>a.commission),backgroundColor:sorted2.map(a=>a.color),borderWidth:0,borderRadius:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v,font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ===== REPORTS =====
+function renderReports(){
+  // Daily sales
+  const ctx1 = document.getElementById('daily-sales-chart').getContext('2d');
+  new Chart(ctx1,{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Passports',data:[8,12,7,14,10,22,18],borderColor:'#C9A84C',fill:false,tension:.4,pointBackgroundColor:'#C9A84C'},{label:'Revenue (₹K)',data:[55,82,49,98,72,154,124],borderColor:'#3b82f6',fill:false,tension:.4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{y:{ticks:{font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},y1:{type:'linear',display:true,position:'right',ticks:{callback:v=>'₹'+v+'K',font:{size:10}},grid:{display:false}},x:{ticks:{font:{size:10}},grid:{display:false}}}}});
+  // Location chart
+  const ctx2 = document.getElementById('location-chart').getContext('2d');
+  new Chart(ctx2,{type:'bar',data:{labels:['Gate 1','Water Park','Amusement','Corp. Office','Field','Tele-sales'],datasets:[{label:'Revenue (₹K)',data:[310,220,180,420,160,140],backgroundColor:'#C9A84C',borderRadius:6,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'K',font:{size:10}},grid:{color:'rgba(0,0,0,.04)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}});
+  // Payment mix
+  const ctx3 = document.getElementById('payment-mix-chart').getContext('2d');
+  new Chart(ctx3,{type:'doughnut',data:{labels:['Cash','UPI / QR','Card / POS'],datasets:[{data:[58,28,14],backgroundColor:['#22c55e','#3b82f6','#7c3aed'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+  // Plan breakdown
+  const ctx4 = document.getElementById('plan-breakdown-chart').getContext('2d');
+  new Chart(ctx4,{type:'doughnut',data:{labels:['Combo','Water Park','Amusement','Family'],datasets:[{data:[42,28,18,12],backgroundColor:['#C9A84C','#3b82f6','#7c3aed','#22c55e'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}}}});
+}
+
+// ===== ACTIVITY =====
+function renderActivity(){
+  const activities = [
+    {dot:'#22c55e',time:'2 min ago',text:'<strong>Ravi Kumar</strong> issued Passport <strong>WOW-PAX-241009</strong> to Rahul Sharma · ₹7,999 (Cash)'},
+    {dot:'#3b82f6',time:'18 min ago',text:'<strong>KYC submitted</strong> by Priya Sharma for Mohit Bansal · Awaiting review'},
+    {dot:'#C9A84C',time:'35 min ago',text:'<strong>Arjun Mehta</strong> collected UPI payment ₹14,999 from Ankit Singh'},
+    {dot:'#7c3aed',time:'1 hr ago',text:'<strong>New agent</strong> WOW-SA-2406 (Deepak Gupta) created by Manager Sunita Verma'},
+    {dot:'#ef4444',time:'2 hrs ago',text:'<strong>KYC Rejected</strong> for Suresh Yadav (Photo quality: blurry) — notified to agent'},
+    {dot:'#f59e0b',time:'3 hrs ago',text:'<strong>Vikram Singh</strong> completed target 80% for March — leaderboard updated'},
+    {dot:'#22c55e',time:'4 hrs ago',text:'<strong>Sneha Patel</strong> issued Family Passport to Gupta Family · ₹14,999 (Card/POS)'},
+    {dot:'#3b82f6',time:'5 hrs ago',text:'<strong>System</strong> sent SMS login credentials to 6 new passport holders'},
+    {dot:'#C9A84C',time:'Yesterday',text:'<strong>Commission</strong> ₹5,950 credited to Arjun Mehta for 53 passports in March'},
+    {dot:'#22c55e',time:'Yesterday',text:'<strong>Priya Sharma</strong> achieved monthly target — 22 passports, ₹1.1L revenue'},
+  ];
+  document.getElementById('activity-feed').innerHTML = activities.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.dot};"></div>
+      <div style="flex:1;font-size:12px;">${a.text}</div>
+      <div style="font-size:10px;color:var(--muted);white-space:nowrap;margin-left:8px;">${a.time}</div>
+    </div>`).join('');
+}
+
+// ===== ADD AGENT MODAL =====
+function openAddAgentModal(){ document.getElementById('agent-modal').classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+function createAgent(){
+  const fname = document.getElementById('ag-fname').value.trim();
+  const lname = document.getElementById('ag-lname').value.trim();
+  const mobile = document.getElementById('ag-mobile').value.trim();
+  const role = document.getElementById('ag-role').value;
+  if(!fname||!lname||!mobile||!role){ showToast('Please fill all required fields'); return; }
+  if(!/^\d{10}$/.test(mobile)){ showToast('Enter valid 10-digit mobile'); return; }
+  const id = 'WOW-SA-'+String(Date.now()).substr(-4);
+  const pin = Math.random().toString().substr(2,6);
+  const colors = ['#7c3aed','#0891b2','#059669','#db2777','#d97706','#ef4444'];
+  const newAgent = {
+    id, fname, lname, mobile,
+    email: document.getElementById('ag-email').value.trim(),
+    role: document.getElementById('ag-role').options[document.getElementById('ag-role').selectedIndex].text,
+    location: document.getElementById('ag-location').value,
+    target: parseInt(document.getElementById('ag-target').value)||100000,
+    achieved:0, passports:0, commission:0,
+    status:'offline', color: colors[Math.floor(Math.random()*colors.length)]
+  };
+  agents.push(newAgent);
+  const suc = document.getElementById('agent-success');
+  suc.style.display='block';
+  suc.innerHTML = `✅ Agent created! <strong>ID: ${id}</strong> · <strong>PIN: ${pin}</strong> sent to ${mobile}`;
+  setTimeout(()=>{ closeModal('agent-modal'); suc.style.display='none'; renderAgents(); showToast(`Agent ${fname} ${lname} created. ID: ${id}`); },2000);
+}
+
+function globalSearch(q){
+  if(q.length<2) return;
+  const res = passports.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.id.toLowerCase().includes(q.toLowerCase())||p.mobile.includes(q));
+  if(res.length){ switchTab('passports',{preventDefault:()=>{}}); setTimeout(()=>{ document.getElementById('pp-search').value=q; renderPassports(); },100); }
+}
+
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
+}
+
+// ===== BULK ISSUANCE =====
+let bulkBatch = [];
+
+const PLAN_PRICES = {
+  'Water Park Passport': 4999,
+  'Amusement Passport':  5999,
+  'Combo Passport':      7999,
+  'Family Passport (4)': 14999,
+};
+
+function addBulkRow(){
+  const fname  = document.getElementById('bl-fname').value.trim();
+  const lname  = document.getElementById('bl-lname').value.trim();
+  const mobile = document.getElementById('bl-mobile').value.trim();
+  const email  = document.getElementById('bl-email').value.trim();
+  const plan   = document.getElementById('bl-plan').value;
+  const mode   = document.getElementById('bl-mode').value;
+  const city   = document.getElementById('bl-city').value.trim();
+  const state  = document.getElementById('bl-state').value.trim();
+  const dob    = document.getElementById('bl-dob').value;
+  const gender = document.getElementById('bl-gender').value;
+
+  if(!fname||!lname)  { showToast('⚠️ Enter first and last name');    return; }
+  if(!/^\d{10}$/.test(mobile)){ showToast('⚠️ Enter valid 10-digit mobile'); return; }
+  if(!plan)           { showToast('⚠️ Select a passport plan');      return; }
+  if(!mode)           { showToast('⚠️ Select payment mode');          return; }
+
+  const price = PLAN_PRICES[plan] || 0;
+  const gst   = Math.round(price * 0.18);
+  const total = price + gst;
+
+  bulkBatch.push({ fname, lname, mobile, email, plan, mode, city, state, dob, gender, price, total, rowStatus: 'pending' });
+  renderBulkTable();
+  // Clear inputs
+  ['bl-fname','bl-lname','bl-mobile','bl-email','bl-dob'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('bl-plan').value = '';
+  document.getElementById('bl-mode').value = '';
+  showToast('✅ Record added to batch');
+}
+
+function renderBulkTable(){
+  const wrap = document.getElementById('bulk-table-wrap');
+  const tbody = document.getElementById('bulk-tbody');
+  wrap.style.display = bulkBatch.length ? 'block' : 'none';
+  document.getElementById('bulk-count').textContent = bulkBatch.length;
+  tbody.innerHTML = bulkBatch.map((r,i)=>{
+    const statusBadge = r.rowStatus==='success' ? '<span class="badge bg-green">✅ Issued</span>'
+                      : r.rowStatus==='failed'  ? '<span class="badge bg-red">❌ Failed</span>'
+                      : r.rowStatus==='processing' ? '<span class="badge bg-blue">⏳ Processing</span>'
+                      : '<span class="badge bg-gray">Pending</span>';
+    return `<tr id="bulk-row-${i}">
+      <td>${i+1}</td>
+      <td><strong>${r.fname} ${r.lname}</strong>${r.rowPassportId?'<br><small style="color:var(--muted);font-size:10px;">'+r.rowPassportId+'</small>':''}</td>
+      <td>${r.mobile}</td>
+      <td style="font-size:11px;">${r.email||'—'}</td>
+      <td><span class="badge bg-gold">${r.plan}</span></td>
+      <td>${r.mode}</td>
+      <td>${r.city||'—'}</td>
+      <td>${statusBadge}</td>
+      <td>${r.rowStatus==='pending'?`<button class="btn btn-outline btn-sm" onclick="removeBulkRow(${i})">✕</button>`:'&nbsp;'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function removeBulkRow(i){
+  bulkBatch.splice(i,1);
+  renderBulkTable();
+}
+
+function clearBulkBatch(){
+  if(!confirm('Clear all records from batch?')) return;
+  bulkBatch = [];
+  renderBulkTable();
+  document.getElementById('bulk-results-card').style.display='none';
+}
+
+async function processBulkIssuance(){
+  if(!bulkBatch.length){ showToast('⚠️ No records in batch'); return; }
+  if(!confirm(`Issue ${bulkBatch.length} passports now? This will save all KYC, payment, and passport records to the database.`)) return;
+
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{"name":"Sales Manager","id":"WOW-SM-0091"}');
+  const btn = document.getElementById('btn-process-bulk');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+
+  const overlay = document.getElementById('bulk-progress-overlay');
+  overlay.style.display = 'grid';
+  document.getElementById('bulk-prog-total').textContent = bulkBatch.length;
+
+  let successCount = 0, failCount = 0, totalRevenue = 0;
+
+  for(let i=0; i<bulkBatch.length; i++){
+    const rec = bulkBatch[i];
+    rec.rowStatus = 'processing';
+    renderBulkTable();
+
+    // Update progress
+    const pct = Math.round(((i+1)/bulkBatch.length)*100);
+    document.getElementById('bulk-progress-bar').style.width = pct+'%';
+    document.getElementById('bulk-prog-num').textContent = i+1;
+    document.getElementById('bulk-progress-text').textContent = `Issuing passport for ${rec.fname} ${rec.lname}…`;
+
+    try {
+      const kycPayload = {
+        plan:          rec.plan,
+        plan_price:    rec.price,
+        fname:         rec.fname,
+        lname:         rec.lname,
+        dob:           rec.dob || '',
+        gender:        rec.gender || 'Male',
+        mobile:        rec.mobile,
+        email:         rec.email || `${rec.fname.toLowerCase()}.${rec.lname.toLowerCase()}@wow.com`,
+        city:          rec.city  || 'Delhi',
+        state:         rec.state || 'Delhi',
+        country:       'India',
+        agent_id:      agent.id,
+        agent_name:    agent.name,
+        location:      agent.location || 'Corporate Office',
+        kyc_status:    'approved',
+        payment_status:'completed',
+      };
+
+      const kyc = await WOW_API.saveKYC(kycPayload);
+
+      const cgst = Math.round(rec.price * 0.09);
+      const sgst = cgst;
+      const totalAmt = rec.price + cgst + sgst;
+      const txnId = WOW_API.genTxnId();
+      const payRecord = {
+        id:            txnId,
+        passport_id:   kyc.passport_id,
+        kyc_id:        kyc.id,
+        holder_name:   `${rec.fname} ${rec.lname}`,
+        plan:          rec.plan,
+        base_amount:   rec.price,
+        cgst, sgst,
+        total_amount:  totalAmt,
+        payment_mode:  rec.mode,
+        agent_id:      agent.id,
+        agent_name:    agent.name,
+        agent_commission: Math.round(totalAmt * 0.03),
+        location:      agent.location || 'Corporate Office',
+        status:        'Confirmed',
+      };
+      const pay = await WOW_API.create('wow_payments', payRecord);
+      const pax = await WOW_API.issuePassport(kyc, pay);
+
+      rec.rowStatus = 'success';
+      rec.rowPassportId = pax.id;
+      successCount++;
+      totalRevenue += totalAmt;
+    } catch(err) {
+      rec.rowStatus = 'failed';
+      rec.rowError = err.message;
+      failCount++;
+      console.error('Bulk issue failed for', rec.fname, err);
+    }
+
+    renderBulkTable();
+    await new Promise(r=>setTimeout(r,200)); // small delay between records
+  }
+
+  overlay.style.display = 'none';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-rocket"></i> Issue All Passports';
+
+  // Show results
+  const resultsCard = document.getElementById('bulk-results-card');
+  resultsCard.style.display = 'block';
+  document.getElementById('bulk-success-count').textContent = successCount;
+  document.getElementById('bulk-fail-count').textContent = failCount;
+  document.getElementById('bulk-total-rev').textContent = '₹'+totalRevenue.toLocaleString('en-IN');
+
+  const failedRecs = bulkBatch.filter(r=>r.rowStatus==='failed');
+  document.getElementById('bulk-results-body').innerHTML = failedRecs.length
+    ? '<div style="font-size:12px;font-weight:600;color:#991b1b;margin-bottom:8px;">Failed Records:</div>'
+      + failedRecs.map(r=>`<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">❌ ${r.fname} ${r.lname} (${r.mobile}) — ${r.rowError||'Unknown error'}</div>`).join('')
+    : '<div style="font-size:12px;color:#065f46;">✅ All records issued successfully!</div>';
+
+  showToast(`✅ Bulk issuance complete: ${successCount} issued, ${failCount} failed`);
+
+  // Activity log entry
+  const feed = document.getElementById('activity-feed');
+  if(feed.firstChild){
+    feed.insertAdjacentHTML('afterbegin',`<div class="activity-item"><div class="activity-dot" style="background:#22c55e;"></div><div style="flex:1;font-size:12px;"><strong>Bulk Issuance</strong> — ${successCount} passports issued, ₹${totalRevenue.toLocaleString('en-IN')} revenue by <strong>${agent.name}</strong></div><div style="font-size:10px;color:var(--muted);white-space:nowrap;margin-left:8px;">Just now</div></div>`);
+  }
+}
+
+function downloadBulkTemplate(){
+  const headers = 'First Name,Last Name,Mobile,Email,Date of Birth (YYYY-MM-DD),Gender,Plan,Payment Mode,City,State';
+  const sample  = 'Ravi,Sharma,9876543210,ravi@example.com,1990-05-14,Male,Combo Passport,Cash,Noida,Uttar Pradesh\nPriya,Gupta,9876543211,priya@example.com,1995-08-22,Female,Water Park Passport,UPI / QR,Delhi,Delhi';
+  const csv = headers + '\n' + sample;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='wow_bulk_passport_template.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('💾 Template downloaded!');
+}
+
+function handleBulkCsvUpload(input){
+  const file = input.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const lines = e.target.result.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(lines.length<2){ showToast('⚠️ CSV has no data rows'); return; }
+    const headers = lines[0].split(',').map(h=>h.trim().toLowerCase());
+    let added=0, errors=[];
+    for(let i=1;i<Math.min(lines.length,201);i++){
+      const cols = lines[i].split(',').map(c=>c.trim());
+      const get = (k)=> { const idx=headers.findIndex(h=>h.includes(k)); return idx>=0?cols[idx]||'':''; };
+      const fname  = get('first');
+      const lname  = get('last');
+      const mobile = get('mobile');
+      const plan   = get('plan');
+      const mode   = get('payment') || get('mode');
+      if(!fname||!lname||!/^\d{10}$/.test(mobile)||!plan){
+        errors.push('Row '+(i+1)+': Missing required fields');
+        continue;
+      }
+      const price = PLAN_PRICES[plan] || 0;
+      if(!price){ errors.push('Row '+(i+1)+': Invalid plan name'); continue; }
+      bulkBatch.push({
+        fname, lname, mobile,
+        email:  get('email'),
+        dob:    get('birth') || get('dob'),
+        gender: get('gender') || 'Male',
+        plan, mode: mode||'Cash',
+        city:   get('city'),
+        state:  get('state'),
+        price,  total: price + Math.round(price*0.18),
+        rowStatus: 'pending'
+      });
+      added++;
+    }
+    renderBulkTable();
+    if(errors.length){ showToast('⚠️ '+added+' added, '+errors.length+' rows had errors', 4000); console.warn('CSV errors:', errors); }
+    else { showToast('✅ '+added+' records loaded from CSV'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ===== API SYNC =====
+async function loadLivePassports(){
+  try {
+    const res = await WOW_API.getPassports({ limit:100, sort:'created_at' });
+    if(res.data && res.data.length){
+      // Merge API passports into local array (prepend)
+      const apiPax = res.data.map(p=>({...p, name:p.holder_name, amount:p.plan_price, mode:p.payment_mode, agent:p.agent_name, issued:WOW_API.formatDate(p.issued_date), expiry:WOW_API.formatDate(p.expiry_date)}));
+      // Add only new ones
+      const existingIds = new Set(passports.map(p=>p.id));
+      apiPax.filter(p=>!existingIds.has(p.id)).forEach(p=>passports.unshift(p));
+    }
+  } catch(e){ /* offline */ }
+}
+
+async function loadLiveKyc(){
+  try {
+    const res = await WOW_API.getKYCList({ limit:50 });
+    if(res.data && res.data.length){
+      const pending = res.data.filter(k=>k.kyc_status==='pending');
+      const mapped = pending.map(k=>({id:k.id, name:`${k.fname} ${k.lname}`, mobile:k.mobile, plan:k.plan, photo:k.photo_data||null, agent:k.agent_name, submitted:new Date(k.created_at||Date.now()).toLocaleString('en-IN'), status:'pending'}));
+      // Merge with local queue
+      const existingIds = new Set(kycQueue.map(q=>q.id));
+      mapped.filter(k=>!existingIds.has(k.id)).forEach(k=>kycQueue.unshift(k));
+      document.getElementById('queue-badge').textContent = kycQueue.length;
+      document.getElementById('metric-kyc-pending').textContent = kycQueue.length;
+    }
+  } catch(e){ /* offline */ }
+}
+
+// Trigger API sync on load
+window.addEventListener('load', async ()=>{
+  await loadLivePassports();
+  await loadLiveKyc();
+});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="sales"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
