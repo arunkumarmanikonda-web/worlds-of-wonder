@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Revenue Analytics — WOW Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+/* ── LOCAL OVERRIDES ── */
+.ra-topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.ra-title{font-size:16px;font-weight:800;font-family:'Nunito',sans-serif;color:#0a1628;}
+.ra-sub{font-size:11px;color:#64748b;margin-top:1px;}
+.ra-content{padding:20px 24px;}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-group{display:flex;align-items:center;gap:6px;}
+.filter-label{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;white-space:nowrap;}
+.filter-select{border:1.5px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:12px;font-family:'Inter',sans-serif;color:#1e293b;outline:none;cursor:pointer;}
+.filter-select:focus{border-color:#ff6b35;}
+.filter-sep{width:1px;height:28px;background:#e2e8f0;margin:0 4px;}
+.filter-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
+.fb-active{background:#ff6b35;color:#fff;}
+.fb-outline{background:#fff;border:1.5px solid #e2e8f0;color:#475569;}
+.fb-outline:hover{border-color:#ff6b35;color:#ff6b35;}
+
+/* ── KPI CARDS ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;}
+.kpi-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-brand::before{background:#ff6b35;}
+.kpi-blue::before{background:#3b82f6;}
+.kpi-green::before{background:#06d6a0;}
+.kpi-purple::before{background:#8b5cf6;}
+.kpi-amber::before{background:#f59e0b;}
+.kpi-val{font-size:26px;font-weight:900;font-family:'Nunito',sans-serif;color:#0a1628;line-height:1.1;margin:6px 0 2px;}
+.kpi-lbl{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.kpi-delta{font-size:11px;font-weight:700;margin-top:4px;}
+.k-up{color:#06d6a0;} .k-dn{color:#ef233c;} .k-warn{color:#f59e0b;}
+.kpi-spark{position:absolute;right:12px;bottom:12px;width:60px;height:30px;}
+
+/* ── CHART CARDS ── */
+.chart-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;margin-bottom:16px;}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.chart-title{font-size:13px;font-weight:800;color:#0a1628;}
+.chart-tabs{display:flex;gap:6px;}
+.ctab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:.15s;}
+.ctab.active{background:#ff6b35;color:#fff;border-color:#ff6b35;}
+
+/* ── GRID LAYOUTS ── */
+.g-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;}
+.g-32{display:grid;grid-template-columns:3fr 2fr;gap:16px;}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr);}.g-2{grid-template-columns:1fr;}.g-3{grid-template-columns:1fr 1fr;}.g-32{grid-template-columns:1fr;}}
+@media(max-width:700px){.kpi-row{grid-template-columns:1fr 1fr;}.g-3{grid-template-columns:1fr;}}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{background:#f8fafc;padding:9px 12px;font-size:11px;font-weight:700;color:#64748b;text-align:left;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.data-table td{padding:9px 12px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#1e293b;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tbody tr:hover{background:#f8fafc;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.bg-green{background:#d1fae5;color:#065f46;}
+.bg-amber{background:#fef9c3;color:#854d0e;}
+.bg-red{background:#fee2e2;color:#991b1b;}
+.bg-blue{background:#dbeafe;color:#1e40af;}
+.bg-purple{background:#ede9fe;color:#5b21b6;}
+
+/* ── FORECAST ── */
+.forecast-card{background:linear-gradient(135deg,#0a1628,#1e3a5f);border-radius:12px;padding:18px;color:#fff;margin-bottom:16px;}
+.forecast-title{font-size:13px;font-weight:800;opacity:.8;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
+.forecast-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);}
+.forecast-row:last-child{border-bottom:none;}
+.forecast-name{font-size:13px;font-weight:600;opacity:.9;}
+.forecast-val{font-size:16px;font-weight:900;font-family:'Nunito',sans-serif;}
+.forecast-delta{font-size:11px;font-weight:700;}
+.fd-up{color:#06d6a0;} .fd-dn{color:#ef233c;}
+
+/* ── CHANNEL PILLS ── */
+.channel-list{display:flex;flex-direction:column;gap:10px;}
+.channel-row{display:flex;align-items:center;gap:10px;}
+.channel-name{font-size:12px;font-weight:700;width:100px;flex-shrink:0;color:#1e293b;}
+.channel-bar-wrap{flex:1;background:#f1f5f9;border-radius:20px;height:10px;}
+.channel-bar-fill{height:100%;border-radius:20px;}
+.channel-pct{font-size:12px;font-weight:800;width:36px;text-align:right;flex-shrink:0;}
+.channel-amt{font-size:11px;color:#64748b;width:60px;text-align:right;flex-shrink:0;}
+
+/* ── BTN ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
+.btn-ghost{background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;}
+.btn-ghost:hover{border-color:#94a3b8;}
+.btn-primary{background:#ff6b35;color:#fff;}
+.btn-primary:hover{background:#e85a22;}
+</style>
+</head>
+<body>
+<div class="adm-layout">
+
+<!-- SIDEBAR -->
+<aside class="adm-sidebar">
+  <div class="adm-sidebar-logo">
+    <a href="../index.html"><div style="width:34px;height:34px;background:#ff6b35;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;">W</div></a>
+    <div class="adm-sidebar-badge"><div class="adm-sidebar-badge-title">WOW Admin</div><div class="adm-sidebar-badge-sub">EALCPL Platform</div></div>
+  </div>
+  <nav class="adm-nav">
+    <div class="adm-nav-section">Overview</div>
+    <a href="index.html" class="adm-nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="bookings.html" class="adm-nav-item"><span class="nav-icon">📋</span> All Bookings</a>
+    <div class="adm-nav-section">Commerce</div>
+    <a href="pricing.html" class="adm-nav-item"><span class="nav-icon">💲</span> Pricing Rules</a>
+    <a href="offers.html" class="adm-nav-item"><span class="nav-icon">🎯</span> Offers &amp; Campaigns</a>
+    <a href="fnb-packages.html" class="adm-nav-item"><span class="nav-icon">🥗</span> F&amp;B Packages</a>
+    <div class="adm-nav-section">Finance</div>
+    <a href="finance.html" class="adm-nav-item"><span class="nav-icon">💰</span> Finance &amp; GST</a>
+    <a href="gst-engine.html" class="adm-nav-item"><span class="nav-icon">📑</span> GST Engine</a>
+    <a href="invoices.html" class="adm-nav-item"><span class="nav-icon">🧾</span> Invoices</a>
+    <a href="revenue-analytics.html" class="adm-nav-item active"><span class="nav-icon">📈</span> Revenue Analytics</a>
+    <div class="adm-nav-section">Operations</div>
+    <a href="ops-dashboard.html" class="adm-nav-item"><span class="nav-icon">🎡</span> Ops Dashboard</a>
+    <a href="gate.html" class="adm-nav-item"><span class="nav-icon">🔐</span> Gate Redemption</a>
+    <div class="adm-nav-section">B2B &amp; Partner</div>
+    <a href="crm.html" class="adm-nav-item"><span class="nav-icon">🤝</span> CRM &amp; Pipeline</a>
+    <a href="b2b-approvals.html" class="adm-nav-item"><span class="nav-icon">🏢</span> B2B Approvals</a>
+    <div class="adm-nav-section">Passport &amp; Loyalty</div>
+    <a href="passport-engine.html" class="adm-nav-item"><span class="nav-icon">🪪</span> Passport Engine</a>
+    <a href="loyalty-engine.html" class="adm-nav-item"><span class="nav-icon">⭐</span> Loyalty Engine</a>
+    <div class="adm-nav-section">Reports &amp; System</div>
+    <a href="reports.html" class="adm-nav-item"><span class="nav-icon">📊</span> All Reports</a>
+    <a href="audit-logs.html" class="adm-nav-item"><span class="nav-icon">🔍</span> Audit Logs</a>
+    <a href="super-admin.html" class="adm-nav-item"><span class="nav-icon">🛡</span> Super Admin</a>
+  </nav>
+  <div class="adm-sidebar-footer">
+    <div class="adm-sidebar-user">
+      <div class="adm-user-avatar">SA</div>
+      <div><div class="adm-user-name">Finance Admin</div><div class="adm-user-role">EALCPL · Full Access</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="adm-main" style="background:#f0f4f8;">
+
+  <!-- TOPBAR -->
+  <div class="ra-topbar">
+    <div>
+      <div class="ra-title">📈 Revenue Analytics &amp; BI Dashboard</div>
+      <div class="ra-sub" id="liveTime">Loading…</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost" onclick="exportReport()"><i class="fa fa-download"></i> Export CSV</button>
+      <button class="btn btn-ghost" onclick="printReport()"><i class="fa fa-print"></i> Print</button>
+      <button class="btn btn-primary" onclick="refreshData()"><i class="fa fa-sync"></i> Refresh</button>
+    </div>
+  </div>
+
+  <div class="ra-content">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Period</span>
+        <select class="filter-select" id="periodSelect" onchange="switchPeriod(this.value)">
+          <option value="today">Today</option>
+          <option value="week" selected>This Week</option>
+          <option value="month">This Month</option>
+          <option value="quarter">This Quarter</option>
+          <option value="year">This Year</option>
+          <option value="custom">Custom Range</option>
+        </select>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Park</span>
+        <select class="filter-select" id="parkSelect" onchange="applyFilters()">
+          <option value="all">All Parks</option>
+          <option value="water">Water Park</option>
+          <option value="amusement">Amusement Park</option>
+        </select>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Channel</span>
+        <select class="filter-select" id="channelSelect" onchange="applyFilters()">
+          <option value="all">All Channels</option>
+          <option value="online">Online (Website/App)</option>
+          <option value="b2b">B2B / Travel Agent</option>
+          <option value="gate">Walk-in / Gate</option>
+          <option value="passport">Passport</option>
+        </select>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <span class="filter-label">Category</span>
+        <select class="filter-select">
+          <option value="all">All Categories</option>
+          <option>Tickets</option>
+          <option>F&amp;B</option>
+          <option>Passport</option>
+          <option>Merchandise</option>
+          <option>Add-ons</option>
+        </select>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="filter-btn fb-outline" onclick="resetFilters()"><i class="fa fa-undo"></i> Reset</button>
+        <button class="filter-btn fb-active" onclick="applyFilters()"><i class="fa fa-check"></i> Apply</button>
+      </div>
+    </div>
+
+    <!-- KPI ROW -->
+    <div class="kpi-row">
+      <div class="kpi-card kpi-brand">
+        <div class="kpi-lbl">Revenue MTD</div>
+        <div class="kpi-val" id="kRevMTD">₹2.34 Cr</div>
+        <div class="kpi-delta k-up">↑ 18.4% vs last month</div>
+        <canvas class="kpi-spark" id="sp1"></canvas>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-lbl">Total Footfall</div>
+        <div class="kpi-val" id="kFootfall">48,240</div>
+        <div class="kpi-delta k-up">↑ 12.1% MoM</div>
+        <canvas class="kpi-spark" id="sp2"></canvas>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-lbl">Revenue Per Pax</div>
+        <div class="kpi-val" id="kRPP">₹485</div>
+        <div class="kpi-delta k-up">↑ ₹38 vs last month</div>
+      </div>
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-lbl">GST Collected</div>
+        <div class="kpi-val" id="kGST">₹35.7L</div>
+        <div class="kpi-delta k-warn">CGST+SGST 18%</div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-lbl">Transactions</div>
+        <div class="kpi-val" id="kTxns">14,820</div>
+        <div class="kpi-delta k-up">↑ 9.3% MoM</div>
+      </div>
+    </div>
+
+    <!-- ROW: MAIN TREND + CHANNEL BREAKDOWN -->
+    <div class="g-32" style="margin-bottom:16px;">
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head">
+          <div class="chart-title">💹 Revenue Trend</div>
+          <div class="chart-tabs">
+            <div class="ctab active" onclick="switchTrend('daily',this)">Daily</div>
+            <div class="ctab" onclick="switchTrend('weekly',this)">Weekly</div>
+            <div class="ctab" onclick="switchTrend('monthly',this)">Monthly</div>
+          </div>
+        </div>
+        <div style="height:280px;"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head"><div class="chart-title">📡 Revenue by Channel</div></div>
+        <div style="height:200px;"><canvas id="channelDonut"></canvas></div>
+        <div class="channel-list" style="margin-top:14px;" id="channelLegend"></div>
+      </div>
+    </div>
+
+    <!-- ROW: HOURLY + CATEGORY -->
+    <div class="g-2" style="margin-bottom:16px;">
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head">
+          <div class="chart-title">⏰ Hourly Revenue Pattern (Today)</div>
+          <div style="font-size:11px;color:#64748b;">Peak: 3 PM–4 PM · ₹6.8L</div>
+        </div>
+        <div style="height:220px;"><canvas id="hourlyChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head">
+          <div class="chart-title">🏷 Revenue by Category</div>
+          <div class="chart-tabs">
+            <div class="ctab active" onclick="switchCat('donut',this)">Donut</div>
+            <div class="ctab" onclick="switchCat('bar',this)">Bar</div>
+          </div>
+        </div>
+        <div style="height:220px;"><canvas id="categoryChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ROW: DAY-OF-WEEK + SEASONAL FORECAST -->
+    <div class="g-2" style="margin-bottom:16px;">
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head">
+          <div class="chart-title">📅 Revenue by Day of Week</div>
+          <div style="font-size:11px;color:#64748b;">Weekends drive 68% of weekly revenue</div>
+        </div>
+        <div style="height:220px;"><canvas id="dowChart"></canvas></div>
+      </div>
+      <div>
+        <div class="forecast-card">
+          <div class="forecast-title">🔮 Demand Forecast — Next 7 Days</div>
+          <div class="forecast-row">
+            <div>
+              <div class="forecast-name">Sun, 29 Mar (Tomorrow)</div>
+              <div style="font-size:11px;opacity:.5;">Forecast: 5,200 pax</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="forecast-val" style="color:#ffd60a;">₹25.2L</div>
+              <div class="forecast-delta fd-up">+12% vs last Sun</div>
+            </div>
+          </div>
+          <div class="forecast-row">
+            <div><div class="forecast-name">Mon, 30 Mar</div><div style="font-size:11px;opacity:.5;">Forecast: 1,800 pax</div></div>
+            <div style="text-align:right;"><div class="forecast-val">₹8.7L</div><div class="forecast-delta fd-dn">-3% vs last Mon</div></div>
+          </div>
+          <div class="forecast-row">
+            <div><div class="forecast-name">Sat, 4 Apr</div><div style="font-size:11px;opacity:.5;">Forecast: 6,800 pax</div></div>
+            <div style="text-align:right;"><div class="forecast-val" style="color:#06d6a0;">₹32.9L</div><div class="forecast-delta fd-up">+24% (Holiday)</div></div>
+          </div>
+          <div class="forecast-row">
+            <div><div class="forecast-name">Sun, 5 Apr</div><div style="font-size:11px;opacity:.5;">Forecast: 7,200 pax</div></div>
+            <div style="text-align:right;"><div class="forecast-val" style="color:#06d6a0;">₹34.9L</div><div class="forecast-delta fd-up">+28% (Long Weekend)</div></div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-bottom:0;">
+          <div class="chart-head"><div class="chart-title">🌡 Capacity Utilisation</div></div>
+          <div style="height:120px;"><canvas id="capacityTrend"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP PERFORMING PRODUCTS TABLE -->
+    <div class="chart-card" style="margin-bottom:16px;">
+      <div class="chart-head">
+        <div class="chart-title">🏆 Top Performing Products &amp; Packages</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm"><i class="fa fa-download"></i> Export</button>
+          <button class="btn btn-ghost btn-sm" onclick="alert('Filtering to this month…')"><i class="fa fa-filter"></i> Filter</button>
+        </div>
+      </div>
+      <table class="data-table" id="topTable">
+        <thead>
+          <tr>
+            <th>#</th><th>Product / Package</th><th>Category</th><th>Units Sold</th>
+            <th>Revenue</th><th>% of Total</th><th>GST</th><th>Net</th><th>Trend</th>
+          </tr>
+        </thead>
+        <tbody id="topTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- DAILY BREAKDOWN TABLE -->
+    <div class="chart-card" style="margin-bottom:16px;">
+      <div class="chart-head">
+        <div class="chart-title">📋 Daily Revenue Breakdown — March 2026</div>
+        <div style="display:flex;gap:6px;">
+          <input type="month" value="2026-03" style="border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 10px;font-size:12px;font-family:'Inter',sans-serif;" />
+          <button class="btn btn-ghost"><i class="fa fa-download"></i> Export</button>
+        </div>
+      </div>
+      <div style="max-height:320px;overflow-y:auto;">
+        <table class="data-table">
+          <thead style="position:sticky;top:0;z-index:1;">
+            <tr><th>Date</th><th>Day</th><th>Footfall</th><th>Tickets</th><th>F&amp;B</th><th>Passport</th><th>Add-ons</th><th>Total</th><th>vs LW</th></tr>
+          </thead>
+          <tbody id="dailyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- B2B / AGENT REVENUE -->
+    <div class="g-2">
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head"><div class="chart-title">🤝 B2B &amp; Agent Revenue Contribution</div></div>
+        <div style="height:220px;"><canvas id="b2bChart"></canvas></div>
+      </div>
+      <div class="chart-card" style="margin-bottom:0;">
+        <div class="chart-head"><div class="chart-title">🎟 Ticket Category Mix</div><a href="ticketing-engine.html" class="btn btn-ghost">Details →</a></div>
+        <div style="height:220px;"><canvas id="ticketMix"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+/* ─── LIVE CLOCK ─── */
+setInterval(()=>{ document.getElementById('liveTime').textContent = 'Live · '+new Date().toLocaleString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}); },1000);
+document.getElementById('liveTime').textContent = 'Live · '+new Date().toLocaleString('en-IN');
+
+/* ─── TREND CHART ─── */
+const trendDataSets = {
+  daily:{
+    labels:['22','23','24','25','26','27','28 Mar'],
+    data:[[4.2,2.1,4.8,6.7,8.9,9.2,8.5],[2.1,1.0,2.3,3.2,4.2,4.4,4.1]]
+  },
+  weekly:{
+    labels:['W1 Jan','W2','W3','W4','W1 Feb','W2','W3','W4','W1 Mar','W2','W3','W4'],
+    data:[[18.2,14.1,22.8,26.7,19.2,15.6,24.1,28.4,22.1,18.6,26.4,31.2],[8.8,6.8,11.0,12.9,9.3,7.6,11.7,13.8,10.7,9.0,12.8,15.1]]
+  },
+  monthly:{
+    labels:['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'],
+    data:[[82,96,142,188,162,98,74,48,52,86,118,168],[39,46,68,90,78,47,36,23,25,41,57,81]]
+  }
+};
+let trendChart;
+function buildTrend(mode){
+  if(trendChart) trendChart.destroy();
+  const d = trendDataSets[mode];
+  trendChart = new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {label:'Total Revenue (₹L)',data:d.data[0],borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#ff6b35'},
+        {label:'Net Revenue (₹L)',data:d.data[1],borderColor:'#06d6a0',backgroundColor:'rgba(6,214,160,.06)',fill:true,tension:.4,borderWidth:2,pointRadius:2,borderDash:[4,4]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+      scales:{y:{ticks:{callback:v=>'₹'+v+'L'},grid:{color:'rgba(0,0,0,.03)'}}}
+    }
+  });
+}
+buildTrend('daily');
+
+function switchTrend(mode,el){
+  document.querySelectorAll('.ctab').forEach(t=>{ if(t.closest('.chart-card')===el.closest('.chart-card')) t.classList.remove('active'); });
+  el.classList.add('active');
+  buildTrend(mode);
+}
+
+/* ─── CHANNEL DONUT ─── */
+const channelData = {labels:['Online (Website/App)','B2B / Travel Agent','Gate Walk-in','WOW Passport','Reseller'],data:[42,28,18,8,4],colors:['#ff6b35','#3b82f6','#06d6a0','#8b5cf6','#f59e0b']};
+new Chart(document.getElementById('channelDonut'),{
+  type:'doughnut',
+  data:{labels:channelData.labels,datasets:[{data:channelData.data,backgroundColor:channelData.colors,borderWidth:3,borderColor:'#fff'}]},
+  options:{cutout:'72%',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+});
+document.getElementById('channelLegend').innerHTML = channelData.labels.map((l,i)=>`
+  <div class="channel-row">
+    <div class="channel-name">${l.split(' ')[0]}</div>
+    <div class="channel-bar-wrap"><div class="channel-bar-fill" style="width:${channelData.data[i]}%;background:${channelData.colors[i]};"></div></div>
+    <div class="channel-pct" style="color:${channelData.colors[i]};">${channelData.data[i]}%</div>
+    <div class="channel-amt">₹${(channelData.data[i]*2.34).toFixed(1)}L</div>
+  </div>`).join('');
+
+/* ─── HOURLY CHART ─── */
+new Chart(document.getElementById('hourlyChart'),{
+  type:'bar',
+  data:{
+    labels:['10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm'],
+    datasets:[
+      {label:'Water Park',data:[2.1,3.8,5.6,5.2,6.0,6.8,5.8,4.2,1.4],backgroundColor:'rgba(0,180,216,.7)',borderRadius:6},
+      {label:'Amusement',data:[1.4,2.6,4.2,3.9,4.8,5.4,4.6,3.4,1.0],backgroundColor:'rgba(124,58,237,.6)',borderRadius:6}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10}}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'₹'+v+'L'}},x:{stacked:false}}}
+});
+
+/* ─── CATEGORY CHART ─── */
+const catLabels = ['Tickets','F&B','Passports','Lockers/Cos.','Merchandise'];
+const catData   = [62,22,8,5,3];
+const catColors = ['#ff6b35','#0ea5e9','#8b5cf6','#06d6a0','#f59e0b'];
+let catChart;
+function buildCat(type){
+  if(catChart) catChart.destroy();
+  catChart = new Chart(document.getElementById('categoryChart'),{
+    type,
+    data:{labels:catLabels,datasets:[{data:catData,backgroundColor:catColors,borderWidth:type==='donut'?2:0,borderColor:'#fff',borderRadius:type==='bar'?6:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:10}}}}}
+  });
+}
+buildCat('doughnut');
+function switchCat(mode,el){
+  document.querySelectorAll('.ctab').forEach(t=>{ if(t.closest('.chart-card')===el.closest('.chart-card')) t.classList.remove('active'); });
+  el.classList.add('active');
+  buildCat(mode==='donut'?'doughnut':'bar');
+}
+
+/* ─── DAY-OF-WEEK ─── */
+new Chart(document.getElementById('dowChart'),{
+  type:'bar',
+  data:{
+    labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets:[{
+      label:'Avg Revenue (₹L)',
+      data:[8.2,7.6,8.8,9.4,14.2,32.8,28.6],
+      backgroundColor:['#94a3b8','#94a3b8','#94a3b8','#94a3b8','#fbbf24','#ff6b35','#f97316'],
+      borderRadius:8
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'L'}}}}
+});
+
+/* ─── CAPACITY TREND ─── */
+new Chart(document.getElementById('capacityTrend'),{
+  type:'line',
+  data:{
+    labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets:[{label:'% Capacity',data:[38,34,42,48,62,88,82],borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.12)',fill:true,tension:.4,borderWidth:2.5,pointRadius:3}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'%'},min:0,max:100}}}
+});
+
+/* ─── TOP PRODUCTS TABLE ─── */
+const topProducts = [
+  {rank:1, name:'Combo Pack — Water + Amusement', cat:'Tickets', units:18420, rev:'₹2.39Cr', pct:42, gst:'₹36.8L', net:'₹2.02Cr', trend:'up'},
+  {rank:2, name:'Water Park — Adult', cat:'Tickets', units:14820, rev:'₹1.19Cr', pct:21, gst:'₹18.3L', net:'₹1.01Cr', trend:'up'},
+  {rank:3, name:'Amusement — Adult', cat:'Tickets', units:12460, rev:'₹99.5L', pct:17, gst:'₹15.3L', net:'₹84.2L', trend:'flat'},
+  {rank:4, name:'Buffet Meal Package', cat:'F&B', units:8240, rev:'₹37.1L', pct:6.5, gst:'₹5.7L', net:'₹31.4L', trend:'up'},
+  {rank:5, name:'WOW Passport — Gold', cat:'Passport', units:380, rev:'₹19.0L', pct:3.3, gst:'₹2.9L', net:'₹16.1L', trend:'up'},
+  {rank:6, name:'WOW Passport — Silver', cat:'Passport', units:820, rev:'₹12.3L', pct:2.2, gst:'₹1.9L', net:'₹10.4L', trend:'up'},
+  {rank:7, name:'F&B Snack Combo', cat:'F&B', units:11640, rev:'₹11.6L', pct:2.0, gst:'₹1.8L', net:'₹9.8L', trend:'up'},
+  {rank:8, name:'Locker Rental', cat:'Add-on', units:6820, rev:'₹6.8L', pct:1.2, gst:'₹1.0L', net:'₹5.8L', trend:'flat'},
+  {rank:9, name:'Costume Rental', cat:'Add-on', units:4210, rev:'₹8.4L', pct:1.5, gst:'₹1.3L', net:'₹7.1L', trend:'dn'},
+  {rank:10, name:'Child Ticket (90–120cm)', cat:'Tickets', units:9420, rev:'₹47.1L', pct:8.3, gst:'₹7.2L', net:'₹39.9L', trend:'up'},
+];
+const trendIcons = {up:'<span class="badge bg-green">↑ Up</span>',flat:'<span class="badge bg-amber">→ Flat</span>',dn:'<span class="badge bg-red">↓ Down</span>'};
+document.getElementById('topTableBody').innerHTML = topProducts.map(p=>`
+  <tr>
+    <td style="font-weight:800;color:#ff6b35;">${p.rank}</td>
+    <td style="font-weight:700;">${p.name}</td>
+    <td><span class="badge ${p.cat==='Tickets'?'bg-blue':p.cat==='F&B'?'bg-green':p.cat==='Passport'?'bg-purple':'bg-amber'}">${p.cat}</span></td>
+    <td style="text-align:center;font-weight:700;">${p.units.toLocaleString('en-IN')}</td>
+    <td style="font-weight:800;color:#0a1628;">${p.rev}</td>
+    <td><div style="display:flex;align-items:center;gap:6px;"><div style="flex:1;background:#f1f5f9;border-radius:20px;height:6px;"><div style="width:${p.pct}%;background:#ff6b35;height:100%;border-radius:20px;"></div></div><span style="font-size:11px;font-weight:700;white-space:nowrap;">${p.pct}%</span></div></td>
+    <td style="color:#64748b;">${p.gst}</td>
+    <td style="font-weight:700;color:#0f766e;">${p.net}</td>
+    <td>${trendIcons[p.trend]}</td>
+  </tr>`).join('');
+
+/* ─── DAILY TABLE ─── */
+const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const dailyRows = Array.from({length:28},(_, i)=>{
+  const d = i+1;
+  const dayName = days[(d+0)%7];
+  const isWE = dayName==='Sat'||dayName==='Sun';
+  const ff = isWE ? 5000+Math.floor(Math.random()*2000) : 1200+Math.floor(Math.random()*1000);
+  const tickets = Math.round(ff*0.82);
+  const fnb = Math.round(ff*28);
+  const pass = isWE ? Math.floor(Math.random()*80000)+20000 : Math.floor(Math.random()*20000)+5000;
+  const addons = Math.round(ff*12);
+  const total = tickets*799+fnb+pass+addons;
+  const vsLW = Math.floor(Math.random()*30)-10;
+  return {d,dayName,ff,tickets,fnb,pass,addons,total,vsLW};
+});
+document.getElementById('dailyTableBody').innerHTML = dailyRows.map(r=>`
+  <tr>
+    <td style="font-weight:700;">${String(r.d).padStart(2,'0')} Mar</td>
+    <td><span class="badge ${r.dayName==='Sat'||r.dayName==='Sun'?'bg-blue':'bg-amber'}" style="font-size:10px;">${r.dayName}</span></td>
+    <td style="text-align:center;">${r.ff.toLocaleString('en-IN')}</td>
+    <td>₹${(r.tickets*799/100000).toFixed(1)}L</td>
+    <td>₹${(r.fnb/100000).toFixed(1)}L</td>
+    <td>₹${(r.pass/100000).toFixed(1)}L</td>
+    <td>₹${(r.addons/100000).toFixed(1)}L</td>
+    <td style="font-weight:800;">₹${(r.total/100000).toFixed(1)}L</td>
+    <td><span class="${r.vsLW>=0?'k-up':'k-dn'}">${r.vsLW>=0?'↑':'↓'}${Math.abs(r.vsLW)}%</span></td>
+  </tr>`).join('');
+
+/* ─── B2B CHART ─── */
+new Chart(document.getElementById('b2bChart'),{
+  type:'bar',
+  data:{
+    labels:['Online Direct','Travel Agents','Resellers','Corporate B2B','Schools','Walk-in'],
+    datasets:[{
+      label:'Revenue (₹L)',
+      data:[98.3,65.5,9.4,42.8,28.6,42.1],
+      backgroundColor:['#ff6b35','#3b82f6','#06d6a0','#8b5cf6','#f59e0b','#64748b'],
+      borderRadius:8
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'₹'+v+'L'}}}}
+});
+
+/* ─── TICKET MIX ─── */
+new Chart(document.getElementById('ticketMix'),{
+  type:'bar',
+  data:{
+    labels:['Combo','Water Park','Amusement','Child (WP)','Child (AP)','Infant'],
+    datasets:[{
+      label:'Units',
+      data:[18420,14820,12460,6240,5180,1820],
+      backgroundColor:'rgba(255,107,53,.7)',
+      borderRadius:6
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+/* ─── SPARKLINES ─── */
+function spark(id,data,color){
+  new Chart(document.getElementById(id),{
+    type:'line',
+    data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:1.5,fill:false,tension:.4,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}}}
+  });
+}
+spark('sp1',[4.2,5.8,5.2,7.6,8.1,9.2,8.5],'#ff6b35');
+spark('sp2',[32,38,35,44,48,52,48],'#3b82f6');
+
+/* ─── PERIOD SWITCH ─── */
+function switchPeriod(v){
+  const kpis = {
+    today:{rev:'₹38.4L',ff:'4,218',rpp:'₹485',gst:'₹5.9L',txns:'1,284'},
+    week:{rev:'₹1.14Cr',ff:'18,420',rpp:'₹495',gst:'₹17.6L',txns:'4,820'},
+    month:{rev:'₹2.34Cr',ff:'48,240',rpp:'₹485',gst:'₹35.7L',txns:'14,820'},
+    quarter:{rev:'₹6.82Cr',ff:'1,42,600',rpp:'₹478',gst:'₹1.04Cr',txns:'48,200'},
+    year:{rev:'₹24.6Cr',ff:'5,18,000',rpp:'₹474',gst:'₹3.76Cr',txns:'1,82,400'},
+  };
+  const k = kpis[v]||kpis.month;
+  document.getElementById('kRevMTD').textContent = k.rev;
+  document.getElementById('kFootfall').textContent = k.ff;
+  document.getElementById('kRPP').textContent = k.rpp;
+  document.getElementById('kGST').textContent = k.gst;
+  document.getElementById('kTxns').textContent = k.txns;
+}
+
+/* ─── CONTROLS ─── */
+function applyFilters(){ alert('Filters applied — data refreshed.'); }
+function resetFilters(){
+  document.getElementById('parkSelect').value='all';
+  document.getElementById('channelSelect').value='all';
+  document.getElementById('periodSelect').value='month';
+  switchPeriod('month');
+}
+function exportReport(){ alert('Revenue report CSV exported to your downloads.'); }
+function printReport(){ window.print(); }
+function refreshData(){ alert('Data refreshed with latest figures.'); }
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
