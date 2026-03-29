@@ -6,6 +6,7 @@
 <title>System Config &amp; Module Toggles — WOW Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
 <style>
 .config-group{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
 .config-group-header{padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
@@ -342,5 +343,6 @@ function showToast(msg,type='info'){
   setTimeout(()=>t.remove(),4000);
 }
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
