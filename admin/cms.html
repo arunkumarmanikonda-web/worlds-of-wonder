@@ -6,6 +6,7 @@
 <title>CMS — Content Management — WOW Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
 <style>
 .cms-zone-card{border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--white);transition:box-shadow var(--tr);}
 .cms-zone-card:hover{box-shadow:var(--sh);}
@@ -513,5 +514,6 @@ function showToast(msg,type='info'){
   setTimeout(()=>t.remove(),4000);
 }
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
