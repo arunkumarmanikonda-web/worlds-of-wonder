@@ -6,12 +6,13 @@
   <title>Offer & Campaign Engine — Admin | Worlds of Wonder</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="../js/wow-auth.js"></script>
+  <script src="../js/wow-offer-engine.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--ink:#0a0f28;--blue:#1a56db;--green:#16a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;--border:#e2e8f0;--text:#374151;--muted:#6b7280;--surface:#f0f4ff;}
     body{font-family:'Poppins',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;display:flex;}
 
-    /* Sidebar same as admin/index */
     .adm-sidebar{width:240px;flex-shrink:0;background:var(--ink);min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
     .adm-sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);}
     .adm-sidebar-logo img{height:40px;width:auto;object-fit:contain;}
@@ -25,59 +26,8 @@
     .adm-topbar-title{font-size:18px;font-weight:800;color:var(--ink);}
     .adm-content{padding:24px;}
 
-    /* Cards */
     .card{background:#fff;border-radius:16px;border:1px solid var(--border);padding:22px;box-shadow:0 1px 8px rgba(0,0,0,.04);margin-bottom:20px;}
     .card-title{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:16px;}
-
-    /* Offer card grid */
-    .offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
-    .offer-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .2s,box-shadow .2s;}
-    .offer-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
-    .offer-card-header{padding:16px 18px 14px;position:relative;}
-    .offer-card-body{padding:0 18px 18px;}
-    .offer-card-type{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
-    .offer-card-name{font-size:16px;font-weight:900;color:var(--ink);font-family:'Nunito',sans-serif;margin-bottom:6px;}
-    .offer-card-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
-    .offer-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
-    .tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:#f3f4f6;color:#374151;}
-    .offer-actions{display:flex;gap:8px;}
-    .btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .15s;}
-    .btn-primary{background:var(--blue);color:#fff;}
-    .btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border);}
-    .btn-amber{background:#fffbeb;color:var(--amber);border:1.5px solid #fde68a;}
-    .btn-red{background:#fef2f2;color:var(--red);border:1.5px solid #fecaca;}
-    .btn-green{background:#f0fdf4;color:var(--green);border:1.5px solid #bbf7d0;}
-    .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;}
-    .badge-green{background:#f0fdf4;color:#15803d;}
-    .badge-amber{background:#fffbeb;color:#b45309;}
-    .badge-red{background:#fef2f2;color:#b91c1c;}
-    .badge-blue{background:#eff6ff;color:#1d4ed8;}
-    .badge-gray{background:#f3f4f6;color:#4b5563;}
-    .badge-purple{background:#faf5ff;color:#6d28d9;}
-    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
-    .dot-green{background:#22c55e;}
-    .dot-amber{background:#f59e0b;}
-    .dot-gray{background:#9ca3af;}
-    .dot-red{background:#ef4444;}
-
-    /* Form */
-    label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;}
-    input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);outline:none;transition:border-color .15s;}
-    input:focus,select:focus,textarea:focus{border-color:var(--blue);}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .form-group{display:flex;flex-direction:column;gap:5px;}
-    .form-group.full{grid-column:span 2;}
-
-    /* Modal */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;align-items:center;justify-content:center;padding:20px;}
-    .modal-overlay.show{display:flex;}
-    .modal{background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
-    .modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-    .modal-title{font-size:18px;font-weight:800;color:var(--ink);}
-    .modal-close{width:32px;height:32px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--muted);display:flex;align-items:center;justify-content:center;border-radius:6px;}
-    .modal-close:hover{background:#f3f4f6;}
-    .modal-body{padding:24px;}
-    .modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
 
     /* Stats */
     .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
@@ -85,29 +35,113 @@
     .stat-num{font-size:26px;font-weight:900;font-family:'Nunito',sans-serif;color:var(--ink);}
     .stat-label{font-size:11.5px;color:var(--muted);margin-top:3px;}
 
-    @media(max-width:900px){.offer-grid{grid-template-columns:1fr 1fr;}.adm-sidebar{display:none;}}
+    /* Offer grid */
+    .offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+    .offer-card{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+    .offer-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
+    .offer-card-header{padding:16px 18px 14px;}
+    .offer-card-body{padding:0 18px 18px;}
+    .offer-card-type{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+    .offer-card-name{font-size:16px;font-weight:900;color:var(--ink);font-family:'Nunito',sans-serif;margin-bottom:6px;}
+    .offer-card-desc{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;}
+    .offer-tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+    .tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:#f3f4f6;color:#374151;}
+    .offer-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;}
+    .badge-green{background:#f0fdf4;color:#15803d;} .badge-amber{background:#fffbeb;color:#b45309;}
+    .badge-red{background:#fef2f2;color:#b91c1c;} .badge-blue{background:#eff6ff;color:#1d4ed8;}
+    .badge-gray{background:#f3f4f6;color:#4b5563;} .badge-purple{background:#faf5ff;color:#6d28d9;}
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+    .dot-green{background:#22c55e;} .dot-amber{background:#f59e0b;} .dot-gray{background:#9ca3af;} .dot-red{background:#ef4444;}
+
+    /* Buttons */
+    .btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .15s;font-family:'Poppins',sans-serif;}
+    .btn-primary{background:var(--blue);color:#fff;} .btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--border);}
+    .btn-amber{background:#fffbeb;color:var(--amber);border:1.5px solid #fde68a;} .btn-red{background:#fef2f2;color:var(--red);border:1.5px solid #fecaca;}
+    .btn-green{background:#f0fdf4;color:var(--green);border:1.5px solid #bbf7d0;} .btn-purple{background:#faf5ff;color:var(--purple);border:1.5px solid #e9d5ff;}
+
+    /* Modal */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:#fff;border-radius:18px;width:100%;max-width:760px;box-shadow:0 20px 60px rgba(0,0,0,.25);margin:auto;}
+    .modal-head{padding:22px 26px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;border-radius:18px 18px 0 0;z-index:1;}
+    .modal-title{font-size:18px;font-weight:800;color:var(--ink);font-family:'Nunito',sans-serif;}
+    .modal-close{width:32px;height:32px;border:none;background:none;cursor:pointer;font-size:20px;color:var(--muted);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+    .modal-close:hover{background:#f3f4f6;}
+    .modal-body{padding:24px 26px;max-height:70vh;overflow-y:auto;}
+    .modal-foot{padding:16px 26px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;border-radius:0 0 18px 18px;}
+
+    /* Form */
+    label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;}
+    input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;font-family:'Poppins',sans-serif;background:#fff;color:var(--text);outline:none;transition:border-color .15s;}
+    input:focus,select:focus,textarea:focus{border-color:var(--blue);}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+    .form-group{display:flex;flex-direction:column;gap:5px;}
+    .form-group.full{grid-column:span 2;}
+    .form-group.full3{grid-column:span 3;}
+    .form-hint{font-size:11px;color:var(--muted);margin-top:3px;}
+    .form-section{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+    .form-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+    .form-section-title{font-size:13px;font-weight:800;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+    /* Offer type selector */
+    .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px;}
+    .type-card{border:2px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;}
+    .type-card:hover{border-color:var(--blue);background:#f0f6ff;}
+    .type-card.selected{border-color:var(--blue);background:#eff6ff;}
+    .type-card .tc-icon{font-size:22px;margin-bottom:6px;}
+    .type-card .tc-name{font-size:12px;font-weight:800;color:var(--ink);}
+    .type-card .tc-desc{font-size:10px;color:var(--muted);margin-top:3px;}
+
+    /* Conditional panels */
+    .cond-panel{display:none;}
+    .cond-panel.show{display:block;}
+
+    /* Schedule type tabs */
+    .sched-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+    .sched-tab{padding:6px 14px;border:1.5px solid var(--border);border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--muted);transition:all .15s;}
+    .sched-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+    /* Buffet config modal */
+    .buffet-modal .modal{max-width:560px;}
+
+    /* Settings modal */
+    .settings-modal .modal{max-width:480px;}
+
+    /* Filter tabs */
+    .filter-tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:4px;}
+    .filter-tab{padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);transition:all .15s;}
+    .filter-tab.active{background:var(--blue);color:#fff;}
+
+    /* Toast */
+    .adm-toast{position:fixed;bottom:24px;right:24px;background:#0a0f28;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transform:translateY(12px);transition:all .3s;pointer-events:none;}
+    .adm-toast.show{opacity:1;transform:translateY(0);}
+
+    @media(max-width:900px){.offer-grid{grid-template-columns:1fr 1fr;}.adm-sidebar{display:none;}.type-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:600px){.offer-grid{grid-template-columns:1fr;}.type-grid{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}.form-group.full{grid-column:span 1;}}
   </style>
 </head>
 <body>
 
 <aside class="adm-sidebar">
   <div class="adm-sidebar-logo">
-    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" style="filter:none!important;" /></a>
+    <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" /></a>
     <div style="font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;font-weight:700;">Admin Panel</div>
   </div>
   <nav class="adm-nav">
     <div class="adm-nav-section">Overview</div>
     <a href="index.html" class="adm-nav-item">📊 Dashboard</a>
-    <a href="index.html" class="adm-nav-item">📋 All Bookings</a>
+    <a href="bookings.html" class="adm-nav-item">📋 All Bookings</a>
     <div class="adm-nav-section">Commerce</div>
     <a href="offers.html" class="adm-nav-item active">🎯 Offers &amp; Campaigns</a>
-    <a href="index.html" class="adm-nav-item">🪪 Passport Plans</a>
-    <a href="index.html" class="adm-nav-item">⭐ Loyalty Engine</a>
+    <a href="passport-engine.html" class="adm-nav-item">🪪 Passport Plans</a>
     <div class="adm-nav-section">B2B &amp; Sales</div>
     <a href="crm.html" class="adm-nav-item">🤝 CRM &amp; Sales</a>
-    <a href="index.html" class="adm-nav-item">🤝 Partners</a>
     <div class="adm-nav-section">Operations</div>
-    <a href="gate.html" class="adm-nav-item">🔐 Gate Redemption</a>
+    <a href="inventory.html" class="adm-nav-item">📦 Capacity</a>
     <a href="finance.html" class="adm-nav-item">💰 Finance</a>
     <a href="banners.html" class="adm-nav-item">🖼 CMS / Banners</a>
     <div class="adm-nav-section">System</div>
@@ -120,8 +154,9 @@
   <div class="adm-topbar">
     <div class="adm-topbar-title">🎯 Offer &amp; Campaign Engine</div>
     <div style="display:flex;gap:10px;">
-      <button class="btn-sm btn-ghost" style="font-size:13px;padding:8px 16px;" onclick="openCloneModal()">📋 Clone Offer</button>
-      <button class="btn-sm btn-primary" style="font-size:13px;padding:8px 18px;" onclick="openCreateModal()">+ Create Offer</button>
+      <button class="btn-sm btn-ghost" onclick="openBuffetModal()" style="font-size:13px;padding:8px 16px;">🍽 Buffet Config</button>
+      <button class="btn-sm btn-ghost" onclick="openSettingsModal()" style="font-size:13px;padding:8px 16px;">⚙️ Settings</button>
+      <button class="btn-sm btn-primary" onclick="openCreateModal()" style="font-size:13px;padding:8px 18px;">+ Create Offer</button>
     </div>
   </div>
 
@@ -129,183 +164,43 @@
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">Live Offers</div></div>
-      <div class="stat-card"><div class="stat-num">3,842</div><div class="stat-label">Offers Redeemed (MTD)</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-live">—</div><div class="stat-label">Live Offers</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-used">3,842</div><div class="stat-label">Offers Redeemed (MTD)</div></div>
       <div class="stat-card"><div class="stat-num">₹18.4L</div><div class="stat-label">Offer Revenue (MTD)</div></div>
-      <div class="stat-card"><div class="stat-num">6.2%</div><div class="stat-label">Avg Discount Given</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-max-tix">—</div><div class="stat-label">Max Tickets / Transaction</div></div>
     </div>
 
-    <!-- Filter tabs -->
+    <!-- Filters -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-      <div style="display:flex;gap:4px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:4px;">
-        <button class="filter-tab active" onclick="filterOffers('all',this)" style="padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;">All</button>
-        <button class="filter-tab" onclick="filterOffers('live',this)" style="padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);">Live</button>
-        <button class="filter-tab" onclick="filterOffers('draft',this)" style="padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);">Draft</button>
-        <button class="filter-tab" onclick="filterOffers('scheduled',this)" style="padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);">Scheduled</button>
-        <button class="filter-tab" onclick="filterOffers('expired',this)" style="padding:7px 16px;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;background:none;color:var(--muted);">Expired</button>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterOffers('all',this)">All</button>
+        <button class="filter-tab" onclick="filterOffers('live',this)">Live</button>
+        <button class="filter-tab" onclick="filterOffers('draft',this)">Draft</button>
+        <button class="filter-tab" onclick="filterOffers('scheduled',this)">Scheduled</button>
+        <button class="filter-tab" onclick="filterOffers('expired',this)">Expired</button>
       </div>
-      <select style="padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;"><option>All Parks</option><option>Water Park</option><option>Amusement Park</option><option>Combo</option></select>
-      <select style="padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff;"><option>All Types</option><option>% Discount</option><option>Flat Discount</option><option>BOGO</option><option>Flash Sale</option></select>
+      <select id="park-filter" onchange="renderOfferGrid()" style="padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+        <option value="">All Parks</option>
+        <option value="WATER_DAY">Water Park</option>
+        <option value="AMUSEMENT_DAY">Amusement Park</option>
+        <option value="COMBO_DAY">Combo</option>
+      </select>
+      <select id="type-filter" onchange="renderOfferGrid()" style="padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
+        <option value="">All Types</option>
+        <option value="percent">% Discount</option>
+        <option value="flat">Flat Discount</option>
+        <option value="bogo">Buy 1 Get 1</option>
+        <option value="b2g1">Buy 2 Get 1</option>
+        <option value="buy4_discount">Buy 4 Discount</option>
+      </select>
     </div>
 
-    <!-- Offers Grid -->
-    <div class="offer-grid" id="offer-grid">
+    <!-- Offer Grid -->
+    <div class="offer-grid" id="offer-grid"></div>
 
-      <!-- Live offers -->
-      <div class="offer-card" style="border-top:4px solid #22c55e;">
-        <div class="offer-card-header">
-          <span class="badge badge-green"><span class="status-dot dot-green"></span>Live</span>
-          <div class="offer-card-type" style="color:#16a34a;margin-top:8px;">🎯 Seasonal Discount</div>
-          <div class="offer-card-name">Summer Splash 20% Off</div>
-          <div class="offer-card-desc">20% off Water Park tickets for all bookings. Applies to Adult &amp; Child categories only.</div>
-          <div class="offer-tag-row">
-            <span class="tag">🌊 Water Park</span>
-            <span class="tag">Online</span>
-            <span class="tag">20% off</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Valid: 1 Apr – 30 Jun 2026</span>
-            <span>Used: 842 times</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-amber" onclick="editOffer('Summer Splash 20% Off')">✏️ Edit</button>
-            <button class="btn-sm btn-ghost" onclick="cloneOffer('Summer Splash 20% Off')">📋 Clone</button>
-            <button class="btn-sm btn-red" onclick="pauseOffer('Summer Splash 20% Off')">⏸ Pause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="offer-card" style="border-top:4px solid #22c55e;">
-        <div class="offer-card-header">
-          <span class="badge badge-green"><span class="status-dot dot-green"></span>Live</span>
-          <div class="offer-card-type" style="color:#16a34a;margin-top:8px;">👨‍👩‍👧 Family Bundle</div>
-          <div class="offer-card-name">Family of 4 — ₹1,000 Off</div>
-          <div class="offer-card-desc">Flat ₹1,000 off on combo booking for exactly 2 adults + 2 children.</div>
-          <div class="offer-tag-row">
-            <span class="tag">🎉 Combo</span>
-            <span class="tag">₹1,000 flat</span>
-            <span class="tag">Family</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Valid: Ongoing</span>
-            <span>Used: 321 times</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-amber" onclick="editOffer('Family of 4')">✏️ Edit</button>
-            <button class="btn-sm btn-ghost" onclick="cloneOffer('Family of 4')">📋 Clone</button>
-            <button class="btn-sm btn-red" onclick="pauseOffer('Family of 4')">⏸ Pause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="offer-card" style="border-top:4px solid #f59e0b;">
-        <div class="offer-card-header">
-          <span class="badge badge-amber"><span class="status-dot dot-amber"></span>Scheduled</span>
-          <div class="offer-card-type" style="color:var(--amber);margin-top:8px;">⚡ Flash Sale</div>
-          <div class="offer-card-name">Weekend Flash — 15% Off</div>
-          <div class="offer-card-desc">15% off all parks, every Friday–Sunday. Flash sale timer displayed on booking page.</div>
-          <div class="offer-tag-row">
-            <span class="tag">All Parks</span>
-            <span class="tag">Weekends</span>
-            <span class="tag">15% off</span>
-            <span class="tag" style="background:#fef3c7;color:#b45309;">Flash Sale</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Starts: 4 Apr 2026</span>
-            <span>Inventory: 500 tickets</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-amber" onclick="editOffer('Weekend Flash')">✏️ Edit</button>
-            <button class="btn-sm btn-green" onclick="activateOffer('Weekend Flash')">▶ Activate Now</button>
-            <button class="btn-sm btn-red" onclick="alert('Offer cancelled.')">✕ Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="offer-card" style="border-top:4px solid #22c55e;">
-        <div class="offer-card-header">
-          <span class="badge badge-green"><span class="status-dot dot-green"></span>Live</span>
-          <div class="offer-card-type" style="color:#16a34a;margin-top:8px;">🎂 Birthday Offer</div>
-          <div class="offer-card-name">Birthday Month — 25% Off</div>
-          <div class="offer-card-desc">Loyalty members get 25% off in their birthday month. Auto-applied via loyalty engine.</div>
-          <div class="offer-tag-row">
-            <span class="tag">All Parks</span>
-            <span class="tag">Loyalty</span>
-            <span class="tag">25% off</span>
-            <span class="tag" style="background:#fdf4ff;color:#7c3aed;">Segment: Members</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Valid: Ongoing · Auto-triggered</span>
-            <span>Used: 148 times</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-amber" onclick="editOffer('Birthday Month')">✏️ Edit</button>
-            <button class="btn-sm btn-ghost">📊 Analytics</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="offer-card" style="border-top:4px solid #1a56db;">
-        <div class="offer-card-header">
-          <span class="badge badge-blue"><span class="status-dot" style="background:#3b82f6;"></span>Draft</span>
-          <div class="offer-card-type" style="color:var(--blue);margin-top:8px;">🏢 Corporate Bulk</div>
-          <div class="offer-card-name">Corporate Day Out — 18% Off</div>
-          <div class="offer-card-desc">18% discount for corporates booking 50+ tickets via quote engine. Requires approval.</div>
-          <div class="offer-tag-row">
-            <span class="tag">All Parks</span>
-            <span class="tag">B2B</span>
-            <span class="tag">50+ tickets</span>
-            <span class="tag" style="background:#eff6ff;color:#1d4ed8;">Segment: Corporate</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Draft — Not published</span>
-            <span>Approval: Pending</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-amber" onclick="editOffer('Corporate Day Out')">✏️ Edit</button>
-            <button class="btn-sm btn-green" onclick="submitApproval('Corporate Day Out')">📤 Submit for Approval</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="offer-card" style="border-top:4px solid #9ca3af;opacity:.8;">
-        <div class="offer-card-header">
-          <span class="badge badge-gray"><span class="status-dot dot-gray"></span>Expired</span>
-          <div class="offer-card-type" style="color:var(--muted);margin-top:8px;">🎄 Seasonal</div>
-          <div class="offer-card-name">New Year Bonanza — 30% Off</div>
-          <div class="offer-card-desc">30% off all tickets during New Year week. Ended 5 Jan 2026.</div>
-          <div class="offer-tag-row">
-            <span class="tag">All Parks</span>
-            <span class="tag">30% off</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);">
-            <span>Expired: 5 Jan 2026</span>
-            <span>Used: 1,284 times</span>
-          </div>
-        </div>
-        <div class="offer-card-body">
-          <div class="offer-actions">
-            <button class="btn-sm btn-ghost" onclick="cloneOffer('New Year Bonanza')">📋 Clone for 2027</button>
-            <button class="btn-sm btn-ghost">📊 ROI Report</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Campaign Performance Table -->
+    <!-- Campaign Performance -->
     <div class="card">
-      <div class="card-title">Campaign Performance (This Month)</div>
+      <div class="card-title">📊 Campaign Performance (This Month)</div>
       <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
           <thead>
@@ -314,79 +209,1028 @@
               <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">Type</th>
               <th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">Uses</th>
               <th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">Revenue</th>
-              <th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">Discount Given</th>
               <th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">ROI</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">Summer Splash 20%</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-green">% Discount</span></td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;">842</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;">₹8,76,558</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;color:var(--red);">₹2,19,139</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;"><span class="badge badge-green">+312%</span></td></tr>
-            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">Family of 4 Bundle</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-blue">Flat ₹</span></td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;">321</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;">₹5,42,079</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;color:var(--red);">₹3,21,000</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;"><span class="badge badge-green">+169%</span></td></tr>
-            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">Birthday Month 25%</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-purple">Loyalty</span></td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;">148</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;">₹3,56,400</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;color:var(--red);">₹1,18,800</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;text-align:right;"><span class="badge badge-green">+300%</span></td></tr>
+            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">Summer Splash 20%</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-green">% Discount</span></td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;">842</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;">₹8,76,558</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;"><span class="badge badge-green">+312%</span></td></tr>
+            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">Family of 4 Bundle</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-blue">Flat ₹</span></td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;">321</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;">₹5,42,079</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;"><span class="badge badge-green">+169%</span></td></tr>
+            <tr><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;font-weight:700;">BOGO Water Park</td><td style="padding:12px 14px;border-bottom:1px solid #f1f5f9;"><span class="badge badge-purple">BOGO</span></td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;">47</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;font-weight:700;">₹1,21,713</td><td style="padding:12px 14px;text-align:right;border-bottom:1px solid #f1f5f9;"><span class="badge badge-green">+205%</span></td></tr>
+            <tr><td style="padding:12px 14px;font-weight:700;">Weekend Flash 15%</td><td style="padding:12px 14px;"><span class="badge badge-amber">Flash</span></td><td style="padding:12px 14px;text-align:right;">88</td><td style="padding:12px 14px;text-align:right;font-weight:700;">₹2,25,600</td><td style="padding:12px 14px;text-align:right;"><span class="badge badge-green">+289%</span></td></tr>
           </tbody>
         </table>
       </div>
     </div>
-  </div><!-- adm-content -->
+
+  </div><!-- /adm-content -->
 </main>
 
-<!-- Create Offer Modal -->
+<!-- ═══════════════════════════════════════════════════════════
+     CREATE / EDIT OFFER MODAL — Fully Functional
+════════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="create-modal">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">Create New Offer</div>
-      <button class="modal-close" onclick="document.getElementById('create-modal').classList.remove('show')">✕</button>
+      <div class="modal-title" id="modal-heading">✨ Create New Offer</div>
+      <button class="modal-close" onclick="closeModal('create-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-grid">
-        <div class="form-group full"><label>Offer Name *</label><input type="text" placeholder="e.g. Monsoon Madness 30% Off" /></div>
-        <div class="form-group"><label>Offer Type</label><select><option>% Percentage Discount</option><option>Flat Amount Off</option><option>Buy X Get Y Free</option><option>Flash Sale</option><option>Bundle Deal</option><option>Loyalty Exclusive</option></select></div>
-        <div class="form-group"><label>Discount Value *</label><input type="number" placeholder="e.g. 20" /></div>
-        <div class="form-group"><label>Applicable Parks</label><select><option>All Parks</option><option>Water Park Only</option><option>Amusement Only</option><option>Combo Only</option></select></div>
-        <div class="form-group"><label>Channels</label><select><option>All Channels</option><option>Online Only</option><option>Partner Only</option><option>B2B / Quote</option></select></div>
-        <div class="form-group"><label>Target Segment</label><select><option>All Guests</option><option>Loyalty Members</option><option>New Customers</option><option>Corporate / B2B</option><option>Senior Citizens</option></select></div>
-        <div class="form-group"><label>Ticket Categories</label><select><option>All Categories</option><option>Adult Only</option><option>Child Only</option><option>Adult + Child</option></select></div>
-        <div class="form-group"><label>Minimum Cart Value (₹)</label><input type="number" placeholder="e.g. 2000 (optional)" /></div>
-        <div class="form-group"><label>Max Uses (leave blank = unlimited)</label><input type="number" placeholder="e.g. 500" /></div>
-        <div class="form-group"><label>Max Uses Per Customer</label><input type="number" placeholder="e.g. 1" value="1" /></div>
-        <div class="form-group"><label>Start Date *</label><input type="date" /></div>
-        <div class="form-group"><label>End Date *</label><input type="date" /></div>
-        <div class="form-group full"><label>Promo Code (optional — leave blank for auto-apply)</label><input type="text" placeholder="e.g. SUMMER20" style="text-transform:uppercase;" /></div>
-        <div class="form-group full"><label>Description (shown to customers)</label><textarea rows="2" placeholder="e.g. Get 20% off Water Park tickets this summer…"></textarea></div>
-        <div class="form-group full" style="display:flex;align-items:center;gap:10px;">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;">
-            <input type="checkbox" /> <span style="font-size:13px;font-weight:600;color:var(--text);">Flash Sale — show countdown timer on booking page</span>
-          </label>
+
+      <!-- SECTION 1: Basics -->
+      <div class="form-section">
+        <div class="form-section-title">📝 Basic Information</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Offer Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Monsoon Madness 30% Off" />
+          </div>
+          <div class="form-group full">
+            <label>Description (shown to customers)</label>
+            <textarea id="f-desc" rows="2" placeholder="e.g. Get 30% off all tickets this monsoon…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="f-status">
+              <option value="live">Live</option>
+              <option value="draft">Draft</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Promo Code (blank = auto-apply)</label>
+            <input type="text" id="f-promo" placeholder="e.g. SUMMER20" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" />
+            <div class="form-hint">Leave blank for automatic application at checkout.</div>
+          </div>
         </div>
-        <div class="form-group full" style="display:flex;align-items:center;gap:10px;">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;">
-            <input type="checkbox" /> <span style="font-size:13px;font-weight:600;color:var(--text);">Requires approval before going live</span>
+      </div>
+
+      <!-- SECTION 2: Offer Type -->
+      <div class="form-section">
+        <div class="form-section-title">🎯 Offer Type *</div>
+        <div class="type-grid" id="type-selector">
+          <div class="type-card selected" data-type="percent" onclick="selectType('percent',this)">
+            <div class="tc-icon">%</div>
+            <div class="tc-name">Percentage Off</div>
+            <div class="tc-desc">e.g. 20% off Adult tickets</div>
+          </div>
+          <div class="type-card" data-type="flat" onclick="selectType('flat',this)">
+            <div class="tc-icon">₹</div>
+            <div class="tc-name">Flat Amount Off</div>
+            <div class="tc-desc">e.g. ₹500 off cart total</div>
+          </div>
+          <div class="type-card" data-type="bogo" onclick="selectType('bogo',this)">
+            <div class="tc-icon">1+1</div>
+            <div class="tc-name">Buy 1 Get 1 Free</div>
+            <div class="tc-desc">Cheapest eligible ticket free</div>
+          </div>
+          <div class="type-card" data-type="b2g1" onclick="selectType('b2g1',this)">
+            <div class="tc-icon">2+1</div>
+            <div class="tc-name">Buy 2 Get 1 Free</div>
+            <div class="tc-desc">Buy 2, 3rd ticket free</div>
+          </div>
+          <div class="type-card" data-type="buy4_discount" onclick="selectType('buy4_discount',this)">
+            <div class="tc-icon">4+</div>
+            <div class="tc-name">Buy 4 — Discount</div>
+            <div class="tc-desc">% or flat off when 4+ tickets</div>
+          </div>
+          <div class="type-card" data-type="flash_sale" onclick="selectType('flash_sale',this)">
+            <div class="tc-icon">⚡</div>
+            <div class="tc-name">Flash Sale</div>
+            <div class="tc-desc">Time-limited % or flat deal</div>
+          </div>
+        </div>
+
+        <!-- Percent / Flat / Flash value -->
+        <div class="cond-panel show" id="panel-value">
+          <div class="form-grid" style="margin-top:12px;">
+            <div class="form-group">
+              <label id="value-label">Discount Percentage (%)</label>
+              <input type="number" id="f-value" placeholder="e.g. 20" min="1" max="100" />
+            </div>
+            <div class="form-group" id="discount-mode-group" style="display:none;">
+              <label>Discount Mode</label>
+              <select id="f-discount-mode">
+                <option value="percent">Percentage (%)</option>
+                <option value="flat">Flat Amount (₹)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOGO / B2G1 config -->
+        <div class="cond-panel" id="panel-bogo" style="margin-top:12px;">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Buy Quantity</label>
+              <input type="number" id="f-buy-qty" value="1" min="1" />
+            </div>
+            <div class="form-group">
+              <label>Free Ticket Quantity</label>
+              <input type="number" id="f-get-qty" value="1" min="1" />
+            </div>
+          </div>
+          <div class="form-hint" style="margin-top:6px;">🎟 The cheapest eligible ticket will be made free. Applies per set.</div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Applicability -->
+      <div class="form-section">
+        <div class="form-section-title">🎪 Applicable Parks &amp; Categories</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Parks</label>
+            <select id="f-parks" multiple size="3" style="height:auto;">
+              <option value="WATER_DAY" selected>🌊 Water Park</option>
+              <option value="AMUSEMENT_DAY" selected>🎢 Amusement Park</option>
+              <option value="COMBO_DAY" selected>🎟 Combo</option>
+            </select>
+            <div class="form-hint">Hold Ctrl/Cmd to select multiple</div>
+          </div>
+          <div class="form-group">
+            <label>Ticket Categories</label>
+            <select id="f-categories" multiple size="5" style="height:auto;">
+              <option value="adult" selected>🧑 Adult</option>
+              <option value="child" selected>🧒 Child</option>
+              <option value="senior">👴 Senior Citizen</option>
+              <option value="armed">🎖 Armed Forces</option>
+              <option value="differently_abled">♿ Differently Abled</option>
+            </select>
+            <div class="form-hint">Hold Ctrl/Cmd to select multiple</div>
+          </div>
+        </div>
+
+        <!-- Auto-apply family rule -->
+        <div style="margin-top:12px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px;">
+            <input type="checkbox" id="f-family-rule" onchange="toggleFamilyRule()" />
+            <span style="font-size:13px;font-weight:600;color:var(--text);">Auto-apply Family Rule (e.g. 2 Adults + 2 Children in cart)</span>
+          </label>
+          <div id="family-rule-panel" style="display:none;background:#f8fafc;border-radius:10px;padding:14px;margin-top:8px;">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Min. Adults Required</label>
+                <input type="number" id="f-min-adults" value="2" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Min. Children Required</label>
+                <input type="number" id="f-min-children" value="2" min="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Schedule & Validity -->
+      <div class="form-section">
+        <div class="form-section-title">📅 Schedule &amp; Validity</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" id="f-start" />
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" id="f-end" />
+          </div>
+        </div>
+
+        <!-- Flash schedule -->
+        <div class="cond-panel" id="panel-flash" style="margin-top:14px;background:#faf5ff;border-radius:12px;padding:16px;">
+          <div class="form-section-title" style="margin-bottom:10px;">⚡ Flash Sale Schedule</div>
+          <div class="sched-tabs">
+            <div class="sched-tab active" onclick="selectSchedType('weekday',this)">Weekday/Weekend</div>
+            <div class="sched-tab" onclick="selectSchedType('hourly',this)">Hourly Window</div>
+            <div class="sched-tab" onclick="selectSchedType('duration',this)">Fixed Duration</div>
+            <div class="sched-tab" onclick="selectSchedType('daily',this)">Daily Repeat</div>
+          </div>
+          <!-- Weekday -->
+          <div id="sched-weekday" class="cond-panel show">
+            <label style="margin-bottom:8px;">Select Active Days</label>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="0" class="day-check" /> Sun</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="1" class="day-check" /> Mon</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="2" class="day-check" /> Tue</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="3" class="day-check" /> Wed</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="4" class="day-check" /> Thu</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="5" class="day-check" checked /> Fri</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:12px;font-weight:600;cursor:pointer;"><input type="checkbox" value="6" class="day-check" checked /> Sat</label>
+            </div>
+          </div>
+          <!-- Hourly -->
+          <div id="sched-hourly" class="cond-panel">
+            <div class="form-grid">
+              <div class="form-group"><label>From Hour</label><input type="time" id="f-from-hour" value="10:00" /></div>
+              <div class="form-group"><label>To Hour</label><input type="time" id="f-to-hour" value="14:00" /></div>
+            </div>
+          </div>
+          <!-- Duration -->
+          <div id="sched-duration" class="cond-panel">
+            <div class="form-grid">
+              <div class="form-group"><label>Start Date &amp; Time</label><input type="datetime-local" id="f-flash-start" /></div>
+              <div class="form-group"><label>Duration (minutes)</label><input type="number" id="f-flash-dur" value="60" min="15" /></div>
+            </div>
+          </div>
+          <!-- Daily -->
+          <div id="sched-daily" class="cond-panel">
+            <div class="form-grid">
+              <div class="form-group"><label>Daily Start Time</label><input type="time" id="f-daily-start" value="09:00" /></div>
+              <div class="form-group"><label>Daily End Time</label><input type="time" id="f-daily-end" value="18:00" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: Limits & Controls -->
+      <div class="form-section">
+        <div class="form-section-title">🔧 Limits &amp; Controls</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Min. Tickets in Cart</label>
+            <input type="number" id="f-min-tix" value="1" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Min. Cart Value (₹)</label>
+            <input type="number" id="f-min-cart" value="0" min="0" placeholder="0 = no minimum" />
+          </div>
+          <div class="form-group">
+            <label>Max Total Uses (blank = unlimited)</label>
+            <input type="number" id="f-max-uses" placeholder="e.g. 500" />
+          </div>
+          <div class="form-group">
+            <label>Max Uses Per Customer</label>
+            <input type="number" id="f-max-per-user" value="1" min="1" />
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="f-auto-apply" checked />
+            <span style="font-size:13px;font-weight:600;color:var(--text);">Auto-apply at checkout (no code needed)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="f-flash-toggle" onchange="toggleFlash()" />
+            <span style="font-size:13px;font-weight:600;color:var(--text);">Show flash countdown timer on booking page</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="f-approval" />
+            <span style="font-size:13px;font-weight:600;color:var(--text);">Requires approval before going live</span>
           </label>
         </div>
       </div>
-    </div>
+
+    </div><!-- /modal-body -->
     <div class="modal-foot">
-      <button class="btn-sm btn-ghost" style="padding:10px 20px;" onclick="document.getElementById('create-modal').classList.remove('show')">Cancel</button>
-      <button class="btn-sm btn-amber" style="padding:10px 20px;" onclick="saveAsDraft()">Save as Draft</button>
-      <button class="btn-sm btn-primary" style="padding:10px 20px;" onclick="publishOffer()">Publish Offer →</button>
+      <button class="btn-sm btn-ghost" style="padding:10px 20px;" onclick="closeModal('create-modal')">Cancel</button>
+      <button class="btn-sm btn-amber" style="padding:10px 20px;" onclick="saveOfferForm('draft')">Save as Draft</button>
+      <button class="btn-sm btn-primary" style="padding:10px 20px;" onclick="saveOfferForm('live')">Publish Offer →</button>
     </div>
   </div>
 </div>
 
-<script>
-function openCreateModal() { document.getElementById('create-modal').classList.add('show'); }
-function openCloneModal()  { alert('Select an existing offer to clone by clicking 📋 Clone on any offer card.'); }
-function editOffer(name)   { alert('Opening editor for: "' + name + '"'); }
-function cloneOffer(name)  { alert('Cloning "' + name + '"…\n\nA new draft copy has been created. Open the Drafts filter to find it.'); }
-function pauseOffer(name)  { if(confirm('Pause "'+name+'"? No new redemptions will be accepted.')) alert('Offer paused successfully.'); }
-function activateOffer(n)  { if(confirm('Activate "'+n+'" immediately?')) alert('Offer is now Live!'); }
-function submitApproval(n) { alert('Offer "'+n+'" submitted for Sales Manager approval.\n\nYou'll be notified once approved.'); }
-function saveAsDraft()     { alert('Offer saved as Draft.'); document.getElementById('create-modal').classList.remove('show'); }
-function publishOffer()    { alert('✅ Offer published and now Live!'); document.getElementById('create-modal').classList.remove('show'); }
+<!-- ═══════════════════════════════════════════════════════════
+     BUFFET CONFIG MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay buffet-modal" id="buffet-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">🍽 Buffet / F&amp;B Add-on Configuration</div>
+      <button class="modal-close" onclick="closeModal('buffet-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">🍴 Buffet Details</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Add-on Name</label>
+            <input type="text" id="b-name" value="Park Buffet Meal" />
+          </div>
+          <div class="form-group full">
+            <label>Description</label>
+            <textarea id="b-desc" rows="2">All-you-can-eat buffet: Starters + Main Course + Dessert + Soft Drink</textarea>
+          </div>
+          <div class="form-group">
+            <label>Base Price (₹)</label>
+            <input type="number" id="b-price" value="599" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Pre-book Discount Type</label>
+            <select id="b-disc-type">
+              <option value="flat">Flat Amount (₹)</option>
+              <option value="percent">Percentage (%)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pre-book Discount Value</label>
+            <input type="number" id="b-disc-val" value="100" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Max Quantity per Transaction</label>
+            <input type="number" id="b-max-qty" value="8" min="1" />
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">📦 Inventory</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Total Inventory (slots available)</label>
+            <input type="number" id="b-inventory" value="200" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Already Sold Count</label>
+            <input type="number" id="b-sold" value="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Sold-Out Threshold</label>
+            <input type="number" id="b-threshold" value="200" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="b-enabled">
+              <option value="1">Enabled (show on booking page)</option>
+              <option value="0">Disabled (hide from bookings)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">🍴 Alternate F&amp;B Outlets (shown when sold out)</div>
+        <div class="form-hint" style="margin-bottom:10px;">These outlets are displayed to customers when the pre-booked buffet is sold out.</div>
+        <div id="fnb-outlets-list"></div>
+        <button class="btn-sm btn-ghost" style="margin-top:10px;" onclick="addFnBOutlet()">+ Add Outlet</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sm btn-ghost" style="padding:10px 20px;" onclick="closeModal('buffet-modal')">Cancel</button>
+      <button class="btn-sm btn-primary" style="padding:10px 20px;" onclick="saveBuffetConfig()">Save Buffet Config</button>
+    </div>
+  </div>
+</div>
 
-function filterOffers(type, btn) {
-  document.querySelectorAll('.filter-tab').forEach(b => { b.style.background='none'; b.style.color='var(--muted)'; });
-  btn.style.background='var(--blue)'; btn.style.color='#fff';
+<!-- ═══════════════════════════════════════════════════════════
+     SETTINGS MODAL (Max tickets, etc.)
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay settings-modal" id="settings-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">⚙️ Booking Engine Settings</div>
+      <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-section-title">🎟 Ticket Limits</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Max Tickets Per Transaction</label>
+            <input type="number" id="s-max-tix" value="8" min="1" max="50" />
+            <div class="form-hint">Enforced in all online booking flows (Water Park, Amusement, Combo). Default: 8</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">💳 GST & Pricing</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>GST Rate (%)</label>
+            <input type="number" id="s-gst" value="18" min="0" max="30" />
+          </div>
+          <div class="form-group">
+            <label>Default Currency</label>
+            <select><option>INR (₹)</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sm btn-ghost" style="padding:10px 20px;" onclick="closeModal('settings-modal')">Cancel</button>
+      <button class="btn-sm btn-primary" style="padding:10px 20px;" onclick="saveSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OFFER ANALYTICS MODAL
+════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="analytics-modal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-head">
+      <div class="modal-title" id="analytics-title">📊 Offer Analytics</div>
+      <button class="modal-close" onclick="closeModal('analytics-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="analytics-content">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sm btn-ghost" style="padding:10px 20px;" onclick="closeModal('analytics-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="adm-toast" id="adm-toast"></div>
+
+<script>
+// ────────────────────────────────────────────────────────────
+//  State
+// ────────────────────────────────────────────────────────────
+let _editId      = null;
+let _offerType   = 'percent';
+let _schedType   = 'weekday';
+let _filterStatus = 'all';
+let _offers      = [];
+
+function init() {
+  _offers = WOWOfferEngine.loadOffers();
+  renderOfferGrid();
+  renderStats();
+  loadBuffetForm();
+  loadSettingsForm();
 }
+
+// ────────────────────────────────────────────────────────────
+//  Render offer cards
+// ────────────────────────────────────────────────────────────
+function renderOfferGrid() {
+  const grid       = document.getElementById('offer-grid');
+  const parkFilter = document.getElementById('park-filter')?.value || '';
+  const typeFilter = document.getElementById('type-filter')?.value || '';
+
+  let filtered = _offers.filter(o => {
+    if (_filterStatus !== 'all' && o.status !== _filterStatus) return false;
+    if (parkFilter && o.parks.indexOf(parkFilter) === -1) return false;
+    if (typeFilter && o.type !== typeFilter) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:span 3;text-align:center;padding:40px;color:var(--muted);">No offers match the current filter.</div>';
+    return;
+  }
+
+  const statusColors = { live:'#22c55e', draft:'#1a56db', scheduled:'#f59e0b', expired:'#9ca3af' };
+  const statusBadge  = { live:'badge-green', draft:'badge-blue', scheduled:'badge-amber', expired:'badge-gray' };
+  const typelabels   = { percent:'% Discount', flat:'Flat ₹', bogo:'Buy 1 Get 1', b2g1:'Buy 2 Get 1', buy4_discount:'Buy 4 Discount', flash_sale:'Flash Sale' };
+  const typeEmoji    = { percent:'%', flat:'₹', bogo:'🎁', b2g1:'🎁🎁', buy4_discount:'4+', flash_sale:'⚡' };
+
+  grid.innerHTML = filtered.map(o => {
+    const color = statusColors[o.status] || '#9ca3af';
+    const badge = statusBadge[o.status] || 'badge-gray';
+    const parks = (o.parks || []).map(p => p.replace('_DAY','').replace('_',' ')).join(', ');
+    const cats  = (o.categories || []).join(', ');
+    const valTxt = o.type === 'percent' ? o.value + '% off'
+      : o.type === 'flat' ? '₹' + o.value + ' off'
+      : o.type === 'bogo' ? 'Buy ' + (o.buyQty||1) + ' Get ' + (o.getFreeQty||1) + ' Free'
+      : o.type === 'b2g1' ? 'Buy ' + (o.buyQty||2) + ' Get ' + (o.getFreeQty||1) + ' Free'
+      : o.type === 'buy4_discount' ? 'Buy 4+: ' + o.value + (o.discountMode === 'flat' ? ' ₹' : '% ') + 'off'
+      : o.value + '% Flash';
+
+    const dateTxt = o.startDate || o.endDate
+      ? (o.startDate || '∞') + ' → ' + (o.endDate || '∞')
+      : 'Ongoing';
+    const autoTxt = o.promoCode ? 'Code: ' + o.promoCode : 'Auto-apply';
+
+    return `<div class="offer-card" style="border-top:4px solid ${color};">
+      <div class="offer-card-header">
+        <span class="badge ${badge}"><span class="status-dot" style="background:${color};"></span>${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
+        <div class="offer-card-type" style="color:${color};margin-top:8px;">${typeEmoji[o.type]||'🎯'} ${typelabels[o.type]||o.type}</div>
+        <div class="offer-card-name">${o.name}</div>
+        <div class="offer-card-desc">${o.description || ''}</div>
+        <div class="offer-tag-row">
+          <span class="tag">${parks}</span>
+          <span class="tag">${valTxt}</span>
+          ${o.flashSale ? '<span class="tag" style="background:#fef3c7;color:#b45309;">⚡ Flash</span>' : ''}
+          ${o.autoApply ? '<span class="tag" style="background:#f0fdf4;color:#16a34a;">Auto</span>' : ''}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+          <span>${dateTxt}</span>
+          <span>Used: ${o.usedCount || 0}${o.maxUses ? ' / '+o.maxUses : ''}</span>
+        </div>
+      </div>
+      <div class="offer-card-body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">🏷 ${autoTxt} · Categories: ${cats}</div>
+        <div class="offer-actions">
+          <button class="btn-sm btn-amber" onclick="editOffer('${o.id}')">✏️ Edit</button>
+          <button class="btn-sm btn-ghost" onclick="cloneOffer('${o.id}')">📋 Clone</button>
+          <button class="btn-sm btn-purple" onclick="openAnalytics('${o.id}')">📊</button>
+          ${o.status === 'live'
+            ? `<button class="btn-sm btn-red" onclick="toggleStatus('${o.id}','draft')">⏸ Pause</button>`
+            : `<button class="btn-sm btn-green" onclick="toggleStatus('${o.id}','live')">▶ Activate</button>`
+          }
+          <button class="btn-sm btn-ghost" onclick="deleteOffer('${o.id}')" style="color:var(--red);border-color:#fecaca;">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ────────────────────────────────────────────────────────────
+//  Stats
+// ────────────────────────────────────────────────────────────
+function renderStats() {
+  const live = _offers.filter(o => o.status === 'live').length;
+  document.getElementById('stat-live').textContent = live;
+  document.getElementById('stat-max-tix').textContent = WOWOfferEngine.getMaxTickets();
+}
+
+// ────────────────────────────────────────────────────────────
+//  Filter
+// ────────────────────────────────────────────────────────────
+function filterOffers(type, btn) {
+  _filterStatus = type;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderOfferGrid();
+}
+
+// ────────────────────────────────────────────────────────────
+//  Modal open/close helpers
+// ────────────────────────────────────────────────────────────
+function openCreateModal() {
+  _editId = null;
+  document.getElementById('modal-heading').textContent = '✨ Create New Offer';
+  resetForm();
+  document.getElementById('create-modal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function resetForm() {
+  document.getElementById('f-name').value       = '';
+  document.getElementById('f-desc').value       = '';
+  document.getElementById('f-status').value     = 'live';
+  document.getElementById('f-promo').value      = '';
+  document.getElementById('f-value').value      = '';
+  document.getElementById('f-buy-qty').value    = '1';
+  document.getElementById('f-get-qty').value    = '1';
+  document.getElementById('f-start').value      = '';
+  document.getElementById('f-end').value        = '';
+  document.getElementById('f-min-tix').value    = '1';
+  document.getElementById('f-min-cart').value   = '0';
+  document.getElementById('f-max-uses').value   = '';
+  document.getElementById('f-max-per-user').value = '1';
+  document.getElementById('f-auto-apply').checked = true;
+  document.getElementById('f-flash-toggle').checked = false;
+  document.getElementById('f-approval').checked = false;
+  document.getElementById('f-family-rule').checked = false;
+  document.getElementById('family-rule-panel').style.display = 'none';
+  document.getElementById('f-discount-mode').value = 'percent';
+
+  // Reset type cards
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  const firstCard = document.querySelector('.type-card[data-type="percent"]');
+  if (firstCard) firstCard.classList.add('selected');
+  selectType('percent', firstCard, false);
+
+  // Reset parks/categories
+  const parksEl = document.getElementById('f-parks');
+  const catsEl  = document.getElementById('f-categories');
+  if (parksEl) Array.from(parksEl.options).forEach(o => o.selected = true);
+  if (catsEl)  { Array.from(catsEl.options).forEach(o => o.selected = false); catsEl.options[0].selected = true; catsEl.options[1].selected = true; }
+
+  // Reset day checkboxes
+  document.querySelectorAll('.day-check').forEach(c => c.checked = false);
+  document.querySelectorAll('.day-check[value="5"],.day-check[value="6"]').forEach(c => c.checked = true);
+}
+
+function editOffer(id) {
+  const offer = _offers.find(o => o.id === id);
+  if (!offer) return;
+  _editId = id;
+  document.getElementById('modal-heading').textContent = '✏️ Edit Offer: ' + offer.name;
+  resetForm();
+
+  document.getElementById('f-name').value     = offer.name;
+  document.getElementById('f-desc').value     = offer.description || '';
+  document.getElementById('f-status').value   = offer.status;
+  document.getElementById('f-promo').value    = offer.promoCode || '';
+  document.getElementById('f-value').value    = offer.value || '';
+  document.getElementById('f-buy-qty').value  = offer.buyQty  || 1;
+  document.getElementById('f-get-qty').value  = offer.getFreeQty || 1;
+  document.getElementById('f-start').value    = offer.startDate || '';
+  document.getElementById('f-end').value      = offer.endDate   || '';
+  document.getElementById('f-min-tix').value  = offer.minTickets  || 1;
+  document.getElementById('f-min-cart').value = offer.minCartValue || 0;
+  document.getElementById('f-max-uses').value = offer.maxUses !== null && offer.maxUses !== undefined ? offer.maxUses : '';
+  document.getElementById('f-auto-apply').checked = !!offer.autoApply;
+  document.getElementById('f-flash-toggle').checked = !!offer.flashSale;
+
+  if (offer.discountMode) document.getElementById('f-discount-mode').value = offer.discountMode;
+
+  // Type
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  const tc = document.querySelector('.type-card[data-type="' + offer.type + '"]');
+  if (tc) { tc.classList.add('selected'); selectType(offer.type, tc, false); }
+
+  // Parks
+  const parksEl = document.getElementById('f-parks');
+  Array.from(parksEl.options).forEach(o => { o.selected = offer.parks.indexOf(o.value) !== -1; });
+
+  // Categories
+  const catsEl = document.getElementById('f-categories');
+  Array.from(catsEl.options).forEach(o => { o.selected = offer.categories.indexOf(o.value) !== -1; });
+
+  // Family rule
+  if (offer.autoApplyRule) {
+    document.getElementById('f-family-rule').checked = true;
+    document.getElementById('family-rule-panel').style.display = 'block';
+    document.getElementById('f-min-adults').value   = offer.autoApplyRule.adults || 2;
+    document.getElementById('f-min-children').value = offer.autoApplyRule.children || 2;
+  }
+
+  // Flash schedule
+  if (offer.flashSale && offer.flashSchedule) {
+    const sched = offer.flashSchedule;
+    selectSchedType(sched.type || 'weekday', null);
+    if (sched.type === 'weekday' && sched.days) {
+      sched.days.forEach(d => {
+        const cb = document.querySelector('.day-check[value="' + d + '"]');
+        if (cb) cb.checked = true;
+      });
+    }
+  }
+
+  toggleFlash();
+  document.getElementById('create-modal').classList.add('show');
+}
+
+function cloneOffer(id) {
+  const offer = _offers.find(o => o.id === id);
+  if (!offer) return;
+  const clone = Object.assign({}, offer, {
+    id: 'OFR' + Date.now().toString(36).toUpperCase(),
+    name: offer.name + ' (Copy)',
+    status: 'draft',
+    usedCount: 0
+  });
+  _offers = WOWOfferEngine.adminSaveOffer(clone);
+  renderOfferGrid();
+  renderStats();
+  showToast('Offer cloned as Draft.');
+}
+
+function deleteOffer(id) {
+  if (!confirm('Delete this offer? This cannot be undone.')) return;
+  _offers = WOWOfferEngine.adminDeleteOffer(id);
+  renderOfferGrid();
+  renderStats();
+  showToast('Offer deleted.');
+}
+
+function toggleStatus(id, newStatus) {
+  const offer = _offers.find(o => o.id === id);
+  if (!offer) return;
+  offer.status = newStatus;
+  _offers = WOWOfferEngine.adminSaveOffer(offer);
+  renderOfferGrid();
+  renderStats();
+  showToast('Offer status updated to: ' + newStatus);
+}
+
+// ────────────────────────────────────────────────────────────
+//  Type selector
+// ────────────────────────────────────────────────────────────
+function selectType(type, card, animate) {
+  _offerType = type;
+
+  if (card) {
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  }
+
+  // Show/hide panels
+  const showValue = ['percent','flat','flash_sale','buy4_discount'].indexOf(type) !== -1;
+  document.getElementById('panel-value').classList.toggle('show', showValue);
+  document.getElementById('panel-bogo').classList.toggle('show', type === 'bogo' || type === 'b2g1');
+
+  // Update label
+  const lbl = document.getElementById('value-label');
+  if (type === 'percent' || type === 'flash_sale') { if (lbl) lbl.textContent = 'Discount Percentage (%)'; }
+  if (type === 'flat')     { if (lbl) lbl.textContent = 'Flat Amount Off (₹)'; }
+  if (type === 'buy4_discount') { if (lbl) lbl.textContent = 'Discount Value'; }
+
+  // Show discount mode for buy4
+  const modeGroup = document.getElementById('discount-mode-group');
+  if (modeGroup) modeGroup.style.display = type === 'buy4_discount' ? '' : 'none';
+
+  // b2g1 default quantities
+  if (type === 'b2g1') {
+    document.getElementById('f-buy-qty').value = '2';
+    document.getElementById('f-get-qty').value = '1';
+  } else if (type === 'bogo') {
+    document.getElementById('f-buy-qty').value = '1';
+    document.getElementById('f-get-qty').value = '1';
+  }
+
+  // Flash schedule panel
+  const fp = document.getElementById('panel-flash');
+  if (fp) fp.classList.toggle('show', type === 'flash_sale' || document.getElementById('f-flash-toggle')?.checked);
+}
+
+function toggleFlash() {
+  const isFlash = document.getElementById('f-flash-toggle').checked || _offerType === 'flash_sale';
+  const fp = document.getElementById('panel-flash');
+  if (fp) fp.classList.toggle('show', isFlash);
+}
+
+function toggleFamilyRule() {
+  const panel = document.getElementById('family-rule-panel');
+  if (panel) panel.style.display = document.getElementById('f-family-rule').checked ? 'block' : 'none';
+}
+
+// ────────────────────────────────────────────────────────────
+//  Schedule type
+// ────────────────────────────────────────────────────────────
+function selectSchedType(type, btn) {
+  _schedType = type;
+  document.querySelectorAll('.sched-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.sched-tab').forEach(t => {
+      if (t.textContent.toLowerCase().indexOf(type) !== -1) t.classList.add('active');
+    });
+  }
+  ['weekday','hourly','duration','daily'].forEach(t => {
+    const el = document.getElementById('sched-' + t);
+    if (el) el.classList.toggle('show', t === type);
+  });
+}
+
+// ────────────────────────────────────────────────────────────
+//  Save offer from form
+// ────────────────────────────────────────────────────────────
+function saveOfferForm(status) {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast('Please enter an offer name.'); return; }
+  const val  = parseFloat(document.getElementById('f-value').value) || 0;
+  if (['percent','flat','flash_sale','buy4_discount'].indexOf(_offerType) !== -1 && val <= 0) {
+    showToast('Please enter a discount value > 0.');
+    return;
+  }
+
+  const parksEl = document.getElementById('f-parks');
+  const parks   = Array.from(parksEl.selectedOptions).map(o => o.value);
+  if (parks.length === 0) { showToast('Select at least one park.'); return; }
+
+  const catsEl = document.getElementById('f-categories');
+  const cats   = Array.from(catsEl.selectedOptions).map(o => o.value);
+  if (cats.length === 0) { showToast('Select at least one ticket category.'); return; }
+
+  // Flash schedule
+  let flashSchedule = null;
+  const isFlash = document.getElementById('f-flash-toggle').checked || _offerType === 'flash_sale';
+  if (isFlash) {
+    if (_schedType === 'weekday') {
+      const days = Array.from(document.querySelectorAll('.day-check:checked')).map(c => parseInt(c.value));
+      flashSchedule = { type: 'weekday', days };
+    } else if (_schedType === 'hourly') {
+      const from = document.getElementById('f-from-hour').value;
+      const to   = document.getElementById('f-to-hour').value;
+      flashSchedule = { type: 'hourly', fromHour: parseInt(from.split(':')[0]), toHour: parseInt(to.split(':')[0]) };
+    } else if (_schedType === 'duration') {
+      flashSchedule = { type: 'duration', startDateTime: document.getElementById('f-flash-start').value, durationMinutes: parseInt(document.getElementById('f-flash-dur').value) || 60 };
+    } else if (_schedType === 'daily') {
+      flashSchedule = { type: 'daily', dailyStart: document.getElementById('f-daily-start').value, dailyEnd: document.getElementById('f-daily-end').value };
+    }
+  }
+
+  // Auto-apply family rule
+  let autoApplyRule = null;
+  if (document.getElementById('f-family-rule').checked) {
+    autoApplyRule = {
+      adults:   parseInt(document.getElementById('f-min-adults').value)   || 0,
+      children: parseInt(document.getElementById('f-min-children').value) || 0
+    };
+  }
+
+  const maxUsesVal = document.getElementById('f-max-uses').value.trim();
+  const offer = {
+    id:          _editId || ('OFR' + Date.now().toString(36).toUpperCase()),
+    name,
+    description: document.getElementById('f-desc').value.trim(),
+    type:        _offerType,
+    value:       val,
+    discountMode: document.getElementById('f-discount-mode').value,
+    parks,
+    categories:  cats,
+    status:      status,
+    autoApply:   document.getElementById('f-auto-apply').checked,
+    promoCode:   document.getElementById('f-promo').value.trim() || null,
+    startDate:   document.getElementById('f-start').value || null,
+    endDate:     document.getElementById('f-end').value   || null,
+    flashSale:   isFlash,
+    flashSchedule,
+    maxUses:     maxUsesVal !== '' ? parseInt(maxUsesVal) : null,
+    minTickets:  parseInt(document.getElementById('f-min-tix').value)  || 1,
+    minCartValue:parseInt(document.getElementById('f-min-cart').value) || 0,
+    autoApplyRule,
+    buyQty:      parseInt(document.getElementById('f-buy-qty').value)  || 1,
+    getFreeQty:  parseInt(document.getElementById('f-get-qty').value)  || 1,
+    usedCount:   _editId ? (_offers.find(o => o.id === _editId)?.usedCount || 0) : 0
+  };
+
+  _offers = WOWOfferEngine.adminSaveOffer(offer);
+  closeModal('create-modal');
+  renderOfferGrid();
+  renderStats();
+  showToast(status === 'live' ? '✅ Offer published and Live!' : '📝 Offer saved as Draft.');
+}
+
+// ────────────────────────────────────────────────────────────
+//  Offer Analytics
+// ────────────────────────────────────────────────────────────
+function openAnalytics(id) {
+  const offer = _offers.find(o => o.id === id);
+  if (!offer) return;
+
+  document.getElementById('analytics-title').textContent = '📊 Analytics — ' + offer.name;
+
+  const used    = offer.usedCount  || 0;
+  const maxUses = offer.maxUses;
+  const pct     = maxUses ? Math.round(used / maxUses * 100) : null;
+
+  // Simulated revenue data
+  const avgOrderValue = offer.type === 'bogo' ? 1299 * 2 : offer.type === 'b2g1' ? 1999 * 2 : 3500;
+  const revenue       = Math.round(used * avgOrderValue * 0.85);
+  const discGiven     = offer.type === 'percent' ? Math.round(used * avgOrderValue * offer.value / 100)
+    : offer.type === 'flat' ? used * offer.value
+    : Math.round(used * avgOrderValue * 0.12);
+  const roi           = discGiven > 0 ? Math.round((revenue - discGiven) / discGiven * 100) : 0;
+
+  const statusColor   = { live:'#16a34a', draft:'#1a56db', scheduled:'#d97706', expired:'#6b7280' };
+
+  document.getElementById('analytics-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;color:#15803d;font-family:'Nunito',sans-serif;">${used.toLocaleString('en-IN')}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Total Uses</div>
+        ${pct !== null ? `<div style="font-size:11px;color:#16a34a;font-weight:700;margin-top:4px;">${pct}% of limit</div>` : '<div style="font-size:11px;color:#6b7280;margin-top:4px;">No limit set</div>'}
+      </div>
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;color:#1d4ed8;font-family:'Nunito',sans-serif;">₹${revenue.toLocaleString('en-IN')}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">Revenue Generated</div>
+      </div>
+      <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:900;color:#6d28d9;font-family:'Nunito',sans-serif;">+${roi}%</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:4px;">ROI vs Discount Cost</div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:12px;">Offer Summary</div>
+      ${[
+        ['Offer ID',     offer.id],
+        ['Type',         offer.type.replace(/_/g,' ').toUpperCase()],
+        ['Status',       `<span style="color:${statusColor[offer.status]||'#6b7280'};font-weight:700;">${offer.status.toUpperCase()}</span>`],
+        ['Value',        offer.type === 'percent' ? offer.value + '%' : offer.type === 'flat' ? '₹' + offer.value : 'Buy ' + (offer.buyQty||1) + ' Get ' + (offer.getFreeQty||1) + ' Free'],
+        ['Parks',        (offer.parks||[]).map(p => p.replace('_DAY','').replace('_',' ')).join(', ')],
+        ['Categories',   (offer.categories||[]).join(', ')],
+        ['Promo Code',   offer.promoCode || 'Auto-apply'],
+        ['Validity',     (offer.startDate || 'Always') + ' → ' + (offer.endDate || 'No end date')],
+        ['Discount Given', '₹' + discGiven.toLocaleString('en-IN')],
+        ['Auto-apply',   offer.autoApply ? '✅ Yes' : '❌ No'],
+        ['Flash Sale',   offer.flashSale  ? '⚡ Yes — ' + (offer.flashSchedule?.type || 'scheduled') : 'No'],
+      ].map(([k,v]) => `
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:13px;">
+          <span style="color:#6b7280;font-weight:600;">${k}</span>
+          <span style="font-weight:700;color:var(--ink);">${v}</span>
+        </div>`).join('')}
+    </div>
+
+    ${maxUses ? `<div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;">Usage Progress</div>
+      <div style="background:#e2e8f0;border-radius:99px;height:10px;overflow:hidden;">
+        <div style="background:${pct > 80 ? '#ef4444' : pct > 50 ? '#f59e0b' : '#22c55e'};height:100%;width:${Math.min(100,pct)}%;border-radius:99px;transition:width .5s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px;">
+        <span>${used} used</span><span>${maxUses - used} remaining</span>
+      </div>
+    </div>` : ''}
+  `;
+
+  document.getElementById('analytics-modal').classList.add('show');
+}
+
+// ────────────────────────────────────────────────────────────
+//  Buffet config
+// ────────────────────────────────────────────────────────────
+let _fnbOutlets = [];
+let _fnbCounter = 0;
+
+function loadBuffetForm() {
+  const cfg = WOWOfferEngine.getBuffetConfig();
+  document.getElementById('b-name').value      = cfg.name;
+  document.getElementById('b-desc').value      = cfg.description;
+  document.getElementById('b-price').value     = cfg.basePrice;
+  document.getElementById('b-disc-type').value = cfg.discountType;
+  document.getElementById('b-disc-val').value  = cfg.discountValue;
+  document.getElementById('b-max-qty').value   = cfg.maxQtyPerTransaction;
+  document.getElementById('b-inventory').value = cfg.totalInventory;
+  document.getElementById('b-sold').value      = cfg.soldCount;
+  document.getElementById('b-threshold').value = cfg.soldOutThreshold;
+  document.getElementById('b-enabled').value   = cfg.enabled ? '1' : '0';
+
+  // Load FnB outlets
+  _fnbOutlets = (cfg.alternativeFnB || []).map((o,i) => ({ id: ++_fnbCounter, name: o.name, location: o.location }));
+  renderFnBOutlets();
+}
+
+function renderFnBOutlets() {
+  const list = document.getElementById('fnb-outlets-list');
+  if (!list) return;
+  if (_fnbOutlets.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">No alternate outlets configured.</div>';
+    return;
+  }
+  list.innerHTML = _fnbOutlets.map(o => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;" id="fnb-row-${o.id}">
+      <input type="text" value="${escHtml(o.name)}" placeholder="Outlet name" style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;" oninput="updateFnB(${o.id},'name',this.value)" />
+      <input type="text" value="${escHtml(o.location)}" placeholder="Location in park" style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:12.5px;" oninput="updateFnB(${o.id},'location',this.value)" />
+      <button onclick="removeFnB(${o.id})" style="padding:8px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;color:#dc2626;cursor:pointer;font-size:13px;">✕</button>
+    </div>`).join('');
+}
+
+function addFnBOutlet() {
+  _fnbOutlets.push({ id: ++_fnbCounter, name: '', location: '' });
+  renderFnBOutlets();
+}
+
+function removeFnB(id) {
+  _fnbOutlets = _fnbOutlets.filter(o => o.id !== id);
+  renderFnBOutlets();
+}
+
+function updateFnB(id, field, val) {
+  const o = _fnbOutlets.find(x => x.id === id);
+  if (o) o[field] = val;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function openBuffetModal() {
+  loadBuffetForm();
+  document.getElementById('buffet-modal').classList.add('show');
+}
+
+function saveBuffetConfig() {
+  const cfg = {
+    name:                document.getElementById('b-name').value,
+    description:         document.getElementById('b-desc').value,
+    basePrice:           parseInt(document.getElementById('b-price').value)     || 599,
+    discountType:        document.getElementById('b-disc-type').value,
+    discountValue:       parseInt(document.getElementById('b-disc-val').value)  || 0,
+    maxQtyPerTransaction:parseInt(document.getElementById('b-max-qty').value)   || 8,
+    totalInventory:      parseInt(document.getElementById('b-inventory').value) || 200,
+    soldCount:           parseInt(document.getElementById('b-sold').value)      || 0,
+    soldOutThreshold:    parseInt(document.getElementById('b-threshold').value) || 200,
+    enabled:             document.getElementById('b-enabled').value === '1',
+    alternativeFnB:      _fnbOutlets.filter(o => o.name).map(o => ({ name: o.name, location: o.location }))
+  };
+  WOWOfferEngine.adminSaveBuffet(cfg);
+  closeModal('buffet-modal');
+  showToast('✅ Buffet configuration saved!');
+}
+
+// ────────────────────────────────────────────────────────────
+//  Settings
+// ────────────────────────────────────────────────────────────
+function loadSettingsForm() {
+  document.getElementById('s-max-tix').value = WOWOfferEngine.getMaxTickets();
+}
+
+function openSettingsModal() {
+  loadSettingsForm();
+  document.getElementById('settings-modal').classList.add('show');
+}
+
+function saveSettings() {
+  const maxTix = parseInt(document.getElementById('s-max-tix').value) || 8;
+  WOWOfferEngine.adminSetMaxTickets(maxTix);
+  closeModal('settings-modal');
+  renderStats();
+  showToast('✅ Settings saved! Max tickets per transaction: ' + maxTix);
+}
+
+// ────────────────────────────────────────────────────────────
+//  Toast
+// ────────────────────────────────────────────────────────────
+function showToast(msg, dur) {
+  dur = dur || 3000;
+  const t = document.getElementById('adm-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ────────────────────────────────────────────────────────────
+//  Run
+// ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', init);
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
