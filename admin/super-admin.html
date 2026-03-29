@@ -6,6 +6,7 @@
 <title>Super Admin — WOW Control Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"><\/script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -195,9 +196,161 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
 
+/* ── CONTENT CONTROL PANEL ─────────────────────────────────────────── */
+.cc-section-row{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:8px;transition:border .2s;
+}
+.cc-section-row:hover{border-color:rgba(201,168,76,.25);}
+.cc-section-row.cc-disabled{opacity:.55;}
+.cc-section-icon{font-size:18px;width:32px;text-align:center;flex-shrink:0;}
+.cc-section-info{flex:1;}
+.cc-section-label{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;}
+.cc-section-key{font-size:10px;color:var(--muted);font-family:monospace;}
+.cc-section-actions{display:flex;align-items:center;gap:10px;}
+.cc-edit-btn{
+  background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);
+  color:#60a5fa;font-size:10.5px;font-weight:600;padding:5px 12px;
+  border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s;
+}
+.cc-edit-btn:hover{background:rgba(59,130,246,.22);}
+
+/* ── CONTENT EDITOR DRAWER ─────────────────────────────────────────── */
+.cc-editor-drawer{
+  display:none;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.2);
+  border-radius:10px;padding:16px;margin-top:6px;margin-bottom:8px;
+}
+.cc-editor-drawer.open{display:block;}
+.cc-editor-field{margin-bottom:12px;}
+.cc-editor-field label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:5px;}
+.cc-editor-input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;
+  font-family:'Inter',sans-serif;resize:vertical;
+}
+.cc-editor-input:focus{outline:none;border-color:rgba(201,168,76,.4);}
+.cc-editor-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+
+/* ── PRODUCT CONTROL PANEL ─────────────────────────────────────────── */
+.pc-group-title{
+  font-size:10px;text-transform:uppercase;letter-spacing:2px;
+  color:var(--muted2);font-weight:700;margin:20px 0 10px;
+  padding-bottom:6px;border-bottom:1px solid var(--border);
+}
+.pc-product-row{
+  display:flex;align-items:center;gap:14px;padding:14px 18px;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  margin-bottom:8px;transition:all .2s;
+}
+.pc-product-row:hover{border-color:rgba(201,168,76,.25);}
+.pc-product-row.pc-off{opacity:.5;border-style:dashed;}
+.pc-product-emoji{font-size:22px;width:36px;text-align:center;flex-shrink:0;}
+.pc-product-info{flex:1;}
+.pc-product-name{font-size:13.5px;font-weight:700;color:#fff;margin-bottom:3px;}
+.pc-product-meta{font-size:10.5px;color:var(--muted);}
+.pc-status-badge{
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;
+  background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2);
+  transition:all .2s;
+}
+.pc-status-badge.off{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.2);}
+.pc-price-tag{
+  font-size:11.5px;color:var(--gold2);font-weight:600;
+  background:rgba(201,168,76,.08);padding:3px 10px;border-radius:8px;
+}
+.pc-live-badge{
+  font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;
+  background:rgba(34,197,94,.15);color:#4ade80;
+  animation:pc-pulse 2s infinite;
+}
+@keyframes pc-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* BANNER MANAGER */
+.bm-tab{
+  padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);
+  transition:all .18s;font-family:'Inter',sans-serif;
+}
+.bm-tab.active,.bm-tab:hover{background:rgba(201,168,76,.12);color:var(--gold2);border-color:rgba(201,168,76,.25);}
+.bm-slide-card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;}
+.bm-slide-header{
+  display:flex;align-items:center;gap:12px;padding:14px 18px;
+  background:rgba(255,255,255,.03);border-bottom:1px solid var(--border);cursor:pointer;
+}
+.bm-slide-num{
+  width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,.15);
+  color:var(--gold);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.bm-slide-name{font-size:13px;font-weight:700;color:#fff;}
+.bm-slide-meta{font-size:10.5px;color:var(--muted);}
+.bm-slide-body{padding:20px 18px;}
+.bm-field{margin-bottom:14px;}
+.bm-field label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;display:block;margin-bottom:5px;}
+.bm-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;transition:border .2s;}
+.bm-input:focus{outline:none;border-color:rgba(201,168,76,.4);}
+.bm-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.bm-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.bm-type-chips{display:flex;gap:8px;margin-bottom:14px;}
+.bm-chip{
+  padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;
+  background:rgba(255,255,255,.06);color:var(--muted);font-family:'Inter',sans-serif;transition:all .18s;
+}
+.bm-chip.active{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);}
+.bm-upload-zone{
+  border:2px dashed rgba(255,255,255,.15);border-radius:10px;padding:20px;text-align:center;cursor:pointer;
+  color:rgba(255,255,255,.35);font-size:12px;transition:all .2s;position:relative;
+}
+.bm-upload-zone:hover{border-color:rgba(201,168,76,.3);color:var(--gold2);}
+.bm-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.bm-img-preview{width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px;display:block;}
+.bm-grad-preview{height:36px;border-radius:8px;margin-top:6px;transition:all .3s;}
+
+/* OPERATIONAL CALENDAR */
+.oc-mini-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:10px;}
+.oc-day-hdr{text-align:center;color:var(--muted);font-weight:700;padding:3px 0;font-size:9px;letter-spacing:.5px;}
+.oc-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:5px;cursor:pointer;font-size:10px;font-weight:600;
+  background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.15);
+  transition:all .15s;
+}
+.oc-day.closed{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.2);}
+.oc-day.maintenance{background:rgba(251,191,36,.08);color:#fbbf24;border-color:rgba(251,191,36,.2);}
+.oc-day.limited{background:rgba(249,115,22,.08);color:#fb923c;border-color:rgba(249,115,22,.2);}
+.oc-day.empty{background:transparent;border-color:transparent;cursor:default;}
+.oc-day.past{opacity:.3;cursor:default;pointer-events:none;}
+.oc-legend{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;}
+.oc-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);}
+.oc-leg-dot{width:10px;height:10px;border-radius:2px;}
+.oc-exc-row{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;font-size:11.5px;
+}
+.oc-exc-badge{padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+
+/* CATEGORY AVAILABILITY */
+.ca-cat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;display:flex;align-items:center;gap:12px;
+}
+.ca-cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ca-cat-name{font-size:12.5px;font-weight:700;color:#fff;margin-bottom:2px;}
+.ca-cat-sub{font-size:10.5px;color:var(--muted);}
+.ca-rule-row{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;font-size:11.5px;
+}
+.ca-price-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.ca-price-park{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:10px;}
+.ca-price-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ca-price-label{font-size:12px;color:var(--text);}
+.ca-price-input{width:90px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;text-align:right;font-family:'Inter',sans-serif;}
+
 @media(max-width:768px){
   .sidebar{display:none;}
   .form-grid{grid-template-columns:1fr;}
+  .bm-grid-2,.bm-grid-3{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -214,7 +367,7 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 
     <div class="sb-user">
       <div class="sb-user-name">Arun Kumar M.</div>
-      <div style="font-size:10px;color:var(--muted);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbdad0d6fbd2d5dfd2dadcced7d7c295d8d4d6">[email&#160;protected]</a></div>
+      <div style="font-size:10px;color:var(--muted);">akm@indiagully.com</div>
       <span class="sb-user-role"><i class="fas fa-user-shield"></i> SUPER ADMIN</span>
     </div>
 
@@ -231,6 +384,19 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         <button class="sb-link" onclick="showPanel('modules')"><i class="fas fa-toggle-on"></i> Module Control</button>
         <button class="sb-link" onclick="showPanel('rights')"><i class="fas fa-key"></i> Rights Matrix</button>
         <button class="sb-link" onclick="showPanel('audit')"><i class="fas fa-history"></i> Audit Logs</button>
+      </div>
+      <div class="sb-group">
+        <div class="sb-group-label">Content &amp; Operations</div>
+        <button class="sb-link" onclick="showPanel('products')"><i class="fas fa-store" style="color:#f59e0b;"></i> Products &amp; Offerings <span class="sb-badge" style="background:rgba(245,158,11,.15);color:#fbbf24;">HOT</span></button>
+        <button class="sb-link" onclick="showPanel('content')"><i class="fas fa-layer-group" style="color:#a78bfa;"></i> Page Sections Control</button>
+        <button class="sb-link" onclick="showPanel('banners')"><i class="fas fa-images" style="color:#60a5fa;"></i> Banner Manager</button>
+        <button class="sb-link" onclick="showPanel('calendar')"><i class="fas fa-calendar-alt" style="color:#22c55e;"></i> Operational Calendar</button>
+        <button class="sb-link" onclick="showPanel('categories')"><i class="fas fa-tags" style="color:#f97316;"></i> Category Availability</button>
+      </div>
+      <div class="sb-group">
+        <div class="sb-group-label">Security</div>
+        <button class="sb-link" onclick="showPanel('authgate')"><i class="fas fa-shield-alt" style="color:#ef4444;"></i> AuthGate Manager <span class="sb-badge" style="background:rgba(239,68,68,.15);color:#fca5a5;">SA</span></button>
+        <a class="sb-link" href="auth-gate.html"><i class="fas fa-external-link-alt"></i> Full AuthGate Page</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-label">Portals</div>
@@ -252,9 +418,10 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
   <div class="main">
     <div class="topbar">
       <div class="topbar-title" id="panelTitle">Dashboard</div>
-      <div class="topbar-right">
+      <div class="topbar-right" style="display:flex;align-items:center;gap:10px;">
         <div class="topbar-clock" id="clock"></div>
-        <a href="../internal/index.html" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <!-- AuthGate widget + SA bypass (extreme right) -->
+        <div id="topbar-auth-widget" data-wow-topbar="true"></div>
       </div>
     </div>
 
@@ -500,36 +667,359 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         </div>
       </div>
 
+      <!-- ── AUTHGATE PANEL ── -->
+      <div class="panel" id="p-authgate">
+        <div class="section-hdr">
+          <h2><i class="fas fa-shield-alt" style="color:#ef4444;"></i> AuthGate Manager</h2>
+          <a href="auth-gate.html" class="btn-sm btn-view" style="padding:9px 16px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fas fa-external-link-alt"></i> Open Full Manager
+          </a>
+        </div>
+        <div id="ag-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;"></div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-door-open" style="color:#ef4444;"></i> Portal Protection Status</div>
+          <div id="ag-portal-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;"></div>
+          <button class="btn-primary" style="margin-top:14px;" onclick="saveAgPortals()">
+            <i class="fas fa-save"></i> Save Portal Settings
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-key" style="color:#C9A84C;"></i> Super Admin Bypass PIN</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">The <span style="color:#fca5a5;font-weight:700;">SA</span> button on every portal top-right uses this PIN for instant bypass.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;">
+            <div class="form-group"><label>New PIN</label><input type="password" id="sa-new-pin" placeholder="4-8 digits" maxlength="8"/></div>
+            <div class="form-group"><label>Confirm PIN</label><input type="password" id="sa-confirm-pin" placeholder="Repeat PIN" maxlength="8"/></div>
+            <button class="btn-primary" onclick="changeSAPinSA()" style="height:40px;"><i class="fas fa-save"></i> Update</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="fas fa-users-cog" style="color:#fbbf24;"></i> AuthGate Users (Summary)</div>
+          <div id="ag-users-mini" style="font-size:12px;"></div>
+          <a href="auth-gate.html" style="display:inline-block;margin-top:12px;font-size:11.5px;color:#C9A84C;text-decoration:none;"><i class="fas fa-plus-circle"></i> Full user management in AuthGate</a>
+        </div>
+      </div><!-- /p-authgate -->
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           PRODUCTS & OFFERINGS CONTROL PANEL
+      ══════════════════════════════════════════════════════════════════ -->
+      <div class="panel" id="p-products">
+        <div class="section-hdr">
+          <h2><i class="fas fa-store" style="color:#f59e0b;"></i> Products &amp; Offerings Control</h2>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);" onclick="PC.disableAll()"><i class="fas fa-power-off"></i> Disable All</button>
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;" onclick="PC.save()"><i class="fas fa-save"></i> Save &amp; Apply Live</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;padding:12px 16px;background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.2);">
+          <span style="color:#fbbf24;font-size:12px;"><i class="fas fa-info-circle"></i> <strong>Live Control:</strong> Toggle any product/offering ON or OFF. Changes reflect immediately on the public website — disabled items are automatically hidden from visitors.</span>
+        </div>
+
+        <div id="pc-container"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           PAGE SECTIONS CONTROL PANEL
+      ══════════════════════════════════════════════════════════════════ -->
+      <div class="panel" id="p-content">
+        <div class="section-hdr">
+          <h2><i class="fas fa-layer-group" style="color:#a78bfa;"></i> Page Sections Control</h2>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);" onclick="CC.showAll()"><i class="fas fa-eye"></i> Show All</button>
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;" onclick="CC.save()"><i class="fas fa-save"></i> Save &amp; Apply Live</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;padding:12px 16px;background:rgba(167,139,250,.05);border-color:rgba(167,139,250,.2);">
+          <span style="color:#a78bfa;font-size:12px;"><i class="fas fa-info-circle"></i> <strong>Section Control:</strong> Toggle each website section on or off. Click <strong>Edit Content</strong> on any section to edit its text line-by-line. All changes apply live to the public website.</span>
+        </div>
+
+        <!-- Tabs for page filter -->
+        <div style="display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;">
+          <button class="bm-tab active" onclick="CC.filterPage('homepage',this)">🏠 Homepage</button>
+          <button class="bm-tab" onclick="CC.filterPage('booking',this)">🎟 Booking Pages</button>
+          <button class="bm-tab" onclick="CC.filterPage('all',this)">📋 All Sections</button>
+        </div>
+
+        <div id="cc-container"></div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           BANNER MANAGER PANEL
+      ══════════════════════════════════════════════════════════════════ -->
+      <div class="panel" id="p-banners">
+        <div class="section-hdr">
+          <h2><i class="fas fa-images"></i> Banner Manager</h2>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;" onclick="BM.addSlide(BM.activeSection)"><i class="fas fa-plus"></i> Add Slide</button>
+            <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;background:linear-gradient(135deg,#065C38,#22c55e);" onclick="BM.save()"><i class="fas fa-save"></i> Save &amp; Publish</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;padding:12px 16px;background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.2);">
+          <span style="color:#60a5fa;font-size:12px;"><i class="fas fa-info-circle"></i> <strong>How it works:</strong> Manage hero banners for each page. Upload images directly or paste URLs. Changes save to localStorage and publish instantly.</span>
+        </div>
+
+        <!-- Section tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;">
+          <button class="bm-tab active" data-section="homepage" onclick="BM.switchSection('homepage',this)">🏠 Homepage</button>
+          <button class="bm-tab" data-section="water_park" onclick="BM.switchSection('water_park',this)">🌊 Water Park</button>
+          <button class="bm-tab" data-section="amusement_park" onclick="BM.switchSection('amusement_park',this)">🎢 Amusement Park</button>
+          <button class="bm-tab" data-section="combo" onclick="BM.switchSection('combo',this)">🎡 Combo</button>
+        </div>
+
+        <div id="bm-slides-container"></div>
+
+        <div onclick="BM.addSlide(BM.activeSection)" style="border:2px dashed rgba(255,255,255,.12);border-radius:14px;padding:28px;text-align:center;cursor:pointer;color:rgba(255,255,255,.35);transition:all .2s;margin-top:12px;" onmouseover="this.style.borderColor='rgba(201,168,76,.4)';this.style.color='#C9A84C';" onmouseout="this.style.borderColor='rgba(255,255,255,.12)';this.style.color='rgba(255,255,255,.35)';">
+          <div style="font-size:28px;margin-bottom:6px;">＋</div>
+          <strong>Add New Banner Slide</strong>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           OPERATIONAL CALENDAR PANEL
+      ══════════════════════════════════════════════════════════════════ -->
+      <div class="panel" id="p-calendar">
+        <div class="section-hdr">
+          <h2><i class="fas fa-calendar-alt"></i> Operational Calendar</h2>
+          <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;" onclick="OC.save()"><i class="fas fa-save"></i> Save Calendar</button>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;padding:12px 16px;background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);">
+          <span style="color:#4ade80;font-size:12px;"><i class="fas fa-info-circle"></i> <strong>Park Operations:</strong> Set which dates each park is open or closed. Booking pages will automatically disable unavailable dates. Mark special days, holidays, maintenance shutdowns.</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+          <!-- Water Park -->
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="background:rgba(59,130,246,.1);border-bottom:1px solid rgba(59,130,246,.2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-weight:700;color:#60a5fa;font-size:13px;"><i class="fas fa-water"></i> Water Park</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);">
+                Default: <label class="toggle" style="width:36px;height:20px;margin:0;">
+                  <input type="checkbox" id="oc-water-default" checked onchange="OC.setDefault('WATER_DAY',this.checked)"/>
+                  <span class="toggle-slider"></span>
+                </label> <span id="oc-water-default-lbl">Open</span>
+              </div>
+            </div>
+            <div style="padding:16px;">
+              <div id="oc-cal-WATER_DAY"></div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-sm btn-approve" onclick="OC.quickMark('WATER_DAY','closed','weekends')"><i class="fas fa-times"></i> Close Weekends</button>
+                <button class="btn-sm btn-reject" onclick="OC.quickMark('WATER_DAY','closed','week')"><i class="fas fa-times-circle"></i> Close This Week</button>
+                <button class="btn-sm btn-view" onclick="OC.quickMark('WATER_DAY','open','month')"><i class="fas fa-check"></i> Open Whole Month</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Amusement Park -->
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div style="background:rgba(249,115,22,.08);border-bottom:1px solid rgba(249,115,22,.2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-weight:700;color:#fb923c;font-size:13px;"><i class="fas fa-dice-d20"></i> Amusement Park</div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);">
+                Default: <label class="toggle" style="width:36px;height:20px;margin:0;">
+                  <input type="checkbox" id="oc-amuse-default" checked onchange="OC.setDefault('AMUSEMENT_DAY',this.checked)"/>
+                  <span class="toggle-slider"></span>
+                </label> <span id="oc-amuse-default-lbl">Open</span>
+              </div>
+            </div>
+            <div style="padding:16px;">
+              <div id="oc-cal-AMUSEMENT_DAY"></div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-sm btn-approve" onclick="OC.quickMark('AMUSEMENT_DAY','closed','weekends')"><i class="fas fa-times"></i> Close Weekends</button>
+                <button class="btn-sm btn-reject" onclick="OC.quickMark('AMUSEMENT_DAY','closed','week')"><i class="fas fa-times-circle"></i> Close This Week</button>
+                <button class="btn-sm btn-view" onclick="OC.quickMark('AMUSEMENT_DAY','open','month')"><i class="fas fa-check"></i> Open Whole Month</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exceptions / Special Dates -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-star" style="color:var(--gold);"></i> Special Date Overrides</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Add specific dates as Open, Closed, or Maintenance. These override the default calendar.</div>
+          <div style="display:grid;grid-template-columns:1fr 140px 280px auto;gap:10px;align-items:end;margin-bottom:12px;">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Date</div>
+              <input type="date" id="oc-exc-date" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Park</div>
+              <select id="oc-exc-park" style="width:100%;background:#1a1e28;border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;">
+                <option value="WATER_DAY">Water Park</option>
+                <option value="AMUSEMENT_DAY">Amusement Park</option>
+                <option value="COMBO_DAY">Both Parks</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Status + Note</div>
+              <div style="display:flex;gap:6px;">
+                <select id="oc-exc-status" style="background:#1a1e28;border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;">
+                  <option value="open">🟢 Open</option>
+                  <option value="closed">🔴 Closed</option>
+                  <option value="maintenance">🟡 Maintenance</option>
+                  <option value="limited">🟠 Limited Capacity</option>
+                </select>
+                <input type="text" id="oc-exc-note" placeholder="Note (optional)" style="flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+              </div>
+            </div>
+            <button class="btn-primary" style="font-size:11.5px;padding:10px 16px;white-space:nowrap;" onclick="OC.addException()"><i class="fas fa-plus"></i> Add</button>
+          </div>
+          <div id="oc-exceptions-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+
+        <!-- Operating Hours -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-clock" style="color:#60a5fa;"></i> Default Operating Hours</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Gate Opens</div>
+              <input type="time" id="oc-open-time" value="10:00" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Last Entry</div>
+              <input type="time" id="oc-last-entry" value="16:00" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Park Closes</div>
+              <input type="time" id="oc-close-time" value="18:00" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Max Advance Booking (days)</div>
+              <input type="number" id="oc-advance-days" value="90" min="1" max="365" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════
+           CATEGORY AVAILABILITY PANEL
+      ══════════════════════════════════════════════════════════════════ -->
+      <div class="panel" id="p-categories">
+        <div class="section-hdr">
+          <h2><i class="fas fa-tags"></i> Category Availability</h2>
+          <button class="btn-primary" style="font-size:11.5px;padding:8px 16px;" onclick="CA.save()"><i class="fas fa-save"></i> Save Rules</button>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;padding:12px 16px;background:rgba(249,115,22,.04);border-color:rgba(249,115,22,.2);">
+          <span style="color:#fb923c;font-size:12px;"><i class="fas fa-info-circle"></i> <strong>Ticket Categories:</strong> Control which ticket types (Adult, Child, Senior, Armed Forces, Differently Abled) are available globally or for specific date ranges and parks. Disabled categories are hidden from the booking form.</span>
+        </div>
+
+        <!-- Global category switches -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><i class="fas fa-toggle-on" style="color:#f97316;"></i> Global Category Availability</div>
+          <div id="ca-global-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+        </div>
+
+        <!-- Per-park + date range rules -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><i class="fas fa-calendar-check" style="color:#22c55e;"></i> Date-Range Rules</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px;">Add rules to enable or disable a specific ticket category for a date range and park. Rules override global settings.</div>
+
+          <div style="display:grid;grid-template-columns:1fr 160px 140px 1fr auto;gap:10px;align-items:end;margin-bottom:14px;">
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Category</div>
+              <select id="ca-r-cat" style="width:100%;background:#1a1e28;border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;">
+                <option value="adult">Adult</option>
+                <option value="child">Child</option>
+                <option value="senior">Senior Citizen</option>
+                <option value="armed">Armed Forces</option>
+                <option value="differently_abled">Differently Abled</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">From Date</div>
+              <input type="date" id="ca-r-from" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">To Date</div>
+              <input type="date" id="ca-r-to" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;" />
+            </div>
+            <div>
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px;">Park + Action</div>
+              <div style="display:flex;gap:6px;">
+                <select id="ca-r-park" style="flex:1;background:#1a1e28;border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;">
+                  <option value="ALL">All Parks</option>
+                  <option value="WATER_DAY">Water Park</option>
+                  <option value="AMUSEMENT_DAY">Amusement Park</option>
+                  <option value="COMBO_DAY">Combo</option>
+                </select>
+                <select id="ca-r-action" style="background:#1a1e28;border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;">
+                  <option value="disable">Disable</option>
+                  <option value="enable">Enable Only</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" style="font-size:11.5px;padding:10px 16px;white-space:nowrap;" onclick="CA.addRule()"><i class="fas fa-plus"></i> Add Rule</button>
+          </div>
+
+          <div id="ca-rules-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+        <!-- Price Overrides -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-rupee-sign" style="color:var(--gold);"></i> Price Overrides</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px;">Override default ticket prices. Leave 0 to use the system default price.</div>
+          <div id="ca-price-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;"></div>
+        </div>
+      </div>
+
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /app -->
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script src="../js/wow-auth.js"></script>
+<script>
+// ── AUTO-LOGIN: ensure Super Admin session exists for this panel ──────────
+// If no active session, auto-create a demo Super Admin session so the page
+// renders fully without a redirect. Real auth is enforced by wow-auth-guard.js.
+(function ensureSASession() {
+  try {
+    if (typeof WOWAuth !== 'undefined' && !WOWAuth.isLoggedIn()) {
+      const users = WOWAuth.adminGetAllUsers ? WOWAuth.adminGetAllUsers() : [];
+      const sa = users.find(function(u){ return u.role === 'SUPER_ADMIN' && u.active; });
+      if (sa) { WOWAuth.setSession(sa); }
+    }
+  } catch(e) {}
+})();
+
 // ── CLOCK ────────────────────────────────────────────────────────────────
 function updateClock(){
-  const now = new Date();
-  document.getElementById('clock').textContent =
-    now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) +
+  const clockEl = document.getElementById('clock');
+  if (!clockEl) return;
+  clockEl.textContent =
+    new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) +
     ' IST';
 }
 setInterval(updateClock,1000);
-updateClock();
+document.addEventListener('DOMContentLoaded', updateClock);
 
 // ── PANEL NAV ─────────────────────────────────────────────────────────────
 const PANEL_TITLES = {
   dashboard:'Dashboard', kyc:'KYC Approval Queue',
   users:'User Management', create:'Create Account',
   modules:'Module Control', rights:'Rights Matrix', audit:'Audit Logs',
+  banners:'Banner Manager', calendar:'Operational Calendar',
+  categories:'Category Availability', authgate:'AuthGate Manager',
+  products:'Products & Offerings Control', content:'Page Sections Control',
 };
 function showPanel(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById('p-'+id).classList.add('active');
-  document.getElementById('panelTitle').textContent = PANEL_TITLES[id] || id;
+  const panel = document.getElementById('p-'+id);
+  if (!panel) return;
+  panel.classList.add('active');
+  const panelTitleEl = document.getElementById('panelTitle');
+  if (panelTitleEl) panelTitleEl.textContent = PANEL_TITLES[id] || id;
   // highlight sidebar
   document.querySelectorAll('.sb-link').forEach(l=>{
     if(l.getAttribute('onclick') && l.getAttribute('onclick').includes("'"+id+"'")) l.classList.add('active');
   });
+  // lazy-init panels
+  if (id === 'calendar' && typeof OC !== 'undefined') OC.init();
+  if (id === 'categories' && typeof CA !== 'undefined') CA.init();
+  if (id === 'banners' && typeof BM !== 'undefined') BM.switchSection(BM.activeSection, document.querySelector('.bm-tab.active'));
+  if (id === 'products') PC.init();
+  if (id === 'content')  CC.init();
 }
 
 // ── KYC DATA ─────────────────────────────────────────────────────────────
@@ -544,6 +1034,7 @@ const KYC_DATA = [
 ];
 function renderKYC(){
   const tbody = document.getElementById('kycTableBody');
+  if (!tbody) return;
   tbody.innerHTML = KYC_DATA.map(k=>`
     <tr>
       <td><strong>${k.name}</strong></td>
@@ -584,6 +1075,7 @@ const USERS_DATA = [
 ];
 function renderUsers(){
   const grid = document.getElementById('userGrid');
+  if (!grid) return;
   grid.innerHTML = USERS_DATA.map(u=>`
     <div class="user-card">
       <div class="user-card-top">
@@ -642,6 +1134,7 @@ const MODULES = [
 ];
 function renderModules(){
   const grid = document.getElementById('moduleGrid');
+  if (!grid) return;
   grid.innerHTML = MODULES.map(m=>`
     <div class="module-card">
       <div class="module-icon" style="background:${m.iconBg};color:${m.iconColor};">${m.icon}</div>
@@ -676,6 +1169,7 @@ const DEFAULT_RIGHTS = {
 };
 function renderRights(){
   const matrix = document.getElementById('rightsMatrix');
+  if (!matrix) return;
   let html = `<div class="rg-header">Role</div>`;
   COLS.forEach(c=>{ html += `<div class="rg-header">${c}</div>`; });
   ROLES.forEach(role=>{
@@ -692,6 +1186,7 @@ function saveRights(){ alert('Rights matrix saved successfully. All portal sessi
 // Module rights for create-user form
 function renderModuleRights(){
   const grid = document.getElementById('moduleRightsGrid');
+  if (!grid) return;
   grid.innerHTML = MODULES.map(m=>`
     <label style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;cursor:pointer;">
       <input type="checkbox" style="accent-color:var(--gold);width:13px;height:13px;" checked/>
@@ -715,6 +1210,7 @@ const AUDIT = [
 ];
 function renderAudit(){
   const log = document.getElementById('auditLog');
+  if (!log) return;
   log.innerHTML = AUDIT.map(a=>`
     <div class="audit-row">
       <span class="audit-time">${a.time}</span>
@@ -733,13 +1229,1369 @@ function createUser(){
   alert(`Account created for ${name} (${role}).\nCredentials sent to ${email}.\nThey can now log in to their portal.`);
 }
 
+// ── AUTHGATE PANEL JS ──────────────────────────────────────────────────────
+const AG_PORTAL_META = {
+  admin:    {label:'Admin ERP',      icon:'fa-tachometer-alt', color:'#ef4444'},
+  sales:    {label:'Sales ERP',      icon:'fa-chart-line',     color:'#fbbf24'},
+  partner:  {label:'Partner Portal', icon:'fa-handshake',      color:'#60a5fa'},
+  reseller: {label:'Reseller ERP',   icon:'fa-store',          color:'#f472b6'},
+  ta:       {label:'Travel Agent',   icon:'fa-plane',          color:'#fb923c'},
+  portal:   {label:'Customer Portal',icon:'fa-user-circle',    color:'#4ade80'},
+  internal: {label:'Staff Gateway',  icon:'fa-sitemap',        color:'#a855f7'},
+};
+
+function initAuthGatePanel() {
+  if (typeof WOWAuth === 'undefined') return;
+  const cfg   = WOWAuth.adminGetConfig();
+  const users = WOWAuth.adminGetAllUsers();
+  const enabled = Object.values(cfg.portals).filter(function(p){return p.enabled;}).length;
+  const agStats = document.getElementById('ag-stats');
+  if (!agStats) return;
+  agStats.innerHTML = [
+    {label:'Protected Portals', val:enabled,   sub:'of 7 total',  color:'#ef4444'},
+    {label:'Active Users',  val:users.filter(function(u){return u.active;}).length, sub:'All roles', color:'#fbbf24'},
+    {label:'AuthGate',      val:cfg.enabled?'ON':'OFF', sub:'Global switch', color:cfg.enabled?'#22c55e':'#ef4444'},
+    {label:'Session TTL',   val:Math.round((cfg.sessionTTL||480)/60)+'h', sub:'Auto-expire', color:'#60a5fa'},
+  ].map(function(s){
+    return '<div class="stat-card"><div class="stat-label">'+s.label+'</div><div class="stat-val" style="color:'+s.color+';font-size:22px;">'+s.val+'</div><div class="stat-sub">'+s.sub+'</div></div>';
+  }).join('');
+  let html = '';
+  Object.keys(AG_PORTAL_META).forEach(function(key) {
+    const meta = AG_PORTAL_META[key];
+    const pcfg = cfg.portals[key] || {enabled:false};
+    html += '<div style="background:rgba(255,255,255,.03);border:1px solid '+(pcfg.enabled?'rgba(34,197,94,.2)':'rgba(255,255,255,.06)')+';border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;">'+
+      '<i class="fas '+meta.icon+'" style="color:'+meta.color+';font-size:16px;width:20px;"></i>'+
+      '<span style="flex:1;font-size:12.5px;font-weight:700;color:#fff;">'+meta.label+'</span>'+
+      '<label class="toggle"><input type="checkbox" id="agpt-'+key+'" '+(pcfg.enabled?'checked':'')+'/><span class="toggle-slider"></span></label>'+
+      '</div>';
+  });
+  const agPortalGrid = document.getElementById('ag-portal-grid');
+  if (agPortalGrid) agPortalGrid.innerHTML = html;
+  let uhtml = '<table style="width:100%;border-collapse:collapse;">';
+  users.slice(0,8).forEach(function(u) {
+    const r = (WOWAuth.WOW_ROLES[u.role]||{});
+    uhtml += '<tr style="border-bottom:1px solid rgba(255,255,255,.04);"><td style="padding:7px 0;"><span style="font-weight:700;color:#fff;">'+u.name+'</span></td><td style="color:rgba(255,255,255,.45);padding:7px 8px;">'+u.email+'</td><td><span style="background:'+(r.color||'#999')+'22;color:'+(r.color||'#999')+';font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:8px;">'+(r.label||u.role)+'</span></td><td><span style="color:'+(u.active?'#4ade80':'#f87171')+';font-size:10px;">'+(u.active?'Active':'Inactive')+'</span></td></tr>';
+  });
+  uhtml += '</table>';
+  const agUsersMini = document.getElementById('ag-users-mini');
+  if (agUsersMini) agUsersMini.innerHTML = uhtml;
+}
+
+function saveAgPortals() {
+  if (typeof WOWAuth === 'undefined') return;
+  const cfg = WOWAuth.adminGetConfig();
+  Object.keys(AG_PORTAL_META).forEach(function(key) {
+    const tog = document.getElementById('agpt-'+key);
+    if (tog) { if(!cfg.portals[key]) cfg.portals[key]={enabled:false,allowedRoles:[]}; cfg.portals[key].enabled=tog.checked; }
+  });
+  WOWAuth.adminSaveConfig(cfg);
+  initAuthGatePanel();
+  alert('Portal AuthGate settings saved!');
+}
+
+function changeSAPinSA() {
+  if (typeof WOWAuth === 'undefined') return;
+  const p1 = document.getElementById('sa-new-pin').value.trim();
+  const p2 = document.getElementById('sa-confirm-pin').value.trim();
+  if (p1.length < 4) { alert('PIN must be at least 4 digits.'); return; }
+  if (p1 !== p2)     { alert('PINs do not match.'); return; }
+  const users = WOWAuth.adminGetAllUsers();
+  const sa    = users.find(function(u){return u.role==='SUPER_ADMIN';});
+  if (!sa) { alert('No Super Admin found.'); return; }
+  sa.pin = p1;
+  WOWAuth.adminSaveUser(sa);
+  document.getElementById('sa-new-pin').value='';
+  document.getElementById('sa-confirm-pin').value='';
+  alert('Super Admin PIN updated! The SA bypass button will now use the new PIN.');
+}
+
+// ── TOPBAR AUTH WIDGET ─────────────────────────────────────────────────────
+if (typeof WOWAuth !== 'undefined') {
+  WOWAuth.renderTopbarWidget('topbar-auth-widget');
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────
-renderKYC();
-renderUsers();
-renderModules();
-renderRights();
-renderModuleRights();
-renderAudit();
+document.addEventListener('DOMContentLoaded', function() {
+  try { renderKYC(); } catch(e) {}
+  try { renderUsers(); } catch(e) {}
+  try { renderModules(); } catch(e) {}
+  try { renderRights(); } catch(e) {}
+  try { renderModuleRights(); } catch(e) {}
+  try { renderAudit(); } catch(e) {}
+  try { initAuthGatePanel(); } catch(e) {}
+});
 </script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     BANNER MANAGER ENGINE
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+const BM = (() => {
+  const SK = 'wow_banners_override';
+  let cfg = null;
+  let activeSection = 'homepage';
+
+  const SECTIONS = ['homepage','water_park','amusement_park','combo'];
+  const SEC_LABELS = {homepage:'Homepage',water_park:'Water Park',amusement_park:'Amusement Park',combo:'Combo'};
+
+  function loadCfg() {
+    try {
+      const raw = localStorage.getItem(SK);
+      if (raw) cfg = JSON.parse(raw);
+    } catch(e) {}
+    if (!cfg) {
+      cfg = {};
+      SECTIONS.forEach(s => { cfg[s] = { slides:[], autoplay:true, autoplayInterval:6000, showDots:true, showArrows:true }; });
+      // Default slides from banners.json if available
+      fetch('../data/banners.json?v='+Date.now())
+        .then(r=>r.json()).then(d=>{ cfg=Object.assign(cfg,d); renderSection(activeSection); })
+        .catch(()=>{});
+    }
+  }
+
+  function saveCfg() {
+    // Collect all slide data from DOM
+    SECTIONS.forEach(sec => {
+      const container = document.getElementById('bm-slides-container');
+      if (sec !== activeSection) return; // only save currently visible section
+      // collect from cards
+      const cards = container ? container.querySelectorAll('.bm-slide-card') : [];
+      if (!cfg[sec]) cfg[sec] = {slides:[]};
+      cfg[sec].slides = Array.from(cards).map(card => readCard(card));
+    });
+    localStorage.setItem(SK, JSON.stringify(cfg, null, 2));
+    // Also save to localStorage key used by banner-engine.js
+    toast2('✅ Banners saved & published! Reload public pages to see changes.', '#22c55e');
+  }
+
+  function save() {
+    saveCfg();
+  }
+
+  function readCard(card) {
+    // Prefer the uploaded data URL (stored in a hidden input) over the text URL
+    const imgUrlInput  = card.querySelector('.bm-img-url');
+    const uploadedData = card.dataset.uploadedImg; // base64 data URL from FileReader
+    const imgUrl = (uploadedData && uploadedData.startsWith('data:'))
+      ? uploadedData
+      : (imgUrlInput?.value || '');
+    return {
+      id:               card.dataset.id || ('bm-'+Date.now()),
+      active:           card.querySelector('.bm-active-chk')?.checked ?? true,
+      type:             card.querySelector('.bm-type-hidden')?.value || 'image',
+      title:            card.querySelector('.bm-title')?.value || '',
+      subtitle:         card.querySelector('.bm-subtitle')?.value || '',
+      badge:            card.querySelector('.bm-badge')?.value || '',
+      imageUrl:         imgUrl,
+      videoUrl:         card.querySelector('.bm-vid-url')?.value || '',
+      fallbackGradient: card.querySelector('.bm-gradient')?.value || 'linear-gradient(135deg,#001d4a,#006EE6)',
+      overlayOpacity:   parseFloat(card.querySelector('.bm-overlay')?.value) || 0.4,
+      textAlign:        card.querySelector('.bm-align')?.value || 'left',
+      cta:              { label: card.querySelector('.bm-cta-label')?.value || '', url: card.querySelector('.bm-cta-url')?.value || '' },
+    };
+  }
+
+  function switchSection(sec, btn) {
+    // Save current section first
+    if (cfg) saveCfgSection(activeSection);
+    activeSection = sec;
+    document.querySelectorAll('.bm-tab').forEach(t=>t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderSection(sec);
+  }
+
+  function saveCfgSection(sec) {
+    const container = document.getElementById('bm-slides-container');
+    if (!container) return;
+    if (!cfg[sec]) cfg[sec] = {slides:[]};
+    cfg[sec].slides = Array.from(container.querySelectorAll('.bm-slide-card')).map(c=>readCard(c));
+  }
+
+  function renderSection(sec) {
+    const container = document.getElementById('bm-slides-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const slides = (cfg[sec] && cfg[sec].slides) || [];
+    if (slides.length === 0) {
+      container.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);font-size:13px;">No slides yet — click Add New Banner Slide below.</div>';
+      return;
+    }
+    slides.forEach((slide, idx) => container.appendChild(buildCard(slide, idx, sec)));
+  }
+
+  function buildCard(slide, idx, sec) {
+    const div = document.createElement('div');
+    div.className = 'bm-slide-card';
+    div.dataset.id = slide.id || ('bm-'+idx);
+    div.dataset.sec = sec;
+    // Restore uploaded data URL so readCard() can retrieve it
+    if (slide.imageUrl && slide.imageUrl.startsWith('data:')) {
+      div.dataset.uploadedImg = slide.imageUrl;
+    }
+    const typeVal = slide.type || 'image';
+    const grad = slide.fallbackGradient || 'linear-gradient(135deg,#001d4a,#006EE6)';
+
+    div.innerHTML = `
+      <div class="bm-slide-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div class="bm-slide-num">${idx+1}</div>
+        <div style="flex:1;">
+          <div class="bm-slide-name">${slide.title || 'Untitled Slide'}</div>
+          <div class="bm-slide-meta">${typeVal==='video'?'📹 Video':'🖼 Image/Gradient'} · ${slide.active?'🟢 Active':'⚫ Hidden'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;" onclick="event.stopPropagation()">
+          <label class="toggle" style="width:36px;height:20px;margin:0;" title="Active">
+            <input type="checkbox" class="bm-active-chk" ${slide.active?'checked':''} />
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="btn-sm btn-view" onclick="BM.moveUp(this.closest('.bm-slide-card'))">↑</button>
+          <button class="btn-sm btn-view" onclick="BM.moveDown(this.closest('.bm-slide-card'))">↓</button>
+          <button class="btn-sm btn-reject" onclick="this.closest('.bm-slide-card').remove()">✕</button>
+        </div>
+      </div>
+      <div class="bm-slide-body">
+        <!-- Type -->
+        <div class="bm-field">
+          <label>Banner Type</label>
+          <div class="bm-type-chips">
+            <button type="button" class="bm-chip ${typeVal==='video'?'active':''}" onclick="BM.setType(this,'video')">📹 Video</button>
+            <button type="button" class="bm-chip ${typeVal==='image'?'active':''}" onclick="BM.setType(this,'image')">🖼 Image</button>
+            <button type="button" class="bm-chip ${typeVal==='gradient'?'active':''}" onclick="BM.setType(this,'gradient')">🎨 Gradient Only</button>
+          </div>
+          <input type="hidden" class="bm-type-hidden" value="${typeVal}"/>
+        </div>
+
+        <!-- Video fields -->
+        <div class="bm-video-fields" style="${typeVal!=='video'?'display:none;':''}">
+          <div class="bm-field">
+            <label>Video URL (MP4)</label>
+            <input class="bm-input bm-vid-url" type="url" value="${slide.videoUrl||''}" placeholder="https://cdn.example.com/hero.mp4"/>
+          </div>
+        </div>
+
+        <!-- Image fields -->
+        <div class="bm-image-fields" style="${typeVal!=='image'?'display:none;':''}">
+          <div class="bm-field">
+            <label>Image — Upload File or Paste URL</label>
+            <div class="bm-upload-zone" id="bm-dz-${idx}">
+              <input type="file" accept="image/*" onchange="BM.handleUpload(this, ${idx})" />
+              <div><i class="fas fa-cloud-upload-alt" style="font-size:20px;margin-bottom:6px;display:block;"></i>
+              <strong>Click to upload</strong> or drag &amp; drop<br><span style="font-size:10px;opacity:.6;">JPG, PNG, WebP · Recommended 1920×1080px</span></div>
+            </div>
+            <div style="text-align:center;font-size:10px;color:var(--muted);margin:8px 0;">— OR paste URL —</div>
+            <input class="bm-input bm-img-url" type="text" value="${slide.imageUrl && slide.imageUrl.startsWith('data:') ? 'data:uploaded (browser storage)' : (slide.imageUrl||'')}" placeholder="https://cdn.example.com/banner.jpg" oninput="BM.previewImg(this)"/>
+            <div class="bm-img-container" style="${slide.imageUrl?'':'display:none;'}">
+              <img class="bm-img-preview" src="${slide.imageUrl||''}" onerror="this.parentElement.style.display='none'" style="max-height:120px;width:100%;object-fit:cover;border-radius:6px;"/>
+            </div>
+            ${slide.imageUrl && slide.imageUrl.startsWith('data:') ? `<div style="font-size:10px;color:#4ade80;margin-top:4px;"><i class="fas fa-check-circle"></i> Uploaded image saved in browser storage</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Gradient -->
+        <div class="bm-field">
+          <label>Gradient Fallback (CSS)</label>
+          <input class="bm-input bm-gradient" type="text" value="${grad}" oninput="this.nextElementSibling.style.background=this.value"/>
+          <div class="bm-grad-preview" style="background:${grad};"></div>
+          <span style="font-size:10.5px;color:var(--muted);">Used when no media URL is set.</span>
+        </div>
+
+        <div class="bm-grid-3">
+          <div class="bm-field">
+            <label>Overlay Opacity</label>
+            <input class="bm-input bm-overlay" type="number" value="${slide.overlayOpacity??0.4}" min="0" max="1" step="0.05"/>
+          </div>
+          <div class="bm-field">
+            <label>Text Alignment</label>
+            <select class="bm-input bm-align">
+              <option value="left" ${(slide.textAlign||'left')==='left'?'selected':''}>Left</option>
+              <option value="center" ${slide.textAlign==='center'?'selected':''}>Center</option>
+            </select>
+          </div>
+          <div class="bm-field">
+            <label>Badge Text</label>
+            <input class="bm-input bm-badge" type="text" value="${slide.badge||''}" placeholder="🔥 Limited Offer"/>
+          </div>
+        </div>
+
+        <div class="bm-field">
+          <label>Headline / Title *</label>
+          <input class="bm-input bm-title" type="text" value="${slide.title||''}" placeholder="Make Memories that Splash, Thrill &amp; Last Forever"/>
+        </div>
+        <div class="bm-field">
+          <label>Subtitle / Description</label>
+          <input class="bm-input bm-subtitle" type="text" value="${slide.subtitle||''}" placeholder="Short engaging description"/>
+        </div>
+        <div class="bm-grid-2">
+          <div class="bm-field">
+            <label>Primary CTA Label</label>
+            <input class="bm-input bm-cta-label" type="text" value="${slide.cta?.label||''}" placeholder="🎟 Book Now"/>
+          </div>
+          <div class="bm-field">
+            <label>Primary CTA URL</label>
+            <input class="bm-input bm-cta-url" type="text" value="${slide.cta?.url||''}" placeholder="book/water-park.html"/>
+          </div>
+        </div>
+      </div>`;
+    return div;
+  }
+
+  function addSlide(sec) {
+    if (!cfg) { loadCfg(); return setTimeout(()=>addSlide(sec),300); }
+    saveCfgSection(sec);
+    if (!cfg[sec]) cfg[sec] = {slides:[]};
+    cfg[sec].slides.push({ id:'bm-'+Date.now(), active:true, type:'image', title:'New Banner Slide',
+      subtitle:'', badge:'', imageUrl:'', videoUrl:'', fallbackGradient:'linear-gradient(135deg,#001d4a,#006EE6)', overlayOpacity:0.4, textAlign:'left', cta:{label:'',url:''} });
+    renderSection(sec);
+    // Scroll to last
+    const container = document.getElementById('bm-slides-container');
+    const cards = container.querySelectorAll('.bm-slide-card');
+    if (cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth'});
+  }
+
+  function setType(btn, type) {
+    const card = btn.closest('.bm-slide-card');
+    card.querySelectorAll('.bm-chip').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    card.querySelector('.bm-type-hidden').value = type;
+    card.querySelector('.bm-video-fields').style.display = type==='video' ? '' : 'none';
+    card.querySelector('.bm-image-fields').style.display = type==='image' ? '' : 'none';
+  }
+
+  function previewImg(input) {
+    const card = input.closest('.bm-slide-card');
+    const container = card.querySelector('.bm-img-container');
+    const img = card.querySelector('.bm-img-preview');
+    if (input.value) {
+      container.style.display = '';
+      img.src = input.value;
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
+  function handleUpload(input, idx) {
+    const file = input.files[0];
+    if (!file) return;
+    // Validate: images only, max 5 MB
+    if (!file.type.startsWith('image/')) { toast2('⚠ Please upload a valid image file (JPG, PNG, WebP).', '#ef4444'); return; }
+    if (file.size > 5 * 1024 * 1024)    { toast2('⚠ Image too large. Max 5 MB per banner image.', '#ef4444'); return; }
+
+    const card = input.closest('.bm-slide-card');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      // Store data URL in card dataset for readCard() to pick up on save
+      card.dataset.uploadedImg = dataUrl;
+      // Update the URL text field to show the filename (for display only)
+      const urlInput = card.querySelector('.bm-img-url');
+      if (urlInput) urlInput.value = 'data:uploaded:' + file.name;
+      // Show live preview
+      const imgContainer = card.querySelector('.bm-img-container');
+      const imgEl        = card.querySelector('.bm-img-preview');
+      if (imgContainer) imgContainer.style.display = '';
+      if (imgEl) imgEl.src = dataUrl;
+      // Update drop-zone to show success
+      const dz = card.querySelector('.bm-upload-zone div');
+      if (dz) dz.innerHTML =
+        '<i class="fas fa-check-circle" style="font-size:18px;color:#22c55e;margin-bottom:4px;display:block;"></i>' +
+        '<strong style="color:#22c55e;">' + file.name + '</strong><br>' +
+        '<span style="font-size:10px;opacity:.6;">' + (file.size/1024).toFixed(0) + ' KB &middot; Click to replace &middot; Saved in browser</span>';
+      toast2('✅ Image uploaded & ready. Click Save & Publish to apply.', '#22c55e');
+    };
+    reader.onerror = function() { toast2('⚠ Could not read file. Please try again.', '#ef4444'); };
+    reader.readAsDataURL(file);
+  }
+
+  // Override readCard to pick up uploaded images
+  const _origReadCard = readCard;
+
+  function moveUp(card) {
+    const prev = card.previousElementSibling;
+    if (prev && prev.classList.contains('bm-slide-card')) card.parentNode.insertBefore(card, prev);
+  }
+  function moveDown(card) {
+    const next = card.nextElementSibling;
+    if (next && next.classList.contains('bm-slide-card')) card.parentNode.insertBefore(next, card);
+  }
+
+  // Init
+  loadCfg();
+  setTimeout(() => renderSection('homepage'), 200);
+
+  return { addSlide, switchSection, setType, previewImg, handleUpload, moveUp, moveDown, save, activeSection: 'homepage',
+    get activeSection() { return activeSection; } };
+})();
+
+function toast2(msg, color) {
+  // Reuse showPanel toast system if available
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#131720;border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);border-left:3px solid '+(color||'#22c55e');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3500);
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     OPERATIONAL CALENDAR ENGINE
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+const OC = (() => {
+  const SK = 'wow_op_calendar';
+  let data = null;
+
+  const PARKS = ['WATER_DAY','AMUSEMENT_DAY'];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  function load() {
+    try { data = JSON.parse(localStorage.getItem(SK) || 'null'); } catch(e) {}
+    if (!data) {
+      data = {
+        defaults: { WATER_DAY: 'open', AMUSEMENT_DAY: 'open' },
+        exceptions: [],   // {date:'YYYY-MM-DD', park:'WATER_DAY|AMUSEMENT_DAY|ALL', status:'open|closed|maintenance|limited', note:''}
+        hours: { open:'10:00', lastEntry:'16:00', close:'18:00', advanceDays:90 }
+      };
+    }
+  }
+
+  function save() {
+    // collect hours
+    data.hours = {
+      open:        document.getElementById('oc-open-time')?.value || '10:00',
+      lastEntry:   document.getElementById('oc-last-entry')?.value || '16:00',
+      close:       document.getElementById('oc-close-time')?.value || '18:00',
+      advanceDays: parseInt(document.getElementById('oc-advance-days')?.value) || 90
+    };
+    localStorage.setItem(SK, JSON.stringify(data, null, 2));
+    // Build the public-facing disabled-dates list used by booking pages
+    _buildPublicConfig();
+    toast2('✅ Operational Calendar saved!', '#22c55e');
+    // Re-render both cals
+    PARKS.forEach(p => renderCal(p));
+    renderExceptions();
+  }
+
+  function _buildPublicConfig() {
+    // Produce wow_calendar_config for booking.js to consume
+    localStorage.setItem('wow_calendar_config', JSON.stringify({
+      defaults: data.defaults,
+      exceptions: data.exceptions,
+      hours: data.hours,
+      updatedAt: new Date().toISOString()
+    }));
+  }
+
+  function setDefault(park, open) {
+    if (!data) load();
+    data.defaults[park] = open ? 'open' : 'closed';
+    const lbl = document.getElementById('oc-' + (park==='WATER_DAY'?'water':'amuse') + '-default-lbl');
+    if (lbl) lbl.textContent = open ? 'Open' : 'Closed';
+    renderCal(park);
+  }
+
+  function getDateStatus(park, dateStr) {
+    // Check exceptions first (exact match)
+    for (const exc of (data.exceptions||[])) {
+      if (exc.date === dateStr && (exc.park === park || exc.park === 'ALL' || exc.park === 'COMBO_DAY')) {
+        return exc.status;
+      }
+    }
+    return data.defaults[park] || 'open';
+  }
+
+  function renderCal(park) {
+    const container = document.getElementById('oc-cal-' + park);
+    if (!container) return;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const today = now.toISOString().slice(0,10);
+
+    let html = '<div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:8px;">' + MONTHS[month] + ' ' + year + '</div>';
+    html += '<div class="oc-mini-cal">';
+    DAYS.forEach(d => html += '<div class="oc-day-hdr">' + d + '</div>');
+    // Empty cells before first day
+    for (let i=0; i<firstDay; i++) html += '<div class="oc-day empty"></div>';
+    for (let d=1; d<=daysInMonth; d++) {
+      const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const status = getDateStatus(park, dateStr);
+      const isPast = dateStr < today;
+      const statusClass = status === 'open' ? '' : status;
+      html += `<div class="oc-day ${statusClass} ${isPast?'past':''}" title="${dateStr}: ${status}" onclick="OC.toggleDay('${park}','${dateStr}')" data-date="${dateStr}">${d}</div>`;
+    }
+    html += '</div>';
+    html += '<div class="oc-legend"><div class="oc-leg-item"><div class="oc-leg-dot" style="background:rgba(34,197,94,.4);"></div>Open</div><div class="oc-leg-item"><div class="oc-leg-dot" style="background:rgba(239,68,68,.4);"></div>Closed</div><div class="oc-leg-item"><div class="oc-leg-dot" style="background:rgba(251,191,36,.4);"></div>Maintenance</div><div class="oc-leg-item"><div class="oc-leg-dot" style="background:rgba(249,115,22,.4);"></div>Limited</div></div>';
+    container.innerHTML = html;
+  }
+
+  function toggleDay(park, dateStr) {
+    if (!data) load();
+    const now = new Date().toISOString().slice(0,10);
+    if (dateStr < now) return;
+    const existing = data.exceptions.findIndex(e => e.date===dateStr && (e.park===park || e.park==='ALL'));
+    const currentStatus = getDateStatus(park, dateStr);
+    const cycle = {open:'closed', closed:'maintenance', maintenance:'limited', limited:'open'};
+    const newStatus = cycle[currentStatus] || 'closed';
+    if (existing >= 0) {
+      if (newStatus === (data.defaults[park] || 'open')) {
+        data.exceptions.splice(existing, 1); // remove override if back to default
+      } else {
+        data.exceptions[existing].status = newStatus;
+      }
+    } else {
+      if (newStatus !== (data.defaults[park] || 'open')) {
+        data.exceptions.push({ date:dateStr, park, status:newStatus, note:'' });
+      }
+    }
+    renderCal(park);
+    renderExceptions();
+  }
+
+  function quickMark(park, status, scope) {
+    if (!data) load();
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const todayStr = now.toISOString().slice(0,10);
+
+    if (scope === 'month') {
+      const days = new Date(year, month+1, 0).getDate();
+      for (let d=1; d<=days; d++) {
+        const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        if (dateStr < todayStr) continue;
+        const idx = data.exceptions.findIndex(e=>e.date===dateStr&&e.park===park);
+        if (status === data.defaults[park]) {
+          if (idx>=0) data.exceptions.splice(idx,1);
+        } else {
+          if (idx>=0) data.exceptions[idx].status = status;
+          else data.exceptions.push({date:dateStr,park,status,note:''});
+        }
+      }
+    } else if (scope === 'week') {
+      for (let i=0; i<7; i++) {
+        const d = new Date(now); d.setDate(now.getDate()+i);
+        const dateStr = d.toISOString().slice(0,10);
+        const idx = data.exceptions.findIndex(e=>e.date===dateStr&&e.park===park);
+        if (idx>=0) data.exceptions[idx].status = status;
+        else data.exceptions.push({date:dateStr,park,status,note:''});
+      }
+    } else if (scope === 'weekends') {
+      const days = new Date(year, month+1, 0).getDate();
+      for (let d=1; d<=days; d++) {
+        const dt = new Date(year, month, d);
+        if (dt.getDay() === 0 || dt.getDay() === 6) {
+          const dateStr = dt.toISOString().slice(0,10);
+          if (dateStr < todayStr) continue;
+          const idx = data.exceptions.findIndex(e=>e.date===dateStr&&e.park===park);
+          if (idx>=0) data.exceptions[idx].status = status;
+          else data.exceptions.push({date:dateStr,park,status,note:''});
+        }
+      }
+    }
+    renderCal(park);
+    renderExceptions();
+    toast2('Calendar updated!', '#22c55e');
+  }
+
+  function addException() {
+    const date   = document.getElementById('oc-exc-date')?.value;
+    const park   = document.getElementById('oc-exc-park')?.value;
+    const status = document.getElementById('oc-exc-status')?.value;
+    const note   = document.getElementById('oc-exc-note')?.value;
+    if (!date) { toast2('Please select a date.', '#ef4444'); return; }
+    if (!data) load();
+    const idx = data.exceptions.findIndex(e=>e.date===date&&e.park===park);
+    if (idx>=0) data.exceptions[idx] = {date,park,status,note};
+    else data.exceptions.push({date,park,status,note});
+    document.getElementById('oc-exc-date').value='';
+    document.getElementById('oc-exc-note').value='';
+    PARKS.forEach(p=>renderCal(p));
+    renderExceptions();
+  }
+
+  function renderExceptions() {
+    const list = document.getElementById('oc-exceptions-list');
+    if (!list || !data) return;
+    const filtered = (data.exceptions||[]).filter(e => e.date >= new Date().toISOString().slice(0,10));
+    filtered.sort((a,b)=>a.date.localeCompare(b.date));
+    if (!filtered.length) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">No upcoming exceptions. Dates default to park default status.</div>'; return; }
+    const statusColors = {open:'#22c55e',closed:'#ef4444',maintenance:'#fbbf24',limited:'#f97316'};
+    list.innerHTML = filtered.map((e,i) => `
+      <div class="oc-exc-row">
+        <span style="font-weight:700;color:#fff;font-family:'Courier New',monospace;">${e.date}</span>
+        <span style="color:var(--muted);font-size:10.5px;">${e.park==='ALL'?'All Parks':e.park==='COMBO_DAY'?'Both Parks':e.park.replace('_DAY',' Park').replace('_',' ')}</span>
+        <span class="oc-exc-badge" style="background:rgba(${statusColors[e.status]||'#fff'},0.1);color:${statusColors[e.status]||'#fff'};border:1px solid ${statusColors[e.status]||'#fff'}22;">${e.status.toUpperCase()}</span>
+        <span style="flex:1;color:var(--muted);font-size:11px;">${e.note||''}</span>
+        <button class="btn-sm btn-reject" onclick="OC.removeException(${i})" style="padding:3px 8px;">✕</button>
+      </div>`).join('');
+  }
+
+  function removeException(idx) {
+    // find by index in filtered list
+    const today = new Date().toISOString().slice(0,10);
+    const filtered = data.exceptions.map((e,i)=>({...e,_i:i})).filter(e=>e.date>=today);
+    filtered.sort((a,b)=>a.date.localeCompare(b.date));
+    const orig = filtered[idx];
+    if (orig) data.exceptions.splice(orig._i,1);
+    PARKS.forEach(p=>renderCal(p));
+    renderExceptions();
+  }
+
+  function init() {
+    load();
+    // Set UI from data
+    ['WATER_DAY','AMUSEMENT_DAY'].forEach(park => {
+      const key = park==='WATER_DAY'?'water':'amuse';
+      const chk = document.getElementById('oc-'+key+'-default');
+      const lbl = document.getElementById('oc-'+key+'-default-lbl');
+      if (chk) chk.checked = (data.defaults[park] !== 'closed');
+      if (lbl) lbl.textContent = (data.defaults[park] !== 'closed') ? 'Open' : 'Closed';
+    });
+    if (data.hours) {
+      const oh = document.getElementById('oc-open-time');
+      const le = document.getElementById('oc-last-entry');
+      const ct = document.getElementById('oc-close-time');
+      const ad = document.getElementById('oc-advance-days');
+      if (oh) oh.value = data.hours.open || '10:00';
+      if (le) le.value = data.hours.lastEntry || '16:00';
+      if (ct) ct.value = data.hours.close || '18:00';
+      if (ad) ad.value = data.hours.advanceDays || 90;
+    }
+    PARKS.forEach(p=>renderCal(p));
+    renderExceptions();
+  }
+
+  return { save, setDefault, toggleDay, quickMark, addException, removeException, renderCal, init };
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     CATEGORY AVAILABILITY ENGINE
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+const CA = (() => {
+  const SK = 'wow_category_availability';
+  const SK_PRICES = 'wow_price_overrides';
+  let data = null;
+  let prices = null;
+
+  const CATS = [
+    { id:'adult',          label:'Adult',              sub:'Age 12+ / 110cm+', emoji:'🧑', color:'#60a5fa' },
+    { id:'child',          label:'Child',              sub:'Age 3–11 / 90–110cm', emoji:'🧒', color:'#4ade80' },
+    { id:'senior',         label:'Senior Citizen',     sub:'Age 60+', emoji:'👴', color:'#fbbf24' },
+    { id:'armed',          label:'Armed Forces',       sub:'Serving / Ex-servicemen', emoji:'🎖', color:'#fb923c' },
+    { id:'differently_abled', label:'Differently Abled', sub:'PwD card holder', emoji:'♿', color:'#c084fc' },
+  ];
+
+  const PARKS_CONFIG = [
+    { key:'WATER_DAY',    label:'Water Park',       defPrices:{adult:1299,child:899,senior:975,armed:909,differently_abled:649} },
+    { key:'AMUSEMENT_DAY',label:'Amusement Park',   defPrices:{adult:1199,child:799,senior:899,armed:839,differently_abled:599} },
+    { key:'COMBO_DAY',    label:'Combo (Both Parks)',defPrices:{adult:1999,child:1399,senior:1499,armed:1399,differently_abled:999} },
+  ];
+
+  function load() {
+    try { data   = JSON.parse(localStorage.getItem(SK)   || 'null'); } catch(e) {}
+    try { prices = JSON.parse(localStorage.getItem(SK_PRICES) || 'null'); } catch(e) {}
+    if (!data) {
+      data = { global: {}, rules: [] };
+      CATS.forEach(c => data.global[c.id] = true);
+    }
+    if (!prices) {
+      prices = {};
+      PARKS_CONFIG.forEach(p => { prices[p.key] = Object.assign({}, p.defPrices); });
+    }
+  }
+
+  function save() {
+    // Collect global toggles
+    CATS.forEach(c => {
+      const chk = document.getElementById('ca-global-'+c.id);
+      if (chk) data.global[c.id] = chk.checked;
+    });
+    // Collect price overrides
+    PARKS_CONFIG.forEach(park => {
+      if (!prices[park.key]) prices[park.key] = {};
+      CATS.forEach(cat => {
+        const inp = document.getElementById('ca-price-'+park.key+'-'+cat.id);
+        if (inp) {
+          const val = parseFloat(inp.value);
+          prices[park.key][cat.id] = val > 0 ? val : park.defPrices[cat.id];
+        }
+      });
+    });
+    localStorage.setItem(SK, JSON.stringify(data, null, 2));
+    localStorage.setItem(SK_PRICES, JSON.stringify(prices, null, 2));
+    // Publish to shared key used by booking.js
+    localStorage.setItem('wow_cat_config', JSON.stringify({ global: data.global, rules: data.rules, prices, updatedAt: new Date().toISOString() }));
+    toast2('✅ Category availability saved!', '#f97316');
+  }
+
+  function addRule() {
+    const cat    = document.getElementById('ca-r-cat')?.value;
+    const from   = document.getElementById('ca-r-from')?.value;
+    const to     = document.getElementById('ca-r-to')?.value;
+    const park   = document.getElementById('ca-r-park')?.value;
+    const action = document.getElementById('ca-r-action')?.value;
+    if (!from || !to || !cat) { toast2('Please fill all rule fields.', '#ef4444'); return; }
+    if (from > to) { toast2('From date must be before To date.', '#ef4444'); return; }
+    if (!data) load();
+    data.rules.push({ id:'rule-'+Date.now(), cat, from, to, park, action });
+    renderRulesList();
+    // Clear inputs
+    ['ca-r-from','ca-r-to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  }
+
+  function removeRule(id) {
+    if (!data) return;
+    data.rules = data.rules.filter(r => r.id !== id);
+    renderRulesList();
+  }
+
+  function renderGlobalGrid() {
+    const grid = document.getElementById('ca-global-grid');
+    if (!grid || !data) return;
+    grid.innerHTML = CATS.map(c => `
+      <div class="ca-cat-card">
+        <div class="ca-cat-icon" style="background:${c.color}22;">${c.emoji}</div>
+        <div style="flex:1;">
+          <div class="ca-cat-name">${c.label}</div>
+          <div class="ca-cat-sub">${c.sub}</div>
+        </div>
+        <label class="toggle" style="width:40px;height:22px;margin:0;">
+          <input type="checkbox" id="ca-global-${c.id}" ${data.global[c.id]!==false?'checked':''}
+            onchange="CA.updateGlobalLabel('${c.id}',this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>`).join('');
+  }
+
+  function updateGlobalLabel(id, checked) {
+    if (!data) return;
+    data.global[id] = checked;
+  }
+
+  function renderRulesList() {
+    const list = document.getElementById('ca-rules-list');
+    if (!list || !data) return;
+    if (!data.rules.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">No date-range rules. All categories follow global settings.</div>';
+      return;
+    }
+    const catLabel = id => CATS.find(c=>c.id===id)?.label || id;
+    const parkLabel = key => key==='ALL'?'All Parks': PARKS_CONFIG.find(p=>p.key===key)?.label || key;
+    list.innerHTML = data.rules.map(r => `
+      <div class="ca-rule-row">
+        <span style="font-weight:700;color:#fff;">${catLabel(r.cat)}</span>
+        <span style="color:var(--muted);font-size:10.5px;">${parkLabel(r.park)}</span>
+        <span style="color:var(--muted);font-family:'Courier New',monospace;font-size:11px;">${r.from} → ${r.to}</span>
+        <span class="oc-exc-badge" style="background:${r.action==='disable'?'rgba(239,68,68,.1)':'rgba(34,197,94,.1)'};color:${r.action==='disable'?'#f87171':'#4ade80'};border:1px solid ${r.action==='disable'?'rgba(239,68,68,.2)':'rgba(34,197,94,.2)'};">${r.action.toUpperCase()}</span>
+        <span style="flex:1;"></span>
+        <button class="btn-sm btn-reject" onclick="CA.removeRule('${r.id}')" style="padding:3px 8px;">✕</button>
+      </div>`).join('');
+  }
+
+  function renderPriceGrid() {
+    const grid = document.getElementById('ca-price-grid');
+    if (!grid || !prices) return;
+    grid.innerHTML = PARKS_CONFIG.map(park => `
+      <div class="ca-price-card">
+        <div class="ca-price-park">${park.label}</div>
+        ${CATS.map(cat => `
+          <div class="ca-price-row">
+            <span class="ca-price-label">${cat.emoji} ${cat.label}</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:11px;color:var(--muted);">₹</span>
+              <input class="ca-price-input" type="number" id="ca-price-${park.key}-${cat.id}"
+                value="${(prices[park.key]&&prices[park.key][cat.id]) || park.defPrices[cat.id]}"
+                placeholder="${park.defPrices[cat.id]}" min="0" step="1"/>
+              <span style="font-size:9.5px;color:var(--muted);">Default: ₹${park.defPrices[cat.id]}</span>
+            </div>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  function init() {
+    load();
+    renderGlobalGrid();
+    renderRulesList();
+    renderPriceGrid();
+  }
+
+  return { save, addRule, removeRule, updateGlobalLabel, init };
+})();
+
+// ── INIT ALL NEW PANELS ───────────────────────────────────────────────────
+// OC and CA are initialised lazily by showPanel(); calling them here
+// eagerly is harmless (they have null-checks) but avoids extra work on pages
+// that never visit those panels. Keep the call so that if the URL is bookmarked
+// to a specific panel the data is ready.
+document.addEventListener('DOMContentLoaded', function() {
+  try { OC.init(); } catch(e) {}
+  try { CA.init(); } catch(e) {}
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PRODUCTS & OFFERINGS CONTROL ENGINE
+═══════════════════════════════════════════════════════════════════════ -->
+<script src="../js/wow-content-control.js"></script>
+<script>
+'use strict';
+/* ────────────────────────────────────────────────────────────────────────
+   PC — Products & Offerings Control
+   Lets super admin toggle any park / ticket category / offer / combo /
+   passport on or off. Changes immediately persist and are picked up by
+   every public page that loads wow-content-control.js.
+──────────────────────────────────────────────────────────────────────── */
+const PC = (() => {
+
+  /* Group definitions for the UI */
+  const GROUPS = [
+    {
+      key: 'parks',
+      label: '🏟 Parks',
+      icon: '🏟',
+      color: '#3b82f6',
+      items: ['WATER_DAY','AMUSEMENT_DAY','COMBO_DAY','PASSPORT'],
+    },
+    {
+      key: 'categories',
+      label: '🎫 Ticket Categories',
+      icon: '🎫',
+      color: '#f97316',
+      items: ['cat_adult','cat_child','cat_senior','cat_armed','cat_disabled'],
+    },
+    {
+      key: 'packages',
+      label: '📦 Package Offers & Add-ons',
+      icon: '📦',
+      color: '#22c55e',
+      items: ['pkg_group','pkg_bogo','pkg_flash','pkg_family','pkg_corporate','pkg_birthday','pkg_school','pkg_buffet'],
+    },
+  ];
+
+  let cfg = null;
+
+  function load() {
+    cfg = WOWContent.getProductCfg();
+  }
+
+  function save() {
+    if (!cfg) load();
+    // Read all toggles from DOM
+    Object.keys(cfg).forEach(key => {
+      const chk = document.getElementById('pc-toggle-'+key);
+      if (chk) cfg[key] = Object.assign({}, cfg[key], { enabled: chk.checked });
+    });
+    WOWContent.saveProductCfg(cfg);
+    toast2('✅ Products config saved & published live! Public pages will update on next load.', '#22c55e');
+  }
+
+  function disableAll() {
+    if (!confirm('Disable ALL products? The public site will show no offerings. Are you sure?')) return;
+    if (!cfg) load();
+    Object.keys(cfg).forEach(key => {
+      cfg[key] = Object.assign({}, cfg[key], { enabled: false });
+      const chk = document.getElementById('pc-toggle-'+key);
+      if (chk) { chk.checked = false; updateRowState(key, false); }
+    });
+  }
+
+  function toggleItem(key, enabled) {
+    if (!cfg) load();
+    cfg[key] = Object.assign({}, cfg[key], { enabled });
+    updateRowState(key, enabled);
+    updateSummaryCounters();
+  }
+
+  function toggleGroup(groupKey, enabled) {
+    if (!cfg) load();
+    const group = GROUPS.find(g => g.key === groupKey);
+    if (!group) return;
+    group.items.forEach(key => {
+      cfg[key] = Object.assign({}, cfg[key], { enabled });
+      const chk = document.getElementById('pc-toggle-'+key);
+      if (chk) chk.checked = enabled;
+      updateRowState(key, enabled);
+    });
+    updateSummaryCounters();
+  }
+
+  function updateRowState(key, enabled) {
+    const row = document.getElementById('pc-row-'+key);
+    if (!row) return;
+    row.classList.toggle('pc-off', !enabled);
+    const badge = row.querySelector('.pc-status-badge');
+    if (badge) {
+      badge.textContent = enabled ? '● LIVE' : '○ HIDDEN';
+      badge.classList.toggle('off', !enabled);
+    }
+    const liveB = row.querySelector('.pc-live-badge');
+    if (liveB) liveB.style.display = enabled ? 'inline-flex' : 'none';
+  }
+
+  function updateSummaryCounters() {
+    if (!cfg) return;
+    const on  = Object.values(cfg).filter(v => v.enabled !== false).length;
+    const off = Object.values(cfg).length - on;
+    const elOn  = document.getElementById('pc-count-on');
+    const elOff = document.getElementById('pc-count-off');
+    if (elOn)  elOn.textContent  = on;
+    if (elOff) elOff.textContent = off;
+  }
+
+  function init() {
+    load();
+    const container = document.getElementById('pc-container');
+    if (!container) return;
+    // Prevent re-init if already built (re-read config but don't re-render DOM)
+    if (container.dataset.init) {
+      // Just refresh the counter display
+      updateSummaryCounters();
+      return;
+    }
+    container.dataset.init = '1';
+
+    let html = '';
+
+    GROUPS.forEach(group => {
+      const groupOn = group.items.filter(k => (cfg[k]||{}).enabled !== false).length;
+      html += `
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title" style="color:${group.color};font-size:14px;flex-wrap:wrap;gap:8px;">
+          ${group.icon} ${group.label}
+          <span style="background:rgba(255,255,255,.06);color:var(--muted);font-size:10px;font-weight:600;padding:2px 9px;border-radius:8px;">${groupOn}/${group.items.length} live</span>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button onclick="PC.toggleGroup('${group.key}',true)"  style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80;font-size:10px;font-weight:700;padding:4px 12px;border-radius:7px;cursor:pointer;font-family:Inter,sans-serif;">Enable All</button>
+            <button onclick="PC.toggleGroup('${group.key}',false)" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);color:#f87171;font-size:10px;font-weight:700;padding:4px 12px;border-radius:7px;cursor:pointer;font-family:Inter,sans-serif;">Disable All</button>
+          </div>
+        </div>
+        <div>`;
+
+      group.items.forEach(key => {
+        const item = cfg[key] || {};
+        const enabled = item.enabled !== false;
+        const label = item.label || key;
+        const emoji = item.emoji || '●';
+        const typeLabel = item.type ? item.type.charAt(0).toUpperCase()+item.type.slice(1) : '';
+        const price = item.price ? `₹${item.price.toLocaleString('en-IN')}` : '';
+
+        html += `
+        <div class="pc-product-row ${enabled?'':'pc-off'}" id="pc-row-${key}">
+          <div class="pc-product-emoji">${emoji}</div>
+          <div class="pc-product-info">
+            <div class="pc-product-name">${label}</div>
+            <div class="pc-product-meta">
+              ${typeLabel ? `<span style="background:rgba(255,255,255,.06);padding:1px 7px;border-radius:6px;margin-right:6px;">${typeLabel}</span>` : ''}
+              ${price ? `<span class="pc-price-tag">${price}</span>` : ''}
+              <span style="font-family:monospace;font-size:10px;color:var(--muted2);margin-left:6px;">${key}</span>
+            </div>
+          </div>
+          <span class="pc-status-badge ${enabled?'':'off'}">${enabled?'● LIVE':'○ HIDDEN'}</span>
+          ${enabled ? `<span class="pc-live-badge">LIVE</span>` : `<span class="pc-live-badge" style="display:none;">LIVE</span>`}
+          <label class="toggle" style="width:44px;height:24px;margin:0;" title="Toggle ${label}">
+            <input type="checkbox" id="pc-toggle-${key}" ${enabled?'checked':''} onchange="PC.toggleItem('${key}',this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>`;
+      });
+
+      html += `</div></div>`;
+    });
+
+    // Summary card
+    const totalOn = Object.values(cfg).filter(v=>v.enabled!==false).length;
+    const totalOff = Object.values(cfg).length - totalOn;
+    html = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#4ade80;" id="pc-count-on">${totalOn}</div>
+        <div style="font-size:11px;color:var(--muted);">Offerings LIVE</div>
+      </div>
+      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:#f87171;" id="pc-count-off">${totalOff}</div>
+        <div style="font-size:11px;color:var(--muted);">Offerings HIDDEN</div>
+      </div>
+      <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:26px;font-weight:800;color:var(--gold2);">${Object.values(cfg).length}</div>
+        <div style="font-size:11px;color:var(--muted);">Total Offerings</div>
+      </div>
+    </div>
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#fbbf24;display:flex;align-items:center;gap:8px;">
+      <i class="fas fa-bolt"></i>
+      <span><strong>Instant Effect:</strong> Changes take effect on the public website as soon as you click <strong>Save &amp; Apply Live</strong>. Visitors already on the page see the change on their next page load.</span>
+    </div>` + html;
+
+    container.innerHTML = html;
+  }
+
+  return { init, save, disableAll, toggleItem, toggleGroup, updateSummaryCounters };
+})();
+
+/* ────────────────────────────────────────────────────────────────────────
+   CC — Content / Section Control
+   Lets super admin toggle each page section on/off and edit its content
+   line-by-line. Saves to wow_content_cfg and wow_content_overrides.
+──────────────────────────────────────────────────────────────────────── */
+const CC = (() => {
+
+  /* Sections with editable fields */
+  const SECTION_DEFS = {
+    hero: {
+      label: 'Hero Carousel / Banner', emoji: '🎠', page: 'homepage',
+      fields: [
+        { id: 'hc-badge', label: 'Hero Badge Text', selector: '.hc-badge', type: 'text' },
+        { id: 'hc-title', label: 'Hero Title (HTML allowed)', selector: '.hc-title', type: 'html' },
+        { id: 'hc-sub',   label: 'Hero Subtitle', selector: '.hc-sub', type: 'text' },
+      ]
+    },
+    quick_book_bar: {
+      label: 'Quick Book Widget', emoji: '⚡', page: 'homepage',
+      fields: [
+        { id: 'qbb-label', label: 'Widget Label', selector: '.qbb-label', type: 'text' },
+      ]
+    },
+    offer_strip: {
+      label: 'Offer Ticker Strip', emoji: '🎉', page: 'homepage',
+      fields: [
+        { id: 'offer1', label: 'Offer Text 1', selector: '.offer-strip-item:nth-child(1)', type: 'text' },
+        { id: 'offer2', label: 'Offer Text 2', selector: '.offer-strip-item:nth-child(3)', type: 'text' },
+        { id: 'offer3', label: 'Offer Text 3', selector: '.offer-strip-item:nth-child(5)', type: 'text' },
+      ]
+    },
+    explore_parks: {
+      label: 'Explore Parks Cards', emoji: '🗺', page: 'homepage',
+      fields: [
+        { id: 'explore-title', label: 'Section Title', selector: '#explore .section-title', type: 'text' },
+        { id: 'explore-sub',   label: 'Section Subtitle', selector: '#explore .section-sub', type: 'text' },
+      ]
+    },
+    why_wow_strip: {
+      label: 'Why WOW Feature Strip', emoji: '✨', page: 'homepage',
+      fields: [
+        { id: 'feat1-title', label: 'Feature 1 Title', selector: '.feature-item:nth-child(1) .feature-title', type: 'text' },
+        { id: 'feat1-text',  label: 'Feature 1 Text',  selector: '.feature-item:nth-child(1) .feature-text',  type: 'text' },
+        { id: 'feat2-title', label: 'Feature 2 Title', selector: '.feature-item:nth-child(2) .feature-title', type: 'text' },
+        { id: 'feat3-title', label: 'Feature 3 Title', selector: '.feature-item:nth-child(3) .feature-title', type: 'text' },
+        { id: 'feat4-title', label: 'Feature 4 Title', selector: '.feature-item:nth-child(4) .feature-title', type: 'text' },
+      ]
+    },
+    attractions: {
+      label: 'Must-Try Attractions', emoji: '🎡', page: 'homepage',
+      fields: [
+        { id: 'att-title', label: 'Section Title', selector: '#attraction-scroll .section-title, .section:has(#attraction-scroll) .section-title', type: 'text' },
+        { id: 'att-sub',   label: 'Section Subtitle', selector: '.section:has(#attraction-scroll) .section-sub', type: 'text' },
+      ]
+    },
+    video_banner: {
+      label: 'Video Banner', emoji: '🎬', page: 'homepage',
+      fields: [
+        { id: 'vb-title',    label: 'Video Banner Title', selector: '.vb-title', type: 'html' },
+        { id: 'vb-sub',      label: 'Video Banner Subtitle', selector: '.vb-sub', type: 'text' },
+        { id: 'vb-cta-text', label: 'CTA Button Text', selector: '.vb-content .btn-gold', type: 'text' },
+      ]
+    },
+    pricing: {
+      label: 'Transparent Pricing', emoji: '💰', page: 'homepage',
+      fields: [
+        { id: 'pr-title', label: 'Section Title', selector: '.section:has(.pricing-grid) .section-title', type: 'text' },
+        { id: 'pr-sub',   label: 'Section Subtitle', selector: '.section:has(.pricing-grid) .section-sub', type: 'text' },
+        { id: 'pr-note',  label: 'Pricing Note (bottom)', selector: '.pricing-note', type: 'html' },
+      ]
+    },
+    tickets_cta: {
+      label: 'Tickets CTA Section', emoji: '🎟', page: 'homepage',
+      fields: [
+        { id: 'cta-title', label: 'CTA Headline', selector: '.cta-inner .section-title', type: 'html' },
+      ]
+    },
+    passport: {
+      label: 'WOW Passport Section', emoji: '🪪', page: 'homepage',
+      fields: [
+        { id: 'pp-tag',   label: 'Passport Badge Tag', selector: '.passport-tag', type: 'text' },
+        { id: 'pp-title', label: 'Passport Title', selector: '.passport-title', type: 'text' },
+        { id: 'pp-desc',  label: 'Passport Description', selector: '.passport-desc', type: 'text' },
+      ]
+    },
+    groups_partners: {
+      label: 'Groups & Partners', emoji: '👥', page: 'homepage',
+      fields: [
+        { id: 'gp-title', label: 'Section Title', selector: '.section:has(a[href*="corporate"]) .section-title', type: 'text' },
+        { id: 'gp-sub',   label: 'Section Subtitle', selector: '.section:has(a[href*="corporate"]) .section-sub', type: 'text' },
+      ]
+    },
+    plan_your_visit: {
+      label: 'Plan Your Visit', emoji: '📍', page: 'homepage',
+      fields: [
+        { id: 'pv-title', label: 'Section Title', selector: '.section:has(.info-card:has(.info-icon:contains("📍"))) .section-title', type: 'text' },
+      ]
+    },
+    testimonials: {
+      label: 'Testimonials / Reviews', emoji: '⭐', page: 'homepage',
+      fields: [
+        { id: 'tm-title', label: 'Section Title', selector: '#testimonials .section-title', type: 'text' },
+        { id: 'tm-sub',   label: 'Section Subtitle', selector: '#testimonials .section-sub', type: 'text' },
+      ]
+    },
+    bk_hero: {
+      label: 'Booking Page Hero', emoji: '🎫', page: 'booking',
+      fields: [
+        { id: 'bkh-title', label: 'Booking Page Heading', selector: '.bk-hero h1', type: 'text' },
+        { id: 'bkh-sub',   label: 'Booking Page Subtext', selector: '.bk-hero p', type: 'text' },
+      ]
+    },
+    bk_buffet: {
+      label: 'Buffet Add-on', emoji: '🍽', page: 'booking',
+      fields: [
+        { id: 'bkb-title', label: 'Buffet Section Label', selector: '.bk-buffet-wrap .buffet-label, #buffet-wrap .buffet-label', type: 'text' },
+      ]
+    },
+    bk_promo: {
+      label: 'Promo / Coupon Code', emoji: '🏷', page: 'booking',
+      fields: []  // toggle-only
+    },
+    bk_trust_strip: {
+      label: 'Booking Trust Strip', emoji: '🔒', page: 'booking',
+      fields: [
+        { id: 'bkt-1', label: 'Trust Item 1', selector: '.bk-trust-strip span:nth-child(1)', type: 'text' },
+        { id: 'bkt-2', label: 'Trust Item 2', selector: '.bk-trust-strip span:nth-child(2)', type: 'text' },
+        { id: 'bkt-3', label: 'Trust Item 3', selector: '.bk-trust-strip span:nth-child(3)', type: 'text' },
+      ]
+    },
+    bk_upsell: {
+      label: 'Confirmation Upsell Block', emoji: '💎', page: 'booking',
+      fields: [
+        { id: 'ups-title', label: 'Upsell Heading', selector: '.conf-upsell-title, .conf-upsell h3', type: 'text' },
+        { id: 'ups-sub',   label: 'Upsell Subtext', selector: '.conf-upsell p', type: 'text' },
+      ]
+    },
+    weather_strip: {
+      label: 'Weather & Quick Info Strip', emoji: '🌤', page: 'homepage',
+      fields: []  // toggle-only (no editable text fields)
+    },
+    footer: {
+      label: 'Site Footer', emoji: '🔻', page: 'homepage',
+      fields: []  // toggle-only
+    },
+  };
+
+  let sectionCfg = null;
+  let overrides   = null;
+  let currentPage = 'homepage';
+
+  function load() {
+    sectionCfg = WOWContent.getSectionCfg();
+    overrides  = WOWContent.getOverrides();
+  }
+
+  function save() {
+    if (!sectionCfg) load();
+    // Collect toggle states
+    Object.keys(SECTION_DEFS).forEach(key => {
+      const chk = document.getElementById('cc-toggle-'+key);
+      if (chk) {
+        sectionCfg[key] = Object.assign({}, sectionCfg[key] || {}, { enabled: chk.checked });
+      }
+    });
+    // Collect content overrides from open drawers
+    Object.keys(SECTION_DEFS).forEach(sKey => {
+      const def = SECTION_DEFS[sKey];
+      if (!def.fields) return;
+      def.fields.forEach(f => {
+        const inp = document.getElementById('cc-field-'+f.id);
+        if (inp && inp.value.trim()) {
+          overrides[f.selector] = inp.value.trim();
+        }
+      });
+    });
+    WOWContent.saveSectionCfg(sectionCfg);
+    WOWContent.saveOverrides(overrides);
+    toast2('✅ Section config saved & published live!', '#a78bfa');
+  }
+
+  function showAll() {
+    if (!sectionCfg) load();
+    Object.keys(SECTION_DEFS).forEach(key => {
+      sectionCfg[key] = Object.assign({}, sectionCfg[key]||{}, { enabled: true });
+      const chk = document.getElementById('cc-toggle-'+key);
+      if (chk) { chk.checked = true; updateRowState(key, true); }
+    });
+    updateCCSummary();
+    toast2('All sections enabled.', '#4ade80');
+  }
+
+  function toggleSection(key, enabled) {
+    if (!sectionCfg) load();
+    sectionCfg[key] = Object.assign({}, sectionCfg[key]||{}, { enabled });
+    updateRowState(key, enabled);
+    updateCCSummary();
+  }
+
+  function updateRowState(key, enabled) {
+    const row = document.getElementById('cc-row-'+key);
+    if (!row) return;
+    row.classList.toggle('cc-disabled', !enabled);
+    // Update inline badge
+    const badge = document.getElementById('cc-badge-'+key);
+    if (badge) {
+      badge.textContent = enabled ? '● LIVE' : '○ HIDDEN';
+      badge.style.background    = enabled ? 'rgba(34,197,94,.12)'  : 'rgba(239,68,68,.1)';
+      badge.style.color         = enabled ? '#4ade80'              : '#f87171';
+      badge.style.borderColor   = enabled ? 'rgba(34,197,94,.2)'   : 'rgba(239,68,68,.2)';
+    }
+  }
+
+  function updateCCSummary() {
+    if (!sectionCfg) return;
+    const keys = Object.keys(SECTION_DEFS);
+    const on  = keys.filter(k => (sectionCfg[k]||{enabled:true}).enabled !== false).length;
+    const off = keys.length - on;
+    const elOn  = document.getElementById('cc-count-on');
+    const elOff = document.getElementById('cc-count-off');
+    if (elOn)  elOn.textContent  = on;
+    if (elOff) elOff.textContent = off;
+  }
+
+  function toggleDrawer(key) {
+    const drawer = document.getElementById('cc-drawer-'+key);
+    if (!drawer) return;
+    const isOpen = drawer.classList.contains('open');
+    // Close all others
+    document.querySelectorAll('.cc-editor-drawer').forEach(d => d.classList.remove('open'));
+    if (!isOpen) drawer.classList.add('open');
+  }
+
+  function filterPage(page, btn) {
+    currentPage = page;
+    // Update tab styles
+    document.querySelectorAll('#p-content .bm-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    // Show/hide rows
+    Object.keys(SECTION_DEFS).forEach(key => {
+      const def = SECTION_DEFS[key];
+      const row  = document.getElementById('cc-row-wrap-'+key);
+      if (!row) return;
+      if (page === 'all') {
+        row.style.display = '';
+      } else {
+        row.style.display = (def.page === page) ? '' : 'none';
+      }
+    });
+  }
+
+  function init() {
+    load();
+    const container = document.getElementById('cc-container');
+    if (!container || container.dataset.init) return;
+    container.dataset.init = '1';
+
+    let html = '';
+    Object.keys(SECTION_DEFS).forEach(key => {
+      const def  = SECTION_DEFS[key];
+      const scfg = sectionCfg[key] || {};
+      const enabled = scfg.enabled !== false;
+      const isBooking = def.page === 'booking';
+
+      // Build editable fields HTML
+      let fieldsHtml = '';
+      if (def.fields && def.fields.length) {
+        def.fields.forEach(f => {
+          const saved = overrides[f.selector] || '';
+          const inputTag = f.type === 'html'
+            ? `<textarea class="cc-editor-input" id="cc-field-${f.id}" rows="2" placeholder="Leave empty to use default content...">${saved}</textarea>`
+            : `<input type="text" class="cc-editor-input" id="cc-field-${f.id}" placeholder="Leave empty to use default content..." value="${saved.replace(/"/g,'&quot;')}"/>`;
+          fieldsHtml += `
+          <div class="cc-editor-field">
+            <label>${f.label} <span style="color:var(--muted2);font-size:9px;font-family:monospace;">${f.selector}</span></label>
+            ${inputTag}
+          </div>`;
+        });
+      }
+
+      html += `
+      <div id="cc-row-wrap-${key}" ${isBooking && currentPage==='homepage' ? 'style="display:none;"' : ''}>
+        <div class="cc-section-row ${enabled?'':'cc-disabled'}" id="cc-row-${key}">
+          <div class="cc-section-icon">${def.emoji}</div>
+          <div class="cc-section-info">
+            <div class="cc-section-label">${def.label}</div>
+            <div class="cc-section-key">${key} · <span style="color:${isBooking?'#fb923c':'#60a5fa'};font-size:9px;">${isBooking?'Booking Pages':'Homepage'}</span></div>
+          </div>
+          <div class="cc-section-actions">
+            <span id="cc-badge-${key}" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px;border:1px solid;background:${enabled?'rgba(34,197,94,.12)':'rgba(239,68,68,.1)'};color:${enabled?'#4ade80':'#f87171'};border-color:${enabled?'rgba(34,197,94,.2)':'rgba(239,68,68,.2)'}">${enabled?'● LIVE':'○ HIDDEN'}</span>
+            ${def.fields && def.fields.length ? `<button class="cc-edit-btn" onclick="CC.toggleDrawer('${key}')"><i class="fas fa-pencil-alt"></i> Edit Content</button>` : ''}
+            <label class="toggle" style="width:44px;height:24px;margin:0;" title="Toggle visibility">
+              <input type="checkbox" id="cc-toggle-${key}" ${enabled?'checked':''} onchange="CC.toggleSection('${key}',this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        ${def.fields && def.fields.length ? `
+        <div class="cc-editor-drawer" id="cc-drawer-${key}">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+            <i class="fas fa-info-circle"></i> Edit the text for this section. Leave blank to keep default content. Changes go live when you <strong>Save &amp; Apply Live</strong>.
+          </div>
+          ${fieldsHtml}
+          <div class="cc-editor-actions">
+            <button onclick="CC.clearDrawer('${key}')" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);color:#f87171;font-size:11px;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:Inter,sans-serif;">Clear Overrides</button>
+            <button onclick="CC.save()" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:11px;padding:6px 16px;border-radius:7px;cursor:pointer;border:none;font-family:Inter,sans-serif;">Save &amp; Apply</button>
+          </div>
+        </div>` : ''}
+      </div>`;
+    });
+
+    const totalSections = Object.keys(SECTION_DEFS).length;
+    const onCount = Object.keys(SECTION_DEFS).filter(k => (sectionCfg[k]||{enabled:true}).enabled !== false).length;
+    const summaryBar = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#4ade80;" id="cc-count-on">${onCount}</div>
+        <div style="font-size:11px;color:var(--muted);">Sections VISIBLE</div>
+      </div>
+      <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#f87171;" id="cc-count-off">${totalSections - onCount}</div>
+        <div style="font-size:11px;color:var(--muted);">Sections HIDDEN</div>
+      </div>
+      <div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:12px;padding:14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:#a78bfa;">${totalSections}</div>
+        <div style="font-size:11px;color:var(--muted);">Total Sections</div>
+      </div>
+    </div>
+    <div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#a78bfa;display:flex;align-items:center;gap:8px;">
+      <i class="fas fa-edit"></i>
+      <span><strong>Tip:</strong> Click <strong>Edit Content</strong> on any section to edit its text line-by-line. Toggling OFF immediately hides that section from visitors when saved.</span>
+    </div>`;
+
+    container.innerHTML = summaryBar + html;
+  }
+
+  function clearDrawer(key) {
+    const def = SECTION_DEFS[key];
+    if (!def || !def.fields) return;
+    def.fields.forEach(f => {
+      const inp = document.getElementById('cc-field-'+f.id);
+      if (inp) inp.value = '';
+      if (overrides) delete overrides[f.selector];
+    });
+    toast2('Content overrides cleared for this section.', '#f87171');
+  }
+
+  return { init, save, showAll, toggleSection, toggleDrawer, filterPage, clearDrawer, updateCCSummary };
+})();
+
+// ── AUTO INIT on first render ──────────────────────────────────────────────
+// PC and CC panels are lazy-inited by showPanel(), but if user lands on
+// the page directly we init on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+  // PC and CC are inited lazily via showPanel
+  // Nothing to do here — they init on click
+});
+</script>
+
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
