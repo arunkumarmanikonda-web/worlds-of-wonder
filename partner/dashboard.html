@@ -6,6 +6,7 @@
 <title>Partner Dashboard — Worlds of Wonder</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -253,5 +254,6 @@ cc.setOption({backgroundColor:'transparent',tooltip:{trigger:'item',formatter:'{
 
 window.addEventListener('resize',()=>{sc.resize();cc.resize();});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="partner"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
