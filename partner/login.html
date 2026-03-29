@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
+  <script src="../js/wow-auth.js"></script>
 </head>
 <body>
 <div id="app">
@@ -159,6 +160,19 @@
       btn.disabled = false; btn.textContent = 'Sign In to Partner Portal →';
     }
   });
+
+  // SA bypass button at extreme top-right
+  if (typeof WOWAuth !== 'undefined') {
+    const saBtn = document.createElement('div');
+    saBtn.style.cssText = 'position:fixed;top:12px;right:14px;z-index:1000;';
+    saBtn.innerHTML = '<button onclick="WOWAuth.openBypassModal()" style="background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid rgba(239,68,68,.4);color:#fca5a5;font-size:10px;font-weight:800;padding:5px 11px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:5px;letter-spacing:.5px;text-transform:uppercase;font-family:Inter,sans-serif;box-shadow:0 0 12px rgba(239,68,68,.2);"><i class=\'fas fa-user-shield\'></i> SA</button>';
+    document.body.appendChild(saBtn);
+    const params = new URLSearchParams(window.location.search);
+    const session = WOWAuth.getSession();
+    if (session && (session.role === 'SUPER_ADMIN' || session.role === 'PARTNER')) {
+      window.location.href = params.get('redirect') || 'dashboard.html';
+    }
+  }
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
