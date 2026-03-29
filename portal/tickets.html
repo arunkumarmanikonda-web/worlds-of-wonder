@@ -1,624 +1,848 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Tickets — Worlds of Wonder</title>
-  <meta name="description" content="View and download your Worlds of Wonder e-tickets with QR codes." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <style>
-    /* ── Filter tabs ── */
-    .tickets-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-    .filter-btn {
-      padding: 8px 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: transparent;
-      color: rgba(255,255,255,.55);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      transition: all .2s;
-    }
-    .filter-btn.active, .filter-btn:hover {
-      background: #0055B3;
-      border-color: #0055B3;
-      color: #fff;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Tickets — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --brand:#ff6b35;--brand-dark:#e55a22;--brand-light:#fff3ee;
+  --navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f0f4f8;--white:#fff;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#7c3aed;--blue:#3b82f6;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--slate);min-height:100vh;display:flex;}
 
-    /* ── Ticket card ── */
-    .ticket-card {
-      background: #1a2235;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      transition: box-shadow .2s;
-    }
-    .ticket-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:40;overflow-y:auto;}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-logo img{height:36px;width:auto;object-fit:contain;filter:none!important;}
+.sb-user{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--brand);display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;}
+.sb-uname{font-size:12.5px;font-weight:700;color:#fff;}
+.sb-utier{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;}
+.sb-nav{padding:12px 8px;flex:1;}
+.sb-section{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:8px 10px 4px;font-weight:700;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:600;transition:.15s;margin-bottom:1px;}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-link.active{background:rgba(255,107,53,.15);color:var(--brand);}
+.sb-link i{width:16px;text-align:center;font-size:13px;}
+.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
 
-    .ticket-header {
-      padding: 20px 24px 18px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      position: relative;
-    }
-    .ticket-park-icon { font-size: 32px; flex-shrink: 0; }
-    .ticket-header-info { flex: 1; min-width: 0; }
-    .ticket-park-name { font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 2px; }
-    .ticket-sub { font-size: 12px; color: rgba(255,255,255,.5); }
-    .ticket-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .status-upcoming { background: rgba(29,78,216,.2);  color: #60a5fa; border: 1px solid rgba(29,78,216,.3); }
-    .status-today    { background: rgba(161,98,7,.2);   color: #F5A800; border: 1px solid rgba(161,98,7,.3); }
-    .status-used     { background: rgba(255,255,255,.06);color: rgba(255,255,255,.35);border: 1px solid rgba(255,255,255,.1); }
-    .status-valid    { background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
-    .status-cancelled{ background: rgba(239,68,68,.12);  color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;}
+.topbar-title{font-size:17px;font-weight:800;color:var(--navy);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:.15s;font-family:inherit;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-dark);}
+.btn-outline{background:var(--white);border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-ghost{background:transparent;border:none;color:var(--muted);padding:8px;}
 
-    /* ── Ticket body: QR + details ── */
-    .ticket-body {
-      display: grid;
-      grid-template-columns: 1fr 180px;
-      gap: 0;
-      border-top: 1px solid rgba(255,255,255,.06);
-    }
-    @media(max-width:640px){ .ticket-body { grid-template-columns: 1fr; } }
+/* PAGE */
+.page-body{padding:24px 28px;max-width:1080px;}
 
-    .ticket-details { padding: 20px 24px; }
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    @media(max-width:500px){ .detail-grid { grid-template-columns: repeat(2, 1fr); } }
-    .detail-item { }
-    .detail-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-    .detail-value { font-size: 14px; font-weight: 600; color: #fff; }
+/* FILTER BAR */
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-tabs{display:flex;gap:4px;background:#f1f5f9;border-radius:9px;padding:3px;}
+.ftab{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:inherit;transition:.15s;}
+.ftab.active{background:var(--white);color:var(--slate);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.filter-sep{flex:1;}
 
-    .guest-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-    .guest-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      font-size: 12px;
-      color: rgba(255,255,255,.65);
-    }
+/* TICKETS GRID */
+.tickets-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:780px){.tickets-grid{grid-template-columns:1fr;}}
 
-    /* QR column */
-    .ticket-qr-col {
-      border-left: 1px dashed rgba(255,255,255,.1);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,.015);
-      position: relative;
-    }
-    .ticket-qr-col::before, .ticket-qr-col::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      background: #0f1726;
-      border-radius: 50%;
-    }
-    .ticket-qr-col::before { left: -9px; top: -9px; }
-    .ticket-qr-col::after  { left: -9px; bottom: -9px; }
-    @media(max-width:640px){ .ticket-qr-col { border-left: none; border-top: 1px dashed rgba(255,255,255,.1); border-radius: 0; } }
+/* TICKET CARD (real-looking boarding pass) */
+.tkt{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.07);border:1px solid var(--border);transition:.2s;}
+.tkt:hover{box-shadow:0 8px 32px rgba(255,107,53,.12);transform:translateY(-2px);}
 
-    .qr-box {
-      background: #fff;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 8px;
-    }
-    .qr-id {
-      font-family: 'Courier New', monospace;
-      font-size: 9px;
-      color: rgba(255,255,255,.35);
-      letter-spacing: .06em;
-      text-align: center;
-      word-break: break-all;
-    }
+.tkt-header{padding:18px 20px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;}
+.tkt-header.water{background:linear-gradient(135deg,#0284c7,#0369a1);}
+.tkt-header.amusement{background:linear-gradient(135deg,#7c3aed,#6d28d9);}
+.tkt-header.combo{background:linear-gradient(135deg,var(--brand),var(--brand-dark));}
+.tkt-header.passport{background:linear-gradient(135deg,#d97706,#b45309);}
+.tkt-header.past{background:linear-gradient(135deg,#64748b,#475569);}
+.tkt-park{display:flex;align-items:center;gap:10px;}
+.tkt-icon{font-size:28px;}
+.tkt-park-name{color:#fff;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;}
+.tkt-park-sub{color:rgba(255,255,255,.75);font-size:11px;margin-top:2px;}
+.tkt-status-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;gap:4px;}
+.tkt-status-chip.valid{background:rgba(16,185,129,.25);border:1px solid rgba(16,185,129,.4);}
+.tkt-status-chip.used{background:rgba(100,116,139,.25);border:1px solid rgba(100,116,139,.4);}
+.tkt-status-chip.today{background:rgba(245,158,11,.3);border:1px solid rgba(245,158,11,.5);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.tkt-status-chip.cancelled{background:rgba(239,68,68,.25);border:1px solid rgba(239,68,68,.4);}
 
-    /* ── Actions bar ── */
-    .ticket-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      padding: 14px 24px;
-      border-top: 1px solid rgba(255,255,255,.05);
-      background: rgba(255,255,255,.015);
-    }
-    .tkt-btn {
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      border: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all .2s;
-      text-decoration: none;
-    }
-    .tkt-btn-primary { background: rgba(0,85,179,.2); color: #60a5fa; border: 1px solid rgba(0,85,179,.3); }
-    .tkt-btn-primary:hover { background: rgba(0,85,179,.35); }
-    .tkt-btn-green { background: rgba(16,185,129,.1); color: #10b981; border: 1px solid rgba(16,185,129,.2); }
-    .tkt-btn-green:hover { background: rgba(16,185,129,.2); }
-    .tkt-btn-red { background: rgba(239,68,68,.08); color: #ef4444; border: 1px solid rgba(239,68,68,.15); }
-    .tkt-btn-red:hover { background: rgba(239,68,68,.15); }
-    .tkt-btn-grey { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.1); }
+/* Tear-off line */
+.tkt-tear{height:0;border-top:2px dashed var(--border);margin:0 16px;position:relative;}
+.tkt-tear::before,.tkt-tear::after{content:'';width:20px;height:20px;background:var(--bg);border-radius:50%;position:absolute;top:50%;transform:translateY(-50%);border:1px solid var(--border);}
+.tkt-tear::before{left:-26px;}
+.tkt-tear::after{right:-26px;}
 
-    /* ── Empty state ── */
-    .empty-state { text-align: center; padding: 64px 24px; }
-    .empty-icon { font-size: 64px; margin-bottom: 16px; }
-    .empty-title { font-size: 18px; font-weight: 800; color: rgba(255,255,255,.5); font-family: 'Nunito', sans-serif; margin-bottom: 8px; }
-    .empty-sub { font-size: 14px; color: rgba(255,255,255,.3); margin-bottom: 24px; }
+.tkt-body{padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;}
+.tkt-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tkt-field{display:flex;flex-direction:column;gap:2px;}
+.tkt-field-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.tkt-field-val{font-size:13px;font-weight:700;color:var(--navy);}
+.tkt-qr-section{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.tkt-qr-box{width:90px;height:90px;border:2px solid var(--border);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fafafa;}
+.tkt-qr-id{font-family:monospace;font-size:10px;color:var(--muted);text-align:center;word-break:break-all;}
 
-    /* ── Modal (full QR view) ── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(6px);
-      z-index: 9998;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: linear-gradient(135deg, #060e24, #0a1628);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 24px;
-      max-width: 420px;
-      width: 100%;
-      padding: 32px;
-      text-align: center;
-      position: relative;
-    }
-    .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      width: 32px;
-      height: 32px;
-      background: rgba(255,255,255,.08);
-      border-radius: 50%;
-      border: none;
-      color: rgba(255,255,255,.6);
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .modal-park { font-size: 14px; color: rgba(255,255,255,.5); margin-bottom: 6px; }
-    .modal-title { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 20px; }
-    .modal-qr-box { background: #fff; border-radius: 16px; padding: 16px; display: inline-block; margin-bottom: 16px; }
-    .modal-ticket-id { font-family: 'Courier New', monospace; font-size: 14px; color: rgba(255,255,255,.6); letter-spacing: .1em; margin-bottom: 20px; }
-    .modal-date { font-size: 16px; font-weight: 700; color: #F5A800; margin-bottom: 8px; }
-    .modal-guests { font-size: 13px; color: rgba(255,255,255,.55); margin-bottom: 24px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .modal-btn {
-      padding: 11px 22px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      border: none;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .modal-btn-blue { background: linear-gradient(135deg, #0055B3, #0073E6); color: #fff; }
-    .modal-btn-green{ background: linear-gradient(135deg, #0a9b5f, #047857); color: #fff; }
-    .modal-btn-grey { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.15); }
-  </style>
+.tkt-footer{padding:10px 20px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--border);background:#f8fafc;}
+.tkt-footer-left{font-size:11px;color:var(--muted);line-height:1.5;}
+.tkt-footer-left strong{color:var(--slate);}
+.tkt-actions{display:flex;gap:6px;}
+.tkt-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;}
+.tkt-btn-primary{background:var(--brand);color:#fff;}
+.tkt-btn-primary:hover{background:var(--brand-dark);}
+.tkt-btn-secondary{background:var(--white);border:1.5px solid var(--border);color:var(--slate);}
+.tkt-btn-secondary:hover{border-color:var(--brand);color:var(--brand);}
+.tkt-btn-wa{background:#25d366;color:#fff;}
+.tkt-btn-cal{background:#4285f4;color:#fff;}
+
+/* COUNTDOWN */
+.countdown-banner{background:linear-gradient(135deg,#fef3c7,#fffbeb);border:1px solid #fde68a;border-radius:12px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.countdown-title{font-size:13px;font-weight:800;color:#92400e;}
+.countdown-sub{font-size:11px;color:#b45309;margin-top:2px;}
+.countdown-chips{display:flex;gap:10px;margin-left:auto;}
+.cd-chip{background:var(--white);border:1px solid #fde68a;border-radius:8px;padding:8px 14px;text-align:center;min-width:52px;}
+.cd-val{font-size:20px;font-weight:900;color:#92400e;font-family:'Nunito',sans-serif;line-height:1;}
+.cd-unit{font-size:9px;color:#b45309;text-transform:uppercase;margin-top:2px;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state .em-icon{font-size:56px;margin-bottom:16px;}
+.empty-state h3{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px;}
+.empty-state p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.8);z-index:100;display:none;place-items:center;padding:20px;}
+.modal-overlay.open{display:grid;}
+.modal-box{background:var(--white);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25);}
+.modal-head{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:15px;font-weight:800;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* SPLIT TICKET */
+.split-modal .modal-box{max-width:520px;max-height:90vh;overflow-y:auto;}
+.split-header{padding:16px 20px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-radius:16px 16px 0 0;}
+.split-header h3{font-size:15px;font-weight:800;margin-bottom:4px;}
+.split-header p{font-size:12px;opacity:.8;}
+.split-recipient{background:#f8fafc;border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;position:relative;}
+.split-recipient-num{position:absolute;top:12px;left:12px;width:22px;height:22px;background:var(--purple);color:#fff;border-radius:50%;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.split-recipient .sr-fields{padding-left:32px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.split-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;font-family:inherit;}
+.split-input:focus{outline:none;border-color:var(--purple);}
+.split-add-btn{width:100%;padding:10px;background:#faf5ff;border:1.5px dashed #c4b5fd;border-radius:10px;color:var(--purple);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;margin-top:4px;}
+.split-add-btn:hover{background:#ede9fe;}
+.split-channel{display:flex;gap:8px;margin-bottom:14px;}
+.split-chan-btn{flex:1;padding:9px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;}
+.split-chan-btn.active{border-color:var(--purple);background:#faf5ff;color:var(--purple);}
+.split-remove{position:absolute;top:10px;right:10px;width:22px;height:22px;background:#fef2f2;border:none;border-radius:50%;color:var(--red);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* FULLSCREEN QR */
+.fullqr-overlay{position:fixed;inset:0;background:rgba(10,22,40,.95);z-index:200;display:none;place-items:center;flex-direction:column;gap:20px;}
+.fullqr-overlay.open{display:grid;}
+.fullqr-box{background:var(--white);border-radius:20px;padding:32px;text-align:center;max-width:340px;width:90%;}
+.fullqr-title{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+.fullqr-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.fullqr-id{font-family:monospace;font-size:13px;color:var(--muted);margin-top:14px;padding:6px 12px;background:#f1f5f9;border-radius:6px;display:inline-block;}
+.fullqr-close{margin-top:12px;background:var(--brand);color:#fff;border:none;padding:12px 32px;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--slate);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:300;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:.25s;}.sidebar.open{transform:translateX(0);}.main{margin-left:0;}.page-body{padding:16px;}}
+</style>
 </head>
-<body class="portal-body">
-<div id="app">
-  <div class="portal-layout">
+<body>
 
-    <!-- ═══ SIDEBAR ═══ -->
-    <aside class="portal-sidebar" id="portal-sidebar">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
-        </a>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><a href="../index.html"><img src="../images/logo.png" alt="WOW"/></a></div>
+  <div class="sb-user">
+    <div class="sb-avatar">R</div>
+    <div><div class="sb-uname">Rajesh Kumar</div><div class="sb-utier">⭐ Silver Member</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a href="dashboard.html" class="sb-link"><i class="fa fa-th-large"></i> Dashboard</a>
+    <a href="my-bookings.html" class="sb-link"><i class="fa fa-calendar-check"></i> My Bookings</a>
+    <a href="tickets.html" class="sb-link active"><i class="fa fa-ticket-alt"></i> My Tickets <span class="sb-badge">2</span></a>
+    <a href="wow-passport.html" class="sb-link"><i class="fa fa-passport"></i> WOW Passport</a>
+    <div class="sb-section">Rewards</div>
+    <a href="loyalty.html" class="sb-link"><i class="fa fa-star"></i> Loyalty Points <span class="sb-badge" style="background:#f59e0b;">1240</span></a>
+    <a href="wallet.html" class="sb-link"><i class="fa fa-wallet"></i> WOW Wallet</a>
+    <a href="offers.html" class="sb-link"><i class="fa fa-tags"></i> My Offers</a>
+    <div class="sb-section">Account</div>
+    <a href="notifications.html" class="sb-link"><i class="fa fa-bell"></i> Notifications <span class="sb-badge">3</span></a>
+    <a href="profile.html" class="sb-link"><i class="fa fa-user"></i> Profile</a>
+    <div class="sb-section">Quick Book</div>
+    <a href="../book/water-park.html" class="sb-link"><i class="fa fa-water" style="color:#0ea5e9;"></i> Water Park</a>
+    <a href="../book/amusement-park.html" class="sb-link"><i class="fa fa-dharmachakra" style="color:#7c3aed;"></i> Amusement Park</a>
+    <a href="../book/combo.html" class="sb-link"><i class="fa fa-ticket-alt" style="color:var(--brand);"></i> Combo Deal</a>
+    <div style="margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.07);">
+      <a href="../index.html" class="sb-link"><i class="fa fa-globe"></i> Public Site</a>
+      <a href="login.html" class="sb-link" style="color:rgba(239,68,68,.7);"><i class="fa fa-sign-out-alt"></i> Sign Out</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-ghost" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa fa-bars"></i></button>
+      <div class="topbar-title">My Tickets</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;color:var(--muted);">Sat, 28 Mar 2026</span>
+      <a href="notifications.html" class="btn btn-ghost"><i class="fa fa-bell"></i></a>
+      <a href="../book/combo.html" class="btn btn-brand btn-sm"><i class="fa fa-plus"></i> Book New</a>
+    </div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- UPCOMING COUNTDOWN -->
+    <div class="countdown-banner" id="countdown-banner">
+      <div>
+        <div class="countdown-title">🎟 Your next visit is coming up! — WOW Combo, 5 Apr 2026</div>
+        <div class="countdown-sub">Booking ID: WOW-2025-49820 · 3 tickets · Main Gate</div>
       </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>Dashboard</span>
-        </a>
-        <a href="my-bookings.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>My Bookings</span>
-        </a>
-        <a href="tickets.html" class="portal-sidenav-item active">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
-          <span>My Tickets</span>
-        </a>
-        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
-          <span>My Passport</span>
-        </a>
-        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span>Loyalty Points</span>
-        </a>
-        <a href="offers.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          <span>My Offers</span>
-        </a>
-        <a href="notifications.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span>Notifications</span>
-        </a>
-        <a href="profile.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Profile</span>
-        </a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          <span>Back to Website</span>
-        </a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
-        </button>
-      </nav>
-    </aside>
-
-    <!-- ═══ MAIN ═══ -->
-    <main class="portal-main">
-      <div id="portal-loading" class="portal-loading">
-        <div class="portal-spinner"></div>
-        <p>Loading your tickets…</p>
+      <div class="countdown-chips">
+        <div class="cd-chip"><div class="cd-val" id="cd-days">08</div><div class="cd-unit">Days</div></div>
+        <div class="cd-chip"><div class="cd-val" id="cd-hrs">00</div><div class="cd-unit">Hours</div></div>
+        <div class="cd-chip"><div class="cd-val" id="cd-min">00</div><div class="cd-unit">Mins</div></div>
+        <div class="cd-chip"><div class="cd-val" id="cd-sec">00</div><div class="cd-unit">Secs</div></div>
       </div>
+    </div>
 
-      <div id="portal-content" style="display:none;">
-        <div class="portal-main-header">
-          <div>
-            <h1 class="portal-main-title">My Tickets</h1>
-            <p class="portal-main-sub">All your QR e-tickets — upcoming visits and past entries</p>
-          </div>
-          <a href="../book/water-park.html" class="btn btn-primary" style="white-space:nowrap;">+ Book New Visit</a>
-        </div>
-
-        <!-- Filter tabs -->
-        <div class="tickets-filter">
-          <button class="filter-btn active" onclick="filterTickets('all', this)">All Tickets</button>
-          <button class="filter-btn" onclick="filterTickets('upcoming', this)">Upcoming</button>
-          <button class="filter-btn" onclick="filterTickets('today', this)">Today</button>
-          <button class="filter-btn" onclick="filterTickets('past', this)">Past</button>
-          <button class="filter-btn" onclick="filterTickets('cancelled', this)">Cancelled</button>
-        </div>
-
-        <!-- Tickets list -->
-        <div id="tickets-list"></div>
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterTkts('all',this)">All Tickets (5)</button>
+        <button class="ftab" onclick="filterTkts('active',this)">Active (2)</button>
+        <button class="ftab" onclick="filterTkts('used',this)">Used (3)</button>
       </div>
-    </main>
+      <div class="filter-sep"></div>
+      <div style="font-size:12px;color:var(--muted);">Tip: Tap a ticket to expand QR · 🔍 Scan at park gate</div>
+    </div>
+
+    <!-- TICKETS GRID -->
+    <div class="tickets-grid" id="tickets-grid"></div>
+
+    <!-- EMPTY -->
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="em-icon">🎫</div>
+      <h3>No tickets found</h3>
+      <p>Book a visit and your e-tickets will appear here instantly.</p>
+      <a href="../book/combo.html" class="btn btn-brand"><i class="fa fa-plus"></i> Book Now</a>
+    </div>
+
   </div>
 </div>
 
-<!-- ── Full QR Modal ── -->
-<div class="modal-overlay" id="qr-modal" onclick="closeModal(event)">
+<!-- TICKET SPLIT MODAL -->
+<div class="modal-overlay split-modal" id="split-modal">
   <div class="modal-box">
-    <button class="modal-close" onclick="document.getElementById('qr-modal').classList.remove('open')">✕</button>
-    <div class="modal-park" id="modal-park">Water Park · Day Entry</div>
-    <div class="modal-title" id="modal-name">Rahul Sharma</div>
-    <div class="modal-qr-box">
-      <canvas id="modal-qr-canvas"></canvas>
+    <div class="split-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h3>🔀 Split &amp; Share Ticket</h3>
+          <p>Send individual sub-tickets to each recipient via WhatsApp or Email</p>
+        </div>
+        <button onclick="closeSplitModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+      </div>
     </div>
-    <div class="modal-ticket-id" id="modal-ticket-id">WOW-XXXXXXXX</div>
-    <div class="modal-date" id="modal-date">—</div>
-    <div class="modal-guests" id="modal-guests">—</div>
-    <div class="modal-actions">
-      <button class="modal-btn modal-btn-blue" onclick="window.print()">🖨 Print</button>
-      <button class="modal-btn modal-btn-green" id="modal-whatsapp-btn">📲 WhatsApp</button>
-      <button class="modal-btn modal-btn-grey" onclick="document.getElementById('qr-modal').classList.remove('open')">Close</button>
+    <div class="modal-body">
+      <!-- Ticket info chip -->
+      <div style="background:#ede9fe;border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#6d28d9;display:flex;align-items:flex-start;gap:8px;">
+        <span style="font-size:18px;flex-shrink:0;">🎟</span>
+        <div>
+          <strong id="split-ticket-info">Ticket: —</strong><br>
+          <span style="opacity:.8;">Each recipient gets their own unique sub-ticket ID and QR link.</span>
+        </div>
+      </div>
+
+      <!-- Delivery Channel -->
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📡 Delivery Channel</div>
+      <div class="split-channel">
+        <div class="split-chan-btn active" id="chan-wa" onclick="selectChannel('wa',this)">💬 WhatsApp</div>
+        <div class="split-chan-btn" id="chan-email" onclick="selectChannel('email',this)">📧 Email</div>
+        <div class="split-chan-btn" id="chan-both" onclick="selectChannel('both',this)">📲 Both</div>
+      </div>
+
+      <!-- Channel hint -->
+      <div id="channel-hint" style="font-size:11px;color:#6b7280;background:#f8fafc;border-radius:8px;padding:8px 10px;margin-bottom:14px;">
+        💬 Recipient mobile number required · <strong>WhatsApp link will open for each recipient</strong>
+      </div>
+
+      <!-- Recipients -->
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">👥 Recipients</div>
+      <div id="split-recipients"></div>
+      <button class="split-add-btn" onclick="addRecipient()">+ Add Another Recipient</button>
+
+      <!-- Result panel -->
+      <div id="split-result" style="display:none;margin-top:14px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeSplitModal()">Cancel</button>
+      <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="sendSplitTickets()">🚀 Send Tickets</button>
     </div>
   </div>
 </div>
+
+<!-- FULLSCREEN QR MODAL -->
+<div class="fullqr-overlay" id="fullqr-overlay">
+  <div class="fullqr-box">
+    <div class="fullqr-title" id="fq-title"></div>
+    <div class="fullqr-sub" id="fq-sub"></div>
+    <div id="fq-qr" style="display:flex;justify-content:center;"></div>
+    <div class="fullqr-id" id="fq-id"></div>
+    <button class="fullqr-close" onclick="document.getElementById('fullqr-overlay').classList.remove('open')">✕ Close</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-  const PARK_LABELS = {
-    WATER_DAY:    { name: '🌊 Water Park — Day Entry', color: '#006EE6', gradient: 'linear-gradient(135deg,#006EE6,#0044a0)' },
-    AMUSEMENT_DAY:{ name: '🎢 Amusement Park — Day Entry', color: '#7c3aed', gradient: 'linear-gradient(135deg,#7c3aed,#4f46e5)' },
-    COMBO:        { name: '🎟 Combo — Both Parks', color: '#FF6B00', gradient: 'linear-gradient(135deg,#FF6B00,#cc4a00)' },
-    PASSPORT:     { name: '🪪 Annual Passport Visit', color: '#0a9b5f', gradient: 'linear-gradient(135deg,#0a9b5f,#047857)' },
-  };
-
-  function fmtDate(iso) {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+// ── TICKET DATA ────────────────────────────────────────────
+const TICKETS = [
+  {
+    id: 'TKT-COMBO-4982001',
+    bookingId: 'WOW-2025-49820',
+    type: 'combo',
+    icon: '🎟',
+    park: 'WOW Combo — Both Parks',
+    subPark: 'Water Park + Amusement Park',
+    date: '2026-04-05',
+    holder: 'Rajesh Kumar',
+    category: 'Adult',
+    seat: 'Open Access',
+    gate: 'Main Entrance (Gate 1)',
+    timing: '10:00 AM – 9:00 PM',
+    status: 'active',
+    bookedOn: '28 Mar 2026'
+  },
+  {
+    id: 'TKT-COMBO-4982002',
+    bookingId: 'WOW-2025-49820',
+    type: 'combo',
+    icon: '🎟',
+    park: 'WOW Combo — Both Parks',
+    subPark: 'Water Park + Amusement Park',
+    date: '2026-04-05',
+    holder: 'Priya Kumar',
+    category: 'Adult',
+    seat: 'Open Access',
+    gate: 'Main Entrance (Gate 1)',
+    timing: '10:00 AM – 9:00 PM',
+    status: 'active',
+    bookedOn: '28 Mar 2026'
+  },
+  {
+    id: 'TKT-COMBO-4982003',
+    bookingId: 'WOW-2025-49820',
+    type: 'combo',
+    icon: '🎟',
+    park: 'WOW Combo — Both Parks',
+    subPark: 'Water Park + Amusement Park',
+    date: '2026-04-05',
+    holder: 'Aryan Kumar',
+    category: 'Child (3–11)',
+    seat: 'Open Access',
+    gate: 'Main Entrance (Gate 1)',
+    timing: '10:00 AM – 9:00 PM',
+    status: 'active',
+    bookedOn: '28 Mar 2026'
+  },
+  {
+    id: 'TKT-AMU-3841201',
+    bookingId: 'WOW-2025-38412',
+    type: 'amusement',
+    icon: '🎢',
+    park: 'Amusement Park',
+    subPark: '30+ Rides · Live Shows · Themed Zones',
+    date: '2026-02-15',
+    holder: 'Rajesh Kumar',
+    category: 'Adult',
+    seat: 'Open Access',
+    gate: 'Amusement Wing (Gate 3)',
+    timing: '10:00 AM – 9:00 PM',
+    status: 'used',
+    bookedOn: '12 Feb 2026',
+    usedAt: '15 Feb 2026, 10:22 AM'
+  },
+  {
+    id: 'TKT-WP-2999101',
+    bookingId: 'WOW-2025-29991',
+    type: 'water',
+    icon: '🌊',
+    park: 'Water Park',
+    subPark: 'Wave Pool · Slides · Lazy River',
+    date: '2026-01-12',
+    holder: 'Rajesh Kumar',
+    category: 'Adult',
+    seat: 'Open Access',
+    gate: 'Water Park Gate (Gate 2)',
+    timing: '10:00 AM – 6:00 PM',
+    status: 'used',
+    bookedOn: '10 Jan 2026',
+    usedAt: '12 Jan 2026, 10:05 AM'
   }
-  function inr(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+];
 
-  function getStatus(ticket) {
-    if (ticket.status === 'cancelled') return { cls: 'status-cancelled', label: '✕ Cancelled' };
-    const d = new Date(ticket.visitDate);
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const visit = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    if (visit < today) return { cls: 'status-used', label: '✓ Used' };
-    if (visit.getTime() === today.getTime()) return { cls: 'status-today', label: '⚡ Today!' };
-    return { cls: 'status-upcoming', label: '📅 Upcoming' };
+let displayedTickets = [...TICKETS];
+
+// ── RENDER ─────────────────────────────────────────────────
+function fmt(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+
+function renderAll() {
+  const grid = document.getElementById('tickets-grid');
+  const empty = document.getElementById('empty-state');
+  if (displayedTickets.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
   }
+  empty.style.display = 'none';
+  grid.innerHTML = displayedTickets.map(renderTicket).join('');
+  displayedTickets.forEach(t => generateQR(t));
+}
 
-  // Build demo tickets based on user
-  function buildDemoTickets(uid) {
-    const base = Date.now();
-    return [
-      {
-        id: 'WOW-' + uid.substring(0,6).toUpperCase() + '-001',
-        parkKey: 'WATER_DAY',
-        visitDate: new Date(base + 7 * 86400000).toISOString().slice(0,10),
-        guestName: 'Account Holder',
-        adults: 2, children: 1, seniors: 0,
-        totalPaid: 3597,
-        status: 'confirmed',
-        bookingRef: 'BK-2026-08142',
-      },
-      {
-        id: 'WOW-' + uid.substring(0,6).toUpperCase() + '-002',
-        parkKey: 'COMBO',
-        visitDate: new Date(base - 14 * 86400000).toISOString().slice(0,10),
-        guestName: 'Account Holder',
-        adults: 2, children: 0, seniors: 0,
-        totalPaid: 3998,
-        status: 'used',
-        bookingRef: 'BK-2026-04291',
-      },
-      {
-        id: 'WOW-' + uid.substring(0,6).toUpperCase() + '-003',
-        parkKey: 'AMUSEMENT_DAY',
-        visitDate: new Date(base - 45 * 86400000).toISOString().slice(0,10),
-        guestName: 'Account Holder',
-        adults: 3, children: 2, seniors: 0,
-        totalPaid: 6597,
-        status: 'used',
-        bookingRef: 'BK-2026-01772',
-      },
-      {
-        id: 'WOW-' + uid.substring(0,6).toUpperCase() + '-004',
-        parkKey: 'WATER_DAY',
-        visitDate: new Date(base - 5 * 86400000).toISOString().slice(0,10),
-        guestName: 'Account Holder',
-        adults: 1, children: 0, seniors: 0,
-        totalPaid: 1299,
-        status: 'cancelled',
-        bookingRef: 'BK-2026-07103',
-      },
-    ];
-  }
+function renderTicket(t) {
+  const isActive = t.status === 'active';
+  const headerClass = t.status === 'used' ? 'past' : t.type;
+  const chipClass = t.status === 'used' ? 'used' : 'valid';
+  const chipLabel = t.status === 'used' ? '✓ Used' : '✅ Valid';
 
-  let allTickets = [];
-  let currentFilter = 'all';
+  return `
+  <div class="tkt">
+    <div class="tkt-header ${headerClass}">
+      <div class="tkt-park">
+        <div class="tkt-icon">${t.icon}</div>
+        <div>
+          <div class="tkt-park-name">${t.park}</div>
+          <div class="tkt-park-sub">${t.subPark}</div>
+        </div>
+      </div>
+      <div class="tkt-status-chip ${chipClass}">${chipLabel}</div>
+    </div>
 
-  function renderTickets(filter) {
-    currentFilter = filter;
-    const list = document.getElementById('tickets-list');
-    let tickets = allTickets;
+    <div class="tkt-tear"></div>
 
-    if (filter === 'upcoming')  tickets = tickets.filter(t => getStatus(t).label.includes('Upcoming'));
-    if (filter === 'today')     tickets = tickets.filter(t => getStatus(t).label.includes('Today'));
-    if (filter === 'past')      tickets = tickets.filter(t => getStatus(t).cls === 'status-used');
-    if (filter === 'cancelled') tickets = tickets.filter(t => t.status === 'cancelled');
+    <div class="tkt-body">
+      <div class="tkt-detail-grid">
+        <div class="tkt-field">
+          <div class="tkt-field-label">Ticket Holder</div>
+          <div class="tkt-field-val">${t.holder}</div>
+        </div>
+        <div class="tkt-field">
+          <div class="tkt-field-label">Category</div>
+          <div class="tkt-field-val">${t.category}</div>
+        </div>
+        <div class="tkt-field">
+          <div class="tkt-field-label">Visit Date</div>
+          <div class="tkt-field-val" style="${isActive ? 'color:var(--brand);' : ''}">${fmt(t.date)}</div>
+        </div>
+        <div class="tkt-field">
+          <div class="tkt-field-label">Entry Gate</div>
+          <div class="tkt-field-val">${t.gate.split('(')[0].trim()}</div>
+        </div>
+        <div class="tkt-field">
+          <div class="tkt-field-label">Park Timing</div>
+          <div class="tkt-field-val">${t.timing}</div>
+        </div>
+        <div class="tkt-field">
+          <div class="tkt-field-label">${t.usedAt ? 'Scanned At' : 'Booking ID'}</div>
+          <div class="tkt-field-val" style="font-family:monospace;font-size:11px;">${t.usedAt || t.bookingId}</div>
+        </div>
+      </div>
 
-    if (tickets.length === 0) {
-      list.innerHTML = `
-        <div class="ticket-card">
-          <div class="empty-state">
-            <div class="empty-icon">🎟</div>
-            <div class="empty-title">No tickets found</div>
-            <div class="empty-sub">${filter === 'all' ? "You haven't booked any tickets yet." : "No " + filter + " tickets."}</div>
-            <a href="../book/water-park.html" class="btn btn-primary">Book Your First Visit →</a>
-          </div>
-        </div>`;
-      return;
-    }
+      <div class="tkt-qr-section">
+        <div class="tkt-qr-box" id="qr-${t.id}" style="cursor:${isActive ? 'pointer' : 'default'};" onclick="${isActive ? `openFullQR('${t.id}')` : ''}">
+          ${t.status === 'used' ? '<div style="font-size:32px;opacity:.3;">✓</div>' : ''}
+        </div>
+        <div class="tkt-qr-id">${t.id.slice(-8)}</div>
+        ${isActive ? `<div style="font-size:9px;color:var(--brand);font-weight:700;text-align:center;cursor:pointer;" onclick="openFullQR('${t.id}')">Tap to expand</div>` : ''}
+      </div>
+    </div>
 
-    list.innerHTML = tickets.map((t, i) => {
-      const park = PARK_LABELS[t.parkKey] || PARK_LABELS['WATER_DAY'];
-      const status = getStatus(t);
-      const guestStr = [
-        t.adults > 0 ? `${t.adults} Adult${t.adults > 1 ? 's' : ''}` : '',
-        t.children > 0 ? `${t.children} Child${t.children > 1 ? 'ren' : ''}` : '',
-        t.seniors > 0 ? `${t.seniors} Senior${t.seniors > 1 ? 's' : ''}` : '',
-      ].filter(Boolean).join(' · ');
+    <div class="tkt-footer">
+      <div class="tkt-footer-left">
+        <strong>Worlds of Wonder</strong>, Sector 38A Noida<br>
+        Booked on ${t.bookedOn} · <a href="my-bookings.html" style="color:var(--brand);text-decoration:none;font-size:10px;">View Booking →</a>
+      </div>
+      <div class="tkt-actions">
+        ${isActive ? `
+          <button class="tkt-btn tkt-btn-primary" onclick="openFullQR('${t.id}')"><i class="fa fa-expand-alt"></i> Full QR</button>
+          <button class="tkt-btn tkt-btn-secondary" onclick="downloadTicket('${t.id}')"><i class="fa fa-download"></i></button>
+          <button class="tkt-btn tkt-btn-wa" onclick="shareTicket('${t.id}')"><i class="fab fa-whatsapp"></i></button>
+          <button class="tkt-btn" style="background:#ede9fe;color:#6d28d9;" onclick="openSplitModal('${t.id}')"><i class="fa fa-share-alt"></i> Split</button>
+          <button class="tkt-btn tkt-btn-cal" onclick="addToCalendar('${t.id}')"><i class="fa fa-calendar-plus"></i></button>
+        ` : `
+          <button class="tkt-btn tkt-btn-secondary" onclick="downloadTicket('${t.id}')"><i class="fa fa-download"></i> Download</button>
+          <button class="tkt-btn" style="background:#ede9fe;color:#6d28d9;" onclick="reBook('${t.id}')"><i class="fa fa-redo"></i> Book Again</button>
+        `}
+      </div>
+    </div>
+  </div>`;
+}
 
-      const canCancel = status.cls === 'status-upcoming';
-      const canView   = status.cls !== 'status-cancelled';
-
-      return `
-        <div class="ticket-card" id="tcard-${t.id}">
-          <div class="ticket-header" style="background:${park.gradient}">
-            <div class="ticket-park-icon" style="font-size:28px;">${park.name.split(' ')[0]}</div>
-            <div class="ticket-header-info">
-              <div class="ticket-park-name">${park.name.replace(/^[^\s]+\s/, '')}</div>
-              <div class="ticket-sub">${t.bookingRef} · Booked for ${fmtDate(t.visitDate)}</div>
-            </div>
-            <div class="ticket-status-badge ${status.cls}">${status.label}</div>
-          </div>
-
-          <div class="ticket-body">
-            <div class="ticket-details">
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <div class="detail-label">Visit Date</div>
-                  <div class="detail-value">${fmtDate(t.visitDate)}</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Total Paid</div>
-                  <div class="detail-value">${inr(t.totalPaid)}</div>
-                </div>
-                <div class="detail-item">
-                  <div class="detail-label">Ticket ID</div>
-                  <div class="detail-value" style="font-family:'Courier New',monospace;font-size:12px;">${t.id}</div>
-                </div>
-              </div>
-              <div class="detail-label">Guests</div>
-              <div class="guest-pills" style="margin-top:6px;">
-                ${t.adults > 0 ? `<span class="guest-pill">👨 ${t.adults} Adult${t.adults > 1 ? 's' : ''}</span>` : ''}
-                ${t.children > 0 ? `<span class="guest-pill">👧 ${t.children} Child${t.children > 1 ? 'ren' : ''}</span>` : ''}
-                ${t.seniors > 0 ? `<span class="guest-pill">🧓 ${t.seniors} Senior${t.seniors > 1 ? 's' : ''}</span>` : ''}
-              </div>
-            </div>
-            ${canView ? `
-            <div class="ticket-qr-col">
-              <div class="qr-box" id="qr-mini-${i}"></div>
-              <div class="qr-id">${t.id}</div>
-            </div>` : `<div style="display:flex;align-items:center;justify-content:center;padding:20px;color:rgba(255,255,255,.25);font-size:13px;">Cancelled</div>`}
-          </div>
-
-          <div class="ticket-actions">
-            ${canView ? `<button class="tkt-btn tkt-btn-primary" onclick="openQRModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">🔍 Full QR View</button>` : ''}
-            ${canView ? `<button class="tkt-btn tkt-btn-green" onclick="shareTicket('${t.id}', '${park.name}', '${t.visitDate}')">📲 Share</button>` : ''}
-            <button class="tkt-btn tkt-btn-grey" onclick="window.print()">🖨 Print</button>
-            ${canCancel ? `<button class="tkt-btn tkt-btn-red" onclick="cancelTicket('${t.id}')">✕ Cancel</button>` : ''}
-          </div>
-        </div>`;
-    }).join('');
-
-    // Generate mini QRs
-    tickets.forEach((t, i) => {
-      if (t.status === 'cancelled') return;
-      const el = document.getElementById('qr-mini-' + i);
-      if (el && typeof QRCode !== 'undefined') {
-        const canvas = document.createElement('canvas');
-        el.appendChild(canvas);
-        QRCode.toCanvas(canvas, JSON.stringify({ id: t.id, park: t.parkKey, date: t.visitDate, guests: t.adults + (t.children||0) }), {
-          width: 100, margin: 0, color: { dark: '#060e24', light: '#ffffff' }, errorCorrectionLevel: 'M'
-        });
-      }
+// ── QR CODE GENERATION ──────────────────────────────────────
+const qrGenerated = {};
+function generateQR(t) {
+  if (t.status === 'used') return;
+  if (qrGenerated[t.id]) return;
+  const el = document.getElementById('qr-' + t.id);
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    new QRCode(el, {
+      text: t.id + '|' + t.bookingId + '|' + t.date + '|' + t.holder,
+      width: 86, height: 86,
+      colorDark: '#0a1628', colorLight: '#ffffff'
     });
+    qrGenerated[t.id] = true;
+  } catch(e) {}
+}
+
+// ── FULLSCREEN QR ──────────────────────────────────────────
+function openFullQR(id) {
+  const t = TICKETS.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('fq-title').textContent = t.icon + ' ' + t.park;
+  document.getElementById('fq-sub').textContent = t.holder + ' · ' + fmt(t.date);
+  document.getElementById('fq-id').textContent = t.id;
+  const qrEl = document.getElementById('fq-qr');
+  qrEl.innerHTML = '';
+  try {
+    new QRCode(qrEl, {
+      text: t.id + '|' + t.bookingId + '|' + t.date + '|' + t.holder,
+      width: 200, height: 200,
+      colorDark: '#0a1628', colorLight: '#ffffff'
+    });
+  } catch(e) {}
+  document.getElementById('fullqr-overlay').classList.add('open');
+}
+
+// ── FILTER ──────────────────────────────────────────────────
+function filterTkts(f, btn) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (f === 'all') displayedTickets = [...TICKETS];
+  else if (f === 'active') displayedTickets = TICKETS.filter(t => t.status === 'active');
+  else if (f === 'used') displayedTickets = TICKETS.filter(t => t.status === 'used');
+  renderAll();
+}
+
+// ── ACTIONS ─────────────────────────────────────────────────
+function downloadTicket(id) {
+  const t = TICKETS.find(x => x.id === id);
+  showToast('📄 Downloading ticket for ' + t.holder + '…');
+}
+
+function shareTicket(id) {
+  const t = TICKETS.find(x => x.id === id);
+  const ticketLink = window.location.origin + '/book/confirmation.html?t=' +
+    btoa(JSON.stringify({ id: t.bookingId, name: t.holder, date: t.date, tktId: t.id }));
+  const msg = `🎟 *WOW Ticket Ready!*\n${t.icon} ${t.park}\n👤 ${t.holder}\n📅 ${fmt(t.date)}\n🆔 ${t.id}\n\n🔗 Your e-Ticket:\n${ticketLink}\n\nShow this QR at the gate. See you at Worlds of Wonder! 🎉`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ── TICKET SPLIT ──────────────────────────────────────────
+let _splitTicketId  = null;
+let _splitChannel   = 'wa';
+let _recipientCount = 0;
+let _recipientIds   = [];
+
+function openSplitModal(id) {
+  _splitTicketId  = id;
+  _splitChannel   = 'wa';
+  _recipientCount = 0;
+  _recipientIds   = [];
+  const t = TICKETS.find(x => x.id === id);
+  if (!t) return;
+
+  document.getElementById('split-ticket-info').textContent =
+    t.icon + ' ' + t.park + ' — ' + fmt(t.date) + ' · ' + t.holder;
+
+  // Reset channels
+  document.querySelectorAll('.split-chan-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('chan-wa').classList.add('active');
+  updateChannelHint('wa');
+
+  // Pre-fill one recipient with ticket holder info
+  const wrap = document.getElementById('split-recipients');
+  wrap.innerHTML = '';
+  addRecipient(t.holder, '');
+
+  document.getElementById('split-result').style.display = 'none';
+  document.getElementById('split-modal').classList.add('open');
+}
+
+function closeSplitModal() {
+  document.getElementById('split-modal').classList.remove('open');
+}
+
+function selectChannel(ch, btn) {
+  _splitChannel = ch;
+  document.querySelectorAll('.split-chan-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateChannelHint(ch);
+}
+
+function updateChannelHint(ch) {
+  const hint = document.getElementById('channel-hint');
+  if (!hint) return;
+  const hints = {
+    wa:    '💬 Enter mobile number (10-digit) · WhatsApp message will open for each recipient',
+    email: '📧 Enter email address · An email compose window will open with ticket link',
+    both:  '📲 Enter mobile number or email · Both WhatsApp &amp; email will be triggered'
+  };
+  hint.innerHTML = hints[ch] || '';
+}
+
+function addRecipient(name, contact) {
+  _recipientCount++;
+  const num  = _recipientCount;
+  _recipientIds.push(num);
+  const wrap = document.getElementById('split-recipients');
+  const div  = document.createElement('div');
+  div.className = 'split-recipient';
+  div.id = 'recip-' + num;
+
+  const contactLabel = _splitChannel === 'email' ? 'Email Address' : 'Mobile Number / Email';
+  const contactPh    = _splitChannel === 'email' ? 'example@gmail.com' : '9876543210 or a@b.com';
+
+  div.innerHTML = `
+    <div class="split-recipient-num">${num}</div>
+    ${num > 1 ? `<button class="split-remove" onclick="removeRecipient(${num})">✕</button>` : ''}
+    <div class="sr-fields">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">Recipient Name *</label>
+        <input class="split-input" id="rname-${num}" type="text" placeholder="e.g. Priya Sharma" value="${escHtml(name || '')}" />
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">${contactLabel} *</label>
+        <input class="split-input" id="rcontact-${num}" type="text" placeholder="${contactPh}" value="${escHtml(contact || '')}" />
+      </div>
+    </div>`;
+  wrap.appendChild(div);
+}
+
+function removeRecipient(num) {
+  const row = document.getElementById('recip-' + num);
+  if (row) row.remove();
+  _recipientIds = _recipientIds.filter(x => x !== num);
+}
+
+function sendSplitTickets() {
+  const t = TICKETS.find(x => x.id === _splitTicketId);
+  if (!t) return;
+
+  const recipients = [];
+  _recipientIds.forEach(num => {
+    const nameEl    = document.getElementById('rname-' + num);
+    const contactEl = document.getElementById('rcontact-' + num);
+    if (!nameEl || !contactEl) return;
+    const name    = nameEl.value.trim();
+    const contact = contactEl.value.trim();
+    if (!name || !contact) return;
+    recipients.push({ name, contact, num });
+  });
+
+  if (recipients.length === 0) {
+    showToast('⚠️ Please fill in at least one recipient with name and contact.');
+    return;
   }
 
-  window.filterTickets = function(filter, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderTickets(filter);
-  };
+  const results = [];
+  let waOpened  = false;
 
-  window.openQRModal = function(ticket) {
-    const park = PARK_LABELS[ticket.parkKey] || PARK_LABELS['WATER_DAY'];
-    document.getElementById('modal-park').textContent = park.name.replace(/^[^\s]+\s/, '');
-    document.getElementById('modal-name').textContent = ticket.guestName || 'Guest';
-    document.getElementById('modal-ticket-id').textContent = ticket.id;
-    document.getElementById('modal-date').textContent = '📅 ' + fmtDate(ticket.visitDate);
-    document.getElementById('modal-guests').textContent = [
-      ticket.adults > 0 ? ticket.adults + ' Adult' + (ticket.adults > 1 ? 's' : '') : '',
-      ticket.children > 0 ? ticket.children + ' Child' + (ticket.children > 1 ? 'ren' : '') : '',
-    ].filter(Boolean).join(' + ') + ' · Total: ' + inr(ticket.totalPaid);
+  recipients.forEach((r, idx) => {
+    const subId   = t.bookingId + '-R' + (idx + 1).toString().padStart(2,'0');
+    const payload = btoa(JSON.stringify({ id: subId, park: t.type, name: r.name, date: t.date, tktId: t.id }));
+    const tktLink = window.location.origin + '/book/confirmation.html?t=' + payload;
 
-    // Big QR
-    const canvas = document.getElementById('modal-qr-canvas');
-    canvas.width = 0; canvas.height = 0; // clear
-    if (typeof QRCode !== 'undefined') {
-      QRCode.toCanvas(canvas, JSON.stringify({ id: ticket.id, park: ticket.parkKey, date: ticket.visitDate, name: ticket.guestName }), {
-        width: 220, margin: 2, color: { dark: '#060e24', light: '#ffffff' }, errorCorrectionLevel: 'H'
-      });
-    }
+    const isEmail  = r.contact.indexOf('@') !== -1;
+    const rawMob   = r.contact.replace(/^\+91/, '').replace(/\s/g,'');
+    const isMobile = /^[6-9]\d{9}$/.test(rawMob);
 
-    // WhatsApp share
-    const msg = encodeURIComponent(`🎟 My WOW Ticket\nPark: ${park.name}\nDate: ${fmtDate(ticket.visitDate)}\nID: ${ticket.id}\n\nBookings: https://worldsofwonder.in`);
-    document.getElementById('modal-whatsapp-btn').onclick = () => window.open('https://wa.me/?text=' + msg, '_blank');
+    const channels = [];
 
-    document.getElementById('qr-modal').classList.add('open');
-  };
-
-  window.closeModal = function(e) {
-    if (e.target === document.getElementById('qr-modal')) {
-      document.getElementById('qr-modal').classList.remove('open');
-    }
-  };
-
-  window.shareTicket = function(id, park, date) {
-    const msg = `🎟 WOW Ticket — ${park}\n📅 ${fmtDate(date)}\nID: ${id}\n\nWorldsofWonder.in`;
-    if (navigator.share) navigator.share({ text: msg }).catch(() => {});
-    else navigator.clipboard.writeText(msg).then(() => alert('Ticket info copied to clipboard!'));
-  };
-
-  window.cancelTicket = function(id) {
-    if (confirm('Are you sure you want to cancel this ticket? Cancellation is subject to our refund policy.')) {
-      const t = allTickets.find(x => x.id === id);
-      if (t) { t.status = 'cancelled'; renderTickets(currentFilter); }
-    }
-  };
-</script>
-
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, collection, query, where, orderBy, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
-
-  const app  = initializeApp(WOW_FB_CONFIG);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = 'login.html'; return; }
-    document.getElementById('portal-loading').style.display = 'none';
-    document.getElementById('portal-content').style.display = 'block';
-
-    // Try Firestore bookings
-    let tickets = [];
-    try {
-      const q = query(
-        collection(db, 'bookings'),
-        where('userId', '==', user.uid),
-        orderBy('visitDate', 'desc')
+    // WhatsApp
+    if ((_splitChannel === 'wa' || _splitChannel === 'both') && isMobile) {
+      const waMsg = encodeURIComponent(
+        `🎟 *WOW Ticket — ${t.park}*\n` +
+        `Hi ${r.name}! 👋\n\n` +
+        `📅 *Visit Date:* ${fmt(t.date)}\n` +
+        `🆔 *Sub-Ticket ID:* \`${subId}\`\n` +
+        `👤 *For:* ${r.name}\n\n` +
+        `🔗 *Your e-Ticket Link:*\n${tktLink}\n\n` +
+        `Tap the link to view your QR code. Show it at the gate. Have a WOW day! 🎉🎢`
       );
-      const snaps = await getDocs(q);
-      snaps.forEach(d => tickets.push({ id: d.id, ...d.data() }));
-    } catch {
-      console.warn('[WOW] Firestore not available, using demo tickets');
+      if (!waOpened) {
+        window.open(`https://wa.me/91${rawMob}?text=${waMsg}`, '_blank');
+        waOpened = true;
+      } else {
+        // Store for sequential opening
+        setTimeout(() => window.open(`https://wa.me/91${rawMob}?text=${waMsg}`, '_blank'), idx * 1200);
+      }
+      channels.push('WhatsApp');
     }
 
-    // Use demo if no real data
-    if (tickets.length === 0) {
-      tickets = buildDemoTickets(user.uid);
+    // Email (via mailto)
+    if ((_splitChannel === 'email' || _splitChannel === 'both') && isEmail) {
+      const subj = encodeURIComponent(`Your WOW Ticket — ${t.park} on ${fmt(t.date)}`);
+      const body = encodeURIComponent(
+        `Hi ${r.name},\n\n` +
+        `Your ticket for Worlds of Wonder is ready!\n\n` +
+        `Park: ${t.park}\nVisit Date: ${fmt(t.date)}\nSub-Ticket ID: ${subId}\n\n` +
+        `View your QR ticket here:\n${tktLink}\n\n` +
+        `Please show the QR code at the park entrance.\n\n` +
+        `See you there! 🎉\n\nWorlds of Wonder, Noida\nhttps://worldsofwonder.in`
+      );
+      setTimeout(() => window.open(`mailto:${r.contact}?subject=${subj}&body=${body}`, '_blank'), idx * 800);
+      channels.push('Email');
     }
 
-    window.allTickets = tickets;
-    renderTickets('all');
+    // SMS / copy-link fallback if neither WhatsApp nor email
+    if (channels.length === 0) {
+      channels.push('Copy Link');
+    }
+
+    results.push({ recipient: r.name, contact: r.contact, subId, tktLink, channels });
   });
 
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await signOut(auth);
-    window.location.href = '../index.html';
+  // Render results
+  const resultEl = document.getElementById('split-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-weight:800;color:#15803d;font-size:13px;margin-bottom:4px;">✅ Tickets dispatched to ${results.length} recipient(s)</div>
+      <div style="font-size:11px;color:#166534;">Delivery in progress. WhatsApp/email windows opened for each recipient.</div>
+    </div>` +
+    results.map(r => `
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:800;color:var(--navy);">${escHtml(r.recipient)}</div>
+            <div style="font-size:11px;color:var(--muted);">${escHtml(r.contact)}</div>
+            <div style="font-family:monospace;font-size:11px;color:#7c3aed;margin-top:3px;">${r.subId}</div>
+            <div style="display:flex;gap:4px;margin-top:6px;">
+              ${r.channels.map(ch => `<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:#ede9fe;color:#6d28d9;font-weight:700;">${ch}</span>`).join('')}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <button onclick="copySplitLink('${r.tktLink}')" style="padding:6px 10px;background:#ede9fe;border:none;border-radius:6px;font-size:11px;font-weight:700;color:#6d28d9;cursor:pointer;white-space:nowrap;">📋 Copy Link</button>
+            <button onclick="waShareSplit('${r.contact}','${encodeURIComponent(r.tktLink)}','${escHtml(r.recipient)}','${r.subId}')" style="padding:6px 10px;background:#dcfce7;border:none;border-radius:6px;font-size:11px;font-weight:700;color:#166534;cursor:pointer;white-space:nowrap;">💬 Re-send</button>
+          </div>
+        </div>
+        <div style="margin-top:8px;background:#f8fafc;border-radius:6px;padding:6px 8px;display:flex;align-items:center;gap:6px;">
+          <input type="text" value="${r.tktLink}" readonly style="flex:1;background:none;border:none;font-size:10px;color:#6b7280;font-family:monospace;outline:none;min-width:0;" />
+        </div>
+      </div>`
+    ).join('');
+
+  showToast('🎟 Tickets sent to ' + results.length + ' recipient(s)!', 'success');
+}
+
+function copySplitLink(link) {
+  navigator.clipboard.writeText(link).then(() => showToast('📋 Ticket link copied to clipboard!', 'success')).catch(() => {
+    prompt('Copy this ticket link:', link);
   });
+}
+
+function waShareSplit(contact, encodedLink, name, subId) {
+  const rawMob = contact.replace(/^\+91/,'').replace(/\s/g,'');
+  const isEmail = contact.indexOf('@') !== -1;
+  const link = decodeURIComponent(encodedLink);
+  const msg = encodeURIComponent(`🎟 *WOW Ticket*\nHi ${name}!\n🆔 ${subId}\n🔗 Your e-Ticket:\n${link}\n\nShow QR at gate. Have a WOW day! 🎉`);
+  if (/^[6-9]\d{9}$/.test(rawMob)) {
+    window.open(`https://wa.me/91${rawMob}?text=${msg}`, '_blank');
+  } else if (isEmail) {
+    const subj = encodeURIComponent('Your WOW Ticket — ' + subId);
+    window.open(`mailto:${contact}?subject=${subj}&body=${encodeURIComponent(`Hi ${name},\n\nYour WOW ticket: ${link}\n\nTicket ID: ${subId}`)}`, '_blank');
+  } else {
+    copySplitLink(link);
+  }
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addToCalendar(id) {
+  const t = TICKETS.find(x => x.id === id);
+  const start = t.date.replace(/-/g,'') + 'T100000';
+  const end   = t.date.replace(/-/g,'') + 'T210000';
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('WOW Visit – ' + t.park)}&dates=${start}/${end}&details=${encodeURIComponent('Booking: ' + t.bookingId + '\nTicket: ' + t.id + '\nGate: ' + t.gate)}&location=Worlds+of+Wonder+Noida`;
+  window.open(url, '_blank');
+  showToast('📅 Opening Google Calendar…');
+}
+
+function reBook(id) {
+  const t = TICKETS.find(x => x.id === id);
+  const urls = {water:'../book/water-park.html',amusement:'../book/amusement-park.html',combo:'../book/combo.html'};
+  window.location.href = urls[t.type] || '../book/combo.html';
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : ' success');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── COUNTDOWN ─────────────────────────────────────────────
+function updateCountdown() {
+  const target = new Date('2026-04-05T10:00:00');
+  const diff = target - new Date();
+  if (diff <= 0) {
+    document.getElementById('countdown-banner').innerHTML = '<div><strong style="color:#065f46;">🎉 Today is your WOW day! Get ready and head to the park!</strong></div>';
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hrs  = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('cd-days').textContent = pad(days);
+  document.getElementById('cd-hrs').textContent  = pad(hrs);
+  document.getElementById('cd-min').textContent  = pad(mins);
+  document.getElementById('cd-sec').textContent  = pad(secs);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  document.getElementById('fullqr-overlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
