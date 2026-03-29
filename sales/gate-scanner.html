@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Passport Gate Scanner — WOW</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="../js/wow-passport-api.js"></script>
+<script src="../js/wow-auth.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --bg:#07071a;--card:#0f0f2a;--card2:#13132e;--border:#252550;
+  --text:#f0f0f0;--muted:#8888aa;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;--purple:#7c3aed;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+.topnav{background:#0a0a20;border-bottom:1.5px solid var(--border);height:60px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.tn-left{display:flex;align-items:center;gap:12px;}
+.tn-logo{width:34px;height:34px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem;font-weight:900;}
+.tn-title{font-size:.95rem;font-weight:800;color:var(--gold);}
+.tn-sub{font-size:.68rem;color:var(--muted);}
+.tn-right{display:flex;align-items:center;gap:10px;}
+.gate-sel{background:#0f0f2e;border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;color:#fff;font-size:.78rem;cursor:pointer;outline:none;}
+.gate-sel:focus{border-color:var(--gold);}
+.btn-back{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:.75rem;color:var(--muted);cursor:pointer;text-decoration:none;transition:all .2s;}
+.btn-back:hover{color:var(--gold);border-color:var(--gold);}
+.online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;}
+
+/* LAYOUT */
+.main{flex:1;display:grid;grid-template-columns:1fr 360px;gap:0;max-height:calc(100vh - 60px);overflow:hidden;}
+
+/* SCANNER PANEL */
+.scan-panel{padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+
+/* Zone selector */
+.zone-bar{display:flex;gap:8px;flex-wrap:wrap;}
+.zone-btn{padding:9px 18px;border-radius:30px;border:2px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.zone-btn:hover{border-color:rgba(201,168,76,.4);}
+.zone-btn.active{color:#0a0a14;}
+.zone-water  { --zc:#3b82f6; }
+.zone-amuse  { --zc:#a855f7; }
+.zone-fnb    { --zc:#f59e0b; }
+.zone-parking{ --zc:#22c55e; }
+.zone-photo  { --zc:#ec4899; }
+.zone-btn.active{ background:var(--zc,var(--gold)); border-color:var(--zc,var(--gold)); }
+
+/* Scanner box */
+.scanner-card{background:var(--card);border:2px solid var(--border);border-radius:22px;padding:24px;text-align:center;position:relative;overflow:hidden;}
+.scanner-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(201,168,76,.04) 0%,transparent 60%);pointer-events:none;}
+.scan-title{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.scan-title .zone-name{padding:3px 10px;border-radius:10px;font-size:.68rem;background:rgba(201,168,76,.15);color:var(--gold);}
+
+/* QR scanner viewport */
+.qr-viewport{width:100%;max-width:340px;margin:0 auto 18px;aspect-ratio:1;background:#040412;border-radius:16px;position:relative;overflow:hidden;border:2px solid var(--border);}
+.qr-video{width:100%;height:100%;object-fit:cover;display:none;}
+.scan-laser{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);animation:scan 2s ease-in-out infinite;display:none;}
+@keyframes scan{0%{top:15%}50%{top:80%}100%{top:15%}}
+.qr-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.qr-corners{width:100%;height:100%;position:absolute;inset:0;pointer-events:none;}
+.qr-corners::before,.qr-corners::after,
+.qr-viewport > .corner-tl,.qr-viewport > .corner-br{content:'';position:absolute;width:28px;height:28px;border-color:var(--gold);border-style:solid;}
+.qr-corners::before{top:10px;left:10px;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
+.qr-corners::after{top:10px;right:10px;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
+
+/* Manual input */
+.manual-input-wrap{display:flex;gap:8px;}
+.id-input{flex:1;background:#0a0a22;border:2px solid var(--border);border-radius:12px;padding:12px 16px;color:#fff;font-size:.95rem;font-weight:700;outline:none;font-family:inherit;letter-spacing:.5px;transition:border-color .2s;}
+.id-input:focus{border-color:var(--gold);}
+.id-input::placeholder{color:#44446a;font-weight:400;}
+.btn-scan{background:linear-gradient(135deg,var(--gold3),var(--gold));border:none;border-radius:12px;padding:12px 20px;font-size:.88rem;font-weight:800;color:#0a0a14;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;}
+.btn-scan:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.35);}
+.btn-scan:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* Camera scan controls */
+.cam-controls{display:flex;gap:10px;justify-content:center;margin-bottom:0;}
+.btn-cam{padding:9px 18px;border-radius:10px;font-size:.78rem;font-weight:700;font-family:inherit;cursor:pointer;border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);transition:all .2s;}
+.btn-cam.active{background:var(--green);border-color:var(--green);color:#fff;}
+.btn-cam:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+
+/* Result display */
+.result-panel{border-radius:18px;padding:22px;margin-top:0;display:none;animation:popIn .35s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+.result-allowed{background:rgba(34,197,94,.07);border:2px solid rgba(34,197,94,.4);}
+.result-denied{background:rgba(239,68,68,.07);border:2px solid rgba(239,68,68,.4);}
+.result-expired{background:rgba(245,158,11,.07);border:2px solid rgba(245,158,11,.4);}
+.result-suspended{background:rgba(100,116,139,.07);border:2px solid rgba(100,116,139,.4);}
+.result-notfound{background:rgba(239,68,68,.05);border:2px dashed rgba(239,68,68,.3);}
+.result-icon{font-size:2.8rem;text-align:center;margin-bottom:10px;}
+.result-status{text-align:center;font-size:1.1rem;font-weight:900;letter-spacing:.5px;margin-bottom:16px;}
+.result-allowed  .result-status{color:var(--green);}
+.result-denied   .result-status{color:var(--red);}
+.result-expired  .result-status{color:var(--amber);}
+.result-suspended .result-status{color:#64748b;}
+.result-notfound .result-status{color:var(--red);}
+.passport-info{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;background:rgba(255,255,255,.03);border-radius:12px;padding:14px;margin-bottom:12px;}
+.holder-photo{width:64px;height:76px;border-radius:8px;object-fit:cover;background:#131330;display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:2px solid var(--border);flex-shrink:0;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.info-item .il{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.info-item .iv{font-size:.82rem;font-weight:700;color:#fff;}
+.entries-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.entry-box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.entry-box .eb-num{font-size:1.4rem;font-weight:900;}
+.entry-box .eb-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.validity-bar-wrap{background:rgba(255,255,255,.04);border-radius:10px;padding:12px;margin-bottom:12px;}
+.validity-bar-inner{height:8px;background:rgba(255,255,255,.1);border-radius:20px;overflow:hidden;margin-top:6px;}
+.validity-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--green),#86efac);}
+.action-row{display:flex;gap:8px;justify-content:center;}
+.btn-action{padding:9px 18px;border-radius:10px;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid;font-family:inherit;transition:all .2s;}
+.btn-allow{background:var(--green);border-color:var(--green);color:#fff;}
+.btn-allow:hover{background:#16a34a;}
+.btn-deny{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4);color:var(--red);}
+.btn-deny:hover{background:rgba(239,68,68,.2);}
+.btn-neutral{background:rgba(255,255,255,.05);border-color:var(--border);color:var(--muted);}
+.btn-neutral:hover{border-color:var(--gold);color:var(--gold);}
+
+/* SIDE PANEL */
+.side-panel{background:var(--card);border-left:1.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sp-header{padding:16px 18px;border-bottom:1px solid var(--border);}
+.sp-title{font-size:.85rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;}
+.sp-title .badge{font-size:.65rem;padding:2px 8px;border-radius:10px;background:rgba(34,197,94,.15);color:var(--green);}
+.sp-body{flex:1;overflow-y:auto;padding:12px;}
+/* Log entries */
+.log-entry{padding:10px 12px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;font-size:.78rem;border:1px solid transparent;transition:all .2s;}
+.log-allowed{background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);}
+.log-denied{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);}
+.log-expired{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);}
+.log-icon{font-size:1.2rem;flex-shrink:0;}
+.log-info{flex:1;}
+.log-name{font-weight:700;color:#fff;}
+.log-meta{color:var(--muted);font-size:.68rem;margin-top:2px;}
+.log-time{font-size:.65rem;color:var(--muted);white-space:nowrap;}
+/* Stats strip */
+.stats-strip{padding:12px 18px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.stat-box{text-align:center;padding:8px;background:rgba(255,255,255,.03);border-radius:8px;}
+.stat-val{font-size:1.2rem;font-weight:900;}
+.stat-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+
+/* Sound indicator */
+.sound-indicator{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:200;padding:10px 22px;border-radius:30px;font-size:.88rem;font-weight:800;pointer-events:none;transition:all .3s;opacity:0;}
+.sound-allow{background:var(--green);color:#fff;}
+.sound-deny{background:var(--red);color:#fff;}
+
+/* Flash */
+.result-flash{position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity .08s;}
+.flash-green{background:rgba(34,197,94,.25);}
+.flash-red{background:rgba(239,68,68,.25);}
+
+/* Stats metrics top */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;}
+.metric{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden;}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.mc-green::before{background:var(--green);}
+.mc-red::before{background:var(--red);}
+.mc-amber::before{background:var(--amber);}
+.mc-blue::before{background:var(--blue);}
+.metric .mv{font-size:1.6rem;font-weight:900;margin:2px 0;}
+.metric .ml{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+/* Responsive */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;max-height:none;}
+  .side-panel{border-left:none;border-top:1.5px solid var(--border);max-height:350px;}
+}
+@media(max-width:500px){
+  .metrics-row{grid-template-columns:1fr 1fr;}
+  .zone-bar{gap:6px;}
+  .zone-btn{padding:7px 12px;font-size:.72rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="tn-left">
+    <div class="tn-logo"><i class="fas fa-passport" style="font-size:14px;"></i></div>
+    <div>
+      <div class="tn-title">WOW Gate Scanner</div>
+      <div class="tn-sub"><span class="online-dot"></span> Passport Redemption Terminal</div>
+    </div>
+  </div>
+  <div class="tn-right">
+    <select class="gate-sel" id="gate-sel" onchange="updateGate()">
+      <option value="GATE-WP-01">🌊 Water Park — Gate 1</option>
+      <option value="GATE-WP-02">🌊 Water Park — Gate 2</option>
+      <option value="GATE-AP-01">🎢 Amusement — Main Gate</option>
+      <option value="GATE-AP-02">🎢 Amusement — Back Gate</option>
+      <option value="GATE-FNB-01">🍽️ F&B Zone — Entry</option>
+      <option value="GATE-PKG-01">🚗 Parking — P1</option>
+    </select>
+    <span class="btn-back" id="operator-badge" style="color:var(--gold);">
+      <i class="fas fa-user-circle"></i> <span id="op-name">Operator</span>
+    </span>
+    <a href="erp-dashboard.html" class="btn-back"><i class="fas fa-th-large"></i> ERP</a>
+    <a href="passport-login.html" class="btn-back"><i class="fas fa-sign-out-alt"></i></a>
+  </div>
+</nav>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+
+  <!-- LEFT: SCANNER -->
+  <div class="scan-panel">
+
+    <!-- Metrics top row -->
+    <div class="metrics-row">
+      <div class="metric mc-green"><div class="ml">Allowed Today</div><div class="mv" id="m-allowed" style="color:var(--green);">0</div></div>
+      <div class="metric mc-red"><div class="ml">Denied Today</div><div class="mv" id="m-denied" style="color:var(--red);">0</div></div>
+      <div class="metric mc-amber"><div class="ml">Expired</div><div class="mv" id="m-expired" style="color:var(--amber);">0</div></div>
+      <div class="metric mc-blue"><div class="ml">Scans This Hour</div><div class="mv" id="m-hour" style="color:var(--blue);">0</div></div>
+    </div>
+
+    <!-- Zone selector -->
+    <div>
+      <div style="font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;"><i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:4px;"></i> Select Park Zone</div>
+      <div class="zone-bar" id="zone-bar">
+        <button class="zone-btn zone-water active"  data-zone="Water Park"   onclick="selectZone(this)">🌊 Water Park</button>
+        <button class="zone-btn zone-amuse"          data-zone="Amusement Park" onclick="selectZone(this)">🎢 Amusement Park</button>
+        <button class="zone-btn zone-fnb"            data-zone="F&B Zone"    onclick="selectZone(this)">🍽️ F&B Zone</button>
+        <button class="zone-btn zone-parking"        data-zone="Parking"     onclick="selectZone(this)">🚗 Parking</button>
+        <button class="zone-btn zone-photo"          data-zone="Photo Studio" onclick="selectZone(this)">📸 Photo Studio</button>
+      </div>
+    </div>
+
+    <!-- Scanner -->
+    <div class="scanner-card">
+      <div class="scan-title">
+        <i class="fas fa-qrcode"></i>
+        Scan Passport
+        <span class="zone-name" id="active-zone-label">Water Park</span>
+      </div>
+
+      <!-- QR Viewport -->
+      <div class="qr-viewport" id="qr-viewport">
+        <video class="qr-video" id="qr-video" playsinline></video>
+        <canvas id="qr-canvas" style="display:none;"></canvas>
+        <div class="scan-laser" id="scan-laser"></div>
+        <!-- Corner marks -->
+        <div style="position:absolute;top:10px;left:10px;width:28px;height:28px;border-top:3px solid var(--gold);border-left:3px solid var(--gold);border-radius:4px 0 0 0;"></div>
+        <div style="position:absolute;top:10px;right:10px;width:28px;height:28px;border-top:3px solid var(--gold);border-right:3px solid var(--gold);border-radius:0 4px 0 0;"></div>
+        <div style="position:absolute;bottom:10px;left:10px;width:28px;height:28px;border-bottom:3px solid var(--gold);border-left:3px solid var(--gold);border-radius:0 0 0 4px;"></div>
+        <div style="position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-bottom:3px solid var(--gold);border-right:3px solid var(--gold);border-radius:0 0 4px 0;"></div>
+        <div class="qr-placeholder" id="qr-placeholder">
+          <i class="fas fa-qrcode" style="font-size:3rem;color:#44446a;"></i>
+          <div style="font-size:.78rem;color:var(--muted);">Camera not active</div>
+          <div style="font-size:.68rem;color:#44446a;">Tap to start camera</div>
+        </div>
+      </div>
+
+      <!-- Camera controls -->
+      <div class="cam-controls" style="margin-bottom:14px;">
+        <button class="btn-cam" id="btn-start-cam" onclick="startCamera()"><i class="fas fa-camera"></i> Start Camera</button>
+        <button class="btn-cam" id="btn-stop-cam" onclick="stopCamera()" disabled><i class="fas fa-stop"></i> Stop Camera</button>
+        <button class="btn-cam" onclick="toggleTorch()" id="btn-torch" style="display:none;"><i class="fas fa-bolt"></i> Torch</button>
+      </div>
+
+      <!-- Manual entry -->
+      <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;text-align:left;">Or enter Passport ID manually:</div>
+      <div class="manual-input-wrap">
+        <input class="id-input" id="passport-id-input" type="text" placeholder="WOW-PAX-241001 or scan QR"
+          oninput="this.value=this.value.toUpperCase()"
+          onkeydown="if(event.key==='Enter')scanPassport()"
+          autocomplete="off" autocorrect="off" spellcheck="false"/>
+        <button class="btn-scan" id="btn-manual-scan" onclick="scanPassport()">
+          <i class="fas fa-search"></i> Verify
+        </button>
+      </div>
+    </div>
+
+    <!-- Result Panel -->
+    <div class="result-panel" id="result-panel">
+      <div class="result-icon" id="result-icon">✅</div>
+      <div class="result-status" id="result-status">ACCESS GRANTED</div>
+      <div class="passport-info" id="passport-info"></div>
+      <div class="entries-grid" id="entries-grid"></div>
+      <div class="validity-bar-wrap" id="validity-bar-wrap"></div>
+      <div class="action-row" id="action-row"></div>
+    </div>
+
+  </div><!-- end scan-panel -->
+
+  <!-- RIGHT: LOG PANEL -->
+  <div class="side-panel">
+    <div class="sp-header">
+      <div class="sp-title">
+        <i class="fas fa-list" style="color:var(--gold);"></i> Scan Log
+        <span class="badge" id="log-count-badge">0 scans</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn-cam" style="flex:1;font-size:.7rem;" onclick="filterLog('all')" id="lf-all"><i class="fas fa-list"></i> All</button>
+        <button class="btn-cam" style="flex:1;font-size:.7rem;" onclick="filterLog('allowed')" id="lf-allowed"><i class="fas fa-check"></i> Allowed</button>
+        <button class="btn-cam" style="flex:1;font-size:.7rem;" onclick="filterLog('denied')" id="lf-denied"><i class="fas fa-ban"></i> Denied</button>
+      </div>
+    </div>
+    <div class="sp-body" id="scan-log-list">
+      <div style="text-align:center;padding:32px 16px;color:var(--muted);font-size:.82rem;">
+        <i class="fas fa-qrcode" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.3;"></i>
+        No scans yet. Start scanning passports.
+      </div>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-box"><div class="stat-val" style="color:var(--green);" id="ss-allowed">0</div><div class="stat-label">OK</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--red);"   id="ss-denied">0</div><div class="stat-label">Denied</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--amber);" id="ss-expired">0</div><div class="stat-label">Expired</div></div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- Flash overlay -->
+<div class="result-flash" id="result-flash"></div>
+
+<!-- Sound indicator -->
+<div class="sound-indicator" id="sound-indicator"></div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e1e3a;border:1.5px solid var(--gold);color:#fff;padding:10px 22px;border-radius:12px;font-size:.82rem;font-weight:700;z-index:9999;display:none;white-space:nowrap;"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let currentZone = 'Water Park';
+let currentGateId = 'GATE-WP-01';
+let operatorName = 'Gate Operator';
+let scanLog = [];
+let logFilter = 'all';
+let scanStream = null;
+let scanInterval = null;
+let torchOn = false;
+
+const STATS = { allowed: 0, denied: 0, expired: 0, hour: 0 };
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = function(){
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent') || '{}');
+  operatorName = agent.name || 'Gate Operator';
+  document.getElementById('op-name').textContent = operatorName.split(' ')[0];
+  document.getElementById('gate-sel').value = currentGateId;
+  // Focus input
+  setTimeout(()=>document.getElementById('passport-id-input').focus(), 400);
+  // Load recent redemptions
+  loadRecentLogs();
+};
+
+// ============================================================
+// ZONE & GATE
+// ============================================================
+function selectZone(el){
+  document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  currentZone = el.dataset.zone;
+  document.getElementById('active-zone-label').textContent = currentZone;
+  clearResult();
+  document.getElementById('passport-id-input').focus();
+}
+
+function updateGate(){
+  currentGateId = document.getElementById('gate-sel').value;
+  showToast('📍 Gate set to: ' + document.getElementById('gate-sel').selectedOptions[0].text);
+}
+
+// ============================================================
+// CAMERA / QR SCANNING
+// ============================================================
+async function startCamera(){
+  try {
+    const constraints = { video: { facingMode: 'environment', width:{ideal:640}, height:{ideal:640} } };
+    scanStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('qr-video');
+    video.srcObject = scanStream;
+    video.play();
+    video.style.display = 'block';
+    document.getElementById('qr-placeholder').style.display = 'none';
+    document.getElementById('scan-laser').style.display = 'block';
+    document.getElementById('btn-start-cam').disabled = true;
+    document.getElementById('btn-stop-cam').disabled = false;
+
+    // Check for torch support
+    const track = scanStream.getVideoTracks()[0];
+    const caps = track.getCapabilities?.() || {};
+    if(caps.torch){ document.getElementById('btn-torch').style.display = 'block'; }
+
+    // Start QR scanning loop
+    startQRScanLoop(video);
+    showToast('📷 Camera active — point at passport QR code');
+  } catch(err) {
+    showToast('⚠️ Camera access denied. Use manual entry.');
+  }
+}
+
+function stopCamera(){
+  if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream=null; }
+  if(scanInterval){ clearInterval(scanInterval); scanInterval=null; }
+  const video = document.getElementById('qr-video');
+  video.style.display = 'none';
+  document.getElementById('qr-placeholder').style.display = 'flex';
+  document.getElementById('scan-laser').style.display = 'none';
+  document.getElementById('btn-start-cam').disabled = false;
+  document.getElementById('btn-stop-cam').disabled = true;
+  document.getElementById('btn-torch').style.display = 'none';
+}
+
+async function toggleTorch(){
+  if(!scanStream) return;
+  const track = scanStream.getVideoTracks()[0];
+  torchOn = !torchOn;
+  try { await track.applyConstraints({ advanced: [{ torch: torchOn }] }); }
+  catch(e){}
+  document.getElementById('btn-torch').style.background = torchOn ? 'var(--amber)' : '';
+  document.getElementById('btn-torch').style.color = torchOn ? '#fff' : '';
+}
+
+function startQRScanLoop(video){
+  const canvas = document.getElementById('qr-canvas');
+  const ctx = canvas.getContext('2d');
+  let lastScanned = '';
+  let lastScanTime = 0;
+
+  scanInterval = setInterval(()=>{
+    if(video.readyState !== video.HAVE_ENOUGH_DATA) return;
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Use jsQR if available, else try BarcodeDetector API
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let qrData = null;
+
+    if(window.jsQR){
+      const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts:'dontInvert' });
+      if(code) qrData = code.data;
+    } else if('BarcodeDetector' in window){
+      // Will handle async below — skip in interval
+    }
+
+    if(qrData && qrData !== lastScanned && (Date.now()-lastScanTime) > 2000){
+      lastScanned = qrData;
+      lastScanTime = Date.now();
+      // Extract passport ID from QR data (format: WOW-PAX-ID|name|plan|expiry|mobile)
+      const paxId = qrData.split('|')[0].trim();
+      document.getElementById('passport-id-input').value = paxId;
+      scanPassport(paxId);
+    }
+  }, 250);
+}
+
+// Also try BarcodeDetector API
+async function tryBarcodeDetector(canvas, callback){
+  if(!('BarcodeDetector' in window)) return;
+  try {
+    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+    const codes = await detector.detect(canvas);
+    if(codes.length) callback(codes[0].rawValue);
+  } catch(e){}
+}
+
+// ============================================================
+// SCAN PASSPORT
+// ============================================================
+async function scanPassport(forcedId){
+  const rawInput = forcedId || document.getElementById('passport-id-input').value.trim();
+  if(!rawInput){ showToast('⚠️ Enter a Passport ID first'); return; }
+
+  // Parse if QR format (WOW-PAX-ID|name|...)
+  const passportId = rawInput.includes('|') ? rawInput.split('|')[0].trim() : rawInput;
+
+  if(!passportId){ showToast('⚠️ Invalid Passport ID'); return; }
+
+  const btn = document.getElementById('btn-manual-scan');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+  try {
+    const result = await WOW_API.scanPassport(passportId, {
+      zone: currentZone,
+      gateId: currentGateId,
+      operatorName
+    });
+
+    displayResult(result, passportId);
+    addToLog(result, passportId);
+    updateStats(result.result);
+    triggerFeedback(result.result);
+
+  } catch(err){
+    // Offline / not in DB — do a demo scan
+    const demoResult = demoScan(passportId);
+    displayResult(demoResult, passportId);
+    addToLog(demoResult, passportId);
+    updateStats(demoResult.result);
+    triggerFeedback(demoResult.result);
+    console.warn('API scan failed, demo mode:', err);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-search"></i> Verify';
+  document.getElementById('passport-id-input').value = '';
+  setTimeout(()=>document.getElementById('passport-id-input').focus(), 300);
+}
+
+// Demo scan for when API is unreachable or ID not in DB
+function demoScan(passportId){
+  // Simulate realistic results based on ID format
+  if(!passportId.startsWith('WOW-PAX-') && !passportId.startsWith('DEMO')){
+    return { result:'not_found', message:'Passport not found in system' };
+  }
+  // Demo passport data
+  const demoPax = {
+    id: passportId,
+    holder_name: 'Demo Customer',
+    mobile: '9876543210',
+    plan: 'Combo Passport',
+    status: 'Active',
+    issued_date: '2026-03-01',
+    expiry_date: '2027-03-01',
+    entries_water: 12,
+    entries_amuse: 12,
+    entries_used_water: 3,
+    entries_used_amuse: 1,
+    agent_name: 'Demo Agent',
+  };
+  const remaining = currentZone.includes('Water') ? (demoPax.entries_water - demoPax.entries_used_water) : (demoPax.entries_amuse - demoPax.entries_used_amuse);
+  if(remaining <= 0) return { result:'denied', passport:demoPax, message:'No entries remaining for ' + currentZone };
+  return { result:'allowed', passport:demoPax, remaining:remaining-1, message:`Access granted! ${remaining-1} entries left for ${currentZone}` };
+}
+
+// ============================================================
+// DISPLAY RESULT
+// ============================================================
+function displayResult(result, passportId){
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  panel.className = 'result-panel';
+
+  const icon     = document.getElementById('result-icon');
+  const status   = document.getElementById('result-status');
+  const info     = document.getElementById('passport-info');
+  const entries  = document.getElementById('entries-grid');
+  const validity = document.getElementById('validity-bar-wrap');
+  const actions  = document.getElementById('action-row');
+
+  if(result.result === 'allowed'){
+    panel.classList.add('result-allowed');
+    icon.textContent = '✅';
+    status.textContent = 'ACCESS GRANTED';
+    const pax = result.passport;
+    renderPassportInfo(info, pax);
+    renderEntries(entries, pax, result.remaining);
+    renderValidity(validity, pax);
+    actions.innerHTML = `
+      <button class="btn-action btn-allow" onclick="clearResult()"><i class="fas fa-check"></i> Done</button>
+      <button class="btn-action btn-neutral" onclick="printPassDetails()"><i class="fas fa-print"></i> Print Slip</button>
+    `;
+  } else if(result.result === 'denied'){
+    panel.classList.add('result-denied');
+    icon.textContent = '🚫';
+    status.textContent = 'ACCESS DENIED';
+    const pax = result.passport;
+    if(pax) renderPassportInfo(info, pax);
+    entries.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:14px;background:rgba(239,68,68,.08);border-radius:10px;color:var(--red);font-size:.85rem;font-weight:700;"><i class="fas fa-exclamation-triangle"></i> ${result.message}</div>`;
+    validity.innerHTML = '';
+    actions.innerHTML = `
+      <button class="btn-action btn-deny" onclick="clearResult()"><i class="fas fa-times"></i> Dismiss</button>
+      <button class="btn-action btn-neutral" onclick="flagForReview('${passportId}')"><i class="fas fa-flag"></i> Flag</button>
+    `;
+  } else if(result.result === 'expired'){
+    panel.classList.add('result-expired');
+    icon.textContent = '⏰';
+    status.textContent = 'PASSPORT EXPIRED';
+    const pax = result.passport;
+    if(pax) renderPassportInfo(info, pax);
+    entries.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:14px;background:rgba(245,158,11,.08);border-radius:10px;color:var(--amber);font-size:.85rem;font-weight:700;"><i class="fas fa-calendar-times"></i> Passport expired on ${WOW_API.formatDate(pax?.expiry_date)}</div>`;
+    validity.innerHTML = '';
+    actions.innerHTML = `
+      <button class="btn-action btn-deny" onclick="clearResult()">Dismiss</button>
+      <button class="btn-action btn-neutral" onclick="showToast('Renewal link sent to customer mobile')">Send Renewal Link</button>
+    `;
+  } else if(result.result === 'suspended'){
+    panel.classList.add('result-suspended');
+    icon.textContent = '⛔';
+    status.textContent = 'PASSPORT SUSPENDED';
+    const pax = result.passport;
+    if(pax) renderPassportInfo(info, pax);
+    entries.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:14px;background:rgba(100,116,139,.08);border-radius:10px;color:#94a3b8;font-size:.85rem;font-weight:700;"><i class="fas fa-ban"></i> This passport has been suspended</div>`;
+    validity.innerHTML = '';
+    actions.innerHTML = `<button class="btn-action btn-deny" onclick="clearResult()">Dismiss</button>`;
+  } else {
+    // not_found or other
+    panel.classList.add('result-notfound');
+    icon.textContent = '❓';
+    status.textContent = 'NOT FOUND';
+    info.innerHTML = `<div style="grid-column:span 2;text-align:center;padding:16px;"><div style="font-size:.88rem;color:var(--muted);margin-bottom:8px;">Passport ID not found:</div><div style="font-size:1rem;font-weight:800;color:var(--red);">${passportId}</div></div>`;
+    entries.innerHTML = '';
+    validity.innerHTML = '';
+    actions.innerHTML = `
+      <button class="btn-action btn-deny" onclick="clearResult()">Dismiss</button>
+      <a href="passport-kyc.html" class="btn-action btn-neutral" style="text-decoration:none;display:flex;align-items:center;gap:5px;"><i class="fas fa-plus"></i> Issue New Passport</a>
+    `;
+  }
+
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function renderPassportInfo(container, pax){
+  if(!pax){ container.innerHTML=''; return; }
+  const photo = pax.photo_url
+    ? `<img src="${pax.photo_url}" style="width:64px;height:76px;border-radius:8px;object-fit:cover;border:2px solid var(--border);" alt="photo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/><div style="width:64px;height:76px;border-radius:8px;background:#131330;display:none;align-items:center;justify-content:center;font-size:1.6rem;border:2px solid var(--border);">👤</div>`
+    : `<div style="width:64px;height:76px;border-radius:8px;background:#131330;display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:2px solid var(--border);">👤</div>`;
+
+  const today = new Date().toISOString().split('T')[0];
+  const expiry = pax.expiry_date || '';
+  const daysLeft = expiry ? Math.ceil((new Date(expiry)-new Date(today))/(864e5)) : 365;
+
+  container.innerHTML = `
+    <div>${photo}</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="il">Name</div><div class="iv">${pax.holder_name||'—'}</div></div>
+      <div class="info-item"><div class="il">Passport ID</div><div class="iv" style="font-size:.72rem;">${pax.id||'—'}</div></div>
+      <div class="info-item"><div class="il">Mobile</div><div class="iv">${pax.mobile||'—'}</div></div>
+      <div class="info-item"><div class="il">Plan</div><div class="iv" style="color:var(--gold);">${pax.plan||'—'}</div></div>
+      <div class="info-item"><div class="il">Valid Until</div><div class="iv" style="color:${daysLeft<30?'var(--red)':daysLeft<90?'var(--amber)':'var(--green)'};">${WOW_API.formatDate(expiry)}</div></div>
+      <div class="info-item"><div class="il">Days Left</div><div class="iv" style="color:${daysLeft<30?'var(--red)':daysLeft<90?'var(--amber)':'var(--green)'};">${daysLeft}</div></div>
+    </div>
+  `;
+}
+
+function renderEntries(container, pax, remaining){
+  if(!pax){ container.innerHTML=''; return; }
+  const isWater = currentZone === 'Water Park';
+  const totalE   = isWater ? (pax.entries_water||0) : (pax.entries_amuse||0);
+  const usedE    = isWater ? (pax.entries_used_water||0) : (pax.entries_used_amuse||0);
+  const remainE  = remaining !== undefined ? remaining : totalE - usedE - 1;
+  const otherTotal = isWater ? (pax.entries_amuse||0) : (pax.entries_water||0);
+  const otherUsed  = isWater ? (pax.entries_used_amuse||0) : (pax.entries_used_water||0);
+
+  container.innerHTML = `
+    <div class="entry-box">
+      <div class="eb-num" style="color:var(--green);">${Math.max(0,remainE)}</div>
+      <div class="eb-label">${currentZone} entries left</div>
+    </div>
+    <div class="entry-box">
+      <div class="eb-num" style="color:var(--muted);">${Math.max(0,otherTotal-otherUsed)}</div>
+      <div class="eb-label">${isWater?'Amusement':'Water Park'} entries left</div>
+    </div>
+    <div class="entry-box">
+      <div class="eb-num" style="color:var(--blue);">${usedE+1}</div>
+      <div class="eb-label">Used (${currentZone})</div>
+    </div>
+    <div class="entry-box">
+      <div class="eb-num" style="color:var(--gold);">${totalE}</div>
+      <div class="eb-label">Total entries</div>
+    </div>
+  `;
+}
+
+function renderValidity(container, pax){
+  if(!pax){ container.innerHTML=''; return; }
+  const today = new Date().toISOString().split('T')[0];
+  const issued = pax.issued_date || today;
+  const expiry = pax.expiry_date || '';
+  const totalDays = Math.ceil((new Date(expiry)-new Date(issued))/(864e5));
+  const elapsed   = Math.ceil((new Date(today)-new Date(issued))/(864e5));
+  const pct = Math.min(100, Math.round((elapsed/Math.max(1,totalDays))*100));
+  const daysLeft = Math.max(0, totalDays - elapsed);
+
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:4px;">
+      <span>Validity</span><span style="color:${daysLeft<30?'var(--red)':daysLeft<90?'var(--amber)':'var(--green)'};">${daysLeft} days remaining</span>
+    </div>
+    <div class="validity-bar-inner">
+      <div class="validity-fill" style="width:${100-pct}%;background:${daysLeft<30?'var(--red)':daysLeft<90?'var(--amber)':'linear-gradient(90deg,var(--green),#86efac)'};"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:.62rem;color:#44446a;margin-top:4px;">
+      <span>${WOW_API.formatDate(issued)}</span><span>${WOW_API.formatDate(expiry)}</span>
+    </div>
+  `;
+}
+
+function clearResult(){
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('passport-id-input').value = '';
+  document.getElementById('passport-id-input').focus();
+}
+
+function flagForReview(passportId){
+  showToast('🚩 Passport ' + passportId + ' flagged for supervisor review');
+  clearResult();
+}
+
+function printPassDetails(){
+  showToast('🖨️ Printing entry slip…');
+  window.print();
+}
+
+// ============================================================
+// FEEDBACK (flash + sound indicator)
+// ============================================================
+function triggerFeedback(result){
+  const flash = document.getElementById('result-flash');
+  const indicator = document.getElementById('sound-indicator');
+
+  if(result === 'allowed'){
+    flash.className = 'result-flash flash-green';
+    flash.style.opacity = '1';
+    indicator.className = 'sound-indicator sound-allow';
+    indicator.textContent = '✅ ALLOWED';
+    indicator.style.opacity = '1';
+    // Simple beep via AudioContext
+    playBeep(880, 0.1, 'sine', '#22c55e');
+  } else {
+    flash.className = 'result-flash flash-red';
+    flash.style.opacity = '1';
+    indicator.className = 'sound-indicator sound-deny';
+    indicator.textContent = result === 'expired' ? '⏰ EXPIRED' : '🚫 DENIED';
+    indicator.style.opacity = '1';
+    playBeep(220, 0.2, 'sawtooth', '#ef4444');
+  }
+
+  setTimeout(()=>{ flash.style.opacity='0'; indicator.style.opacity='0'; }, 600);
+}
+
+function playBeep(freq, dur, type, color){
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime+dur);
+  } catch(e){}
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats(result){
+  if(result==='allowed')    STATS.allowed++;
+  else if(result==='denied') STATS.denied++;
+  else if(result==='expired') STATS.expired++;
+  STATS.hour++;
+
+  document.getElementById('m-allowed').textContent = STATS.allowed;
+  document.getElementById('m-denied').textContent  = STATS.denied;
+  document.getElementById('m-expired').textContent = STATS.expired;
+  document.getElementById('m-hour').textContent    = STATS.hour;
+  document.getElementById('ss-allowed').textContent = STATS.allowed;
+  document.getElementById('ss-denied').textContent  = STATS.denied;
+  document.getElementById('ss-expired').textContent = STATS.expired;
+
+  document.getElementById('log-count-badge').textContent = scanLog.length + ' scans';
+}
+
+// ============================================================
+// SCAN LOG
+// ============================================================
+function addToLog(result, passportId){
+  const entry = {
+    id: passportId,
+    result: result.result,
+    name:   result.passport?.holder_name || passportId,
+    plan:   result.passport?.plan || '—',
+    zone:   currentZone,
+    gate:   currentGateId,
+    time:   new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    message: result.message || '',
+    remaining: result.remaining
+  };
+  scanLog.unshift(entry);
+  if(scanLog.length > 200) scanLog.pop();
+  renderLog();
+}
+
+function filterLog(f){
+  logFilter = f;
+  document.querySelectorAll('[id^="lf-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('lf-'+f).classList.add('active');
+  renderLog();
+}
+
+function renderLog(){
+  const list = document.getElementById('scan-log-list');
+  const filtered = logFilter === 'all' ? scanLog
+    : scanLog.filter(e=> logFilter==='allowed' ? e.result==='allowed' : e.result!=='allowed');
+
+  if(!filtered.length){
+    list.innerHTML = `<div style="text-align:center;padding:24px;color:var(--muted);font-size:.78rem;">No ${logFilter==='all'?'':logFilter} scans</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(e=>{
+    const cls = e.result==='allowed' ? 'log-allowed' : e.result==='expired' ? 'log-expired' : 'log-denied';
+    const icon = e.result==='allowed' ? '✅' : e.result==='expired' ? '⏰' : e.result==='suspended' ? '⛔' : e.result==='not_found' ? '❓' : '🚫';
+    const color = e.result==='allowed' ? 'var(--green)' : e.result==='expired' ? 'var(--amber)' : 'var(--red)';
+    return `
+      <div class="log-entry ${cls}">
+        <div class="log-icon">${icon}</div>
+        <div class="log-info">
+          <div class="log-name">${e.name}</div>
+          <div class="log-meta">${e.id} · ${e.plan}</div>
+          <div class="log-meta" style="color:${color};">${e.message||e.result.toUpperCase()}</div>
+        </div>
+        <div class="log-time">${e.time}</div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================================
+// LOAD RECENT FROM API
+// ============================================================
+async function loadRecentLogs(){
+  try {
+    const res = await WOW_API.getRedemptions({ limit:20, sort:'created_at' });
+    if(res.data && res.data.length){
+      res.data.forEach(r=>{
+        scanLog.push({
+          id: r.passport_id,
+          result: r.scan_result,
+          name: r.holder_name || r.passport_id,
+          plan: r.plan || '—',
+          zone: r.park_zone || '—',
+          gate: r.gate_id || '—',
+          time: new Date(r.created_at||Date.now()).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),
+          message: r.notes || r.scan_result,
+          remaining: r.entries_remaining
+        });
+        if(r.scan_result==='allowed') STATS.allowed++;
+        else if(r.scan_result==='denied'||r.scan_result==='expired') STATS.denied++;
+      });
+      renderLog();
+      document.getElementById('log-count-badge').textContent = scanLog.length + ' scans';
+      document.getElementById('m-allowed').textContent = STATS.allowed;
+      document.getElementById('m-denied').textContent  = STATS.denied;
+    }
+  } catch(e){ /* offline */ }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, dur=2800){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.style.display='none', dur);
+}
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="sales"></script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
