@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WOW — Push to GitHub</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0a0f28;color:#fff;min-height:100vh;padding:40px 20px;}
+  .wrap{max-width:860px;margin:0 auto;}
+  h1{font-size:28px;font-weight:800;margin-bottom:6px;color:#f5a800;}
+  .sub{color:rgba(255,255,255,.55);font-size:14px;margin-bottom:32px;}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px;margin-bottom:20px;}
+  .card h2{font-size:16px;font-weight:700;margin-bottom:16px;color:#7dd3fc;}
+  label{display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  input{width:100%;padding:11px 16px;border-radius:8px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:white;font-size:14px;outline:none;transition:border-color .2s;}
+  input:focus{border-color:#f5a800;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .row.one{grid-template-columns:1fr;margin-bottom:16px;}
+  .file-list{display:flex;flex-direction:column;gap:10px;}
+  .file-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;}
+  .file-name{font-size:14px;font-weight:600;color:#e0e7ff;}
+  .file-path{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+  .file-status{font-size:12px;font-weight:700;padding:4px 12px;border-radius:50px;}
+  .status-pending{background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);}
+  .status-uploading{background:rgba(245,168,0,.15);color:#f5a800;animation:pulse .8s ease-in-out infinite alternate;}
+  .status-done{background:rgba(22,163,74,.15);color:#4ade80;}
+  .status-error{background:rgba(220,38,38,.15);color:#f87171;}
+  .status-skipped{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3);}
+  @keyframes pulse{from{opacity:1}to{opacity:.5}}
+  .btn-push{width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(90deg,#f5a800,#e8670a);color:#0a0f28;font-size:17px;font-weight:900;cursor:pointer;transition:transform .2s,box-shadow .2s;margin-top:8px;}
+  .btn-push:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,168,0,.4);}
+  .btn-push:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .log-box{background:#050912;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px;max-height:300px;overflow-y:auto;font-family:'Courier New',monospace;font-size:12.5px;line-height:1.7;margin-top:16px;}
+  .log-box:empty::before{content:'Logs will appear here...';color:rgba(255,255,255,.2);}
+  .log-ok{color:#4ade80;}
+  .log-warn{color:#f5a800;}
+  .log-err{color:#f87171;}
+  .log-info{color:#7dd3fc;}
+  .progress-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-top:12px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#0055b3,#f5a800);border-radius:3px;width:0%;transition:width .4s;}
+  .result-banner{display:none;padding:20px 24px;border-radius:12px;margin-top:16px;text-align:center;}
+  .result-banner.success{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);}
+  .result-banner.error{background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);}
+  .result-banner h3{font-size:20px;font-weight:800;margin-bottom:8px;}
+  .result-banner.success h3{color:#4ade80;}
+  .result-banner.error h3{color:#f87171;}
+  .result-banner p{font-size:14px;color:rgba(255,255,255,.65);line-height:1.6;}
+  .result-banner a{color:#f5a800;font-weight:700;}
+  .info-box{background:rgba(125,211,252,.07);border:1px solid rgba(125,211,252,.15);border-radius:10px;padding:14px 16px;font-size:13px;color:rgba(125,211,252,.8);line-height:1.6;margin-bottom:20px;}
+  .info-box strong{color:#7dd3fc;}
+  .checkbox-row{display:flex;align-items:center;gap:10px;padding:8px 0;}
+  .checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:#f5a800;cursor:pointer;flex-shrink:0;}
+  .checkbox-row label{font-size:13px;color:rgba(255,255,255,.7);text-transform:none;letter-spacing:0;cursor:pointer;margin:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>🚀 WOW — Push to GitHub</h1>
+  <p class="sub">Full platform push — Sprint 6 Final: QR tickets, offer engine, buffet, ticket split, analytics, FnB outlets, README. No terminal needed.</p>
+
+  <div class="info-box">
+    <strong>How this works:</strong> This tool runs entirely in <em>your browser</em>. It uses the GitHub REST API with your Personal Access Token to upload files one by one. Your PAT never leaves your browser — it is not sent anywhere except directly to <code>api.github.com</code>.
+  </div>
+
+  <!-- Config -->
+  <div class="card">
+    <h2>⚙️ Configuration</h2>
+    <div class="row">
+      <div>
+        <label>GitHub Personal Access Token (PAT)</label>
+        <input type="password" id="pat" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+      </div>
+      <div>
+        <label>Commit Message</label>
+        <input type="text" id="commit-msg" value="feat(sprint6): QR ticket delivery, offer engine v3 (BOGO/B2G1/Flash/Family), buffet add-on, max-8 ticket cap, offer analytics, FnB outlets config, ticket split (WhatsApp/email/copy-link), portal improvements" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Repository Owner</label>
+        <input type="text" id="owner" value="arunkumarmanikonda-web" />
+      </div>
+      <div>
+        <label>Repository Name</label>
+        <input type="text" id="repo" value="worlds-of-wonder" />
+      </div>
+    </div>
+    <div class="row one">
+      <div>
+        <label>Branch</label>
+        <input type="text" id="branch" value="main" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Files to push -->
+  <div class="card">
+    <h2>📁 Files to Push</h2>
+    <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:16px;">Select which files to push. All content is embedded in this page and will be pushed as-is.</p>
+    <div class="file-list" id="file-list"></div>
+  </div>
+
+  <!-- Push button -->
+  <button class="btn-push" id="push-btn" onclick="startPush()">
+    🚀 Push All Files to GitHub
+  </button>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <!-- Result -->
+  <div class="result-banner" id="result-banner">
+    <h3 id="result-title"></h3>
+    <p id="result-msg"></p>
+  </div>
+
+  <!-- Log -->
+  <div class="card" style="margin-top:20px;">
+    <h2>📋 Push Log</h2>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// FILES TO PUSH — content fetched from same origin at runtime
+// ─────────────────────────────────────────────────────────────
+const FILES = [
+  // ── Core Public Pages ──────────────────────────────────────────
+  { path: 'index.html',                         label: 'Homepage (hero, testimonials, FAQ, weather)' },
+  { path: 'water-park.html',                    label: 'Water Park page' },
+  { path: 'amusement-park.html',                label: 'Amusement Park page' },
+  { path: 'combo.html',                         label: 'Combo Ticket page' },
+  { path: 'passport.html',                      label: 'WOW Passport public page (3-tier: Explore / Together / Legacy)' },
+  { path: 'contact.html',                       label: 'Contact page (map, form, emergency)' },
+  { path: 'offers.html',                        label: 'Offers page (flash sales, countdown, deals)' },
+  { path: 'gallery.html',                       label: 'Photo Gallery (masonry, lightbox)' },
+  { path: 'faq.html',                           label: 'FAQ page (searchable, categorised)' },
+  { path: 'plan-your-visit.html',               label: 'Plan Your Visit page' },
+  { path: 'rides-attractions.html',             label: 'Rides & Attractions page' },
+  { path: 'safety-guidelines.html',             label: 'Safety Guidelines page' },
+  // ── Booking Flow (Sprint 6) ────────────────────────────────────
+  { path: 'book/water-park.html',               label: '✅ Water Park booking — offer engine, buffet add-on, max-8 cap' },
+  { path: 'book/amusement-park.html',           label: '✅ Amusement Park booking — offer engine, buffet add-on' },
+  { path: 'book/combo.html',                    label: '✅ Combo booking — offer engine, buffet add-on' },
+  { path: 'book/group.html',                    label: 'Group booking (5-step flow)' },
+  { path: 'book/payment.html',                  label: 'Payment page (UPI, Card, Net Banking)' },
+  { path: 'book/confirmation.html',             label: '✅ Sprint6: QR ticket, WhatsApp/email delivery, shareable link, delivery status, SMS fallback, download PNG' },
+  // ── Stylesheets & JS (Sprint 6) ───────────────────────────────
+  { path: 'css/style.css',                      label: 'Master stylesheet' },
+  { path: 'css/booking-page.css',               label: '✅ Booking styles + buffet add-on styles' },
+  { path: 'css/forms.css',                      label: 'Form component styles' },
+  { path: 'js/booking.js',                      label: '✅ Sprint6 v2.0: max-8 cap, offer engine wiring, buffet, promo code, auto-apply' },
+  { path: 'js/wow-offer-engine.js',             label: '✅ Sprint6 v3.0: BOGO, B2G1, Buy4, Flash, Family auto-apply, buffet config, admin CRUD' },
+  { path: 'js/wow-modules.js',                  label: 'Module feature flags' },
+  { path: 'js/wow-passport-api.js',             label: 'Passport API utility (CRUD, ID gen, MRZ/QR)' },
+  { path: 'js/shell.js',                        label: 'Shared nav shell (logo, mega-nav, weather)' },
+  { path: 'js/main.js',                         label: 'Public site JS' },
+  // ── Customer Portal ────────────────────────────────────────────
+  { path: 'portal/login.html',                  label: 'Customer Portal: Login' },
+  { path: 'portal/register.html',               label: 'Customer Portal: Register' },
+  { path: 'portal/dashboard.html',              label: 'Customer Portal: Dashboard' },
+  { path: 'portal/my-bookings.html',            label: 'Customer Portal: My Bookings' },
+  { path: 'portal/profile.html',               label: 'Customer Portal: Profile & KYC' },
+  { path: 'portal/forgot-password.html',        label: 'Customer Portal: Forgot Password' },
+  { path: 'portal/passport.html',               label: 'Customer Portal: My Passport' },
+  { path: 'portal/passport-card.html',          label: 'Customer Portal: Passport Card (QR + vouchers)' },
+  { path: 'portal/offers.html',                 label: 'Customer Portal: Offers' },
+  { path: 'portal/loyalty.html',                label: 'Customer Portal: Loyalty Points' },
+  { path: 'portal/tickets.html',                label: '✅ Sprint6: My Tickets — split (WA/email/both), mailto compose, copy-link fallback, re-send, sub-IDs' },
+  { path: 'portal/notifications.html',          label: 'Customer Portal: Notifications' },
+  { path: 'portal/wallet.html',                 label: 'Customer Portal: Wallet' },
+  { path: 'portal/guest-details.html',          label: 'Customer Portal: Guest Details step' },
+  { path: 'portal/referral.html',               label: 'Customer Portal: Refer & Earn' },
+  { path: 'portal/wow-passport.html',           label: 'Customer Portal: Indian-style WOW Passport' },
+  // ── Passport Holder Portal (standalone) ───────────────────────
+  { path: 'passport/login.html',                label: 'Passport Holder: Login (PIN-based)' },
+  { path: 'passport/register.html',             label: 'Passport Holder: Register / KYC + Payment' },
+  { path: 'passport/my-passport.html',          label: 'Passport Holder: My Passport Dashboard' },
+  // ── Partner Portal ─────────────────────────────────────────────
+  { path: 'partner/login.html',                 label: 'Partner Portal: Login' },
+  { path: 'partner/onboarding.html',            label: 'Partner Portal: Onboarding' },
+  { path: 'partner/onboarding-kyc.html',        label: 'Partner Portal: KYC & Documents' },
+  { path: 'partner/dashboard.html',             label: 'Partner Portal: Dashboard' },
+  { path: 'partner/buy-tickets.html',           label: 'Partner Portal: Buy Tickets' },
+  { path: 'partner/ticket-batches.html',        label: 'Partner Portal: Ticket Batches' },
+  { path: 'partner/quote-builder.html',         label: 'Partner Portal: Quote Builder' },
+  { path: 'partner/bulk-tickets.html',          label: 'Partner Portal: Bulk Tickets' },
+  { path: 'partner/invoice-gst.html',           label: 'Partner Portal: GST Invoice' },
+  { path: 'partner/invoices.html',              label: 'Partner Portal: Invoices' },
+  { path: 'partner/statements.html',            label: 'Partner Portal: Statements' },
+  { path: 'partner/reports.html',               label: 'Partner Portal: Reports' },
+  { path: 'partner/support.html',               label: 'Partner Portal: Support' },
+  // ── Groups Portal ──────────────────────────────────────────────
+  { path: 'groups/index.html',                  label: 'Groups Portal: Landing' },
+  { path: 'groups/schools.html',                label: 'Groups Portal: Schools' },
+  { path: 'groups/corporate.html',              label: 'Groups Portal: Corporate' },
+  { path: 'groups/birthdays.html',              label: 'Groups Portal: Birthdays' },
+  // ── Sales ERP ──────────────────────────────────────────────────
+  { path: 'sales/passport-login.html',          label: 'Sales ERP: Passport Agent Login (4 roles, quick-login)' },
+  { path: 'sales/passport-dashboard.html',      label: 'Sales ERP: Passport Agent Dashboard' },
+  { path: 'sales/passport-kyc.html',            label: 'Sales ERP: Passport KYC Form (full wizard + API)' },
+  { path: 'sales/passport-payment.html',        label: 'Sales ERP: Passport Payment (Cash/UPI/Card + API save)' },
+  { path: 'sales/passport-issued.html',         label: 'Sales ERP: Passport Issued Confirmation (Indian-style booklet)' },
+  { path: 'sales/erp-dashboard.html',           label: 'Sales ERP: Main Dashboard (10 tabs + Bulk Issue)' },
+  { path: 'sales/gate-scanner.html',            label: 'Sales ERP: Gate Scanner (zone, camera QR, allow/deny, scan log)' },
+  { path: 'sales/erp-crm.html',                 label: 'Sales ERP: CRM & Leads' },
+  { path: 'sales/erp-agents.html',              label: 'Sales ERP: Agent Management' },
+  { path: 'sales/erp-reports.html',             label: 'Sales ERP: Reports' },
+  { path: 'sales/erp-products.html',            label: 'Sales ERP: Products' },
+  { path: 'sales/quote-builder.html',           label: 'Sales ERP: Quote Builder' },
+  { path: 'sales/leads.html',                   label: 'Sales ERP: Leads Pipeline' },
+  { path: 'sales/pipeline.html',                label: 'Sales ERP: Sales Pipeline' },
+  // ── Admin Panel ────────────────────────────────────────────────
+  { path: 'admin/index.html',                   label: 'Admin: Leadership Dashboard' },
+  { path: 'admin/bookings.html',                label: 'Admin: Bookings' },
+  { path: 'admin/tickets.html',                 label: 'Admin: Tickets' },
+  { path: 'admin/inventory.html',               label: 'Admin: Inventory' },
+  { path: 'admin/pricing.html',                 label: 'Admin: Pricing' },
+  { path: 'admin/dynamic-pricing.html',         label: 'Admin: Dynamic Pricing Engine' },
+  { path: 'admin/revenue-analytics.html',       label: 'Admin: Revenue Analytics BI' },
+  { path: 'admin/offers.html',                  label: '✅ Sprint6: Offer Definition Modal (BOGO/B2G1/Flash/Family), Offer Analytics, Buffet+FnB config, Settings' },
+  { path: 'admin/banners.html',                 label: 'Admin: Banners & CMS' },
+  { path: 'admin/passport.html',                label: 'Admin: Passport Overview' },
+  { path: 'admin/passport-products.html',       label: 'Admin: Passport Products' },
+  { path: 'admin/passport-engine.html',         label: 'Admin: Passport Engine (full config)' },
+  { path: 'admin/passport-redemptions.html',    label: 'Admin: Passport Redemptions (QR scanner)' },
+  { path: 'admin/loyalty.html',                 label: 'Admin: Loyalty Overview' },
+  { path: 'admin/loyalty-engine.html',          label: 'Admin: Loyalty Engine (Platinum config)' },
+  { path: 'admin/crm.html',                     label: 'Admin: CRM & Leads' },
+  { path: 'admin/b2b-approvals.html',           label: 'Admin: B2B Approvals' },
+  { path: 'admin/ta-approvals.html',            label: 'Admin: Travel Agent Approvals' },
+  { path: 'admin/reseller-config.html',         label: 'Admin: Reseller Config' },
+  { path: 'admin/partners.html',                label: 'Admin: Partners' },
+  { path: 'admin/ticketing-engine.html',        label: 'Admin: Ticketing Engine' },
+  { path: 'admin/fnb-packages.html',            label: 'Admin: F&B Packages' },
+  { path: 'admin/gate.html',                    label: 'Admin: Gate / Entry Management' },
+  { path: 'admin/ops-dashboard.html',           label: 'Admin: Operations Dashboard' },
+  { path: 'admin/call-center.html',             label: 'Admin: Call Center' },
+  { path: 'admin/finance.html',                 label: 'Admin: Finance' },
+  { path: 'admin/invoices.html',                label: 'Admin: Invoices' },
+  { path: 'admin/cms.html',                     label: 'Admin: CMS' },
+  { path: 'admin/users.html',                   label: 'Admin: Users & Roles' },
+  { path: 'admin/module-control.html',          label: 'Admin: Module Control' },
+  { path: 'admin/api-secrets.html',             label: 'Admin: API Secrets & Config' },
+  { path: 'admin/gst-engine.html',              label: 'Admin: GST Engine' },
+  { path: 'admin/notifications.html',           label: 'Admin: Notification Templates' },
+  { path: 'admin/config.html',                  label: 'Admin: System Config' },
+  { path: 'admin/audit-logs.html',              label: 'Admin: Audit Logs' },
+  { path: 'admin/advisories.html',              label: 'Admin: Advisories' },
+  { path: 'admin/reports.html',                 label: 'Admin: Reports' },
+  { path: 'admin/reporting.html',               label: 'Admin: Reporting Engine' },
+  { path: 'admin/settings.html',                label: 'Admin: Settings' },
+  { path: 'admin/products.html',                label: 'Admin: Products' },
+  { path: 'admin/super-admin.html',             label: 'Admin: Super Admin Panel (user mgmt, module toggle, rights)' },
+  { path: 'admin/user-management.html',         label: 'Admin: User Management' },
+  // ── Internal Portal ────────────────────────────────────────────
+  { path: 'internal/index.html',                label: 'Internal Staff Gateway (portal selector)' },
+  // ── Reseller ERP ───────────────────────────────────────────────
+  { path: 'reseller/index.html',                label: 'Reseller ERP: Dashboard, inventory, bulk tickets, team, commissions' },
+  // ── Travel Agent ERP ───────────────────────────────────────────
+  { path: 'ta/index.html',                      label: 'Travel Agent ERP: Leads, pipeline, bookings, team, commissions' },
+  // ── Config & Meta ──────────────────────────────────────────────
+  { path: '_redirects',                         label: 'Cloudflare _redirects' },
+  { path: '_headers',                           label: 'Cloudflare _headers' },
+  { path: 'README.md',                          label: '✅ Sprint6 README — QR, offer engine, buffet, ticket split, analytics, FnB outlets' },
+  { path: 'github-push.html',                   label: 'GitHub Push Tool (self-updating)' },
+];
+
+// ─────────────────────────────────────────────────────────────
+// Build file list UI
+// ─────────────────────────────────────────────────────────────
+function buildFileList() {
+  const list = document.getElementById('file-list');
+  list.innerHTML = FILES.map((f, i) => `
+    <div class="file-item" id="fi-${i}">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;">
+        <div class="checkbox-row" style="padding:0;">
+          <input type="checkbox" id="cb-${i}" checked />
+        </div>
+        <div>
+          <div class="file-name">${f.path}</div>
+          <div class="file-path">${f.label}</div>
+        </div>
+      </div>
+      <div class="file-status status-pending" id="fs-${i}">Pending</div>
+    </div>
+  `).join('');
+}
+buildFileList();
+
+// ─────────────────────────────────────────────────────────────
+// Logging
+// ─────────────────────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const box = document.getElementById('log-box');
+  const line = document.createElement('div');
+  line.className = `log-${type}`;
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setStatus(i, status, label) {
+  const el = document.getElementById(`fs-${i}`);
+  if (!el) return;
+  el.className = `file-status status-${status}`;
+  el.textContent = label;
+}
+
+function setProgress(pct) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ─────────────────────────────────────────────────────────────
+// GitHub API helpers
+// ─────────────────────────────────────────────────────────────
+async function ghGet(url, pat) {
+  const r = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${pat}`,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  });
+  return r;
+}
+
+async function ghPut(url, pat, body) {
+  const r = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${pat}`,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    },
+    body: JSON.stringify(body)
+  });
+  return r;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Fetch file content from same origin (Genspark preview)
+// ─────────────────────────────────────────────────────────────
+async function fetchFileContent(path) {
+  const r = await fetch(path + '?_=' + Date.now());
+  if (!r.ok) throw new Error(`HTTP ${r.status} fetching ${path}`);
+  const text = await r.text();
+  return text;
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTF-8 string → base64 (handles Unicode correctly)
+// ─────────────────────────────────────────────────────────────
+function toBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// ─────────────────────────────────────────────────────────────
+// Push a single file
+// ─────────────────────────────────────────────────────────────
+async function pushFile(pat, owner, repo, branch, filePath, content, commitMsg) {
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+  // 1. Get existing SHA (needed for updates)
+  let sha = null;
+  const getResp = await ghGet(`${apiUrl}?ref=${branch}`, pat);
+  if (getResp.ok) {
+    const data = await getResp.json();
+    sha = data.sha;
+    log(`  ↳ Existing SHA: ${sha.slice(0,7)}`, 'info');
+  } else if (getResp.status === 404) {
+    log(`  ↳ New file (does not exist yet)`, 'info');
+  } else {
+    const err = await getResp.text();
+    throw new Error(`GET failed ${getResp.status}: ${err}`);
+  }
+
+  // 2. PUT (create or update)
+  const body = {
+    message: commitMsg,
+    content: toBase64(content),
+    branch:  branch
+  };
+  if (sha) body.sha = sha;
+
+  const putResp = await ghPut(apiUrl, pat, body);
+  if (!putResp.ok) {
+    const err = await putResp.text();
+    throw new Error(`PUT failed ${putResp.status}: ${err}`);
+  }
+
+  const result = await putResp.json();
+  return result;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Main push function
+// ─────────────────────────────────────────────────────────────
+async function startPush() {
+  const pat       = document.getElementById('pat').value.trim();
+  const owner     = document.getElementById('owner').value.trim();
+  const repo      = document.getElementById('repo').value.trim();
+  const branch    = document.getElementById('branch').value.trim();
+  const commitMsg = document.getElementById('commit-msg').value.trim() || 'Update site';
+
+  if (!pat) { alert('Please enter your GitHub PAT.'); return; }
+  if (!owner || !repo) { alert('Owner and repo are required.'); return; }
+
+  const btn = document.getElementById('push-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Pushing…';
+  document.getElementById('log-box').innerHTML = '';
+  document.getElementById('result-banner').style.display = 'none';
+  setProgress(0);
+
+  // Determine selected files
+  const selected = FILES.filter((f, i) => document.getElementById(`cb-${i}`)?.checked);
+  const total = selected.length;
+
+  log(`Starting push of ${total} file(s) to ${owner}/${repo}@${branch}`, 'info');
+  log(`Commit: "${commitMsg}"`, 'info');
+
+  let done = 0, failed = 0;
+
+  for (let i = 0; i < FILES.length; i++) {
+    const f = FILES[i];
+    const cb = document.getElementById(`cb-${i}`);
+    if (!cb?.checked) {
+      setStatus(i, 'skipped', 'Skipped');
+      continue;
+    }
+
+    setStatus(i, 'uploading', '⏳ Pushing…');
+    log(`\nPushing: ${f.path}`, 'info');
+
+    try {
+      // Fetch content from Genspark (same origin)
+      log(`  ↳ Reading file content…`, 'info');
+      const content = await fetchFileContent(f.path);
+      log(`  ↳ Content read: ${content.length.toLocaleString()} chars`, 'info');
+
+      // Push to GitHub
+      await pushFile(pat, owner, repo, branch, f.path, content, commitMsg);
+      setStatus(i, 'done', '✅ Done');
+      log(`  ✅ ${f.path} pushed successfully`, 'ok');
+      done++;
+    } catch (err) {
+      setStatus(i, 'error', '❌ Failed');
+      log(`  ❌ ${f.path} failed: ${err.message}`, 'err');
+      failed++;
+    }
+
+    setProgress(Math.round(((done + failed) / total) * 100));
+  }
+
+  // Final result
+  setProgress(100);
+  const banner = document.getElementById('result-banner');
+  banner.style.display = 'block';
+
+  if (failed === 0) {
+    banner.className = 'result-banner success';
+    document.getElementById('result-title').textContent = `✅ All ${done} files pushed successfully!`;
+    document.getElementById('result-msg').innerHTML = `
+      Cloudflare will auto-deploy in ~60 seconds.<br>
+      <a href="https://worlds-of-wonder.pages.dev/" target="_blank">→ View live site: worlds-of-wonder.pages.dev</a><br><br>
+      <a href="https://github.com/${owner}/${repo}/commits/${branch}" target="_blank">→ View commits on GitHub</a>
+    `;
+    log(`\n🎉 Push complete! ${done} files updated. Cloudflare deploying now…`, 'ok');
+  } else {
+    banner.className = 'result-banner error';
+    document.getElementById('result-title').textContent = `⚠️ ${done} pushed, ${failed} failed`;
+    document.getElementById('result-msg').innerHTML = `
+      Check the log above for error details.<br>
+      Common causes: PAT expired, wrong repo name, or rate limit.
+    `;
+    log(`\n⚠️ Finished with ${failed} error(s). Check logs above.`, 'warn');
+  }
+
+  btn.disabled = false;
+  btn.textContent = done > 0 ? '🔄 Push Again' : '🚀 Push All Files to GitHub';
+}
+</script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
