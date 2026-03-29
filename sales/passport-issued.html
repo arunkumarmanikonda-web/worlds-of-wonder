@@ -3,157 +3,149 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Digital Passport — Worlds of Wonder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&family=MedievalSharp&display=swap" rel="stylesheet"/>
+  <title>Digital Passport Issued — WOW Sales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="../js/wow-auth.js"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--gold4:#7A5218;--bg:#0a0a14;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#E31837;--navy:#00256b;--maroon:#7b0000}
     body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
     .topnav{background:#0e0e22;border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
     .topnav-brand{display:flex;align-items:center;gap:10px;font-size:.9rem;font-weight:800;color:var(--gold)}
-    .topnav-brand .ico{width:34px;height:34px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem}
-    .topnav-right{display:flex;gap:10px}
+    .topnav-brand .ico{width:34px;height:34px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#0a0a14}
+    .topnav-right{display:flex;gap:8px;align-items:center}
     .btn-nav{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:6px}
     .btn-nav:hover{color:#fff;border-color:var(--gold)}
     .btn-nav.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14;border:none;font-weight:800}
     .btn-nav.gold:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.4)}
-    .page-wrap{max-width:960px;margin:0 auto;padding:28px 24px}
-    .page-header{text-align:center;margin-bottom:32px}
-    .page-header h1{font-size:1.5rem;font-weight:900}
-    .page-header h1 span{color:var(--gold)}
-    .page-header p{font-size:.85rem;color:var(--muted);margin-top:6px}
-    /* ========= PASSPORT BOOKLET ========= */
-    .passport-booklet{width:100%;max-width:720px;margin:0 auto;position:relative}
-    /* COVER */
-    .passport-cover{
-      background:linear-gradient(145deg,#1a0a00 0%,#2d1500 20%,#1a0800 40%,#2a1200 60%,#1a0800 80%,#2d1500 100%);
-      border-radius:16px 16px 4px 4px;
-      padding:40px 36px 32px;
-      position:relative;overflow:hidden;
-      border:2px solid var(--gold3);
-      box-shadow:0 20px 60px rgba(0,0,0,.8), inset 0 1px 0 rgba(240,208,128,.2), 0 0 40px rgba(201,168,76,.15);
-    }
-    .passport-cover::before{
-      content:'';position:absolute;inset:8px;
-      border:1px solid rgba(201,168,76,.15);border-radius:10px;pointer-events:none;
-    }
-    /* Gold filigree pattern */
-    .cover-pattern{
-      position:absolute;inset:0;
-      background-image:
-        repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(201,168,76,.03) 20px,rgba(201,168,76,.03) 21px),
-        repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(201,168,76,.03) 20px,rgba(201,168,76,.03) 21px);
-      pointer-events:none;
-    }
-    .cover-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;z-index:2}
-    .cover-title-text{text-align:center;flex:1}
-    .cover-title-text .ct-country{font-family:'Poppins',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold2);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px}
-    .cover-title-text .ct-org{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:800;color:var(--gold);letter-spacing:.5px}
-    .cover-title-text .ct-sub{font-family:'Poppins',sans-serif;font-size:.58rem;color:rgba(240,208,128,.6);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-    /* WOW Emblem */
-    .wow-emblem{width:120px;height:120px;margin:0 auto 20px;position:relative;z-index:2}
-    .emblem-ring{width:100%;height:100%;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(201,168,76,.15) 0%,transparent 70%);box-shadow:0 0 20px rgba(201,168,76,.3),inset 0 0 20px rgba(201,168,76,.1)}
-    .emblem-inner{text-align:center}
-    .emblem-star{font-size:2rem;color:var(--gold);display:block;line-height:1;filter:drop-shadow(0 0 8px rgba(201,168,76,.6))}
-    .emblem-wow{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:900;color:var(--gold);line-height:1;letter-spacing:2px;text-shadow:0 0 10px rgba(201,168,76,.5)}
-    .emblem-tag{font-size:.45rem;color:rgba(240,208,128,.7);letter-spacing:1.5px;text-transform:uppercase}
-    .cover-passport-label{text-align:center;position:relative;z-index:2;margin-bottom:16px}
-    .cover-passport-label .cp-text{font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:300;letter-spacing:6px;color:var(--gold2);text-transform:uppercase}
-    .cover-passport-label .cp-sub{font-size:.6rem;color:rgba(240,208,128,.5);letter-spacing:2px;text-transform:uppercase}
-    .cover-plan-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:20px;padding:6px 16px;font-family:'Poppins',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);letter-spacing:.5px;position:relative;z-index:2}
-    .cover-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px;position:relative;z-index:2}
-    .cover-bottom .cb-label{font-size:.55rem;color:rgba(240,208,128,.4);letter-spacing:2px;text-transform:uppercase}
-    .cover-bottom .cb-val{font-size:.72rem;color:rgba(240,208,128,.8);font-weight:700;font-family:'Poppins',sans-serif;letter-spacing:.5px}
-    /* SPINE */
-    .passport-spine{height:8px;background:linear-gradient(90deg,var(--gold4),var(--gold3),var(--gold),var(--gold3),var(--gold4));box-shadow:0 2px 8px rgba(201,168,76,.3)}
-    /* INNER PAGES */
-    .passport-inner{background:linear-gradient(180deg,#f8f4e8 0%,#fffdf5 30%,#f8f4e8 100%);border-radius:0 0 12px 12px;border:1px solid #d4c98a;border-top:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-    /* DATA PAGE */
-    .data-page{padding:28px 32px;position:relative}
-    /* Watermark */
-    .page-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.04}
-    .page-watermark .wm-text{font-family:'Poppins',sans-serif;font-size:6rem;font-weight:900;color:#9A6F2A;transform:rotate(-30deg);letter-spacing:4px}
-    /* Top security strip */
-    .sec-strip{background:linear-gradient(90deg,var(--navy) 0%,#003087 40%,#001a5e 100%);padding:8px 32px;display:flex;align-items:center;justify-content:space-between}
-    .sec-strip .ss-text{font-family:'Poppins',sans-serif;font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase}
-    .sec-strip .ss-id{font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--gold);font-weight:700;letter-spacing:1px}
-    /* Page header */
-    .page-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--gold3)}
-    .phb-left{font-family:'Poppins',sans-serif}
-    .phb-left .phb-type{font-size:.6rem;color:var(--gold3);font-weight:700;letter-spacing:3px;text-transform:uppercase}
-    .phb-left .phb-title{font-size:1rem;font-weight:800;color:#1a0800;letter-spacing:.5px}
-    .phb-right{text-align:right}
-    .phb-right .phb-org{font-size:.58rem;color:#888;letter-spacing:1px;text-transform:uppercase}
-    .phb-right .phb-org-name{font-size:.75rem;font-weight:800;color:var(--gold3)}
-    /* PHOTO + DATA */
-    .biometric-section{display:flex;gap:24px;margin-bottom:20px}
-    .bio-photo-wrap{flex-shrink:0}
-    .bio-photo{width:110px;height:130px;border:3px solid var(--gold3);border-radius:4px;object-fit:cover;background:#e8e0d0;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#aaa;overflow:hidden}
-    .bio-photo img{width:100%;height:100%;object-fit:cover}
-    .bio-photo-label{text-align:center;font-size:.55rem;color:#888;margin-top:4px;letter-spacing:1px;text-transform:uppercase}
-    .bio-data{flex:1}
-    .bio-field{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(154,111,42,.15)}
-    .bio-field:last-child{border-bottom:none;margin-bottom:0}
-    .bf-label{font-size:.55rem;color:var(--gold3);font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
-    .bf-val{font-family:'Poppins',sans-serif;font-size:.88rem;font-weight:600;color:#1a0800}
-    .bio-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    /* PASSPORT ID BOX */
-    .passport-id-box{background:linear-gradient(135deg,var(--navy),#001a5e);border:2px solid var(--gold);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
-    .pib-left .pib-label{font-size:.55rem;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
-    .pib-left .pib-id{font-family:'Poppins',sans-serif;font-size:1.1rem;font-weight:900;color:var(--gold);letter-spacing:2px}
-    .pib-qr{width:64px;height:64px;background:#fff;padding:4px;border-radius:4px}
-    /* VALIDITY BAR */
-    .validity-section{margin-bottom:20px}
-    .val-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
-    .val-item{background:rgba(154,111,42,.08);border:1px solid rgba(154,111,42,.2);border-radius:8px;padding:10px 12px}
-    .val-item .vi-label{font-size:.55rem;color:var(--gold3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
-    .val-item .vi-val{font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:700;color:#1a0800}
-    .validity-bar-wrap{background:rgba(154,111,42,.1);border-radius:20px;height:8px;overflow:hidden;margin-bottom:6px}
-    .validity-bar{height:100%;background:linear-gradient(90deg,var(--gold4),var(--gold),var(--gold2));border-radius:20px}
-    .validity-text{font-size:.65rem;color:#888;text-align:right}
-    /* BENEFITS */
-    .benefits-section{margin-bottom:20px}
-    .benefits-title{font-family:'Poppins',sans-serif;font-size:.65rem;font-weight:800;color:var(--gold3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .benefits-title::after{content:'';flex:1;height:1px;background:rgba(154,111,42,.2)}
-    .benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .benefit-item{display:flex;align-items:center;gap:6px;font-size:.72rem;color:#3a2800}
-    .benefit-item i{color:var(--gold3);font-size:.65rem;flex-shrink:0}
-    /* VOUCHERS */
-    .vouchers-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-    .voucher-chip{background:linear-gradient(135deg,#1a0800,#2d1500);border:1px solid var(--gold3);border-radius:8px;padding:8px 12px;text-align:center;min-width:80px}
-    .vc-val{font-size:.7rem;font-weight:800;color:var(--gold);display:block;font-family:'Poppins',sans-serif}
-    .vc-label{font-size:.55rem;color:rgba(240,208,128,.6);text-transform:uppercase;letter-spacing:.5px}
-    /* MRZ ZONE */
-    .mrz-zone{background:#f0edd8;border-top:2px solid rgba(154,111,42,.3);padding:14px 24px;font-family:'Courier New',monospace;overflow:hidden}
-    .mrz-label{font-size:.55rem;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
-    .mrz-line{font-size:.7rem;color:#333;letter-spacing:2px;word-break:break-all;margin-bottom:3px;line-height:1.4}
-    /* HOLOGRAM STRIP */
-    .holo-strip{background:linear-gradient(90deg,#1a0800,#2d1500,#1a0800);padding:4px 24px;display:flex;align-items:center;gap:8px;overflow:hidden;position:relative}
-    .holo-strip::before{content:'WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER •';font-size:.55rem;color:rgba(201,168,76,.4);letter-spacing:2px;white-space:nowrap;text-transform:uppercase;animation:scrollText 20s linear infinite}
-    @keyframes scrollText{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    /* ACTIONS */
-    .actions-bar{display:flex;gap:12px;justify-content:center;margin:28px 0;flex-wrap:wrap}
-    .act-btn{display:flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;font-size:.85rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;border:none}
+    .page-wrap{max-width:760px;margin:0 auto;padding:28px 24px}
+    /* Success banner */
+    .success-banner{background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.25);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+    .sb-icon{width:52px;height:52px;background:rgba(34,197,94,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+    .sb-text h2{font-size:1.1rem;font-weight:800;color:#fff;}
+    .sb-text p{font-size:.82rem;color:var(--muted);}
+    /* Stats row */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+    .stat-card i{font-size:1.2rem;color:var(--gold);margin-bottom:8px;display:block;}
+    .stat-val{font-size:1.1rem;font-weight:900;font-family:'Poppins',sans-serif;color:var(--gold);}
+    .stat-label{font-size:.7rem;color:var(--muted);margin-top:3px;}
+    /* Actions */
+    .actions-bar{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap;}
+    .act-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-size:.83rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;border:none}
     .act-btn.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14}
     .act-btn.gold:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
     .act-btn.outline{background:rgba(255,255,255,.06);border:1.5px solid var(--border);color:var(--text)}
     .act-btn.outline:hover{border-color:var(--gold);color:var(--gold)}
     .act-btn.green{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
-    /* BOTTOM CARDS */
-    .bottom-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
-    .bc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
-    .bc-card i{font-size:1.3rem;color:var(--gold);margin-bottom:8px;display:block}
-    .bc-card .bc-val{font-size:1.2rem;font-weight:900;font-family:'Poppins',sans-serif;color:var(--gold)}
-    .bc-card .bc-label{font-size:.72rem;color:var(--muted);margin-top:3px}
-    @media(max-width:600px){.biometric-section{flex-direction:column}.bio-photo{width:100%;height:auto;aspect-ratio:9/11;margin:0 auto}.val-row{grid-template-columns:1fr 1fr}.benefits-grid{grid-template-columns:1fr}.bottom-cards{grid-template-columns:1fr 1fr}}
-    @media print{
-      .topnav,.actions-bar,.bottom-cards{display:none!important}
-      body{background:#fff}
-      .passport-booklet{max-width:100%}
-      .passport-inner{box-shadow:none}
+    /* ========= PASSPORT BOOKLET ========= */
+    .passport-booklet{width:100%;max-width:680px;margin:0 auto 28px;position:relative;}
+    /* COVER */
+    .passport-cover{
+      background:linear-gradient(145deg,#1a0a00 0%,#2d1500 20%,#1a0800 40%,#2a1200 60%,#1a0800 80%,#2d1500 100%);
+      border-radius:16px 16px 4px 4px;padding:36px 32px 28px;position:relative;overflow:hidden;
+      border:2px solid var(--gold3);
+      box-shadow:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(240,208,128,.2),0 0 40px rgba(201,168,76,.15);
     }
+    .passport-cover::before{content:'';position:absolute;inset:8px;border:1px solid rgba(201,168,76,.15);border-radius:10px;pointer-events:none;}
+    .cover-pattern{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(201,168,76,.03) 20px,rgba(201,168,76,.03) 21px),repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(201,168,76,.03) 20px,rgba(201,168,76,.03) 21px);pointer-events:none;}
+    .cover-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:2}
+    .cover-title-text{text-align:center;flex:1}
+    .ct-country{font-family:'Poppins',sans-serif;font-size:.68rem;font-weight:700;color:var(--gold2);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px}
+    .ct-org{font-family:'Poppins',sans-serif;font-size:.95rem;font-weight:800;color:var(--gold);letter-spacing:.5px}
+    .ct-sub{font-family:'Poppins',sans-serif;font-size:.55rem;color:rgba(240,208,128,.6);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+    .wow-emblem{width:110px;height:110px;margin:0 auto 18px;position:relative;z-index:2}
+    .emblem-ring{width:100%;height:100%;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(201,168,76,.15) 0%,transparent 70%);box-shadow:0 0 20px rgba(201,168,76,.3),inset 0 0 20px rgba(201,168,76,.1)}
+    .emblem-inner{text-align:center}
+    .emblem-wow{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:900;color:var(--gold);line-height:1;letter-spacing:2px;text-shadow:0 0 10px rgba(201,168,76,.5)}
+    .emblem-tag{font-size:.42rem;color:rgba(240,208,128,.7);letter-spacing:1.5px;text-transform:uppercase}
+    .cover-passport-label{text-align:center;position:relative;z-index:2;margin-bottom:14px}
+    .cp-text{font-family:'Poppins',sans-serif;font-size:1.4rem;font-weight:300;letter-spacing:6px;color:var(--gold2);text-transform:uppercase}
+    .cp-sub{font-size:.58rem;color:rgba(240,208,128,.5);letter-spacing:2px;text-transform:uppercase}
+    .cover-plan-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:20px;padding:6px 16px;font-family:'Poppins',sans-serif;font-size:.7rem;font-weight:700;color:var(--gold);letter-spacing:.5px;position:relative;z-index:2}
+    .cover-bottom{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;position:relative;z-index:2}
+    .cb-label{font-size:.52rem;color:rgba(240,208,128,.4);letter-spacing:2px;text-transform:uppercase}
+    .cb-val{font-size:.7rem;color:rgba(240,208,128,.8);font-weight:700;font-family:'Poppins',sans-serif;letter-spacing:.5px}
+    /* SPINE */
+    .passport-spine{height:8px;background:linear-gradient(90deg,var(--gold4),var(--gold3),var(--gold),var(--gold3),var(--gold4));box-shadow:0 2px 8px rgba(201,168,76,.3)}
+    /* INNER PAGES */
+    .passport-inner{background:linear-gradient(180deg,#f8f4e8 0%,#fffdf5 30%,#f8f4e8 100%);border-radius:0 0 12px 12px;border:1px solid #d4c98a;border-top:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    /* Security strip */
+    .sec-strip{background:linear-gradient(90deg,var(--navy) 0%,#003087 40%,#001a5e 100%);padding:8px 28px;display:flex;align-items:center;justify-content:space-between}
+    .ss-text{font-family:'Poppins',sans-serif;font-size:.58rem;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase}
+    .ss-id{font-family:'Poppins',sans-serif;font-size:.7rem;color:var(--gold);font-weight:700;letter-spacing:1px}
+    /* DATA PAGE */
+    .data-page{padding:26px 28px;position:relative}
+    .page-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.04}
+    .wm-text{font-family:'Poppins',sans-serif;font-size:5.5rem;font-weight:900;color:#9A6F2A;transform:rotate(-30deg);letter-spacing:4px}
+    .page-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--gold3)}
+    .phb-type{font-family:'Poppins',sans-serif;font-size:.58rem;color:var(--gold3);font-weight:700;letter-spacing:3px;text-transform:uppercase}
+    .phb-title{font-size:.95rem;font-weight:800;color:#1a0800;letter-spacing:.5px}
+    .phb-org{font-size:.55rem;color:#888;letter-spacing:1px;text-transform:uppercase}
+    .phb-org-name{font-size:.72rem;font-weight:800;color:var(--gold3)}
+    /* Passport ID box */
+    .passport-id-box{background:linear-gradient(135deg,var(--navy),#001a5e);border:2px solid var(--gold);border-radius:8px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+    .pib-label{font-size:.52rem;color:rgba(255,255,255,.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+    .pib-id{font-family:'Poppins',sans-serif;font-size:1.05rem;font-weight:900;color:var(--gold);letter-spacing:2px}
+    .pib-qr{width:60px;height:60px;background:#fff;padding:4px;border-radius:4px}
+    /* PHOTO + DATA */
+    .biometric-section{display:flex;gap:20px;margin-bottom:18px}
+    .bio-photo-wrap{flex-shrink:0}
+    .bio-photo{width:105px;height:125px;border:3px solid var(--gold3);border-radius:4px;object-fit:cover;background:#e8e0d0;display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:#aaa;overflow:hidden}
+    .bio-photo img{width:100%;height:100%;object-fit:cover}
+    .bio-photo-label{text-align:center;font-size:.52rem;color:#888;margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+    .bio-data{flex:1}
+    .bio-field{margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid rgba(154,111,42,.15)}
+    .bio-field:last-child{border-bottom:none;margin-bottom:0}
+    .bf-label{font-size:.52rem;color:var(--gold3);font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+    .bf-val{font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:600;color:#1a0800}
+    .bio-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    /* Validity */
+    .validity-section{margin-bottom:18px}
+    .val-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+    .val-item{background:rgba(154,111,42,.08);border:1px solid rgba(154,111,42,.2);border-radius:8px;padding:9px 11px}
+    .vi-label{font-size:.52rem;color:var(--gold3);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+    .vi-val{font-family:'Poppins',sans-serif;font-size:.76rem;font-weight:700;color:#1a0800}
+    .validity-bar-wrap{background:rgba(154,111,42,.1);border-radius:20px;height:7px;overflow:hidden;margin-bottom:4px}
+    .validity-bar{height:100%;background:linear-gradient(90deg,var(--gold4),var(--gold),var(--gold2));border-radius:20px}
+    /* Benefits */
+    .benefits-title{font-family:'Poppins',sans-serif;font-size:.62rem;font-weight:800;color:var(--gold3);letter-spacing:2px;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+    .benefits-title::after{content:'';flex:1;height:1px;background:rgba(154,111,42,.2)}
+    .benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
+    .benefit-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:#3a2800}
+    .benefit-item i{color:var(--gold3);font-size:.62rem;flex-shrink:0}
+    /* Entry limits badge */
+    .entry-limits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+    .el-item{background:linear-gradient(135deg,rgba(154,111,42,.1),rgba(154,111,42,.05));border:1px solid rgba(154,111,42,.25);border-radius:8px;padding:9px;text-align:center}
+    .el-val{font-family:'Poppins',sans-serif;font-size:.88rem;font-weight:800;color:var(--gold3)}
+    .el-label{font-size:.55rem;color:#888;text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+    /* Vouchers */
+    .vouchers-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+    .voucher-chip{background:linear-gradient(135deg,#1a0800,#2d1500);border:1px solid var(--gold3);border-radius:8px;padding:7px 11px;text-align:center;min-width:76px}
+    .vc-val{font-size:.68rem;font-weight:800;color:var(--gold);display:block;font-family:'Poppins',sans-serif}
+    .vc-label{font-size:.52rem;color:rgba(240,208,128,.6);text-transform:uppercase;letter-spacing:.5px}
+    /* Agent footer */
+    .agent-footer{display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(154,111,42,.2);margin-top:6px;font-size:.68rem;color:#888}
+    /* Hologram strip */
+    .holo-strip{background:linear-gradient(90deg,#1a0800,#2d1500,#1a0800);padding:4px 24px;overflow:hidden;position:relative}
+    .holo-strip::before{content:'WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER • WORLDS OF WONDER • VERIFIED MEMBER •';font-size:.52rem;color:rgba(201,168,76,.4);letter-spacing:2px;white-space:nowrap;text-transform:uppercase;animation:scrollText 20s linear infinite;display:block}
+    @keyframes scrollText{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    /* MRZ */
+    .mrz-zone{background:#f0edd8;border-top:2px solid rgba(154,111,42,.3);padding:12px 22px}
+    .mrz-label{font-size:.52rem;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
+    .mrz-line{font-size:.68rem;color:#333;letter-spacing:2px;word-break:break-all;margin-bottom:2px;line-height:1.4;font-family:'Courier New',monospace}
+    /* Login creds card */
+    .login-creds-card{background:rgba(34,197,94,.07);border:1.5px solid rgba(34,197,94,.25);border-radius:14px;padding:18px;margin-bottom:20px;}
+    .lc-title{font-size:.72rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    .lc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .lc-item{background:#0a1a12;border-radius:8px;padding:10px;}
+    .lc-item-label{font-size:.65rem;color:var(--muted);margin-bottom:3px;}
+    .lc-item-val{font-size:.88rem;font-weight:800;color:var(--green);}
+    .lc-note{font-size:.72rem;color:var(--muted);margin-top:10px;display:flex;gap:6px;align-items:flex-start;}
+    @media(max-width:600px){.biometric-section{flex-direction:column}.bio-photo{width:100%;height:auto;aspect-ratio:9/11}.val-row{grid-template-columns:1fr 1fr}.benefits-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.entry-limits{grid-template-columns:1fr 1fr}}
+    @media print{.topnav,.actions-bar,.stats-row,.login-creds-card,#share-section{display:none!important} body{background:#fff;} .passport-booklet{max-width:100%;} .passport-inner{box-shadow:none;}}
   </style>
 </head>
 <body>
@@ -163,25 +155,51 @@
     Digital Passport Issued
   </div>
   <div class="topnav-right">
-    <a href="passport-dashboard.html" class="btn-nav"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-    <button class="btn-nav gold" onclick="printPassport()"><i class="fas fa-print"></i> Print</button>
+    <a href="erp-dashboard.html" class="btn-nav"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="gate-scanner.html" class="btn-nav"><i class="fas fa-qrcode"></i> Gate Scanner</a>
+    <button class="btn-nav gold" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
     <button class="btn-nav" onclick="sharePassport()"><i class="fas fa-share-alt"></i> Share</button>
     <button class="btn-nav" onclick="newSale()"><i class="fas fa-plus"></i> New Sale</button>
   </div>
 </nav>
 
 <div class="page-wrap">
-  <!-- ACTIONS TOP -->
-  <div style="text-align:center;margin-bottom:24px">
-    <div style="font-size:1.4rem;font-weight:900;color:#fff">🎉 Passport Successfully Issued!</div>
-    <div style="font-size:.85rem;color:var(--muted);margin-top:6px">The digital passport has been generated. Share or print for the customer.</div>
+
+  <!-- Success Banner -->
+  <div class="success-banner">
+    <div class="sb-icon">🎉</div>
+    <div class="sb-text">
+      <h2>Passport Successfully Issued!</h2>
+      <p>The digital WOW Passport has been generated. Share or print for the customer. Credentials sent via SMS.</p>
+    </div>
   </div>
 
-  <!-- STATS -->
-  <div class="bottom-cards" style="margin-bottom:24px">
-    <div class="bc-card"><i class="fas fa-passport"></i><div class="bc-val" id="statsId">—</div><div class="bc-label">Passport ID</div></div>
-    <div class="bc-card"><i class="fas fa-calendar-check"></i><div class="bc-val" id="statsExpiry">—</div><div class="bc-label">Valid Until</div></div>
-    <div class="bc-card"><i class="fas fa-shield-alt"></i><div class="bc-val" style="color:var(--green)">ACTIVE</div><div class="bc-label">Status</div></div>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><i class="fas fa-passport"></i><div class="stat-val" id="statsId">—</div><div class="stat-label">Passport ID</div></div>
+    <div class="stat-card"><i class="fas fa-calendar-check"></i><div class="stat-val" id="statsExpiry">—</div><div class="stat-label">Valid Until</div></div>
+    <div class="stat-card"><i class="fas fa-shield-alt"></i><div class="stat-val" style="color:var(--green);">ACTIVE</div><div class="stat-label">Status</div></div>
+    <div class="stat-card"><i class="fas fa-rupee-sign"></i><div class="stat-val" id="statsPaid">—</div><div class="stat-label">Amount Paid</div></div>
+  </div>
+
+  <!-- Login Credentials Card -->
+  <div class="login-creds-card">
+    <div class="lc-title"><i class="fas fa-key"></i> Customer Login Credentials (Auto-Generated)</div>
+    <div class="lc-grid">
+      <div class="lc-item"><div class="lc-item-label">Primary Login ID (Mobile)</div><div class="lc-item-val" id="lc-mobile">—</div></div>
+      <div class="lc-item"><div class="lc-item-label">Login ID (Email)</div><div class="lc-item-val" style="font-size:.78rem;color:#fff;" id="lc-email">—</div></div>
+      <div class="lc-item"><div class="lc-item-label">Temporary Password</div><div class="lc-item-val" style="color:var(--amber);" id="lc-pw">—</div></div>
+      <div class="lc-item"><div class="lc-item-label">Portal URL</div><div class="lc-item-val" style="font-size:.72rem;color:var(--gold);">portal.wow.com/login</div></div>
+    </div>
+    <div class="lc-note"><i class="fas fa-info-circle" style="color:var(--amber);flex-shrink:0;"></i> Credentials sent to customer via SMS &amp; email. Customer must change password on first login.</div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions-bar">
+    <button class="act-btn gold" onclick="window.print()"><i class="fas fa-print"></i> Print Passport</button>
+    <button class="act-btn green" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
+    <button class="act-btn outline" onclick="sendEmail()"><i class="fas fa-envelope"></i> Email to Customer</button>
+    <button class="act-btn outline" onclick="downloadPassport()"><i class="fas fa-download"></i> Download PDF</button>
   </div>
 
   <!-- PASSPORT BOOKLET -->
@@ -191,20 +209,20 @@
     <div class="passport-cover">
       <div class="cover-pattern"></div>
       <div class="cover-top">
-        <div style="width:60px;text-align:left;font-size:1.4rem;color:rgba(201,168,76,.3)">❧</div>
+        <div style="width:56px;text-align:left;font-size:1.3rem;color:rgba(201,168,76,.3)">❧</div>
         <div class="cover-title-text">
           <div class="ct-country">Republic of Entertainment</div>
           <div class="ct-org">WORLDS OF WONDER</div>
           <div class="ct-sub">Annual Membership Passport</div>
         </div>
-        <div style="width:60px;text-align:right;font-size:1.4rem;color:rgba(201,168,76,.3)">❧</div>
+        <div style="width:56px;text-align:right;font-size:1.3rem;color:rgba(201,168,76,.3)">❧</div>
       </div>
       <div class="wow-emblem">
         <div class="emblem-ring">
           <div class="emblem-inner">
-            <span class="emblem-star">⭐</span>
+            <div style="font-size:1.8rem;color:var(--gold);line-height:1;filter:drop-shadow(0 0 8px rgba(201,168,76,.6))">⭐</div>
             <div class="emblem-wow">WOW</div>
-            <div class="emblem-tag">Est. 2004 · Delhi</div>
+            <div class="emblem-tag">Est. 2004 · Delhi NCR</div>
           </div>
         </div>
       </div>
@@ -212,12 +230,12 @@
         <div class="cp-text">PASSPORT</div>
         <div class="cp-sub">पासपोर्ट / Annual Membership</div>
       </div>
-      <div style="text-align:center;position:relative;z-index:2">
-        <div class="cover-plan-badge" id="coverPlanBadge"><i class="fas fa-star"></i> COMBO PASSPORT · PREMIUM</div>
+      <div style="text-align:center;position:relative;z-index:2;">
+        <div class="cover-plan-badge" id="coverPlanBadge"><i class="fas fa-star"></i> <span id="coverPlanText">COMBO PASSPORT · PREMIUM</span></div>
       </div>
       <div class="cover-bottom">
         <div><div class="cb-label">Issued By</div><div class="cb-val">WOW Sales Portal</div></div>
-        <div style="font-size:1.8rem;color:rgba(201,168,76,.2)">☽ ✦ ☾</div>
+        <div style="font-size:1.6rem;color:rgba(201,168,76,.2)">☽ ✦ ☾</div>
         <div style="text-align:right"><div class="cb-label">Valid For</div><div class="cb-val">365 DAYS</div></div>
       </div>
     </div>
@@ -225,38 +243,37 @@
     <!-- SPINE -->
     <div class="passport-spine"></div>
 
-    <!-- INNER: Security Strip -->
+    <!-- INNER -->
     <div class="passport-inner">
       <div class="sec-strip">
         <span class="ss-text">Official Membership Document · Worlds of Wonder · Not Transferable</span>
         <span class="ss-id" id="secStripId">WOW-PAX-XXXXXX</span>
       </div>
 
-      <!-- DATA PAGE -->
       <div class="data-page">
         <div class="page-watermark"><div class="wm-text">WOW</div></div>
 
         <div class="page-header-bar">
-          <div class="phb-left">
+          <div>
             <div class="phb-type">MEMBERSHIP · ANNUAL</div>
             <div class="phb-title">Member Data Page</div>
           </div>
-          <div class="phb-right">
+          <div style="text-align:right">
             <div class="phb-org">ISSUED BY</div>
             <div class="phb-org-name">Worlds of Wonder</div>
           </div>
         </div>
 
-        <!-- Passport ID box with QR -->
+        <!-- Passport ID + QR -->
         <div class="passport-id-box">
-          <div class="pib-left">
+          <div>
             <div class="pib-label">Passport / Membership Number</div>
             <div class="pib-id" id="innerPassportId">WOW-PAX-XXXXXX</div>
           </div>
           <div class="pib-qr" id="passportQR"></div>
         </div>
 
-        <!-- Biometric section -->
+        <!-- Photo + Data -->
         <div class="biometric-section">
           <div class="bio-photo-wrap">
             <div class="bio-photo" id="bioPhotoWrap"><i class="fas fa-user"></i></div>
@@ -278,60 +295,48 @@
               </div>
             </div>
             <div class="bio-field">
-              <div class="bf-label">Mobile Number</div>
+              <div class="bf-label">Mobile / Phone</div>
               <div class="bf-val" id="bfPhone">—</div>
             </div>
             <div class="bio-field">
               <div class="bf-label">Email Address</div>
-              <div class="bf-val" id="bfEmail" style="font-size:.78rem">—</div>
+              <div class="bf-val" id="bfEmail" style="font-size:.76rem">—</div>
             </div>
             <div class="bio-field">
               <div class="bf-label">Address</div>
-              <div class="bf-val" id="bfAddr" style="font-size:.75rem;line-height:1.4">—</div>
+              <div class="bf-val" id="bfAddr" style="font-size:.72rem;line-height:1.4">—</div>
             </div>
           </div>
         </div>
 
-        <!-- Validity Section -->
+        <!-- Validity -->
         <div class="validity-section">
           <div class="val-row">
-            <div class="val-item">
-              <div class="vi-label">Issue Date</div>
-              <div class="vi-val" id="valIssued">—</div>
-            </div>
-            <div class="val-item">
-              <div class="vi-label">Expiry Date</div>
-              <div class="vi-val" id="valExpiry">—</div>
-            </div>
-            <div class="val-item">
-              <div class="vi-label">Days Remaining</div>
-              <div class="vi-val" id="valDays" style="color:var(--gold3)">365</div>
-            </div>
+            <div class="val-item"><div class="vi-label">Issue Date</div><div class="vi-val" id="valIssued">—</div></div>
+            <div class="val-item"><div class="vi-label">Expiry Date</div><div class="vi-val" id="valExpiry">—</div></div>
+            <div class="val-item"><div class="vi-label">Days Remaining</div><div class="vi-val" id="valDays" style="color:var(--gold3)">365</div></div>
           </div>
-          <div class="validity-bar-wrap">
-            <div class="validity-bar" id="validityBar" style="width:100%"></div>
-          </div>
-          <div class="validity-text" id="validityText">365 of 365 days remaining</div>
+          <div class="validity-bar-wrap"><div class="validity-bar" id="validityBar" style="width:100%"></div></div>
+          <div style="font-size:.62rem;color:#888;text-align:right;" id="validityText">365 of 365 days remaining</div>
         </div>
 
-        <!-- Plan & Benefits -->
-        <div class="benefits-section">
-          <div class="benefits-title"><i class="fas fa-star" style="color:var(--gold3)"></i> Plan Benefits</div>
-          <div class="benefits-grid" id="benefitsGrid"></div>
-        </div>
+        <!-- Entry Limits -->
+        <div class="benefits-title"><i class="fas fa-ticket-alt" style="color:var(--gold3)"></i> Entry Limits & Access</div>
+        <div class="entry-limits" id="entryLimits"></div>
+
+        <!-- Benefits -->
+        <div class="benefits-title"><i class="fas fa-star" style="color:var(--gold3)"></i> Plan Benefits</div>
+        <div class="benefits-grid" id="benefitsGrid"></div>
 
         <!-- Vouchers -->
-        <div class="benefits-title" style="font-family:'Poppins',sans-serif;font-size:.65rem;font-weight:800;color:var(--gold3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          <i class="fas fa-ticket-alt" style="color:var(--gold3)"></i> Included Vouchers
-          <div style="flex:1;height:1px;background:rgba(154,111,42,.2)"></div>
-        </div>
+        <div class="benefits-title" style="margin-top:14px;"><i class="fas fa-gift" style="color:var(--gold3)"></i> Included Vouchers</div>
         <div class="vouchers-row" id="vouchersRow"></div>
 
-        <!-- Agent issued by -->
-        <div style="display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(154,111,42,.2);margin-top:8px;font-size:.7rem;color:#888">
-          <div>Agent: <span style="font-weight:700;color:#555" id="agentName">—</span></div>
-          <div>Login: <span style="font-weight:700;color:var(--gold3)" id="loginId">—</span></div>
-          <div>Issued: <span style="font-weight:700;color:#555" id="issuedDate">—</span></div>
+        <!-- Agent footer -->
+        <div class="agent-footer">
+          <div>Agent: <span style="font-weight:700;color:#555;" id="agentName">—</span></div>
+          <div>Login ID: <span style="font-weight:700;color:var(--gold3);" id="loginId">—</span></div>
+          <div>Issued: <span style="font-weight:700;color:#555;" id="issuedDate">—</span></div>
         </div>
       </div><!-- end data-page -->
 
@@ -341,174 +346,236 @@
       <!-- MRZ Zone -->
       <div class="mrz-zone">
         <div class="mrz-label">Machine Readable Zone (MRZ)</div>
-        <div class="mrz-line" id="mrzLine1">P&lt;WOW&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+        <div class="mrz-line" id="mrzLine1">P&lt;WOW&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
         <div class="mrz-line" id="mrzLine2">XXXXXXXXXXXXXX&lt;&lt;XXXXXXXXXXXXXXX&lt;&lt;&lt;&lt;&lt;&lt;&lt;0000000000</div>
       </div>
     </div><!-- end inner -->
-
   </div><!-- end booklet -->
 
-  <!-- ACTIONS -->
-  <div class="actions-bar">
-    <button class="act-btn gold" onclick="printPassport()"><i class="fas fa-print"></i> Print Passport</button>
-    <button class="act-btn green" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
-    <button class="act-btn outline" onclick="sendEmail()"><i class="fas fa-envelope"></i> Send via Email</button>
-    <button class="act-btn outline" onclick="newSale()"><i class="fas fa-plus"></i> New Sale</button>
-    <button class="act-btn outline" onclick="window.location.href='passport-dashboard.html'"><i class="fas fa-home"></i> Dashboard</button>
+  <!-- Share section -->
+  <div id="share-section" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px;">
+    <div style="font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;">Share & Notify Customer</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="act-btn green" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+      <button class="act-btn outline" onclick="sendEmail()"><i class="fas fa-envelope"></i> Email</button>
+      <button class="act-btn outline" onclick="sendSms()"><i class="fas fa-sms"></i> SMS</button>
+      <button class="act-btn outline" onclick="newSale()"><i class="fas fa-plus"></i> Start New Sale</button>
+      <a href="passport-dashboard.html" class="act-btn outline"><i class="fas fa-home"></i> Dashboard</a>
+    </div>
   </div>
-</div>
+
+</div><!-- end page-wrap -->
+
+<div id="toast"></div>
 
 <script>
-const passport = JSON.parse(sessionStorage.getItem('latest_passport') || 'null');
-const kyc = JSON.parse(sessionStorage.getItem('current_kyc') || 'null');
-const agent = JSON.parse(sessionStorage.getItem('sales_agent') || '{"name":"Sales Agent","id":"EMP-001"}');
-
-const PLAN_BENEFITS = {
-  'Water Park Passport':[
-    {icon:'fa-water',text:'Unlimited water park entries'},
-    {icon:'fa-utensils',text:'10% off on F&B'},
-    {icon:'fa-user-friends',text:'2 guest passes/month'},
-    {icon:'fa-star',text:'Priority queue access'},
-    {icon:'fa-tag',text:'Exclusive offers & deals'},
-  ],
-  'Amusement Passport':[
-    {icon:'fa-gamepad',text:'Unlimited amusement entries'},
-    {icon:'fa-percentage',text:'15% off all rides'},
-    {icon:'fa-user-friends',text:'1 guest pass/month'},
-    {icon:'fa-calendar-star',text:'Exclusive member events'},
-    {icon:'fa-tag',text:'Birthday special privileges'},
-  ],
-  'Combo Passport':[
-    {icon:'fa-infinity',text:'Both parks unlimited access'},
-    {icon:'fa-utensils',text:'20% off F&B & merchandise'},
-    {icon:'fa-user-friends',text:'3 guest passes/month'},
-    {icon:'fa-crown',text:'VIP lounge access'},
-    {icon:'fa-lock-open',text:'Free locker every visit'},
-    {icon:'fa-star',text:'Premium member events'},
-  ],
+const PLAN_DATA = {
+  water:{
+    benefits:[
+      {icon:'fa-water',text:'Unlimited Water Park entries'},
+      {icon:'fa-utensils',text:'10% off on all F&B'},
+      {icon:'fa-user-friends',text:'2 guest passes / month'},
+      {icon:'fa-star',text:'Priority queue access'},
+    ],
+    vouchers:[{val:'3x',label:'Meal Vouchers'},{val:'₹200',label:'F&B Voucher'},{val:'2x',label:'Guest Passes'}],
+    entries:[{val:'∞',label:'Water Park'},{val:'0',label:'Amusement'},{val:'2x',label:'Guest/Month'}],
+    discount:'10%',
+  },
+  amusement:{
+    benefits:[
+      {icon:'fa-gamepad',text:'Unlimited Amusement entries'},
+      {icon:'fa-percentage',text:'15% off ride merchandise'},
+      {icon:'fa-user-friends',text:'1 guest pass / month'},
+      {icon:'fa-birthday-cake',text:'Birthday privileges'},
+    ],
+    vouchers:[{val:'2x',label:'Meal Vouchers'},{val:'₹150',label:'Ride Discount'},{val:'1x',label:'Guest Pass'}],
+    entries:[{val:'0',label:'Water Park'},{val:'∞',label:'Amusement'},{val:'1x',label:'Guest/Month'}],
+    discount:'15%',
+  },
+  combo:{
+    benefits:[
+      {icon:'fa-infinity',text:'Both parks unlimited access'},
+      {icon:'fa-utensils',text:'20% off F&B & merch'},
+      {icon:'fa-user-friends',text:'3 guest passes / month'},
+      {icon:'fa-crown',text:'VIP lounge access'},
+      {icon:'fa-lock-open',text:'Free locker every visit'},
+      {icon:'fa-star',text:'Premium member events'},
+    ],
+    vouchers:[{val:'5x',label:'Meal Vouchers'},{val:'₹500',label:'F&B Voucher'},{val:'3x',label:'Guest Passes'},{val:'FREE',label:'Locker/Visit'}],
+    entries:[{val:'∞',label:'Water Park'},{val:'∞',label:'Amusement'},{val:'3x',label:'Guest/Month'}],
+    discount:'20%',
+  },
+  family:{
+    benefits:[
+      {icon:'fa-users',text:'Up to 4 family members'},
+      {icon:'fa-infinity',text:'Both parks unlimited'},
+      {icon:'fa-utensils',text:'25% off F&B & merch'},
+      {icon:'fa-crown',text:'VIP lounge for all'},
+      {icon:'fa-gift',text:'Birthday pack each member'},
+      {icon:'fa-lock-open',text:'Free lockers every visit'},
+    ],
+    vouchers:[{val:'8x',label:'Meal Vouchers'},{val:'₹1000',label:'F&B Voucher'},{val:'4x',label:'Guest Passes'},{val:'FREE',label:'Lockers'}],
+    entries:[{val:'∞',label:'Water Park'},{val:'∞',label:'Amusement'},{val:'4x',label:'Guest/Month'}],
+    discount:'25%',
+  },
 };
 
-const PLAN_VOUCHERS = {
-  'Water Park Passport':[{val:'3x',label:'Meal Vouchers'},{val:'₹200',label:'F&B Discount'},{val:'2x',label:'Guest Passes'}],
-  'Amusement Passport':[{val:'2x',label:'Meal Vouchers'},{val:'₹150',label:'Ride Discount'},{val:'1x',label:'Guest Pass'}],
-  'Combo Passport':[{val:'5x',label:'Meal Vouchers'},{val:'₹500',label:'F&B Voucher'},{val:'3x',label:'Guest Passes'},{val:'FREE',label:'Locker/Visit'}],
-};
+function pad(n){ return n.toString().padStart(2,'0'); }
 
-function pad2(n){return n.toString().padStart(2,'0')}
+function genPassportId(mobile){
+  const ts = Date.now().toString(36).toUpperCase().substr(-6);
+  const suffix = (mobile||'000000').substr(-4);
+  return 'WOW-PAX-'+suffix+ts;
+}
 
 function init(){
-  const data = passport || {
-    passportId:'WOW-PAX-DEMO01',
-    customerName:'Demo Customer',
-    phone:'9876543210',
-    email:'demo@wow.com',
-    plan:'Combo Passport',
-    amount:4999,
-    payMode:'UPI',
-    agentName:agent.name,
-    dob:'1990-01-15',
-    address:'New Delhi, Delhi',
-    tempPwd:'WOW@3210',
-    timestamp:new Date().toISOString(),
-    expiresAt:new Date(Date.now()+365*24*3600*1000).toISOString(),
-  };
+  let kyc = {};
+  let payment = {};
+  try{ kyc = JSON.parse(sessionStorage.getItem('wow_passport_kyc')||'{}'); } catch(e){}
+  try{ payment = JSON.parse(sessionStorage.getItem('wow_payment')||'{}'); } catch(e){}
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{"name":"Sales Agent","id":"EMP-001"}');
 
-  const pid = data.passportId;
-  const plan = data.plan || 'Combo Passport';
-  const issued = new Date(data.timestamp);
-  const expiry = new Date(data.expiresAt || Date.now()+365*24*3600*1000);
-  const daysLeft = Math.max(0,Math.ceil((expiry-Date.now())/(1000*3600*24)));
-  const pct = Math.min(100,Math.round(daysLeft/365*100));
+  const plan = kyc.plan || {id:'combo', name:'Combo Passport', price:7999};
+  const planId = plan.id || 'combo';
+  const planConfig = PLAN_DATA[planId] || PLAN_DATA.combo;
+  const passportId = genPassportId(kyc.mobile);
+
+  const issueDate = new Date();
+  const expiryDate = new Date(issueDate);
+  expiryDate.setFullYear(expiryDate.getFullYear()+1);
+
+  // Save passport record
+  const passportRecord = {
+    id: passportId,
+    kyc,
+    plan,
+    payment,
+    agent: agent,
+    issuedAt: issueDate.toISOString(),
+    expiresAt: expiryDate.toISOString(),
+    loginId: kyc.mobile,
+    loginEmail: kyc.email,
+    loginPw: kyc.loginPw,
+    status: 'active',
+  };
+  sessionStorage.setItem('latest_passport', JSON.stringify(passportRecord));
 
   // Stats
-  document.getElementById('statsId').textContent = pid;
-  document.getElementById('statsExpiry').textContent = expiry.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('statsId').textContent = passportId;
+  document.getElementById('statsExpiry').textContent = expiryDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('statsPaid').textContent = '₹'+(plan.price||0).toLocaleString('en-IN');
+
+  // Login creds
+  document.getElementById('lc-mobile').textContent = kyc.mobile ? '+91-'+kyc.mobile : '—';
+  document.getElementById('lc-email').textContent = kyc.email || '—';
+  document.getElementById('lc-pw').textContent = kyc.loginPw || '—';
 
   // Cover
-  const planLabels={'Water Park Passport':'WATER PARK · ANNUAL','Amusement Passport':'AMUSEMENT · ANNUAL','Combo Passport':'COMBO · PREMIUM'};
-  document.getElementById('coverPlanBadge').innerHTML = `<i class="fas fa-star"></i> ${planLabels[plan]||plan.toUpperCase()}`;
+  document.getElementById('coverPlanText').textContent = (plan.name||'COMBO PASSPORT').toUpperCase();
+  document.getElementById('secStripId').textContent = passportId;
+  document.getElementById('innerPassportId').textContent = passportId;
 
-  // Security strip
-  document.getElementById('secStripId').textContent = pid;
-
-  // Passport ID
-  document.getElementById('innerPassportId').textContent = pid;
+  // QR
+  try{
+    new QRCode(document.getElementById('passportQR'),{
+      text: JSON.stringify({id:passportId,name:(kyc.fname||'')+' '+(kyc.lname||''),plan:plan.name,expiry:expiryDate.toISOString()}),
+      width:52, height:52, colorDark:'#000', colorLight:'#fff',
+      correctLevel:QRCode.CorrectLevel.H
+    });
+  }catch(e){}
 
   // Photo
-  const photo = data.photo || (kyc&&kyc.photo);
-  if(photo){
-    document.getElementById('bioPhotoWrap').innerHTML = `<img src="${photo}" alt="Member Photo"/>`;
+  if(kyc.photo){
+    const wrap = document.getElementById('bioPhotoWrap');
+    wrap.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = kyc.photo;
+    wrap.appendChild(img);
   }
 
-  // Bio data
-  document.getElementById('bfName').textContent = data.customerName;
-  const dob = data.dob ? new Date(data.dob).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
-  document.getElementById('bfDob').textContent = dob;
-  document.getElementById('bfGender').textContent = (kyc&&kyc.gender)||'—';
-  document.getElementById('bfPhone').textContent = data.phone||'—';
-  document.getElementById('bfEmail').textContent = data.email||'—';
-  const addr = data.address || ((kyc&&kyc.addr)?kyc.addr+(kyc.city?', '+kyc.city:'')+(kyc.state?', '+kyc.state:''):'—');
-  document.getElementById('bfAddr').textContent = addr;
+  // Biometric data
+  const fullName = ((kyc.fname||'')+ ' '+(kyc.lname||'')).trim();
+  document.getElementById('bfName').textContent = fullName.toUpperCase()||'—';
+  document.getElementById('bfDob').textContent = kyc.dob ? new Date(kyc.dob).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : '—';
+  document.getElementById('bfGender').textContent = kyc.gender||'—';
+  document.getElementById('bfPhone').textContent = kyc.mobile ? '+91-'+kyc.mobile : '—';
+  document.getElementById('bfEmail').textContent = kyc.email||'—';
+  const addr = [kyc.addr1, kyc.city, kyc.state, kyc.pin].filter(Boolean).join(', ');
+  document.getElementById('bfAddr').textContent = addr||'—';
 
-  // Validity
-  document.getElementById('valIssued').textContent = issued.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('valExpiry').textContent = expiry.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
-  document.getElementById('valDays').textContent = daysLeft;
-  document.getElementById('validityBar').style.width = pct+'%';
-  document.getElementById('validityText').textContent = daysLeft+' of 365 days remaining';
+  // Dates
+  const fmt = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('valIssued').textContent = fmt(issueDate);
+  document.getElementById('valExpiry').textContent = fmt(expiryDate);
+  document.getElementById('valDays').textContent = '365';
+  document.getElementById('validityBar').style.width = '100%';
+  document.getElementById('validityText').textContent = '365 of 365 days remaining';
+
+  // Entry limits
+  document.getElementById('entryLimits').innerHTML = (planConfig.entries||[]).map(e=>`
+    <div class="el-item"><div class="el-val">${e.val}</div><div class="el-label">${e.label}</div></div>`).join('');
 
   // Benefits
-  const bens = PLAN_BENEFITS[plan] || PLAN_BENEFITS['Combo Passport'];
-  document.getElementById('benefitsGrid').innerHTML = bens.map(b=>`
+  document.getElementById('benefitsGrid').innerHTML = (planConfig.benefits||[]).map(b=>`
     <div class="benefit-item"><i class="fas ${b.icon}"></i>${b.text}</div>`).join('');
 
   // Vouchers
-  const vouchers = PLAN_VOUCHERS[plan] || PLAN_VOUCHERS['Combo Passport'];
-  document.getElementById('vouchersRow').innerHTML = vouchers.map(v=>`
+  document.getElementById('vouchersRow').innerHTML = (planConfig.vouchers||[]).map(v=>`
     <div class="voucher-chip"><span class="vc-val">${v.val}</span><span class="vc-label">${v.label}</span></div>`).join('');
 
   // Agent info
-  document.getElementById('agentName').textContent = data.agentName||agent.name;
-  document.getElementById('loginId').textContent = data.phone;
-  document.getElementById('issuedDate').textContent = issued.toLocaleDateString('en-IN');
-
-  // QR Code
-  const qrData = JSON.stringify({
-    id:pid, name:data.customerName, phone:data.phone,
-    plan:plan, issued:issued.toISOString(), expires:expiry.toISOString(),
-    status:'active', portal:'https://wow.in/portal'
-  });
-  try{
-    new QRCode(document.getElementById('passportQR'),{text:qrData,width:56,height:56,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-  }catch(e){}
+  document.getElementById('agentName').textContent = agent.name||'—';
+  document.getElementById('loginId').textContent = kyc.mobile||'—';
+  document.getElementById('issuedDate').textContent = fmt(issueDate);
 
   // MRZ
-  const name = data.customerName.toUpperCase().replace(/\s+/g,'<').padEnd(39,'<').slice(0,39);
-  const pidClean = pid.replace(/-/g,'').padEnd(9,'<').slice(0,9);
-  const dobStr = data.dob ? data.dob.replace(/-/g,'').slice(2) : '000000';
-  document.getElementById('mrzLine1').textContent = 'P<WOW'+name;
-  document.getElementById('mrzLine2').textContent = pidClean+'<'+dobStr+'<<<<<<<<<<<<<<<<<<<<<<0';
+  const ln = (kyc.lname||'UNKNOWN').toUpperCase().replace(/[^A-Z]/g,'<').padEnd(14,'<');
+  const fn = (kyc.fname||'MEMBER').toUpperCase().replace(/[^A-Z]/g,'<').padEnd(10,'<');
+  const pid = passportId.replace(/[^A-Z0-9]/g,'').substr(0,14).padEnd(14,'<');
+  const dob = kyc.dob ? kyc.dob.replace(/-/g,'').substr(2).substr(0,6) : '000000';
+  document.getElementById('mrzLine1').textContent = 'P<WOW'+ln+'<<'+fn+'<<<<<<<<<<';
+  document.getElementById('mrzLine2').textContent = pid+dob+'M'+(dob+'2'+new Date(expiryDate).toISOString().replace(/-/g,'').substr(0,8)).substr(0,9)+'IND0000000000';
 }
 
-function printPassport(){ window.print(); }
-function sharePassport(){
-  if(navigator.share){
-    navigator.share({title:'My WOW Passport',text:'My Worlds of Wonder Passport has been issued!',url:window.location.href});
-  } else {
-    navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!');
-  }
-}
 function sendWhatsApp(){
-  const p = passport||{};
-  const msg = encodeURIComponent(`🎉 Your Worlds of Wonder Passport has been issued!\n\nPassport ID: ${p.passportId||'WOW-PAX-DEMO'}\nPlan: ${p.plan||'Combo Passport'}\nValid Until: ${p.expiresAt?new Date(p.expiresAt).toLocaleDateString('en-IN'):'-'}\n\nLogin at: wow.in/portal\nID: ${p.phone||'-'}\nTemp Password: ${p.tempPwd||'-'}\n\n🎢 See you at Worlds of Wonder!`);
-  const phone = (passport&&passport.phone)||'';
-  window.open(`https://wa.me/91${phone}?text=${msg}`,'_blank');
+  const passport = JSON.parse(sessionStorage.getItem('latest_passport')||'{}');
+  const kyc = passport.kyc||{};
+  const mobile = kyc.mobile;
+  const text = `🎉 Congratulations! Your WOW Passport has been issued!\n\n📋 Passport ID: ${passport.id}\n👤 Name: ${(kyc.fname||'')+' '+(kyc.lname||'')}\n📅 Valid Until: ${new Date(passport.expiresAt).toLocaleDateString('en-IN')}\n\n🔑 Login at: portal.wow.com/login\nID: ${kyc.mobile}\nTemp Password: ${kyc.loginPw}\n\nWelcome to WOW Family! 🌟`;
+  const url = mobile ? `https://api.whatsapp.com/send?phone=91${mobile}&text=${encodeURIComponent(text)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(url,'_blank');
 }
-function sendEmail(){ alert('Email sending — configure SendGrid/SMTP in admin panel to enable.'); }
-function newSale(){ sessionStorage.removeItem('current_kyc'); window.location.href='passport-kyc.html'; }
+
+function sendEmail(){
+  const passport = JSON.parse(sessionStorage.getItem('latest_passport')||'{}');
+  const kyc = passport.kyc||{};
+  const sub = 'Your WOW Passport is Ready! — '+passport.id;
+  const body = `Dear ${kyc.fname||'Member'},\n\nYour WOW Annual Passport has been successfully issued!\n\nPassport ID: ${passport.id}\nPlan: ${passport.plan?.name||'—'}\nValid Until: ${new Date(passport.expiresAt).toLocaleDateString('en-IN')}\n\nLogin Credentials:\nURL: portal.wow.com/login\nID: ${kyc.mobile}\nPassword: ${kyc.loginPw}\n\nWelcome to Worlds of Wonder!\nCustomer Care: 1800-WOW-HELP`;
+  window.open(`mailto:${kyc.email||''}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`);
+}
+
+function sendSms(){ showToast(`SMS with passport details & login credentials sent to +91-${(JSON.parse(sessionStorage.getItem('latest_passport')||'{}').kyc||{}).mobile||'—'}`); }
+
+function sharePassport(){
+  const p = JSON.parse(sessionStorage.getItem('latest_passport')||'{}');
+  const text = `WOW Passport ID: ${p.id} · Plan: ${p.plan?.name} · Valid: ${new Date(p.expiresAt||Date.now()).toLocaleDateString('en-IN')}`;
+  if(navigator.share){ navigator.share({title:'WOW Passport',text:text}); }
+  else { navigator.clipboard.writeText(text); showToast('Passport details copied to clipboard!'); }
+}
+
+function downloadPassport(){ showToast('PDF download: Use Print → Save as PDF for a digital copy.'); }
+
+function newSale(){ sessionStorage.removeItem('wow_passport_kyc'); sessionStorage.removeItem('wow_payment'); window.location.href='passport-kyc.html'; }
+
+function showToast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a1a36;border:1px solid var(--gold);color:#fff;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:600;z-index:9999;display:block;max-width:320px;';
+  setTimeout(()=>t.style.display='none',dur);
+}
 
 init();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="sales"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
