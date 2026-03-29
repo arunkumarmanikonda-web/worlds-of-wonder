@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
 <style>
 .log-table { width:100%;border-collapse:collapse; }
 .log-table th { background:var(--bg2);padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-align:left;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0; }
@@ -274,5 +275,6 @@ setInterval(() => {
   if (el) el.textContent = (parseInt(el.textContent.replace(',',''))+Math.floor(Math.random()*3)).toLocaleString('en-IN');
 }, 3000);
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
