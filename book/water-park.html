@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/booking-page.css" />
+  <link rel="stylesheet" href="../css/forms.css" />
 </head>
 <body>
 <div id="app">
@@ -87,6 +88,7 @@
                   <label class="label" for="visit-date">Visit Date *</label>
                   <input class="input" id="visit-date" type="date" />
                   <div class="field-err hidden" id="visit-date-err"></div>
+                  <div id="date-unavailable-msg" style="display:none;margin-top:6px;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#ef4444;font-size:12.5px;font-weight:600;"></div>
                 </div>
                 <div class="bk-timing-card">
                   <div class="bk-timing-row"><span class="bk-timing-icon">🕙</span><div><strong>Park opens:</strong> 10:00 AM</div></div>
@@ -121,6 +123,29 @@
 
               <!-- Group hint -->
               <div class="cat-hint hidden" id="group-hint"></div>
+
+              <!-- Max ticket toast -->
+              <div id="max-ticket-toast" class="bk-notice bk-notice--red hidden" style="margin-top:8px;"></div>
+
+              <!-- Flash offer banner -->
+              <div id="flash-banner" class="bk-notice bk-notice--flash hidden" style="margin-top:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:13px;"></div>
+
+              <!-- Applied offer badge -->
+              <div id="applied-offer-badge" class="bk-notice hidden" style="margin-top:8px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:13px;"></div>
+
+              <!-- Buffet Add-On -->
+              <div id="buffet-addon-wrap" style="margin-top:12px;"></div>
+
+              <!-- Promo Code -->
+              <div style="margin-top:14px;padding:14px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+                <label style="font-size:12px;font-weight:700;color:#6b7280;display:block;margin-bottom:6px;">🏷 Promo Code (optional)</label>
+                <div style="display:flex;gap:8px;">
+                  <input id="promo-code-input" type="text" placeholder="Enter promo code" style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;" />
+                  <button id="apply-promo-btn" style="padding:9px 16px;background:#0055B3;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Apply</button>
+                </div>
+                <div id="promo-err" class="hidden" style="color:#dc2626;font-size:12px;margin-top:4px;"></div>
+                <div id="promo-success" class="hidden" style="color:#16a34a;font-size:12px;margin-top:4px;"></div>
+              </div>
 
               <!-- Proof-required reminder -->
               <div class="bk-notice bk-notice--amber" style="margin-top:12px;">
@@ -202,6 +227,18 @@
                 <span id="sum-group-disc" style="color:var(--wow-green);">—</span>
               </div>
 
+              <!-- Offer discount -->
+              <div class="bk-sum-row bk-sum-row--disc hidden" id="sum-offer-row">
+                <span id="sum-offer-label">🎯 Offer</span>
+                <span id="sum-offer-val" style="color:#7c3aed;">—</span>
+              </div>
+
+              <!-- Buffet -->
+              <div class="bk-sum-row hidden" id="sum-buffet-row">
+                <span>🍽 Buffet Meals</span>
+                <span id="sum-buffet-val">—</span>
+              </div>
+
               <!-- GST -->
               <div class="bk-sum-row bk-sum-row--gst">
                 <span>GST 18% (incl.)</span>
@@ -276,35 +313,39 @@
 
       <div id="suc-proof-reminder" class="bk-modal-proof hidden"></div>
 
-      <div class="bk-modal-qr-note">📱 In a live environment your QR ticket would be sent via SMS &amp; WhatsApp instantly.</div>
-      <button id="modal-close" class="btn bk-cta-btn bk-cta-btn--water" style="width:100%;">Done — Enjoy the splashes! 🌊</button>
+      <div class="bk-modal-qr-note">📱 Your QR ticket & confirmation will be sent via WhatsApp &amp; Email to <strong id="suc-mobile">—</strong></div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button id="modal-close" class="btn bk-cta-btn bk-cta-btn--water" style="flex:1;">← Back</button>
+        <button id="go-confirmation-btn" class="btn bk-cta-btn bk-cta-btn--water" style="flex:2;background:linear-gradient(135deg,#065C38,#0A9B5F);">View Ticket &amp; QR →</button>
+      </div>
     </div>
   </div>
 
 </div><!-- #app -->
+<script src="../js/wow-content-control.js"></script>
+<script src="../js/wow-modules.js"></script>
+<script src="../js/wow-offer-engine.js"></script>
 <script src="../js/shell.js"></script>
 <script src="../js/booking.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  WOWBooking.initBookingForm('WATER_DAY');
-
-  // Mirror desktop CTA total on mobile
-  const obs = new MutationObserver(() => {
-    const v = document.getElementById('sum-total')?.textContent;
-    const m = document.getElementById('mobile-sum-total');
-    if (m && v) m.textContent = v;
-  });
-  const sumEl = document.getElementById('sum-total');
-  if (sumEl) obs.observe(sumEl, { characterData: true, subtree: true, childList: true });
-
-  // Wire mobile CTA to same handler
-  const mobileBtn = document.getElementById('checkout-btn-mobile');
-  if (mobileBtn) {
-    mobileBtn.addEventListener('click', () => {
-      document.getElementById('checkout-btn')?.click();
-    });
+  // Block access if park is disabled by super admin
+  if (typeof WOWContent !== 'undefined') {
+    const pCfg = WOWContent.getProductCfg();
+    if (pCfg.WATER_DAY && pCfg.WATER_DAY.enabled === false) {
+      document.getElementById('app').innerHTML = `
+        <div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
+          <div style="font-size:56px;margin-bottom:16px;">🌊</div>
+          <h2 style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#003D82;margin-bottom:12px;">Water Park Bookings Temporarily Unavailable</h2>
+          <p style="font-size:16px;color:#6B7280;max-width:480px;margin-bottom:28px;">Online bookings for the Water Park are currently paused. Please check back soon or contact us for assistance.</p>
+          <a href="../index.html" style="display:inline-flex;align-items:center;gap:8px;background:#003D82;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;">← Back to Home</a>
+        </div>`;
+      return;
+    }
+    WOWContent.apply();
   }
+  WOWBooking.initBookingForm('WATER_DAY');
 });
 </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
