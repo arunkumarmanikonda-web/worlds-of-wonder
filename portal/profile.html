@@ -1,891 +1,660 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>My Profile — Worlds of Wonder</title>
-  <meta name="description" content="Manage your Worlds of Wonder account — personal details, contact info, ID documents and preferences." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="../js/wow-auth.js"></script>
   <style>
-    /* ── Profile card ── */
-    .profile-hero {
-      background: linear-gradient(135deg, #0a1628, #1a2a4a);
-      border-radius: 20px;
-      padding: 32px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(255,255,255,.08);
-      flex-wrap: wrap;
-    }
-    .profile-avatar {
-      width: 88px;
-      height: 88px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0055B3, #0088dd);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 900;
-      color: #fff;
-      font-family: 'Nunito', sans-serif;
-      flex-shrink: 0;
-      box-shadow: 0 8px 24px rgba(0,85,179,.4);
-      position: relative;
-    }
-    .avatar-edit-btn {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 28px;
-      height: 28px;
-      background: #0055B3;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      cursor: pointer;
-      border: 2px solid #0a1628;
-    }
-    .profile-hero-info { flex: 1; min-width: 180px; }
-    .profile-name { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .profile-email { font-size: 14px; color: rgba(255,255,255,.55); margin-bottom: 10px; }
-    .profile-badges { display: flex; gap: 8px; flex-wrap: wrap; }
-    .profile-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .badge-member  { background: rgba(0,85,179,.2); color: #60a5fa; border: 1px solid rgba(0,85,179,.3); }
-    .badge-passport{ background: rgba(245,168,0,.15); color: #F5A800; border: 1px solid rgba(245,168,0,.25); }
-    .badge-verified{ background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
-    .profile-hero-actions { display: flex; flex-direction: column; gap: 8px; }
-
-    /* ── Section card ── */
-    .section-card {
-      background: #1a2235;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      padding: 28px;
-      margin-bottom: 20px;
-    }
-    .section-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 22px;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: rgba(255,255,255,.45);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-    .section-edit-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
-      border-radius: 10px;
-      background: rgba(0,85,179,.15);
-      color: #60a5fa;
-      border: 1px solid rgba(0,85,179,.25);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      transition: all .2s;
-    }
-    .section-edit-btn:hover { background: rgba(0,85,179,.3); }
-
-    /* ── Fields ── */
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-    @media(max-width:640px){ .field-grid { grid-template-columns: 1fr; } }
-    .field-item { }
-    .field-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255,255,255,.35);
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      margin-bottom: 6px;
-    }
-    .field-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .field-value.muted { color: rgba(255,255,255,.35); font-style: italic; }
-    .field-verified {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: #10b981;
-      font-weight: 700;
-      margin-left: 8px;
-    }
-
-    /* ── Edit Form (hidden by default) ── */
-    .edit-form { display: none; }
-    .edit-form.open { display: block; }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    @media(max-width:640px){ .form-row { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.5); }
-    .form-input {
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      color: #fff;
-      font-size: 14px;
-      font-family: 'Poppins', sans-serif;
-      outline: none;
-      transition: border-color .2s;
-    }
-    .form-input:focus { border-color: #0055B3; }
-    .form-input::placeholder { color: rgba(255,255,255,.25); }
-    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
-    .btn-save {
-      padding: 11px 28px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #0055B3, #0073E6);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      transition: all .2s;
-    }
-    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,85,179,.4); }
-    .btn-cancel-edit {
-      padding: 11px 20px;
-      border-radius: 12px;
-      background: transparent;
-      color: rgba(255,255,255,.5);
-      font-size: 14px;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,.15);
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    /* ── ID Documents ── */
-    .doc-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    @media(max-width:640px){ .doc-grid { grid-template-columns: 1fr; } }
-    .doc-card {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      padding: 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .doc-icon { font-size: 26px; flex-shrink: 0; }
-    .doc-info { flex: 1; min-width: 0; }
-    .doc-name { font-size: 13px; font-weight: 700; color: #fff; }
-    .doc-status { font-size: 11px; margin-top: 3px; }
-    .doc-verified { color: #10b981; }
-    .doc-pending  { color: #F5A800; }
-    .doc-missing  { color: rgba(255,255,255,.35); }
-    .doc-upload-btn {
-      padding: 7px 14px;
-      border-radius: 8px;
-      background: rgba(0,85,179,.2);
-      color: #60a5fa;
-      border: 1px solid rgba(0,85,179,.3);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      white-space: nowrap;
-    }
-
-    /* ── Preferences ── */
-    .pref-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(255,255,255,.05);
-    }
-    .pref-row:last-child { border-bottom: none; }
-    .pref-label { font-size: 14px; color: #fff; font-weight: 600; }
-    .pref-sub { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
-    .toggle {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,.15);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: .3s;
-    }
-    .toggle-slider:before {
-      content: '';
-      position: absolute;
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: .3s;
-    }
-    .toggle input:checked + .toggle-slider { background: #0055B3; }
-    .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
-
-    /* ── Danger zone ── */
-    .danger-card {
-      background: rgba(239,68,68,.05);
-      border: 1px solid rgba(239,68,68,.2);
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 20px;
-    }
-    .danger-title { font-size: 14px; font-weight: 700; color: #ef4444; margin-bottom: 12px; }
-    .danger-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn-danger {
-      padding: 10px 20px;
-      border-radius: 10px;
-      background: rgba(239,68,68,.12);
-      color: #ef4444;
-      border: 1px solid rgba(239,68,68,.25);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-    }
-    .btn-danger:hover { background: rgba(239,68,68,.2); }
-
-    /* ── Success toast ── */
-    #save-toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #0a9b5f;
-      color: #fff;
-      padding: 14px 24px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 8px 32px rgba(0,0,0,.4);
-      display: none;
-      z-index: 9999;
-      animation: slideUp .3s ease;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
+    :root{--bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--bg4:#212d42;--border:rgba(255,255,255,.08);--text:#e2e8f0;--muted:rgba(255,255,255,.45);--primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;--purple:#a78bfa;--cyan:#22d3ee;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;}
+    .portal-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    .sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+    .sidebar-logo a{font-size:22px;font-weight:900;color:#fff;text-decoration:none;}
+    .sidebar-nav{padding:14px;flex:1;}
+    .nav-section{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;padding:14px 20px 6px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;transition:all .2s;margin-bottom:2px;}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+    .nav-item.active{background:rgba(0,85,179,.25);color:#60a5fa;border-left:3px solid var(--primary);}
+    .portal-main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;}
+    .portal-topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px;}
+    .portal-content{padding:24px 28px;flex:1;}
+    @media(max-width:768px){.portal-sidebar{display:none;}.portal-content{padding:16px;}}
+    /* page tabs */
+    .page-tabs{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:5px;margin-bottom:24px;flex-wrap:wrap;}
+    .page-tab{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .2s;border:none;background:none;font-family:inherit;}
+    .page-tab:hover{color:#fff;}
+    .page-tab.active{background:var(--primary);color:#fff;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    /* layout */
+    .two-col{display:grid;grid-template-columns:280px 1fr;gap:20px;}
+    @media(max-width:1000px){.two-col{grid-template-columns:1fr;}}
+    .section-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px;}
+    .section-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .section-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+    /* avatar */
+    .avatar-section{text-align:center;padding:24px;border-bottom:1px solid var(--border);}
+    .avatar-circle{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#0055B3,#003D82);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:#fff;margin:0 auto 12px;position:relative;border:3px solid rgba(0,85,179,.5);}
+    .avatar-edit-btn{position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;background:var(--gold);border:2px solid var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;}
+    .avatar-name{font-size:16px;font-weight:800;color:#fff;}
+    .avatar-email{font-size:12px;color:var(--muted);margin-top:3px;}
+    .avatar-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,168,0,.15);border:1px solid rgba(245,168,0,.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--gold);margin-top:10px;}
+    /* stats */
+    .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;}
+    .mini-stat{background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+    .mini-stat-val{font-size:20px;font-weight:900;color:#fff;}
+    .mini-stat-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:3px;}
+    /* forms */
+    .form-group{margin-bottom:16px;}
+    .form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:block;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;font-family:inherit;outline:none;transition:border .2s;}
+    .form-input:focus{border-color:rgba(0,85,179,.6);}
+    .form-input:disabled{opacity:.5;cursor:not-allowed;}
+    .form-select{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;font-family:inherit;outline:none;cursor:pointer;}
+    .form-select option{background:#1a2235;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:700px){.form-row{grid-template-columns:1fr;}}
+    .form-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+    .btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-primary:hover{background:#0066d6;}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important;}
+    .btn-ghost:hover{background:rgba(255,255,255,.1);}
+    .btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)!important;}
+    .btn-success{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2)!important;}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+    /* toggle */
+    .toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .toggle-wrap:last-child{border-bottom:none;}
+    .toggle-info{flex:1;}
+    .toggle-title{font-size:13px;font-weight:700;color:#fff;}
+    .toggle-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+    .toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:24px;transition:.3s;}
+    .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;}
+    .toggle input:checked + .toggle-slider{background:var(--green);}
+    .toggle input:checked + .toggle-slider:before{transform:translateX(20px);}
+    /* linked account */
+    .linked-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .linked-row:last-child{border-bottom:none;}
+    .linked-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+    .linked-info{flex:1;margin:0 12px;}
+    .linked-name{font-size:13px;font-weight:700;color:#fff;}
+    .linked-status{font-size:11px;color:var(--muted);}
+    /* device row */
+    .device-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .device-row:last-child{border-bottom:none;}
+    .device-icon{font-size:24px;margin-right:12px;}
+    /* danger zone */
+    .danger-card{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:14px;padding:20px;margin-bottom:16px;}
+    .danger-title{font-size:14px;font-weight:800;color:#ef4444;margin-bottom:4px;}
+    .danger-desc{font-size:12px;color:rgba(239,68,68,.7);margin-bottom:14px;}
+    /* password strength */
+    .pw-strength{margin-top:6px;}
+    .pw-bars{display:flex;gap:3px;margin-bottom:4px;}
+    .pw-bar{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:background .3s;}
+    .pw-label{font-size:11px;color:var(--muted);}
+    /* KYC banner */
+    .kyc-banner{background:linear-gradient(135deg,rgba(245,168,0,.15),rgba(245,168,0,.05));border:1px solid rgba(245,168,0,.25);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+    .kyc-icon{font-size:28px;}
+    .kyc-content{flex:1;}
+    .kyc-title{font-size:14px;font-weight:800;color:var(--gold);}
+    .kyc-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;}
+    /* verified badge */
+    .verified-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;color:#10b981;}
+    .unverified-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(245,168,0,.12);border:1px solid rgba(245,168,0,.25);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--gold);}
+    /* modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px;width:460px;max-width:95vw;}
+    .modal-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:8px;}
+    .modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+    /* toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#10b981;color:#fff;font-size:13px;font-weight:700;padding:12px 24px;border-radius:20px;z-index:999;transition:transform .3s ease;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .divider{height:1px;background:var(--border);margin:16px 0;}
   </style>
 </head>
-<body class="portal-body">
-<div id="app">
-  <div class="portal-layout">
+<body>
 
-    <!-- ═══ SIDEBAR ═══ -->
-    <aside class="portal-sidebar" id="portal-sidebar">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
-        </a>
+<!-- SIDEBAR -->
+<aside class="portal-sidebar">
+  <div class="sidebar-logo"><a href="../index.html"><span style="color:#60a5fa;">W</span>OW</a></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">My Account</div>
+    <a href="dashboard.html"    class="nav-item">📊 Dashboard</a>
+    <a href="my-bookings.html"  class="nav-item">🎟️ My Bookings</a>
+    <a href="tickets.html"      class="nav-item">🎫 My Tickets</a>
+    <a href="passport.html"     class="nav-item">🛂 My Passport</a>
+    <div class="nav-section">Rewards</div>
+    <a href="loyalty.html"      class="nav-item">⭐ Loyalty Points</a>
+    <a href="referral.html"     class="nav-item">🎁 Refer &amp; Earn</a>
+    <a href="offers.html"       class="nav-item">🏷️ My Offers</a>
+    <a href="wallet.html"       class="nav-item">💰 WOW Wallet</a>
+    <div class="nav-section">Account</div>
+    <a href="notifications.html" class="nav-item">🔔 Notifications</a>
+    <a href="profile.html"       class="nav-item active">👤 My Profile</a>
+    <div style="padding:16px;border-top:1px solid var(--border);margin-top:auto;">
+      <a href="../index.html" class="nav-item">🌐 Visit WOW</a>
+      <a href="login.html"    class="nav-item" style="color:var(--red);">⏻ Sign Out</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="portal-main">
+  <div class="portal-topbar">
+    <div>
+      <div style="font-size:18px;font-weight:900;color:#fff;">👤 My Profile</div>
+      <div style="font-size:12px;color:var(--muted);">Manage your account, security &amp; preferences</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="saveAllChanges()">💾 Save Changes</button>
+  </div>
+
+  <div class="portal-content">
+
+    <!-- KYC Banner -->
+    <div class="kyc-banner">
+      <div class="kyc-icon">🪪</div>
+      <div class="kyc-content">
+        <div class="kyc-title">Complete KYC for Full Benefits</div>
+        <div class="kyc-sub">Verify your Aadhaar or PAN to unlock ₹500 welcome credit, group discounts &amp; Passport purchases</div>
       </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>Dashboard</span>
-        </a>
-        <a href="my-bookings.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>My Bookings</span>
-        </a>
-        <a href="tickets.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
-          <span>My Tickets</span>
-        </a>
-        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
-          <span>My Passport</span>
-        </a>
-        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span>Loyalty Points</span>
-        </a>
-        <a href="offers.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          <span>My Offers</span>
-        </a>
-        <a href="notifications.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span>Notifications</span>
-        </a>
-        <a href="profile.html" class="portal-sidenav-item active">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Profile</span>
-        </a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          <span>Back to Website</span>
-        </a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
-        </button>
-      </nav>
-    </aside>
+      <button class="btn btn-gold btn-sm" style="background:rgba(245,168,0,.2);color:var(--gold);border:1px solid rgba(245,168,0,.35)!important;" onclick="openKYCModal()">Verify Now →</button>
+    </div>
 
-    <!-- ═══ MAIN ═══ -->
-    <main class="portal-main">
-      <div id="portal-loading" class="portal-loading">
-        <div class="portal-spinner"></div>
-        <p>Loading your profile…</p>
-      </div>
+    <div class="page-tabs">
+      <button class="page-tab active" onclick="switchTab('personal')">👤 Personal Info</button>
+      <button class="page-tab" onclick="switchTab('security')">🔐 Security</button>
+      <button class="page-tab" onclick="switchTab('prefs')">🔔 Preferences</button>
+      <button class="page-tab" onclick="switchTab('linked')">🔗 Linked Accounts</button>
+      <button class="page-tab" onclick="switchTab('sessions')">📱 Sessions</button>
+      <button class="page-tab" onclick="switchTab('danger')">⚠️ Danger Zone</button>
+    </div>
 
-      <div id="portal-content" style="display:none;">
-        <div class="portal-main-header">
-          <div>
-            <h1 class="portal-main-title">My Profile</h1>
-            <p class="portal-main-sub">Manage your account details, ID documents and preferences</p>
+    <!-- ─── PERSONAL INFO ─── -->
+    <div class="tab-content active" id="tab-personal">
+      <div class="two-col">
+        <!-- Left: Avatar Card -->
+        <div>
+          <div class="section-card" style="padding:0;overflow:hidden;">
+            <div class="avatar-section">
+              <div class="avatar-circle">R
+                <div class="avatar-edit-btn" onclick="changeAvatar()">✏️</div>
+              </div>
+              <div class="avatar-name">Ravi Choudhary</div>
+              <div class="avatar-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e69487908fc8858e8993828e87949fa6818b878f8ac885898b">[email&#160;protected]</a></div>
+              <div class="avatar-badge">⭐ WOW Gold Member</div>
+            </div>
+            <div class="mini-stats">
+              <div class="mini-stat"><div class="mini-stat-val">12</div><div class="mini-stat-label">Total Visits</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">₹14.2K</div><div class="mini-stat-label">Total Spent</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">2,450</div><div class="mini-stat-label">WOW Coins</div></div>
+              <div class="mini-stat"><div class="mini-stat-val">5</div><div class="mini-stat-label">Referrals</div></div>
+            </div>
+            <div style="padding:16px;border-top:1px solid var(--border);">
+              <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Account Health</div>
+              <div style="font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;justify-content:space-between;"><span>Email</span><span class="verified-badge">✓ Verified</span></div>
+                <div style="display:flex;justify-content:space-between;"><span>Mobile</span><span class="verified-badge">✓ Verified</span></div>
+                <div style="display:flex;justify-content:space-between;"><span>KYC</span><span class="unverified-badge">⚠ Pending</span></div>
+                <div style="display:flex;justify-content:space-between;"><span>2FA</span><span class="unverified-badge">⚠ Not Set</span></div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Profile Completion</div>
+                <div style="background:rgba(255,255,255,.07);border-radius:4px;height:6px;"><div style="width:72%;background:var(--gold);border-radius:4px;height:6px;"></div></div>
+                <div style="font-size:11px;color:var(--gold);margin-top:4px;">72% complete — add DOB &amp; address</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="section-card">
+            <div class="section-title">🔗 Quick Links</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <a href="my-bookings.html" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg4);border-radius:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='var(--bg4)'">🎟️ My Bookings <span style="color:var(--muted);">›</span></a>
+              <a href="wallet.html"      style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg4);border-radius:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='var(--bg4)'">💰 WOW Wallet <span style="color:var(--muted);">›</span></a>
+              <a href="loyalty.html"     style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg4);border-radius:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='var(--bg4)'">⭐ Loyalty Points <span style="color:var(--muted);">›</span></a>
+              <a href="referral.html"    style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg4);border-radius:8px;text-decoration:none;color:var(--text);font-size:13px;font-weight:600;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='var(--bg4)'">🎁 Refer &amp; Earn <span style="color:var(--muted);">›</span></a>
+            </div>
           </div>
         </div>
 
-        <!-- ── Profile Hero ── -->
-        <div class="profile-hero">
-          <div class="profile-avatar" id="profile-avatar">
-            ?
-            <div class="avatar-edit-btn" title="Change photo">✏️</div>
-          </div>
-          <div class="profile-hero-info">
-            <div class="profile-name" id="hero-name">Loading…</div>
-            <div class="profile-email" id="hero-email">—</div>
-            <div class="profile-badges">
-              <span class="profile-badge badge-member">🌟 WOW Member</span>
-              <span class="profile-badge badge-passport" id="passport-badge" style="display:none;">🪪 Passport Active</span>
-              <span class="profile-badge badge-verified" id="verified-badge" style="display:none;">✓ Verified</span>
-            </div>
-          </div>
-          <div class="profile-hero-actions">
-            <a href="my-bookings.html" class="btn btn-outline" style="font-size:13px;padding:10px 18px;white-space:nowrap;">View Bookings</a>
-          </div>
-        </div>
-
-        <!-- ── Personal Info ── -->
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-title">Personal Information</div>
-            <button class="section-edit-btn" id="edit-personal-btn" onclick="toggleEdit('personal')">✏️ Edit</button>
-          </div>
-
-          <!-- View Mode -->
-          <div id="personal-view">
-            <div class="field-grid">
-              <div class="field-item">
-                <div class="field-label">First Name</div>
-                <div class="field-value" id="view-first-name">—</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">Last Name</div>
-                <div class="field-value" id="view-last-name">—</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">Date of Birth</div>
-                <div class="field-value" id="view-dob" class="muted">Not set</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">Gender</div>
-                <div class="field-value" id="view-gender" class="muted">Not set</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">City</div>
-                <div class="field-value" id="view-city" class="muted">Not set</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">State</div>
-                <div class="field-value" id="view-state" class="muted">Not set</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Edit Mode -->
-          <form id="personal-form" class="edit-form" onsubmit="savePersonal(event)">
+        <!-- Right: Edit Form -->
+        <div>
+          <div class="section-card">
+            <div class="section-title">✏️ Edit Personal Information</div>
+            <div class="section-sub">Your details are used for bookings and ticket delivery</div>
             <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">First Name</label>
-                <input class="form-input" id="in-first-name" placeholder="First Name" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Last Name</label>
-                <input class="form-input" id="in-last-name" placeholder="Last Name" />
-              </div>
+              <div class="form-group"><label class="form-label">First Name</label><input class="form-input" id="p_fname" value="Ravi"/></div>
+              <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" id="p_lname" value="Choudhary"/></div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Date of Birth</label>
-                <input class="form-input" id="in-dob" type="date" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Gender</label>
-                <select class="form-input" id="in-gender">
-                  <option value="">Select gender</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Non-binary</option>
-                  <option>Prefer not to say</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">City</label>
-                <input class="form-input" id="in-city" placeholder="City" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">State</label>
-                <select class="form-input" id="in-state">
-                  <option value="">Select state</option>
-                  <option>Delhi</option>
-                  <option>Uttar Pradesh</option>
-                  <option>Haryana</option>
-                  <option>Rajasthan</option>
-                  <option>Madhya Pradesh</option>
-                  <option>Maharashtra</option>
-                  <option>Other</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-save">Save Changes</button>
-              <button type="button" class="btn-cancel-edit" onclick="toggleEdit('personal')">Cancel</button>
-            </div>
-          </form>
-        </div>
-
-        <!-- ── Contact Info ── -->
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-title">Contact Details</div>
-            <button class="section-edit-btn" onclick="toggleEdit('contact')">✏️ Edit</button>
-          </div>
-
-          <div id="contact-view">
-            <div class="field-grid">
-              <div class="field-item">
-                <div class="field-label">Email Address</div>
-                <div class="field-value" id="view-email">—
-                  <span class="field-verified" id="email-verified" style="display:none;">✓ Verified</span>
+                <label class="form-label">Mobile Number</label>
+                <div style="position:relative;">
+                  <input class="form-input" id="p_phone" value="+91 98765 43210" style="padding-right:90px;"/>
+                  <button class="btn btn-sm" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);color:#10b981;font-size:11px;" onclick="verifyPhone()">Verify</button>
                 </div>
+                <div class="form-hint">✅ Verified</div>
               </div>
-              <div class="field-item">
-                <div class="field-label">Mobile Number</div>
-                <div class="field-value" id="view-mobile">—
-                  <span class="field-verified" id="mobile-verified" style="display:none;">✓ Verified</span>
-                </div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">WhatsApp Number</div>
-                <div class="field-value" id="view-whatsapp" style="color:rgba(255,255,255,.35);font-style:italic;">Same as mobile</div>
-              </div>
-              <div class="field-item">
-                <div class="field-label">Alternate Email</div>
-                <div class="field-value" id="view-alt-email" style="color:rgba(255,255,255,.35);font-style:italic;">Not set</div>
-              </div>
-            </div>
-          </div>
-
-          <form id="contact-form" class="edit-form" onsubmit="saveContact(event)">
-            <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input class="form-input" id="in-email" type="email" placeholder="you@example.com" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Mobile Number (+91)</label>
-                <input class="form-input" id="in-mobile" type="tel" placeholder="10-digit mobile" maxlength="10" />
+                <div style="position:relative;">
+                  <input class="form-input" id="p_email" value="ravi.choudhary@gmail.com" style="padding-right:90px;"/>
+                  <button class="btn btn-sm" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:rgba(16,185,129,.15);color:#10b981;font-size:11px;">✓ Verified</button>
+                </div>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">WhatsApp Number (if different)</label>
-                <input class="form-input" id="in-whatsapp" type="tel" placeholder="Leave blank to use mobile" maxlength="10" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Alternate Email</label>
-                <input class="form-input" id="in-alt-email" type="email" placeholder="Optional backup email" />
+              <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-input" id="p_dob" value="1990-07-15"/></div>
+              <div class="form-group"><label class="form-label">Gender</label>
+                <select class="form-select" id="p_gender"><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select>
               </div>
             </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-save">Save Contact Info</button>
-              <button type="button" class="btn-cancel-edit" onclick="toggleEdit('contact')">Cancel</button>
+            <div class="form-group"><label class="form-label">Address Line 1</label><input class="form-input" id="p_addr1" placeholder="House/Flat No., Street…"/></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">City</label><input class="form-input" id="p_city" value="Noida"/></div>
+              <div class="form-group"><label class="form-label">State</label>
+                <select class="form-select" id="p_state"><option>Uttar Pradesh</option><option>Delhi</option><option>Haryana</option><option>Maharashtra</option><option>Karnataka</option></select>
+              </div>
             </div>
-          </form>
-        </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">PIN Code</label><input class="form-input" id="p_pin" placeholder="6-digit PIN" maxlength="6"/></div>
+              <div class="form-group"><label class="form-label">Nationality</label><input class="form-input" id="p_nat" value="Indian"/></div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+              <button class="btn btn-ghost" onclick="resetPersonal()">↺ Reset</button>
+              <button class="btn btn-primary" onclick="savePersonal()">💾 Save Personal Info</button>
+            </div>
+          </div>
 
-        <!-- ── ID Documents ── -->
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-title">ID Documents (for Concession Verification)</div>
-          </div>
-          <div class="doc-grid">
-            <div class="doc-card">
-              <div class="doc-icon">🪪</div>
-              <div class="doc-info">
-                <div class="doc-name">Aadhaar Card</div>
-                <div class="doc-status doc-missing">Not uploaded</div>
+          <!-- Emergency Contact -->
+          <div class="section-card">
+            <div class="section-title">🆘 Emergency Contact</div>
+            <div class="section-sub">Used only in case of incidents at the park</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" id="ec_name" placeholder="Family member name"/></div>
+              <div class="form-group"><label class="form-label">Relationship</label>
+                <select class="form-select" id="ec_rel"><option>Spouse</option><option>Parent</option><option>Sibling</option><option>Friend</option></select>
               </div>
-              <button class="doc-upload-btn">Upload</button>
             </div>
-            <div class="doc-card">
-              <div class="doc-icon">📘</div>
-              <div class="doc-info">
-                <div class="doc-name">Passport</div>
-                <div class="doc-status doc-missing">Not uploaded</div>
-              </div>
-              <button class="doc-upload-btn">Upload</button>
-            </div>
-            <div class="doc-card">
-              <div class="doc-icon">🎖️</div>
-              <div class="doc-info">
-                <div class="doc-name">Defence ID (for Armed Forces discount)</div>
-                <div class="doc-status doc-missing">Not uploaded</div>
-              </div>
-              <button class="doc-upload-btn">Upload</button>
-            </div>
-            <div class="doc-card">
-              <div class="doc-icon">♿</div>
-              <div class="doc-info">
-                <div class="doc-name">Disability Certificate (for 50% discount)</div>
-                <div class="doc-status doc-missing">Not uploaded</div>
-              </div>
-              <button class="doc-upload-btn">Upload</button>
-            </div>
-          </div>
-          <p style="font-size:12px;color:rgba(255,255,255,.35);margin-top:16px;line-height:1.6;">
-            ℹ️ ID documents are verified by our team before the concession discount is activated. You can also present physical ID at the gate for spot discounts.
-          </p>
-        </div>
-
-        <!-- ── Communication Preferences ── -->
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-title">Communication Preferences</div>
-          </div>
-          <div class="pref-row">
-            <div>
-              <div class="pref-label">Email Notifications</div>
-              <div class="pref-sub">Booking confirmations, receipts, updates</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pref-email" checked onchange="savePref('email', this.checked)" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="pref-row">
-            <div>
-              <div class="pref-label">SMS Alerts</div>
-              <div class="pref-sub">Booking reminders and gate entry notifications</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pref-sms" checked onchange="savePref('sms', this.checked)" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="pref-row" data-module="whatsapp_campaigns">
-            <div>
-              <div class="pref-label">WhatsApp Updates</div>
-              <div class="pref-sub">Instant ticket delivery and flash offers via WhatsApp</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pref-whatsapp" checked onchange="savePref('whatsapp', this.checked)" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="pref-row">
-            <div>
-              <div class="pref-label">Promotional Offers</div>
-              <div class="pref-sub">Flash deals, seasonal discounts and special events</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pref-promo" checked onchange="savePref('promo', this.checked)" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="pref-row" data-module="loyalty_program">
-            <div>
-              <div class="pref-label">Loyalty Points Alerts</div>
-              <div class="pref-sub">Points earned and tier upgrades</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="pref-loyalty" checked onchange="savePref('loyalty', this.checked)" />
-              <span class="toggle-slider"></span>
-            </label>
+            <div class="form-group"><label class="form-label">Emergency Phone</label><input class="form-input" id="ec_phone" placeholder="+91 XXXXX XXXXX"/></div>
+            <button class="btn btn-ghost btn-sm" onclick="saveEmergency()">Save Emergency Contact</button>
           </div>
         </div>
-
-        <!-- ── Security ── -->
-        <div class="section-card">
-          <div class="section-header">
-            <div class="section-title">Security</div>
-          </div>
-          <div class="field-grid">
-            <div class="field-item">
-              <div class="field-label">Password</div>
-              <div class="field-value">●●●●●●●●</div>
-            </div>
-            <div class="field-item">
-              <div class="field-label">Two-Factor Auth</div>
-              <div class="field-value" style="color:rgba(255,255,255,.4);font-style:italic;">Not enabled</div>
-            </div>
-            <div class="field-item">
-              <div class="field-label">Last Login</div>
-              <div class="field-value" id="last-login">—</div>
-            </div>
-            <div class="field-item">
-              <div class="field-label">Account Created</div>
-              <div class="field-value" id="acct-created">—</div>
-            </div>
-          </div>
-          <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="section-edit-btn" onclick="alert('Password reset link sent to your email.')">🔐 Change Password</button>
-            <button class="section-edit-btn" onclick="alert('2FA setup will be available soon.')">🛡 Enable 2FA</button>
-          </div>
-        </div>
-
-        <!-- ── Danger Zone ── -->
-        <div class="danger-card">
-          <div class="danger-title">⚠️ Danger Zone</div>
-          <p style="font-size:13px;color:rgba(255,255,255,.45);margin-bottom:16px;line-height:1.5;">
-            These actions are permanent and cannot be undone. Please be absolutely certain before proceeding.
-          </p>
-          <div class="danger-actions">
-            <button class="btn-danger" onclick="confirmDelete()">🗑 Delete My Account</button>
-            <button class="btn-danger" onclick="confirmExport()">📥 Export My Data (GDPR)</button>
-          </div>
-        </div>
-
       </div>
-      <!-- /portal-content -->
-    </main>
+    </div>
+
+    <!-- ─── SECURITY ─── -->
+    <div class="tab-content" id="tab-security">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div class="section-card">
+            <div class="section-title">🔑 Change Password</div>
+            <div class="section-sub">Use a strong password with letters, numbers &amp; symbols</div>
+            <div class="form-group"><label class="form-label">Current Password</label><input type="password" class="form-input" id="s_current" placeholder="Enter current password"/></div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-input" id="s_new" placeholder="Min 8 chars" oninput="checkPasswordStrength(this.value)"/>
+              <div class="pw-strength">
+                <div class="pw-bars"><div class="pw-bar" id="pwBar1"></div><div class="pw-bar" id="pwBar2"></div><div class="pw-bar" id="pwBar3"></div><div class="pw-bar" id="pwBar4"></div></div>
+                <div class="pw-label" id="pwLabel">Enter a password</div>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" class="form-input" id="s_confirm" placeholder="Re-enter new password"/></div>
+            <button class="btn btn-primary" onclick="changePassword()">🔑 Update Password</button>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">📱 Two-Factor Authentication</div>
+            <div class="section-sub">Add an extra layer of security to your account</div>
+            <div class="toggle-wrap">
+              <div class="toggle-info">
+                <div class="toggle-title">SMS OTP (Recommended)</div>
+                <div class="toggle-desc">Get OTP on +91 98765 43210 when signing in</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-wrap">
+              <div class="toggle-info">
+                <div class="toggle-title">Authenticator App</div>
+                <div class="toggle-desc">Use Google Authenticator or Authy</div>
+              </div>
+              <label class="toggle"><input type="checkbox" onchange="setup2FA(this)"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-wrap">
+              <div class="toggle-info">
+                <div class="toggle-title">Email OTP</div>
+                <div class="toggle-desc">Get OTP on <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="84f6e5f2edaae7ecebf1e0ece5f6fdc4e3e9e5ede8aae7ebe9">[email&#160;protected]</a></div>
+              </div>
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-card">
+            <div class="section-title">🛡️ Security Overview</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:10px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">🔒 Password</span><span class="verified-badge">✓ Strong</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:10px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">📱 SMS 2FA</span><span class="verified-badge">✓ Enabled</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(245,168,0,.07);border:1px solid rgba(245,168,0,.15);border-radius:10px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">🪪 KYC</span><span class="unverified-badge">⚠ Pending</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);border-radius:10px;">
+                <span style="font-size:13px;font-weight:600;color:#fff;">📧 Email</span><span class="verified-badge">✓ Verified</span>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Security Score</div>
+            <div style="background:rgba(255,255,255,.07);border-radius:6px;height:10px;margin-bottom:6px;"><div style="width:75%;height:10px;background:linear-gradient(90deg,#10b981,#F5A800);border-radius:6px;"></div></div>
+            <div style="font-size:12px;color:var(--gold);">75/100 — Complete KYC &amp; enable App 2FA to reach 100</div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">📋 Login History</div>
+            <div style="display:flex;flex-direction:column;gap:0;">
+              ${[
+                {icon:'💻',device:'Chrome on Windows',loc:'Noida, UP',time:'Today, 2:34 PM',current:true},
+                {icon:'📱',device:'WOW App — Android',loc:'Noida, UP',time:'Yesterday, 8:15 AM',current:false},
+                {icon:'💻',device:'Firefox on MacOS',loc:'Delhi, DL',time:'26 Mar, 11:45 AM',current:false},
+              ].map(s=>`
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                  <span style="font-size:22px;">${s.icon}</span>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:700;color:#fff;">${s.device}${s.current?` <span style="background:rgba(16,185,129,.15);color:#10b981;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;">Current</span>`:''}</div>
+                    <div style="font-size:11px;color:var(--muted);">📍 ${s.loc} · ${s.time}</div>
+                  </div>
+                  ${!s.current?`<button class="btn btn-danger btn-sm" style="font-size:11px;" onclick="revokeSession('${s.device}')">Revoke</button>`:''}
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PREFERENCES ─── -->
+    <div class="tab-content" id="tab-prefs">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div class="section-card">
+            <div class="section-title">🔔 Notification Preferences</div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Booking Confirmations</div><div class="toggle-desc">Email &amp; SMS on every booking</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Upcoming Visit Reminders</div><div class="toggle-desc">24h &amp; 2h before your visit</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Offer Alerts</div><div class="toggle-desc">When new deals &amp; promos go live</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Loyalty &amp; Coins Updates</div><div class="toggle-desc">When coins are earned or expiring</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Referral Updates</div><div class="toggle-desc">When a referred friend books</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Marketing Emails</div><div class="toggle-desc">Seasonal campaigns &amp; newsletters</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">WhatsApp Notifications</div><div class="toggle-desc">Tickets &amp; reminders via WhatsApp</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-card">
+            <div class="section-title">⚙️ App Preferences</div>
+            <div class="form-group"><label class="form-label">Language</label>
+              <select class="form-select"><option>English</option><option>हिंदी (Hindi)</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">Currency Display</label>
+              <select class="form-select"><option>₹ Indian Rupee (INR)</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">Default Park</label>
+              <select class="form-select"><option>Water Park</option><option>Amusement Park</option><option>Combo (Both)</option></select>
+            </div>
+            <div class="toggle-wrap" style="margin-top:8px;"><div class="toggle-info"><div class="toggle-title">Dark Mode</div><div class="toggle-desc">Currently enabled (default)</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Compact View</div><div class="toggle-desc">Show more info in less space</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">🎟️ Booking Preferences</div>
+            <div class="form-group"><label class="form-label">Default Adults Count</label>
+              <input type="number" class="form-input" value="2" min="1" max="20"/>
+            </div>
+            <div class="form-group"><label class="form-label">Preferred Visit Time</label>
+              <select class="form-select"><option>Morning (10 AM)</option><option>Midday (12 PM)</option><option>Afternoon (2 PM)</option></select>
+            </div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Save Cards for Fast Checkout</div><div class="toggle-desc">Securely store payment methods</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="toggle-wrap"><div class="toggle-info"><div class="toggle-title">Auto-apply WOW Coins</div><div class="toggle-desc">Use coins by default on checkout</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="savePreferences()">💾 Save Preferences</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── LINKED ACCOUNTS ─── -->
+    <div class="tab-content" id="tab-linked">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div class="section-card">
+            <div class="section-title">🔗 Social &amp; Login Accounts</div>
+            <div class="section-sub">Link accounts for quick one-tap sign-in</div>
+            <div id="linkedAccounts">
+              ${[
+                {icon:'🔵',name:'Google',email:'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4a6b5a2bdfab7bcbba1b0bcb5a6ad94b3b9b5bdb8fab7bbb9">[email&#160;protected]</a>',linked:true,color:'rgba(66,133,244,.2)'},
+                {icon:'🔷',name:'Facebook',email:'Not linked',linked:false,color:'rgba(66,103,178,.2)'},
+                {icon:'📱',name:'Phone / OTP',email:'+91 98765 43210',linked:true,color:'rgba(16,185,129,.2)'},
+              ].map(a=>`
+                <div class="linked-row">
+                  <div class="linked-icon" style="background:${a.color};">${a.icon}</div>
+                  <div class="linked-info">
+                    <div class="linked-name">${a.name}</div>
+                    <div class="linked-status">${a.email}</div>
+                  </div>
+                  <button class="btn btn-sm ${a.linked?'btn-danger':'btn-ghost'}" onclick="${a.linked?`unlinkAccount('${a.name}')`:`linkAccount('${a.name}')`}">
+                    ${a.linked?'Unlink':'Link'}
+                  </button>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">💳 Saved Payment Methods</div>
+            <div class="section-sub">Manage cards &amp; UPI IDs for quick checkout</div>
+            <div>
+              ${[
+                {icon:'💳',name:'HDFC Visa •••• 4231',sub:'Expires 08/27',default:true},
+                {icon:'💳',name:'ICICI Mastercard •••• 8847',sub:'Expires 12/25',default:false},
+                {icon:'📱',name:'ravi@okicici',sub:'UPI — ICICI Bank',default:false},
+              ].map(p=>`
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                  <span style="font-size:22px;">${p.icon}</span>
+                  <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:700;color:#fff;">${p.name}</div>
+                    <div style="font-size:11px;color:var(--muted);">${p.sub}</div>
+                  </div>
+                  ${p.default?`<span class="verified-badge" style="font-size:10px;">Default</span>`:``}
+                  <button class="btn btn-danger btn-sm" onclick="removePayment('${p.name}')">Remove</button>
+                </div>`).join('')}
+              <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="addPaymentMethod()">＋ Add Payment Method</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-card">
+            <div class="section-title">🪪 KYC Documents</div>
+            <div class="section-sub">Required for group bookings &gt;₹5,000 &amp; Passport purchases</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              ${[
+                {name:'Aadhaar Card',status:'Not uploaded',action:'Upload'},
+                {name:'PAN Card',status:'Not uploaded',action:'Upload'},
+                {name:'Passport / Voter ID',status:'Not uploaded',action:'Upload (Optional)'},
+              ].map(d=>`
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg4);border-radius:10px;border:1px solid var(--border);">
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#fff;">${d.name}</div>
+                    <div style="font-size:11px;color:var(--muted);">${d.status}</div>
+                  </div>
+                  <button class="btn btn-ghost btn-sm" onclick="uploadDoc('${d.name}')">${d.action}</button>
+                </div>`).join('')}
+            </div>
+            <div style="background:rgba(245,168,0,.07);border:1px solid rgba(245,168,0,.15);border-radius:10px;padding:12px;margin-top:14px;font-size:12px;color:rgba(245,168,0,.8);">
+              🔒 All documents are encrypted and stored securely. Used only for KYC verification.
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-title">🏆 WOW Memberships</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="background:linear-gradient(135deg,rgba(245,168,0,.18),rgba(245,168,0,.06));border:1px solid rgba(245,168,0,.3);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-size:14px;font-weight:800;color:var(--gold);">⭐ WOW Gold</div><div style="font-size:11px;color:var(--muted);">Since Jan 2026 · 12 visits</div></div>
+                <span style="font-size:11px;font-weight:700;color:var(--gold);background:rgba(245,168,0,.15);border-radius:20px;padding:3px 10px;">Active</span>
+              </div>
+              <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-size:14px;font-weight:800;color:var(--muted);">🛂 WOW Passport</div><div style="font-size:11px;color:var(--muted);">Not purchased</div></div>
+                <a href="wow-passport.html" class="btn btn-primary btn-sm">Buy Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SESSIONS ─── -->
+    <div class="tab-content" id="tab-sessions">
+      <div class="section-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div><div class="section-title" style="margin:0;">📱 Active Sessions</div><div style="font-size:12px;color:var(--muted);margin-top:3px;">Devices currently signed in to your account</div></div>
+          <button class="btn btn-danger btn-sm" onclick="revokeAllSessions()">Sign out all devices</button>
+        </div>
+        <div id="sessionsContainer"></div>
+      </div>
+    </div>
+
+    <!-- ─── DANGER ZONE ─── -->
+    <div class="tab-content" id="tab-danger">
+      <div class="danger-card">
+        <div class="danger-title">⏸ Deactivate Account</div>
+        <div class="danger-desc">Temporarily hide your account. You can reactivate anytime by signing in.</div>
+        <button class="btn btn-danger btn-sm" onclick="deactivateAccount()">Deactivate Account</button>
+      </div>
+      <div class="danger-card">
+        <div class="danger-title">📤 Export My Data</div>
+        <div class="danger-desc">Download a copy of all your personal data, bookings, and transaction history (DPDP Act compliance).</div>
+        <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ Request Data Export</button>
+      </div>
+      <div class="danger-card">
+        <div class="danger-title">🗑 Delete Account Permanently</div>
+        <div class="danger-desc">This will permanently delete your account, all bookings history, WOW Coins, and Wallet balance. This action is irreversible.</div>
+        <button class="btn btn-danger btn-sm" onclick="deleteAccount()">Delete My Account</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Save toast -->
-<div id="save-toast">✅ Changes saved successfully!</div>
+<!-- KYC Modal -->
+<div class="modal-overlay" id="kycModal">
+  <div class="modal">
+    <div class="modal-title">🪪 Quick KYC Verification</div>
+    <div class="modal-sub">Verify your identity to unlock full benefits</div>
+    <div class="form-group"><label class="form-label">Document Type</label>
+      <select class="form-select"><option>Aadhaar Card</option><option>PAN Card</option><option>Voter ID</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Document Number</label><input class="form-input" placeholder="Enter document number"/></div>
+    <div style="background:rgba(0,85,179,.08);border:1px solid rgba(0,85,179,.2);border-radius:10px;padding:12px;font-size:12px;color:rgba(100,160,255,.8);margin-bottom:16px;">
+      🔒 Your document details are encrypted. WOW complies with India's DPDP Act 2023.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="document.getElementById('kycModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitKYC()">Verify Identity</button>
+    </div>
+  </div>
+</div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-  const app  = initializeApp(WOW_FB_CONFIG);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function switchTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='sessions') renderSessions();
+}
 
-  let currentUser = null;
-  let profileData = {};
+/* ── Password Strength ── */
+function checkPasswordStrength(pw){
+  const bars=[document.getElementById('pwBar1'),document.getElementById('pwBar2'),document.getElementById('pwBar3'),document.getElementById('pwBar4')];
+  const lbl=document.getElementById('pwLabel');
+  let score=0;
+  if(pw.length>=8) score++;
+  if(/[A-Z]/.test(pw)&&/[a-z]/.test(pw)) score++;
+  if(/[0-9]/.test(pw)) score++;
+  if(/[^A-Za-z0-9]/.test(pw)) score++;
+  const colors=['#ef4444','#f97316','#F5A800','#10b981'];
+  const labels=['Weak','Fair','Good','Strong'];
+  bars.forEach((b,i)=>{ b.style.background=i<score?colors[score-1]:'rgba(255,255,255,.1)'; });
+  lbl.textContent=pw.length===0?'Enter a password':labels[score-1]||'Weak';
+  lbl.style.color=score>0?colors[score-1]:'var(--muted)';
+}
 
-  function showToast(msg = '✅ Saved!') {
-    const t = document.getElementById('save-toast');
-    t.textContent = msg;
-    t.style.display = 'block';
-    setTimeout(() => t.style.display = 'none', 3000);
-  }
+/* ── Sessions ── */
+function renderSessions(){
+  const sessions=[
+    {icon:'💻',device:'Chrome 122 on Windows 11',loc:'Noida, Uttar Pradesh',ip:'103.21.x.x',time:'Now',current:true,secure:true},
+    {icon:'📱',device:'WOW App v3.2 — Android 14',loc:'Noida, Uttar Pradesh',ip:'49.36.x.x',time:'Yesterday 8:15 AM',current:false,secure:true},
+    {icon:'💻',device:'Firefox 124 on macOS',loc:'Delhi',ip:'122.163.x.x',time:'26 Mar, 11:45 AM',current:false,secure:true},
+    {icon:'📱',device:'Safari on iPhone 15',loc:'Gurgaon, Haryana',ip:'116.72.x.x',time:'20 Mar, 3:22 PM',current:false,secure:false},
+  ];
+  document.getElementById('sessionsContainer').innerHTML=sessions.map(s=>`
+    <div class="device-row">
+      <span class="device-icon">${s.icon}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:#fff;">${s.device} ${s.current?`<span style="background:rgba(16,185,129,.15);color:#10b981;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;">Current</span>`:''} ${!s.secure?`<span style="background:rgba(245,168,0,.15);color:#F5A800;border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700;">⚠ Suspicious</span>`:''}</div>
+        <div style="font-size:11px;color:var(--muted);">📍 ${s.loc} · IP: ${s.ip} · ${s.time}</div>
+      </div>
+      ${!s.current?`<button class="btn btn-danger btn-sm" onclick="revokeSession('${s.device}')">Sign Out</button>`:''}
+    </div>`).join('');
+}
 
-  window.toggleEdit = function(section) {
-    const form = document.getElementById(section + '-form');
-    const view = document.getElementById(section + '-view');
-    const btn  = document.getElementById('edit-' + section + '-btn');
-    if (!form) return;
-    const isOpen = form.classList.contains('open');
-    form.classList.toggle('open', !isOpen);
-    if (view) view.style.display = isOpen ? 'block' : 'none';
-    if (btn)  btn.textContent   = isOpen ? '✏️ Edit' : '✕ Cancel';
-  };
+/* ── Actions ── */
+function savePersonal(){ showToast('✅ Personal information saved!'); }
+function saveEmergency(){ showToast('✅ Emergency contact saved!'); }
+function savePreferences(){ showToast('✅ Preferences saved!'); }
+function saveAllChanges(){ showToast('✅ All changes saved successfully!'); }
+function resetPersonal(){ showToast('↺ Reset to last saved values'); }
+function changePassword(){
+  const cur=document.getElementById('s_current').value;
+  const nw=document.getElementById('s_new').value;
+  const con=document.getElementById('s_confirm').value;
+  if(!cur||!nw||!con){alert('Please fill in all password fields.');return;}
+  if(nw!==con){alert('New passwords do not match.');return;}
+  if(nw.length<8){alert('Password must be at least 8 characters.');return;}
+  showToast('🔑 Password updated successfully!');
+  ['s_current','s_new','s_confirm'].forEach(id=>document.getElementById(id).value='');
+}
+function setup2FA(el){ if(el.checked) alert('📱 Scan the QR code in your Authenticator app:\n\nIntegration: /api/2fa/setup (generates TOTP secret)\n\nFor demo purposes, 2FA is simulated.'); }
+function verifyPhone(){ alert('📱 OTP sent to +91 98765 43210\n\nAPI: POST /api/auth/send-otp'); }
+function revokeSession(device){ if(confirm('Sign out of: '+device+'?')) showToast('✅ Session revoked for '+device); }
+function revokeAllSessions(){ if(confirm('Sign out of ALL devices except this one?')) showToast('✅ All other sessions have been signed out'); }
+function linkAccount(name){ alert('Linking '+name+'...\nAPI: POST /api/auth/link/'+name.toLowerCase()); showToast('✅ '+name+' account linked!'); }
+function unlinkAccount(name){ if(confirm('Unlink '+name+' from your account?')) showToast('✅ '+name+' account unlinked'); }
+function removePayment(name){ if(confirm('Remove: '+name+'?')) showToast('✅ Payment method removed'); }
+function addPaymentMethod(){ alert('Add payment method\nAPI: POST /api/payments/cards'); }
+function uploadDoc(name){ alert('Upload '+name+'\nAPI: POST /api/kyc/upload\n\nIn production: integrated with DigiLocker'); }
+function deactivateAccount(){ if(confirm('Deactivate your account?\n\nYou can reactivate by signing in again.')) alert('Account deactivated.\nAPI: PATCH /api/account/deactivate'); }
+function exportData(){ alert('📤 Data export requested!\n\nYou will receive a download link at ravi.choudhary@gmail.com within 24 hours.\nAPI: POST /api/account/export-data'); }
+function deleteAccount(){ const confirm1=confirm('⚠️ This will PERMANENTLY delete your account and all data.\n\nThis cannot be undone. Are you sure?'); if(!confirm1) return; const confirm2=confirm('Last chance! Type "DELETE" to confirm permanent deletion.\n\nAre you absolutely sure?'); if(!confirm2) return; alert('Account deletion request submitted.\nYou will receive a confirmation email.\nData will be purged within 30 days per DPDP Act.'); }
+function changeAvatar(){ alert('Change profile photo\nAPI: PATCH /api/account/avatar\n\nIn production: supports JPG/PNG up to 5MB'); }
+function openKYCModal(){ document.getElementById('kycModal').classList.add('show'); }
+function submitKYC(){ document.getElementById('kycModal').classList.remove('show'); showToast('✅ KYC submitted! Verification in 24 hrs'); }
 
-  window.savePersonal = function(e) {
-    e.preventDefault();
-    const data = {
-      firstName: document.getElementById('in-first-name').value,
-      lastName:  document.getElementById('in-last-name').value,
-      dob:       document.getElementById('in-dob').value,
-      gender:    document.getElementById('in-gender').value,
-      city:      document.getElementById('in-city').value,
-      state:     document.getElementById('in-state').value,
-    };
-    Object.assign(profileData, data);
-    // Save to localStorage as fallback
-    localStorage.setItem('wow_profile_' + (currentUser?.uid || 'demo'), JSON.stringify(profileData));
-    // Try Firestore
-    if (currentUser) {
-      import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')
-        .then(({ getFirestore, doc, updateDoc }) => {
-          updateDoc(doc(getFirestore(), 'users', currentUser.uid), data).catch(() => {});
-        });
-    }
-    renderPersonalView(data);
-    toggleEdit('personal');
-    showToast('✅ Personal info updated!');
-  };
+/* ── Toast ── */
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
 
-  window.saveContact = function(e) {
-    e.preventDefault();
-    const data = {
-      altEmail:  document.getElementById('in-alt-email').value,
-      whatsapp:  document.getElementById('in-whatsapp').value,
-    };
-    Object.assign(profileData, data);
-    localStorage.setItem('wow_profile_' + (currentUser?.uid || 'demo'), JSON.stringify(profileData));
-    toggleEdit('contact');
-    showToast('✅ Contact info updated!');
-  };
-
-  window.savePref = function(key, val) {
-    const prefs = JSON.parse(localStorage.getItem('wow_prefs') || '{}');
-    prefs[key] = val;
-    localStorage.setItem('wow_prefs', JSON.stringify(prefs));
-    showToast(val ? `🔔 ${key} notifications enabled` : `🔕 ${key} notifications disabled`);
-  };
-
-  window.confirmDelete = function() {
-    if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
-      alert('Account deletion request submitted. Our team will process it within 30 days as per GDPR.');
-    }
-  };
-
-  window.confirmExport = function() {
-    alert('A data export has been requested. You will receive a download link to your email within 72 hours.');
-    showToast('📥 Data export requested!');
-  };
-
-  function renderPersonalView(data) {
-    document.getElementById('view-first-name').textContent = data.firstName || '—';
-    document.getElementById('view-last-name').textContent  = data.lastName  || '—';
-    document.getElementById('view-dob').textContent        = data.dob       || 'Not set';
-    document.getElementById('view-gender').textContent     = data.gender    || 'Not set';
-    document.getElementById('view-city').textContent       = data.city      || 'Not set';
-    document.getElementById('view-state').textContent      = data.state     || 'Not set';
-    // Populate edit fields
-    if (data.firstName) document.getElementById('in-first-name').value = data.firstName;
-    if (data.lastName)  document.getElementById('in-last-name').value  = data.lastName;
-    if (data.dob)       document.getElementById('in-dob').value        = data.dob;
-    if (data.gender)    document.getElementById('in-gender').value     = data.gender;
-    if (data.city)      document.getElementById('in-city').value       = data.city;
-    if (data.state)     document.getElementById('in-state').value      = data.state;
-  }
-
-  function initials(name) {
-    if (!name) return '?';
-    return name.split(' ').map(p => p[0]).join('').slice(0,2).toUpperCase();
-  }
-
-  function fmtDate(ts) {
-    if (!ts) return '—';
-    return new Date(typeof ts === 'number' ? ts : ts).toLocaleDateString('en-IN', {
-      day:'numeric', month:'short', year:'numeric'
-    });
-  }
-
-  // Load saved prefs
-  function loadPrefs() {
-    const prefs = JSON.parse(localStorage.getItem('wow_prefs') || '{}');
-    ['email','sms','whatsapp','promo','loyalty'].forEach(k => {
-      const el = document.getElementById('pref-' + k);
-      if (el && k in prefs) el.checked = prefs[k];
-    });
-  }
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = 'login.html'; return; }
-    currentUser = user;
-
-    document.getElementById('portal-loading').style.display = 'none';
-    document.getElementById('portal-content').style.display = 'block';
-
-    // ── Firebase metadata ──
-    const meta = user.metadata;
-    document.getElementById('last-login').textContent  = fmtDate(meta.lastSignInTime ? new Date(meta.lastSignInTime) : null);
-    document.getElementById('acct-created').textContent = fmtDate(meta.creationTime  ? new Date(meta.creationTime)  : null);
-
-    // ── Basic from Firebase Auth ──
-    const nameParts = (user.displayName || '').split(' ');
-    const fName = nameParts[0] || '';
-    const lName = nameParts.slice(1).join(' ') || '';
-
-    document.getElementById('hero-name').textContent  = user.displayName || user.email?.split('@')[0] || 'WOW Member';
-    document.getElementById('hero-email').textContent = user.email || '—';
-    document.getElementById('profile-avatar').textContent = initials(user.displayName || user.email || 'WM');
-    document.getElementById('view-email').innerHTML = (user.email || '—') + (user.emailVerified ? '<span class="field-verified">✓ Verified</span>' : '');
-    document.getElementById('view-mobile').textContent = '—';
-    if (user.emailVerified) document.getElementById('email-verified').style.display = 'inline-flex';
-    if (user.emailVerified) document.getElementById('verified-badge').style.display = 'inline-flex';
-
-    // ── Try loading saved profile data ──
-    let savedLocal = {};
-    try { savedLocal = JSON.parse(localStorage.getItem('wow_profile_' + user.uid) || '{}'); } catch {}
-
-    // ── Try Firestore ──
-    let firestoreData = {};
-    try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) firestoreData = snap.data();
-    } catch {}
-
-    profileData = { firstName: fName, lastName: lName, ...savedLocal, ...firestoreData };
-    renderPersonalView(profileData);
-
-    // Passport badge
-    try {
-      const pSnap = await getDoc(doc(db, 'passports', user.uid));
-      if (pSnap.exists() && pSnap.data().status === 'active') {
-        document.getElementById('passport-badge').style.display = 'inline-flex';
-      }
-    } catch {}
-
-    loadPrefs();
-  });
-
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await signOut(auth);
-    window.location.href = '../index.html';
-  });
+/* ── Close modal ── */
+document.getElementById('kycModal').addEventListener('click',e=>{ if(e.target===document.getElementById('kycModal')) document.getElementById('kycModal').classList.remove('show'); });
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
