@@ -199,6 +199,38 @@
                 <button class="qty-btn" onclick="changeAddon('photo',1)">+</button>
               </div>
             </div>
+            <div class="qty-row">
+              <div class="qty-info"><div class="qty-name">🔒 Locker Rental</div><div class="qty-price">₹100 per locker (shared ~3 pax)</div></div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeAddon('locker',-1)">−</button>
+                <span class="qty-count" id="lockerCount">0</span>
+                <button class="qty-btn" onclick="changeAddon('locker',1)">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div class="qty-info"><div class="qty-name">👙 Costume Rental</div><div class="qty-price">₹200 per person</div></div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeAddon('costume',-1)">−</button>
+                <span class="qty-count" id="costumeCount">0</span>
+                <button class="qty-btn" onclick="changeAddon('costume',1)">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div class="qty-info"><div class="qty-name">🏟️ Private Event Space</div><div class="qty-price">₹25,000 for 3 hrs (100+ groups)</div></div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeAddon('venue',-1)">−</button>
+                <span class="qty-count" id="venueCount">0</span>
+                <button class="qty-btn" onclick="changeAddon('venue',1)">+</button>
+              </div>
+            </div>
+            <div class="qty-row">
+              <div class="qty-info"><div class="qty-name">🎤 MC &amp; Entertainment</div><div class="qty-price">₹15,000 flat (2 hrs)</div></div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeAddon('mc',-1)">−</button>
+                <span class="qty-count" id="mcCount">0</span>
+                <button class="qty-btn" onclick="changeAddon('mc',1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -310,7 +342,7 @@
   </div>
 
   <script>
-    let gState = { groupType:'corporate', park:'combo', adults:50, children:10, infants:0, buffet:0, photo:0, currentStep:1, promoDiscount:0 };
+    let gState = { groupType:'corporate', park:'combo', adults:50, children:10, infants:0, buffet:0, photo:0, locker:0, costume:0, venue:0, mc:0, currentStep:1, promoDiscount:0 };
     const prices = { water:{adults:749,children:499}, amusement:{adults:749,children:499}, combo:{adults:1299,children:499} };
 
     function selectGroupType(el, type) {
@@ -326,8 +358,12 @@
     }
 
     function changeAddon(type, delta) {
-      if (type === 'buffet') { gState.buffet = Math.max(0, gState.buffet + delta); document.getElementById('buffetCount').textContent = gState.buffet; }
-      if (type === 'photo')  { gState.photo  = Math.max(0, gState.photo + delta);  document.getElementById('photoCount').textContent = gState.photo; }
+      if (type === 'buffet')  { gState.buffet  = Math.max(0, gState.buffet + delta);  document.getElementById('buffetCount').textContent = gState.buffet; }
+      if (type === 'photo')   { gState.photo   = Math.max(0, gState.photo + delta);   document.getElementById('photoCount').textContent = gState.photo; }
+      if (type === 'locker')  { gState.locker  = Math.max(0, gState.locker + delta);  document.getElementById('lockerCount').textContent = gState.locker; }
+      if (type === 'costume') { gState.costume = Math.max(0, gState.costume + delta); document.getElementById('costumeCount').textContent = gState.costume; }
+      if (type === 'venue')   { gState.venue   = Math.max(0, Math.min(1, gState.venue + delta)); document.getElementById('venueCount').textContent = gState.venue; }
+      if (type === 'mc')      { gState.mc      = Math.max(0, Math.min(1, gState.mc + delta));    document.getElementById('mcCount').textContent = gState.mc; }
       updateGroupPricing();
     }
 
@@ -341,9 +377,13 @@
       else if (total >= 50) rate = p.adults - 100;
       const adultAmt = gState.adults * rate;
       const childAmt = gState.children * p.children;
-      const buffetAmt = gState.buffet * 450;
-      const photoAmt = gState.photo * 5000;
-      const subtotal = adultAmt + childAmt + buffetAmt + photoAmt;
+      const buffetAmt  = gState.buffet  * 450;
+      const photoAmt   = gState.photo   * 5000;
+      const lockerAmt  = gState.locker  * 100;
+      const costumeAmt = gState.costume * 200;
+      const venueAmt   = gState.venue   * 25000;
+      const mcAmt      = gState.mc      * 15000;
+      const subtotal = adultAmt + childAmt + buffetAmt + photoAmt + lockerAmt + costumeAmt + venueAmt + mcAmt;
       const gst = Math.round(subtotal * 0.05);
       const grand = subtotal + gst - gState.promoDiscount;
 
@@ -352,7 +392,11 @@
         ${gState.children > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Children × ${gState.children}</span><span style="color:#fff;font-weight:600;">₹${childAmt.toLocaleString('en-IN')}</span></div>` : ''}
         ${gState.infants > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Infants × ${gState.infants}</span><span style="color:rgba(16,185,129,.8);font-weight:600;">FREE</span></div>` : ''}
         ${gState.buffet > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Buffet × ${gState.buffet}</span><span style="color:#fff;font-weight:600;">₹${buffetAmt.toLocaleString('en-IN')}</span></div>` : ''}
-        ${gState.photo > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Photo Package × ${gState.photo}</span><span style="color:#fff;font-weight:600;">₹${photoAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${gState.photo   > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Photo Package × ${gState.photo}</span><span style="color:#fff;font-weight:600;">₹${photoAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${gState.locker  > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Lockers × ${gState.locker}</span><span style="color:#fff;font-weight:600;">₹${lockerAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${gState.costume > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Costumes × ${gState.costume}</span><span style="color:#fff;font-weight:600;">₹${costumeAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${gState.venue   > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">Private Venue</span><span style="color:#fff;font-weight:600;">₹${venueAmt.toLocaleString('en-IN')}</span></div>` : ''}
+        ${gState.mc      > 0 ? `<div class="order-line"><span style="color:rgba(255,255,255,.6);">MC &amp; Entertainment</span><span style="color:#fff;font-weight:600;">₹${mcAmt.toLocaleString('en-IN')}</span></div>` : ''}
         <div class="order-line"><span style="color:rgba(255,255,255,.6);">GST (5%)</span><span style="color:#fff;font-weight:600;">₹${gst.toLocaleString('en-IN')}</span></div>
         ${gState.promoDiscount > 0 ? `<div class="order-line"><span style="color:#10b981;">Promo Discount</span><span style="color:#10b981;font-weight:600;">−₹${gState.promoDiscount.toLocaleString('en-IN')}</span></div>` : ''}
       `;
@@ -418,5 +462,5 @@
 
     updateGroupPricing();
   </script>
-</body>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
