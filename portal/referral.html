@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Refer & Earn — Worlds of Wonder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/wow-auth.js"></script>
+  <style>
+    :root{--bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--bg4:#212d42;--border:rgba(255,255,255,.08);--text:#e2e8f0;--muted:rgba(255,255,255,.45);--primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;--purple:#a78bfa;--cyan:#22d3ee;--orange:#f97316;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;}
+
+    /* Sidebar */
+    .portal-sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    .sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+    .sidebar-logo a{font-size:22px;font-weight:900;color:#fff;text-decoration:none;}
+    .sidebar-nav{padding:14px;flex:1;}
+    .nav-section{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;padding:14px 20px 6px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;transition:all .2s;margin-bottom:2px;}
+    .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+    .nav-item.active{background:rgba(0,85,179,.25);color:#60a5fa;border-left:3px solid var(--primary);}
+    .nav-item svg{width:18px;height:18px;flex-shrink:0;}
+    .portal-main{flex:1;overflow-x:hidden;display:flex;flex-direction:column;min-width:0;}
+    .portal-topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:10px;}
+    .portal-content{padding:24px 28px;flex:1;}
+    @media(max-width:768px){.portal-sidebar{display:none;}.portal-content{padding:16px;}}
+
+    /* Hero Banner */
+    .referral-hero{background:linear-gradient(135deg,#0a1628 0%,#0d1f3c 50%,#0a1628 100%);border:1px solid rgba(245,168,0,.2);border-radius:20px;padding:36px;margin-bottom:24px;position:relative;overflow:hidden;display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+    .referral-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(245,168,0,.12) 0%,transparent 70%);border-radius:50%;}
+    .referral-hero-left{flex:1;min-width:250px;position:relative;z-index:1;}
+    .referral-hero-right{flex-shrink:0;position:relative;z-index:1;}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(245,168,0,.15);border:1px solid rgba(245,168,0,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:14px;}
+    .hero-title{font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:8px;}
+    .hero-subtitle{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px;line-height:1.6;}
+    .referral-code-box{background:rgba(255,255,255,.06);border:2px dashed rgba(245,168,0,.4);border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:380px;}
+    .referral-code{font-size:22px;font-weight:900;color:var(--gold);letter-spacing:3px;font-family:'Poppins',monospace;}
+    .reward-pill{background:linear-gradient(135deg,rgba(245,168,0,.2),rgba(245,168,0,.08));border:1px solid rgba(245,168,0,.3);border-radius:16px;padding:20px 28px;text-align:center;min-width:160px;}
+    .reward-pill-val{font-size:36px;font-weight:900;color:var(--gold);}
+    .reward-pill-label{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;}
+    .reward-pill-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+    @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+    .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;text-align:center;position:relative;overflow:hidden;}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .stat-card:nth-child(1)::before{background:var(--gold);}
+    .stat-card:nth-child(2)::before{background:var(--green);}
+    .stat-card:nth-child(3)::before{background:var(--primary);}
+    .stat-card:nth-child(4)::before{background:var(--purple);}
+    .stat-emoji{font-size:28px;margin-bottom:8px;}
+    .stat-val{font-size:28px;font-weight:900;color:#fff;}
+    .stat-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:5px;}
+    .stat-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+
+    /* Share Methods */
+    .share-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;}
+    .share-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:all .25s;}
+    .share-card:hover{border-color:rgba(0,85,179,.4);transform:translateY(-2px);}
+    .share-icon{font-size:30px;margin-bottom:10px;}
+    .share-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .share-desc{font-size:11px;color:var(--muted);}
+
+    /* Two Column Layout */
+    .two-col{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;}
+    @media(max-width:1100px){.two-col{grid-template-columns:1fr;}}
+
+    /* Section Card */
+    .section-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+    .section-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .section-sub{font-size:12px;color:var(--muted);margin-bottom:16px;}
+
+    /* Timeline */
+    .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+    @media(max-width:800px){.how-grid{grid-template-columns:1fr;}}
+    .how-step{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;position:relative;}
+    .how-step-num{width:36px;height:36px;border-radius:50%;background:rgba(0,85,179,.3);border:2px solid rgba(0,85,179,.5);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#60a5fa;margin:0 auto 12px;}
+    .how-step-icon{font-size:28px;margin-bottom:10px;}
+    .how-step-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:6px;}
+    .how-step-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+    .how-connector{position:absolute;top:32px;right:-50%;width:100%;height:2px;background:linear-gradient(90deg,rgba(0,85,179,.4),transparent);display:none;}
+
+    /* Referral History */
+    .ref-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .ref-row:last-child{border-bottom:none;}
+    .ref-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgba(0,85,179,.3),rgba(0,85,179,.1));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#60a5fa;flex-shrink:0;}
+    .ref-info{flex:1;}
+    .ref-name{font-size:13px;font-weight:700;color:#fff;}
+    .ref-date{font-size:11px;color:var(--muted);}
+    .ref-status{display:flex;align-items:center;gap:8px;}
+    .ref-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-joined{background:rgba(16,185,129,.12);color:#10b981;}
+    .badge-booked{background:rgba(0,85,179,.2);color:#60a5fa;}
+    .badge-pending{background:rgba(245,168,0,.12);color:#F5A800;}
+    .ref-reward{font-size:13px;font-weight:800;color:var(--gold);}
+
+    /* Leaderboard */
+    .lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+    .lb-row:last-child{border-bottom:none;}
+    .lb-rank{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;}
+    .rank-1{background:linear-gradient(135deg,#F5A800,#D48F00);color:#000;}
+    .rank-2{background:linear-gradient(135deg,#9CA3AF,#6B7280);color:#fff;}
+    .rank-3{background:linear-gradient(135deg,#CD7C3A,#9A5C28);color:#fff;}
+    .rank-other{background:rgba(255,255,255,.07);color:var(--muted);}
+    .lb-name{flex:1;font-size:13px;font-weight:700;color:#fff;}
+    .lb-refs{font-size:12px;color:var(--muted);}
+    .lb-rewards{font-size:13px;font-weight:800;color:var(--gold);}
+    .lb-you{background:rgba(0,85,179,.15);border:1px solid rgba(0,85,179,.3);border-radius:8px;padding:2px 6px;font-size:10px;color:#60a5fa;font-weight:700;margin-left:6px;}
+
+    /* Chart */
+    .chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+    .chart-title{font-size:13px;font-weight:800;color:#fff;margin-bottom:14px;}
+
+    /* Tier Progress */
+    .tier-bar-wrap{background:var(--bg4);border-radius:20px;height:10px;overflow:hidden;margin:8px 0;}
+    .tier-bar-fill{height:100%;border-radius:20px;transition:width .5s;}
+
+    /* Reward Catalogue */
+    .reward-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+    .reward-card{background:var(--bg4);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:all .2s;}
+    .reward-card:hover{border-color:rgba(245,168,0,.3);transform:translateY(-1px);}
+    .reward-emoji{font-size:32px;margin-bottom:8px;}
+    .reward-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .reward-cost{font-size:18px;font-weight:900;color:var(--gold);margin-bottom:2px;}
+    .reward-desc{font-size:11px;color:var(--muted);margin-bottom:10px;}
+    .reward-avail{font-size:11px;color:var(--green);margin-bottom:10px;}
+    .btn{padding:9px 18px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary{background:var(--primary);color:#fff;}
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important;}
+    .btn-gold{background:linear-gradient(135deg,rgba(245,168,0,.2),rgba(245,168,0,.08));color:var(--gold);border:1px solid rgba(245,168,0,.3)!important;}
+    .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+    .btn-xs{padding:4px 10px;font-size:11px;border-radius:6px;}
+
+    /* Invite Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:28px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:6px;}
+    .modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+    .form-group{margin-bottom:14px;}
+    .form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
+    .form-input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:#fff;font-family:inherit;outline:none;}
+    .form-input:focus{border-color:rgba(0,85,179,.6);}
+    textarea.form-input{resize:vertical;}
+
+    /* Copied toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#10b981;color:#fff;font-size:13px;font-weight:700;padding:12px 24px;border-radius:20px;z-index:999;transition:transform .3s ease;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="portal-sidebar">
+  <div class="sidebar-logo">
+    <a href="../index.html"><span style="color:#60a5fa;">W</span>OW</a>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">My Account</div>
+    <a href="dashboard.html"    class="nav-item">📊 Dashboard</a>
+    <a href="my-bookings.html"  class="nav-item">🎟️ My Bookings</a>
+    <a href="tickets.html"      class="nav-item">🎫 My Tickets</a>
+    <a href="passport.html"     class="nav-item">🛂 My Passport</a>
+    <div class="nav-section">Rewards</div>
+    <a href="loyalty.html"      class="nav-item">⭐ Loyalty Points</a>
+    <a href="referral.html"     class="nav-item active">🎁 Refer &amp; Earn</a>
+    <a href="offers.html"       class="nav-item">🏷️ My Offers</a>
+    <a href="wallet.html"       class="nav-item">💰 WOW Wallet</a>
+    <div class="nav-section">Account</div>
+    <a href="notifications.html" class="nav-item">🔔 Notifications</a>
+    <a href="profile.html"       class="nav-item">👤 My Profile</a>
+    <div style="padding:16px;border-top:1px solid var(--border);margin-top:auto;">
+      <a href="../index.html" class="nav-item" style="font-size:13px;">🌐 Visit WOW</a>
+      <a href="login.html"    class="nav-item" style="color:var(--red);font-size:13px;">⏻ Sign Out</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="portal-main">
+  <div class="portal-topbar">
+    <div>
+      <div style="font-size:18px;font-weight:900;color:#fff;">🎁 Refer &amp; Earn</div>
+      <div style="font-size:12px;color:var(--muted);">Share WOW. Earn real rewards every time a friend books.</div>
+    </div>
+    <button class="btn btn-gold btn-sm" onclick="openInviteModal()">✉️ Invite Friends</button>
+  </div>
+
+  <div class="portal-content">
+
+    <!-- Hero -->
+    <div class="referral-hero">
+      <div class="referral-hero-left">
+        <div class="hero-badge">🎁 Referral Program</div>
+        <div class="hero-title">Earn ₹500 for<br/>every friend you<br/>invite to WOW!</div>
+        <div class="hero-subtitle">Share your unique referral code. When your friend completes their first booking, both of you earn ₹500 WOW Credits instantly.</div>
+        <div class="referral-code-box">
+          <div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Your Referral Code</div>
+            <div class="referral-code" id="referralCode">WOW-RAVI50</div>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="copyCode()">📋 Copy</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="shareWhatsApp()">💬 WhatsApp</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyLink()">🔗 Copy Link</button>
+          <button class="btn btn-primary btn-sm" onclick="openInviteModal()">✉️ Email Invite</button>
+        </div>
+      </div>
+      <div class="referral-hero-right">
+        <div class="reward-pill">
+          <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;margin-bottom:6px;">You Earn</div>
+          <div class="reward-pill-val">₹500</div>
+          <div class="reward-pill-label">per successful referral</div>
+          <div style="height:1px;background:rgba(255,255,255,.1);margin:10px 0;"></div>
+          <div style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;margin-bottom:6px;">Friend Gets</div>
+          <div style="font-size:24px;font-weight:900;color:#22d3ee;">₹250</div>
+          <div class="reward-pill-label">on first booking</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-emoji">👥</div>
+        <div class="stat-val" id="statTotal">7</div>
+        <div class="stat-label">Total Referrals</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emoji">✅</div>
+        <div class="stat-val" id="statCompleted">5</div>
+        <div class="stat-label">Successful</div>
+        <div class="stat-sub">Booked & paid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emoji">💰</div>
+        <div class="stat-val" id="statEarned">₹2,500</div>
+        <div class="stat-label">Total Earned</div>
+        <div class="stat-sub">WOW Credits</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emoji">🏆</div>
+        <div class="stat-val" id="statRank">#14</div>
+        <div class="stat-label">Your Rank</div>
+        <div class="stat-sub">This month</div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <div class="how-step-icon">🔗</div>
+        <div class="how-step-title">Share Your Code</div>
+        <div class="how-step-desc">Share your unique WOW referral code or link with friends &amp; family via WhatsApp, email, or social media.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <div class="how-step-icon">🎟️</div>
+        <div class="how-step-title">Friend Books a Visit</div>
+        <div class="how-step-desc">Your friend signs up using your code and completes their first ticket booking — any park, any date.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <div class="how-step-icon">💰</div>
+        <div class="how-step-title">Both Earn Rewards</div>
+        <div class="how-step-desc">You get ₹500 WOW Credits. Your friend gets ₹250 off their booking. Credited instantly!</div>
+      </div>
+    </div>
+
+    <!-- Share Methods -->
+    <div class="share-row">
+      <div class="share-card" onclick="shareWhatsApp()">
+        <div class="share-icon">💬</div>
+        <div class="share-name">WhatsApp</div>
+        <div class="share-desc">Send directly to contacts</div>
+      </div>
+      <div class="share-card" onclick="shareEmail()">
+        <div class="share-icon">📧</div>
+        <div class="share-name">Email</div>
+        <div class="share-desc">Compose a personal invite</div>
+      </div>
+      <div class="share-card" onclick="shareFacebook()">
+        <div class="share-icon">📘</div>
+        <div class="share-name">Facebook</div>
+        <div class="share-desc">Share on your timeline</div>
+      </div>
+      <div class="share-card" onclick="shareTwitter()">
+        <div class="share-icon">🐦</div>
+        <div class="share-name">Twitter / X</div>
+        <div class="share-desc">Tweet your code</div>
+      </div>
+      <div class="share-card" onclick="copyLink()">
+        <div class="share-icon">🔗</div>
+        <div class="share-name">Copy Link</div>
+        <div class="share-desc">Share anywhere you want</div>
+      </div>
+    </div>
+
+    <!-- Main Content: History + Leaderboard -->
+    <div class="two-col">
+      <!-- Left -->
+      <div>
+        <!-- Referral History -->
+        <div class="section-card">
+          <div class="section-title">📋 Referral History</div>
+          <div class="section-sub">Track everyone you've invited</div>
+          <div id="referralList"></div>
+        </div>
+
+        <!-- Earnings Chart -->
+        <div class="chart-card">
+          <div class="chart-title">💰 Monthly Referral Earnings</div>
+          <div style="height:200px;"><canvas id="earningsChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div>
+        <!-- Leaderboard -->
+        <div class="section-card">
+          <div class="section-title">🏆 Monthly Leaderboard</div>
+          <div class="section-sub">Top referrers this month win bonus rewards</div>
+          <div id="leaderboard"></div>
+          <div style="background:rgba(245,168,0,.08);border:1px solid rgba(245,168,0,.2);border-radius:10px;padding:12px;margin-top:14px;font-size:12px;color:rgba(255,255,255,.6);">
+            🥇 Top 3 referrers win <strong style="color:var(--gold);">Bonus ₹2,000 / ₹1,000 / ₹500</strong> + WOW Passport upgrade at month-end!
+          </div>
+        </div>
+
+        <!-- Tier Progress -->
+        <div class="section-card">
+          <div class="section-title">🎯 Referral Tier Progress</div>
+          <div class="section-sub">More referrals → higher multipliers</div>
+          <div id="tierProgress"></div>
+        </div>
+
+        <!-- Reward Catalogue -->
+        <div class="section-card">
+          <div class="section-title">🎁 Redeem Your Credits</div>
+          <div class="section-sub" id="creditsAvailable">Available: ₹2,500 WOW Credits</div>
+          <div class="reward-grid" id="rewardGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- T&C -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:20px;margin-top:4px;">
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px;">📜 Terms &amp; Conditions</div>
+      <ul style="font-size:12px;color:var(--muted);line-height:1.9;padding-left:18px;">
+        <li>Referral reward of ₹500 is credited only when the referred friend completes their first booking and visit.</li>
+        <li>The referred friend must register using your unique referral code at the time of sign-up.</li>
+        <li>Referred friend receives ₹250 discount on their first booking (minimum order ₹1,000).</li>
+        <li>WOW Credits can be used against future bookings. Credits are non-transferable and non-encashable.</li>
+        <li>Credits are valid for 12 months from date of credit.</li>
+        <li>Worlds of Wonder reserves the right to disqualify fraudulent or bulk self-referrals.</li>
+        <li>Maximum referral reward per account: ₹50,000 per calendar year.</li>
+        <li>Program terms may change without prior notice. Current program valid until further communication.</li>
+      </ul>
+    </div>
+
+  </div><!-- /portal-content -->
+</div><!-- /portal-main -->
+
+<!-- Invite Modal -->
+<div class="modal-overlay" id="inviteModal">
+  <div class="modal">
+    <div class="modal-title">✉️ Send Email Invitation</div>
+    <div class="modal-sub">Invite friends directly — we'll add your referral code automatically</div>
+    <div class="form-group">
+      <label class="form-label">Friend's Name</label>
+      <input class="form-input" id="inv_name" placeholder="Enter your friend's name" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Friend's Email</label>
+      <input type="email" class="form-input" id="inv_email" placeholder="friend@email.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Personal Message (optional)</label>
+      <textarea class="form-input" id="inv_msg" rows="3" placeholder="Hey! Come visit WOW with me — use my code WOW-RAVI50 for ₹250 off your first booking!"></textarea>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">
+      📨 Preview: <span style="color:#fff;">Your referral code <strong style="color:var(--gold);">WOW-RAVI50</strong> will be included in the email. Friend gets ₹250 off. You get ₹500 when they book!</span>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeInviteModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="sendInvite()">📨 Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Data ── */
+const REFERRAL_CODE = 'WOW-RAVI50';
+const REFERRAL_LINK = 'https://worldsofwonder.in/register?ref=WOW-RAVI50';
+const MY_CREDITS    = 2500;
+const MY_NAME       = 'Ravi C';
+
+const REFERRALS = [
+  {name:'Sneha Patel',   initial:'S', date:'22 Mar 2026', status:'booked',   reward:500, park:'Water Park', visits:2},
+  {name:'Mohit Sharma',  initial:'M', date:'18 Mar 2026', status:'booked',   reward:500, park:'Combo',      visits:1},
+  {name:'Ananya Iyer',   initial:'A', date:'14 Mar 2026', status:'booked',   reward:500, park:'Amusement',  visits:3},
+  {name:'Kiran Bose',    initial:'K', date:'08 Mar 2026', status:'booked',   reward:500, park:'Water Park',  visits:1},
+  {name:'Deepa Nair',    initial:'D', date:'01 Mar 2026', status:'booked',   reward:500, park:'Combo',      visits:2},
+  {name:'Farhan Khan',   initial:'F', date:'25 Feb 2026', status:'joined',   reward:0,   park:'—',          visits:0},
+  {name:'Swati Agarwal', initial:'S', date:'20 Feb 2026', status:'pending',  reward:0,   park:'—',          visits:0},
+];
+
+const LEADERBOARD = [
+  {name:'Priya M.',    referrals:14, earned:7000, isYou:false},
+  {name:'Akash S.',    referrals:11, earned:5500, isYou:false},
+  {name:'Meera G.',    referrals:9,  earned:4500, isYou:false},
+  {name:'Sunita P.',   referrals:8,  earned:4000, isYou:false},
+  {name:'Vikram T.',   referrals:7,  earned:3500, isYou:false},
+  {name:'Rohit M.',    referrals:7,  earned:3500, isYou:false},
+  {name:'Divya S.',    referrals:6,  earned:3000, isYou:false},
+  {name:'Arjun K.',    referrals:6,  earned:3000, isYou:false},
+  {name:'Neha R.',     referrals:6,  earned:3000, isYou:false},
+  {name:'Kavita B.',   referrals:5,  earned:2500, isYou:false},
+  {name:'Suresh Y.',   referrals:5,  earned:2500, isYou:false},
+  {name:'Geeta P.',    referrals:5,  earned:2500, isYou:false},
+  {name:'Tushar G.',   referrals:5,  earned:2500, isYou:false},
+  {name:MY_NAME,       referrals:5,  earned:2500, isYou:true},
+  {name:'Pooja R.',    referrals:4,  earned:2000, isYou:false},
+];
+
+const TIERS = [
+  {name:'Starter',    min:0,  max:2,   mult:'1×',  color:'#94A3B8', reward:'Standard rewards'},
+  {name:'Explorer',   min:3,  max:9,   mult:'1.1×', color:'#60a5fa', reward:'+10% bonus credits'},
+  {name:'Adventurer', min:10, max:24,  mult:'1.25×',color:'#10b981', reward:'+25% bonus + priority support'},
+  {name:'Champion',   min:25, max:49,  mult:'1.5×', color:'#F5A800', reward:'+50% bonus + free passport upgrade'},
+  {name:'Legend',     min:50, max:999, mult:'2×',   color:'#a78bfa', reward:'Double credits + VIP lounge access'},
+];
+
+const REWARDS = [
+  {emoji:'🎟️', name:'₹500 Ticket Discount', cost:500,  desc:'₹500 off any ticket', avail:true},
+  {emoji:'🍔', name:'F&B Voucher ₹300',     cost:300,  desc:'Use at any food outlet', avail:true},
+  {emoji:'🔐', name:'Locker Free Day',       cost:200,  desc:'Free locker for 1 visit', avail:true},
+  {emoji:'🛂', name:'Passport 1-Month',      cost:2000, desc:'WOW Explore Passport', avail:true},
+  {emoji:'🎁', name:'WOW Merch Bundle',      cost:1500, desc:'Cap + T-shirt + bag', avail:true},
+  {emoji:'🌟', name:'VIP Fast-Pass',         cost:800,  desc:'Skip queues for 1 day', avail:true},
+];
+
+/* ── Render Referral List ── */
+function renderReferrals(){
+  document.getElementById('referralList').innerHTML = REFERRALS.map(r => {
+    const badge = r.status==='booked' ? 'badge-booked' : r.status==='joined' ? 'badge-joined' : 'badge-pending';
+    const label = r.status==='booked' ? '✅ Booked' : r.status==='joined' ? '🟢 Joined' : '⏳ Pending';
+    return `
+    <div class="ref-row">
+      <div class="ref-avatar">${r.initial}</div>
+      <div class="ref-info">
+        <div class="ref-name">${r.name}</div>
+        <div class="ref-date">${r.date} ${r.park!=='—'?'· '+r.park:''} ${r.visits>0?'· '+r.visits+' visit'+(r.visits>1?'s':''):''}</div>
+      </div>
+      <div class="ref-status">
+        <span class="ref-badge ${badge}">${label}</span>
+        ${r.reward>0?`<span class="ref-reward">+₹${r.reward}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Leaderboard ── */
+function renderLeaderboard(){
+  const top15 = LEADERBOARD.slice(0,15);
+  document.getElementById('leaderboard').innerHTML = top15.map((u,i) => {
+    const rank = i+1;
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-other';
+    const rankLabel = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    return `
+    <div class="lb-row ${u.isYou?'':''}">
+      <div class="lb-rank ${rankClass}">${rankLabel}</div>
+      <div class="lb-name">${u.name}${u.isYou?'<span class="lb-you">YOU</span>':''}</div>
+      <div class="lb-refs" style="width:60px;text-align:right;">${u.referrals} refs</div>
+      <div class="lb-rewards" style="width:60px;text-align:right;">₹${u.earned.toLocaleString('en-IN')}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Tier Progress ── */
+function renderTierProgress(){
+  const myReferrals = 5;
+  const currentTierIdx = TIERS.findIndex(t => myReferrals >= t.min && myReferrals <= t.max);
+  const currentTier = TIERS[currentTierIdx];
+  const nextTier = TIERS[currentTierIdx+1];
+  const pct = nextTier ? Math.round(((myReferrals-currentTier.min)/(nextTier.min-currentTier.min))*100) : 100;
+  const needed = nextTier ? nextTier.min - myReferrals : 0;
+
+  document.getElementById('tierProgress').innerHTML = `
+    <div style="background:var(--bg4);border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div>
+          <span style="font-size:14px;font-weight:800;color:${currentTier.color};">${currentTier.name}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:8px;">${currentTier.mult} multiplier</span>
+        </div>
+        <span style="font-size:20px;font-weight:900;color:#fff;">${myReferrals} refs</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${currentTier.reward}</div>
+      <div class="tier-bar-wrap"><div class="tier-bar-fill" style="width:${pct}%;background:${currentTier.color};"></div></div>
+      ${nextTier?`<div style="font-size:11px;color:var(--muted);margin-top:6px;">${needed} more referral${needed!==1?'s':''} to unlock <strong style="color:${nextTier.color};">${nextTier.name}</strong> (${nextTier.mult})</div>`:`<div style="font-size:11px;color:var(--gold);margin-top:6px;">🎉 You've reached the highest tier!</div>`}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${TIERS.map((t,i)=>`
+        <div style="flex:1;min-width:80px;background:${i<=currentTierIdx?t.color+'22':'rgba(255,255,255,.04)'};border:1px solid ${i<=currentTierIdx?t.color+'55':'var(--border)'};border-radius:8px;padding:8px;text-align:center;">
+          <div style="font-size:11px;font-weight:800;color:${i<=currentTierIdx?t.color:'var(--muted)'};">${t.name}</div>
+          <div style="font-size:10px;color:var(--muted);">${t.min}+ refs</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ── Reward Catalogue ── */
+function renderRewardGrid(){
+  document.getElementById('rewardGrid').innerHTML = REWARDS.map(r => `
+    <div class="reward-card">
+      <div class="reward-emoji">${r.emoji}</div>
+      <div class="reward-name">${r.name}</div>
+      <div class="reward-cost">₹${r.cost}</div>
+      <div class="reward-desc">${r.desc}</div>
+      <div class="reward-avail">✅ Available</div>
+      <button class="btn btn-gold btn-xs" onclick="redeemReward('${r.name}',${r.cost})">${MY_CREDITS >= r.cost ? 'Redeem' : '🔒 Need ₹'+(r.cost-MY_CREDITS)+' more'}</button>
+    </div>
+  `).join('');
+}
+
+/* ── Earnings Chart ── */
+function initChart(){
+  new Chart(document.getElementById('earningsChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets: [{
+        label: 'Referral Earnings (₹)',
+        data: [0, 500, 1000, 0, 500, 500],
+        backgroundColor: 'rgba(245,168,0,.6)',
+        borderColor: 'rgba(245,168,0,1)',
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks:{ color:'rgba(255,255,255,.4)',font:{size:10} }, grid:{ color:'rgba(255,255,255,.04)' } },
+        y: { ticks:{ color:'rgba(255,255,255,.4)',font:{size:10}, callback: v=>'₹'+v }, grid:{ color:'rgba(255,255,255,.04)' }, beginAtZero:true }
+      }
+    }
+  });
+}
+
+/* ── Share Actions ── */
+function copyCode(){
+  navigator.clipboard?.writeText(REFERRAL_CODE).catch(()=>{});
+  showToast('✅ Referral code copied: '+REFERRAL_CODE);
+}
+function copyLink(){
+  navigator.clipboard?.writeText(REFERRAL_LINK).catch(()=>{});
+  showToast('🔗 Referral link copied!');
+}
+function shareWhatsApp(){
+  const msg=encodeURIComponent(`🎉 Hey! Come visit Worlds of Wonder, Noida — India's best water & amusement park!\n\nUse my referral code *${REFERRAL_CODE}* to get ₹250 OFF your first booking!\n\n👉 Register here: ${REFERRAL_LINK}`);
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+function shareEmail(){
+  const sub=encodeURIComponent('You\'re invited to Worlds of Wonder — Get ₹250 Off!');
+  const body=encodeURIComponent(`Hi!\n\nI'd love for you to visit Worlds of Wonder, Noida with me!\n\nUse my referral code ${REFERRAL_CODE} when you sign up to get ₹250 off your first booking.\n\nBook here: ${REFERRAL_LINK}\n\nSee you there!\n${MY_NAME}`);
+  window.location.href='mailto:?subject='+sub+'&body='+body;
+}
+function shareFacebook(){ window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(REFERRAL_LINK),'_blank'); }
+function shareTwitter(){ const t=encodeURIComponent(`🎡 Just visited Worlds of Wonder! Use my referral code ${REFERRAL_CODE} for ₹250 off your first booking → ${REFERRAL_LINK} #WOW #WorldsOfWonder`); window.open('https://twitter.com/intent/tweet?text='+t,'_blank'); }
+
+/* ── Invite Modal ── */
+function openInviteModal(){
+  document.getElementById('inviteModal').classList.add('show');
+  document.getElementById('inv_name').value='';
+  document.getElementById('inv_email').value='';
+  document.getElementById('inv_msg').value='';
+}
+function closeInviteModal(){ document.getElementById('inviteModal').classList.remove('show'); }
+function sendInvite(){
+  const name=document.getElementById('inv_name').value.trim();
+  const email=document.getElementById('inv_email').value.trim();
+  if(!name||!email){ alert('Please enter a name and email.'); return; }
+  closeInviteModal();
+  showToast('📨 Invite sent to '+name+'!');
+}
+
+/* ── Redeem ── */
+function redeemReward(name, cost){
+  if(MY_CREDITS < cost){ alert(`Insufficient WOW Credits.\nYou need ₹${cost-MY_CREDITS} more.`); return; }
+  if(confirm(`Redeem "${name}" for ₹${cost} WOW Credits?`)){
+    showToast('🎁 '+name+' redeemed successfully!');
+  }
+}
+
+/* ── Toast ── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ── Close modal on overlay click ── */
+document.getElementById('inviteModal').addEventListener('click',e=>{ if(e.target===document.getElementById('inviteModal')) closeInviteModal(); });
+
+/* ── Init ── */
+renderReferrals();
+renderLeaderboard();
+renderTierProgress();
+renderRewardGrid();
+initChart();
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
+<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</html>
