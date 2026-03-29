@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="../js/wow-auth.js"></script>
 <style>
 .report-card { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px; }
 .report-card:hover { border-color:var(--primary);box-shadow:0 4px 20px rgba(0,85,179,.1);transform:translateY(-2px); }
@@ -372,5 +373,6 @@ function exportChart(type) { alert(`Exporting ${type} chart as PNG/PDF...`); }
 
 initCharts();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
