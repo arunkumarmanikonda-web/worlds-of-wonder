@@ -6,6 +6,7 @@
   <title>System Settings — WOW Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="../js/wow-auth.js"></script>
   <style>
     :root{--bg:#0a0f1e;--bg2:#111827;--bg3:#1a2235;--border:rgba(255,255,255,.08);--text:#e2e8f0;--muted:rgba(255,255,255,.45);--primary:#0055B3;--gold:#F5A800;--green:#10b981;--red:#ef4444;--orange:#f97316;}
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -527,5 +528,6 @@ function removeUser(n){ if(confirm(`Remove ${n} from admin?`)) alert(`${n} remov
 
 renderRoles(); renderUsers(); renderAudit(); renderAPIKeys();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
