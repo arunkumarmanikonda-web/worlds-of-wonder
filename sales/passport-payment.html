@@ -2,499 +2,693 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Settlement — WOW Passport Sales</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Payment Collection — WOW Passport Sales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="../js/wow-passport-api.js"></script>
+  <script src="../js/wow-auth.js"></script>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    :root{--gold:#C9A84C;--gold-light:#F0D080;--gold-dark:#9A6F2A;--bg:#0a0a14;--card:#12122a;--border:#2a2a4a;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7}
-    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    .topnav{background:#0e0e22;border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-    .topnav-brand{display:flex;align-items:center;gap:10px}
-    .topnav-brand .ico{width:34px;height:34px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem}
-    .topnav-brand span{font-weight:800;font-size:.9rem;color:var(--gold)}
-    .topnav-right{display:flex;align-items:center;gap:10px}
-    .btn-back{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:'Nunito',sans-serif;text-decoration:none;transition:all .2s}
-    .btn-back:hover{color:#fff;border-color:var(--gold)}
-    /* PROGRESS STEPS */
-    .progress-bar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:0}
-    .pb-step{display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;color:var(--muted)}
-    .pb-step i{font-size:.7rem}
-    .pb-step.done{color:var(--green)}
-    .pb-step.active{color:var(--gold)}
-    .pb-sep{flex:1;height:1px;background:var(--border);margin:0 8px;max-width:40px}
-    .pb-sep.done{background:var(--green)}
-    /* LAYOUT */
-    .pay-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;max-width:1000px;margin:0 auto;padding:28px 24px}
-    /* ORDER SUMMARY */
-    .order-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}
-    .order-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .order-head h3{font-size:.92rem;font-weight:700;display:flex;align-items:center;gap:8px}
-    .order-head h3 i{color:var(--gold)}
-    .order-body{padding:16px 20px}
-    .cust-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.05)}
-    .cust-photo{width:52px;height:62px;border-radius:8px;border:2px solid var(--gold);object-fit:cover;flex-shrink:0;background:#1a1a3e;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--muted)}
-    .cust-photo img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-    .cust-info .cn{font-size:1rem;font-weight:800}
-    .cust-info .cm{font-size:.78rem;color:var(--muted);margin-top:2px}
-    .plan-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-    .plan-row:last-child{border-bottom:none}
-    .pr-label{font-size:.82rem;color:var(--muted)}
-    .pr-val{font-size:.9rem;font-weight:700}
-    .total-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0 0;border-top:2px solid var(--border);margin-top:10px}
-    .total-row .tl{font-size:1rem;font-weight:800;color:var(--gold)}
-    .total-row .tv{font-size:1.4rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif}
-    /* PAYMENT MODES */
-    .mode-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px}
-    .mode-tab{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s}
-    .mode-tab:hover{border-color:rgba(201,168,76,.4)}
-    .mode-tab.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
-    .mode-tab i{font-size:1.4rem;display:block;margin-bottom:6px;color:var(--muted)}
-    .mode-tab.active i{color:var(--gold)}
-    .mode-tab span{font-size:.78rem;font-weight:700;color:var(--muted)}
-    .mode-tab.active span{color:var(--gold)}
-    /* PANELS */
-    .pay-panel{display:none}
-    .pay-panel.active{display:block}
-    /* CASH */
-    .cash-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
-    .cash-wrap h3{font-size:.92rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .cash-wrap h3 i{color:var(--green)}
-    .amount-display{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.03));border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:18px;text-align:center;margin-bottom:18px}
-    .amount-display .amt-label{font-size:.8rem;color:var(--muted);font-weight:700;margin-bottom:6px}
-    .amount-display .amt-val{font-size:2.2rem;font-weight:900;color:var(--green);font-family:'Poppins',sans-serif}
-    .cash-field{margin-bottom:14px}
-    .cash-field label{font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
-    .cash-field input{width:100%;background:#0d0d22;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:1rem;font-weight:700;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
-    .cash-field input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.1)}
-    .change-display{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-    .change-display span{font-size:.82rem;font-weight:700;color:#60a5fa}
-    .change-display .cv{font-size:1.1rem;font-weight:900;color:#60a5fa;font-family:'Poppins',sans-serif}
-    /* UPI */
-    .upi-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center}
-    .upi-wrap h3{font-size:.92rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:8px}
-    .upi-wrap h3 i{color:var(--blue)}
-    .qr-container{width:200px;height:200px;margin:0 auto 14px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(201,168,76,.2)}
-    #upiQr{width:100%;height:100%}
-    .upi-id-box{background:#0d0d22;border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-    .upi-id-box span{font-size:.85rem;font-weight:700;color:var(--gold);font-family:'Poppins',sans-serif}
-    .upi-id-box button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.82rem;font-family:'Nunito',sans-serif;font-weight:700;transition:color .2s}
-    .upi-id-box button:hover{color:var(--gold)}
-    .upi-timer{font-size:.82rem;color:var(--muted);margin-bottom:16px}
-    .upi-timer span{color:var(--red);font-weight:800}
-    .upi-apps{display:flex;justify-content:center;gap:16px;margin-bottom:18px}
-    .upi-app{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.7rem;color:var(--muted);font-weight:600}
-    .upi-app-ico{width:40px;height:40px;border-radius:10px;background:#0d0d22;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
-    /* CARD */
-    .card-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px}
-    .card-wrap h3{font-size:.92rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .card-wrap h3 i{color:var(--purple)}
-    .card-visual{background:linear-gradient(135deg,#1a1a3e,#2a1a4e);border:1px solid rgba(168,85,247,.3);border-radius:14px;padding:18px;margin-bottom:18px;font-family:'Poppins',sans-serif;position:relative;overflow:hidden}
-    .card-visual::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(168,85,247,.1)}
-    .cv-chip{width:30px;height:22px;background:linear-gradient(135deg,#d4a017,#f0d080);border-radius:4px;margin-bottom:14px}
-    .cv-num{font-size:.95rem;letter-spacing:2px;color:#fff;margin-bottom:10px}
-    .cv-row{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.6)}
-    .cf-group{margin-bottom:14px}
-    .cf-group label{font-size:.72rem;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
-    .cf-group input{width:100%;background:#0d0d22;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;color:#fff;font-size:.9rem;font-family:'Nunito',sans-serif;outline:none;transition:border-color .2s}
-    .cf-group input:focus{border-color:var(--purple)}
-    .cf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    /* CONFIRM BTN */
-    .confirm-btn{width:100%;background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light));color:#0a0a14;border:none;border-radius:12px;padding:14px;font-size:1rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px}
-    .confirm-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.4)}
-    .confirm-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    /* SUCCESS OVERLAY */
-    .success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center}
-    .success-overlay.show{display:flex}
-    .success-modal{background:var(--card);border:2px solid var(--gold);border-radius:24px;padding:40px;text-align:center;max-width:440px;width:90%;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)}
-    @keyframes popIn{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
-    .suc-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));border:3px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:var(--green)}
-    .suc-title{font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:6px}
-    .suc-sub{font-size:.85rem;color:var(--muted);margin-bottom:20px}
-    .suc-passport-id{background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:14px;margin-bottom:20px}
-    .suc-passport-id .pid-label{font-size:.72rem;color:var(--muted);font-weight:700;margin-bottom:4px;text-transform:uppercase}
-    .suc-passport-id .pid-val{font-size:1.2rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif;letter-spacing:1px}
-    .suc-btn{width:100%;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#0a0a14;border:none;border-radius:12px;padding:13px;font-size:.92rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;margin-bottom:10px}
-    .suc-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.4)}
-    .suc-btn.outline{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text)}
-    .suc-btn.outline:hover{border-color:var(--gold);color:var(--gold)}
-    .receipt-info{background:#0d0d22;border-radius:10px;padding:14px;margin-bottom:20px;text-align:left}
-    .ri-row{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px}
-    .ri-row:last-child{margin-bottom:0}
-    .ri-row .rl{color:var(--muted)}
-    .ri-row .rv{font-weight:700}
-    @media(max-width:820px){.pay-layout{grid-template-columns:1fr}.pay-layout .order-sidebar{order:-1}}
+    :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--bg:#07071a;--card:#0f0f2a;--border:#252550;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    .topnav{background:#0a0a20;border-bottom:1.5px solid var(--border);height:60px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .tn-brand{display:flex;align-items:center;gap:10px;}
+    .tn-badge{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;}
+    .tn-name{font-weight:800;font-size:.9rem;color:var(--gold);}
+    .btn-back{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:'Poppins',sans-serif;text-decoration:none;transition:all .2s;}
+    .btn-back:hover{color:var(--gold);border-color:var(--gold);}
+    .page-wrap{max-width:900px;margin:0 auto;padding:28px 20px;}
+    .page-title{font-size:1.3rem;font-weight:900;margin-bottom:4px;}
+    .page-title span{color:var(--gold);}
+    .page-sub{font-size:.85rem;color:var(--muted);margin-bottom:24px;}
+    /* Progress steps */
+    .pay-progress{display:flex;align-items:center;gap:0;margin-bottom:28px;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .pp-step{flex:1;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--muted);border-right:1px solid var(--border);}
+    .pp-step:last-child{border-right:none;}
+    .pp-step.done{color:var(--green);}
+    .pp-step.active{color:var(--gold);background:rgba(201,168,76,.05);}
+    .pp-step .pp-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;}
+    .pp-step.done .pp-num{background:var(--green);border-color:var(--green);color:#fff;}
+    /* Layout */
+    .layout{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start;}
+    /* Summary card */
+    .summary-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;position:sticky;top:76px;}
+    .sum-header{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+    .sum-photo{width:56px;height:68px;border-radius:8px;border:2px solid var(--gold);object-fit:cover;flex-shrink:0;}
+    .sum-name{font-size:.95rem;font-weight:800;color:#fff;}
+    .sum-sub{font-size:.72rem;color:var(--muted);margin-top:2px;}
+    .plan-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:800;background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);margin-top:5px;}
+    .sum-row{display:flex;justify-content:space-between;font-size:.83rem;color:var(--muted);margin-bottom:8px;}
+    .sum-row.total{font-size:1.05rem;font-weight:800;color:var(--gold);border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+    .commission-box{margin-top:12px;padding:10px 12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;font-size:.78rem;color:var(--green);}
+    .benefits-box{margin-top:10px;padding:12px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:10px;}
+    .bx-title{font-size:.68rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+    /* Payment methods */
+    .method-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+    .method-tab{display:flex;flex-direction:column;align-items:center;gap:7px;padding:16px 8px;border:2px solid var(--border);border-radius:14px;cursor:pointer;transition:all .2s;background:var(--card);}
+    .method-tab:hover{border-color:rgba(201,168,76,.4);}
+    .method-tab.active{border-color:var(--gold);background:rgba(201,168,76,.07);}
+    .mt-icon{font-size:1.6rem;}
+    .mt-label{font-size:.8rem;font-weight:700;color:var(--text);}
+    .mt-sub{font-size:.68rem;color:var(--muted);}
+    .payment-panel{display:none;}
+    .payment-panel.active{display:block;animation:fadeIn .3s;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    /* Cash panel */
+    .cash-amount-box{background:linear-gradient(135deg,#0a1520,#0d1a30);border:2px solid rgba(201,168,76,.3);border-radius:16px;padding:26px;text-align:center;margin-bottom:18px;}
+    .ca-label{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+    .ca-amount{font-size:2.8rem;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,.3);}
+    .ca-gst{font-size:.75rem;color:var(--muted);margin-top:4px;}
+    .quick-cash{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+    .qc-btn{padding:7px 14px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;}
+    .qc-btn:hover{border-color:var(--gold);color:var(--gold);}
+    .cash-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+    .cf-label{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:6px;display:block;}
+    .cf-input{width:100%;background:#0a0a1e;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:#fff;font-size:1rem;font-weight:700;font-family:'Poppins',sans-serif;outline:none;transition:border-color .2s;}
+    .cf-input:focus{border-color:var(--gold);}
+    .change-box{background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.3);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+    .change-label{color:var(--green);font-weight:700;font-size:.88rem;}
+    .change-val{font-size:1.3rem;font-weight:900;color:var(--green);}
+    /* UPI panel */
+    .qr-container{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px;text-align:center;}
+    #qr-box{width:200px;height:200px;margin:0 auto 14px;background:#fff;padding:10px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+    .qr-amount{font-size:1.5rem;font-weight:900;color:var(--gold);margin-bottom:6px;}
+    .qr-upi-id{font-size:.8rem;color:var(--muted);margin-bottom:14px;}
+    .qr-upi-id strong{color:#fff;}
+    .timer-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;font-size:.82rem;color:var(--muted);}
+    .timer-circle{width:38px;height:38px;border-radius:50%;border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:var(--gold);}
+    .app-chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+    .app-chip{padding:6px 14px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid var(--border);font-size:.72rem;font-weight:700;color:var(--muted);}
+    .btn-check{width:100%;padding:13px;background:rgba(34,197,94,.12);border:1.5px solid rgba(34,197,94,.3);border-radius:12px;color:var(--green);font-size:.88rem;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;margin-bottom:10px;}
+    .btn-check:hover{background:rgba(34,197,94,.22);}
+    .upi-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .upi-btn{padding:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;transition:all .2s;}
+    .upi-btn:hover{color:var(--gold);border-color:var(--gold);}
+    /* Card panel */
+    .card-visual{background:linear-gradient(135deg,#1a0a00 0%,#2d1500 50%,#1a0800 100%);border:1.5px solid var(--gold3);border-radius:16px;padding:22px;margin-bottom:20px;position:relative;overflow:hidden;}
+    .card-chip{width:36px;height:28px;background:linear-gradient(135deg,#d4a017,#f5c842);border-radius:5px;margin-bottom:14px;}
+    .card-num-display{font-size:1.1rem;font-weight:800;letter-spacing:.18em;color:#fff;margin-bottom:12px;}
+    .card-bottom{display:flex;justify-content:space-between;align-items:flex-end;}
+    .cl-label{font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:3px;}
+    .cl-val{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.8);}
+    .card-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .card-full{grid-column:span 2;}
+    .btn-confirm{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));border:none;border-radius:14px;font-size:1rem;font-weight:800;color:#0a0a14;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px;}
+    .btn-confirm:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,168,76,.4);}
+    .alert-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);border-radius:10px;padding:12px 16px;font-size:.78rem;color:#93c5fd;display:flex;gap:8px;margin-top:12px;}
+    /* Receipt modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.show{display:flex;}
+    .receipt-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+    /* Processing / success */
+    .processing-overlay{position:fixed;inset:0;background:rgba(7,7,26,.95);z-index:300;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+    .processing-overlay.show{display:flex;}
+    .spin-ring{width:80px;height:80px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--gold);animation:spin 1s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .success-overlay{position:fixed;inset:0;background:rgba(7,7,26,.97);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px;}
+    .success-overlay.show{display:flex;}
+    .confetti-wrap{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:401;}
+    .success-ring{width:100px;height:100px;border-radius:50%;border:4px solid var(--green);display:flex;align-items:center;justify-content:center;animation:popIn .5s ease-out;background:rgba(34,197,94,.1);margin-bottom:20px;}
+    @keyframes popIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+    .success-check{font-size:2.5rem;color:var(--green);}
+    .success-actions{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px;margin-top:24px;}
+    .sa-btn{padding:14px;border-radius:12px;font-size:.92rem;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;border:none;transition:all .2s;}
+    .sa-btn.gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14;}
+    .sa-btn.outline{background:rgba(255,255,255,.06);border:1.5px solid var(--border);color:var(--text);}
+    #toast{position:fixed;bottom:24px;right:24px;background:#1a1a36;border:1px solid var(--gold);color:#fff;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:600;z-index:9999;display:none;max-width:320px;}
+    @media(max-width:760px){.layout{grid-template-columns:1fr;}.summary-card{position:static;}}
+    @media(max-width:480px){.cash-row,.card-form{grid-template-columns:1fr;}.card-full{grid-column:auto;}.method-tabs{grid-template-columns:1fr 1fr 1fr;}}
   </style>
 </head>
 <body>
+
 <nav class="topnav">
-  <div class="topnav-brand">
-    <div class="ico"><i class="fas fa-credit-card"></i></div>
-    <span>Payment Settlement</span>
+  <div class="tn-brand">
+    <div class="tn-badge"><i class="fas fa-credit-card"></i></div>
+    <div><div class="tn-name">Payment Collection</div></div>
   </div>
-  <div class="topnav-right">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="font-size:.78rem;color:var(--muted);">Agent: <strong id="agent-name" style="color:#fff;">—</strong></div>
     <a href="passport-kyc.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to KYC</a>
   </div>
 </nav>
 
-<div class="progress-bar">
-  <div class="pb-step done"><i class="fas fa-check"></i> Plan</div>
-  <div class="pb-sep done"></div>
-  <div class="pb-step done"><i class="fas fa-check"></i> KYC</div>
-  <div class="pb-sep done"></div>
-  <div class="pb-step done"><i class="fas fa-check"></i> Photo</div>
-  <div class="pb-sep done"></div>
-  <div class="pb-step done"><i class="fas fa-check"></i> Review</div>
-  <div class="pb-sep done"></div>
-  <div class="pb-step active"><i class="fas fa-credit-card"></i> Payment</div>
-</div>
+<div class="page-wrap">
+  <div class="page-title">Collect <span>Payment</span></div>
+  <div class="page-sub">Choose payment mode and confirm the transaction</div>
 
-<div class="pay-layout">
-  <!-- LEFT: Payment -->
-  <div>
-    <div style="margin-bottom:16px">
-      <div style="font-size:1.2rem;font-weight:800;margin-bottom:4px">Complete <span style="color:var(--gold)">Payment</span></div>
-      <div style="font-size:.82rem;color:var(--muted)">Choose a payment mode to settle the passport purchase</div>
-    </div>
+  <!-- Progress bar -->
+  <div class="pay-progress">
+    <div class="pp-step done"><div class="pp-num"><i class="fas fa-check" style="font-size:.6rem;"></i></div>Plan & KYC</div>
+    <div class="pp-step active"><div class="pp-num">2</div>Payment</div>
+    <div class="pp-step"><div class="pp-num">3</div>Passport Issued</div>
+  </div>
 
-    <div class="mode-tabs">
-      <div class="mode-tab active" id="tab-cash" onclick="switchMode('cash')">
-        <i class="fas fa-money-bill-wave" style="color:var(--green)"></i>
-        <span>Cash</span>
+  <div class="layout">
+    <!-- LEFT: payment methods -->
+    <div>
+      <div class="method-tabs">
+        <div class="method-tab active" id="mt-cash" onclick="switchMethod('cash')">
+          <div class="mt-icon">💵</div>
+          <div class="mt-label">Cash</div>
+          <div class="mt-sub">Instant</div>
+        </div>
+        <div class="method-tab" id="mt-upi" onclick="switchMethod('upi')">
+          <div class="mt-icon">📱</div>
+          <div class="mt-label">UPI / QR</div>
+          <div class="mt-sub">GPay · PhonePe</div>
+        </div>
+        <div class="method-tab" id="mt-card" onclick="switchMethod('card')">
+          <div class="mt-icon">💳</div>
+          <div class="mt-label">Card / POS</div>
+          <div class="mt-sub">Debit · Credit</div>
+        </div>
       </div>
-      <div class="mode-tab" id="tab-upi" onclick="switchMode('upi')">
-        <i class="fas fa-qrcode" style="color:var(--blue)"></i>
-        <span>UPI / QR</span>
-      </div>
-      <div class="mode-tab" id="tab-card" onclick="switchMode('card')">
-        <i class="fas fa-credit-card" style="color:var(--purple)"></i>
-        <span>Card</span>
-      </div>
-    </div>
 
-    <!-- CASH PANEL -->
-    <div class="pay-panel active" id="panel-cash">
-      <div class="cash-wrap">
-        <h3><i class="fas fa-money-bill-wave"></i> Cash Payment</h3>
-        <div class="amount-display">
-          <div class="amt-label">Amount to Collect</div>
-          <div class="amt-val" id="cashTotal">₹0</div>
+      <!-- ====== CASH ====== -->
+      <div class="payment-panel active" id="pp-cash">
+        <div class="cash-amount-box">
+          <div class="ca-label">Amount to Collect</div>
+          <div class="ca-amount" id="cash-display">₹0</div>
+          <div class="ca-gst">Incl. 18% GST · CGST ₹<span id="cgst-val">0</span> + SGST ₹<span id="sgst-val">0</span></div>
         </div>
-        <div class="cash-field">
-          <label>Cash Received from Customer (₹)</label>
-          <input type="number" id="cashReceived" placeholder="Enter amount received" oninput="calcChange()"/>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:8px;">Quick Denominations</div>
+          <div class="quick-cash" id="qc-wrap"></div>
         </div>
-        <div class="change-display">
-          <span><i class="fas fa-exchange-alt"></i> Change to Return</span>
-          <span class="cv" id="changeAmt">₹0</span>
+
+        <div class="cash-row">
+          <div>
+            <label class="cf-label">Cash Tendered (₹)</label>
+            <input class="cf-input" type="number" id="cash-tendered" placeholder="0" oninput="calcChange()"/>
+          </div>
+          <div>
+            <label class="cf-label">Change to Return (₹)</label>
+            <input class="cf-input" type="number" id="cash-change" placeholder="0" readonly style="color:var(--green);background:#0a1a12;border-color:rgba(34,197,94,.3);"/>
+          </div>
         </div>
-        <div style="margin-top:14px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:10px;font-size:.78rem;color:var(--muted)">
-          <i class="fas fa-info-circle" style="color:var(--green)"></i>
-          Cash payment is recorded manually. Ensure you issue a physical receipt or digital confirmation to the customer.
+
+        <div class="change-box" id="change-box" style="display:none;">
+          <span class="change-label"><i class="fas fa-coins"></i> Return Change</span>
+          <span class="change-val" id="change-amount">₹0</span>
         </div>
-        <button class="confirm-btn" id="cashConfirmBtn" onclick="confirmPayment('Cash')" style="margin-top:18px">
+
+        <button class="btn-confirm" id="btn-cash-confirm" onclick="confirmCash()">
           <i class="fas fa-check-circle"></i> Confirm Cash Payment
         </button>
-      </div>
-    </div>
 
-    <!-- UPI PANEL -->
-    <div class="pay-panel" id="panel-upi">
-      <div class="upi-wrap">
-        <h3><i class="fas fa-qrcode"></i> UPI / QR Code Payment</h3>
-        <div class="qr-container"><div id="upiQr"></div></div>
-        <div class="upi-id-box">
-          <span id="upiIdText">wow@paytm</span>
-          <button onclick="copyUpiId()"><i class="fas fa-copy"></i> Copy UPI ID</button>
+        <div class="alert-info" style="margin-top:14px;">
+          <i class="fas fa-info-circle"></i>
+          Transaction is auto-recorded. Agent daily cash balance updated in ERP.
         </div>
-        <div class="upi-timer">QR valid for <span id="upiCountdown">10:00</span></div>
-        <div class="upi-apps">
-          <div class="upi-app"><div class="upi-app-ico">📱</div>PhonePe</div>
-          <div class="upi-app"><div class="upi-app-ico">💳</div>GPay</div>
-          <div class="upi-app"><div class="upi-app-ico">🔵</div>Paytm</div>
-          <div class="upi-app"><div class="upi-app-ico">🏦</div>BHIM</div>
-        </div>
-        <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Ask the customer to scan the QR using any UPI app and pay <b style="color:var(--gold)" id="upiAmtText">₹0</b></div>
-        <button class="confirm-btn" onclick="confirmPayment('UPI')">
-          <i class="fas fa-check-circle"></i> Confirm UPI Payment Received
-        </button>
       </div>
-    </div>
 
-    <!-- CARD PANEL -->
-    <div class="pay-panel" id="panel-card">
-      <div class="card-wrap">
-        <h3><i class="fas fa-credit-card"></i> Card / POS Payment</h3>
+      <!-- ====== UPI ====== -->
+      <div class="payment-panel" id="pp-upi">
+        <div class="qr-container">
+          <div style="font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;">Scan QR to Pay</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:20px;">Customer scans with any UPI app</div>
+          <div id="qr-box"></div>
+          <div class="qr-amount" id="upi-amount">₹0</div>
+          <div class="qr-upi-id">UPI ID: <strong>wow.passport@axisbank</strong></div>
+          <div class="timer-row">
+            <i class="fas fa-clock" style="color:var(--gold);"></i>
+            QR expires in <div class="timer-circle" id="timer-num">05:00</div>
+          </div>
+          <div class="app-chips">
+            <div class="app-chip">GPay</div>
+            <div class="app-chip">PhonePe</div>
+            <div class="app-chip">Paytm</div>
+            <div class="app-chip">BHIM</div>
+            <div class="app-chip">Cred</div>
+          </div>
+          <button class="btn-check" onclick="checkUpiPayment()">
+            <i class="fas fa-sync"></i> Check Payment Status
+          </button>
+          <div class="upi-actions">
+            <button class="upi-btn" onclick="regenerateQr()"><i class="fas fa-qrcode"></i> Refresh QR</button>
+            <button class="upi-btn" onclick="shareUpiLink()"><i class="fab fa-whatsapp" style="color:#25d366;"></i> Share Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== CARD ====== -->
+      <div class="payment-panel" id="pp-card">
         <div class="card-visual">
-          <div class="cv-chip"></div>
-          <div class="cv-num" id="cvNum">●●●● ●●●● ●●●● ●●●●</div>
-          <div class="cv-row">
-            <div><div style="font-size:.6rem;opacity:.6">CARD HOLDER</div><div id="cvName" style="font-size:.78rem;color:#fff">CUSTOMER NAME</div></div>
-            <div style="text-align:right"><div style="font-size:.6rem;opacity:.6">EXPIRES</div><div id="cvExpiry" style="font-size:.78rem;color:#fff">MM/YY</div></div>
+          <div class="card-chip"></div>
+          <div class="card-num-display" id="cv-number">•••• •••• •••• ••••</div>
+          <div class="card-bottom">
+            <div><div class="cl-label">Card Holder</div><div class="cl-val" id="cv-name">FULL NAME</div></div>
+            <div><div class="cl-label">Expires</div><div class="cl-val" id="cv-expiry">MM/YY</div></div>
+            <div id="cv-network" style="font-size:1.5rem;">💳</div>
           </div>
         </div>
-        <div class="cf-group">
-          <label>Card Number</label>
-          <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" onkeyup="updateCardVisual()"/>
-        </div>
-        <div class="cf-group">
-          <label>Cardholder Name</label>
-          <input type="text" id="cardName" placeholder="Name on card" oninput="document.getElementById('cvName').textContent=(this.value||'CUSTOMER NAME').toUpperCase()"/>
-        </div>
-        <div class="cf-row">
-          <div class="cf-group">
-            <label>Expiry (MM/YY)</label>
-            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this);document.getElementById('cvExpiry').textContent=(this.value||'MM/YY')"/>
+
+        <div class="card-form">
+          <div class="card-full">
+            <label class="cf-label">Card Number</label>
+            <input class="cf-input" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"/>
           </div>
-          <div class="cf-group">
-            <label>CVV</label>
-            <input type="password" id="cardCvv" placeholder="●●●" maxlength="4" inputmode="numeric"/>
+          <div class="card-full">
+            <label class="cf-label">Cardholder Name</label>
+            <input class="cf-input" id="card-name" placeholder="As on card" oninput="document.getElementById('cv-name').textContent=this.value.toUpperCase()||'FULL NAME'"/>
+          </div>
+          <div>
+            <label class="cf-label">Expiry (MM/YY)</label>
+            <input class="cf-input" id="card-expiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)"/>
+          </div>
+          <div>
+            <label class="cf-label">CVV</label>
+            <input class="cf-input" type="password" id="card-cvv" placeholder="•••" maxlength="4"/>
           </div>
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)"><i class="fas fa-shield-alt" style="color:var(--green)"></i> 3D Secure</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)"><i class="fas fa-lock" style="color:var(--gold)"></i> PCI DSS</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)"><i class="fab fa-cc-visa" style="color:#1a1fe0;font-size:1rem"></i></div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)"><i class="fab fa-cc-mastercard" style="color:#eb001b;font-size:1rem"></i></div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)"><i class="fab fa-cc-amex" style="color:#007bc1;font-size:1rem"></i></div>
+
+        <div class="alert-info">
+          <i class="fas fa-lock"></i>
+          Card data processed via POS terminal / Razorpay. CVV never stored.
         </div>
-        <button class="confirm-btn" onclick="confirmPayment('Card')">
-          <i class="fas fa-lock"></i> Process Card Payment — <span id="cardAmtText">₹0</span>
+
+        <button class="btn-confirm" onclick="confirmCard()">
+          <i class="fas fa-lock"></i> Charge ₹<span id="card-amount-btn">0</span> to Card
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- RIGHT: Order Summary -->
-  <div class="order-sidebar">
-    <div class="order-card">
-      <div class="order-head"><h3><i class="fas fa-receipt"></i> Order Summary</h3></div>
-      <div class="order-body">
-        <div class="cust-row">
-          <div class="cust-photo" id="custPhotoWrap"><i class="fas fa-user"></i></div>
-          <div class="cust-info">
-            <div class="cn" id="custName">Loading…</div>
-            <div class="cm" id="custPhone">—</div>
-            <div class="cm" id="custEmail" style="margin-top:2px">—</div>
+    <!-- RIGHT: Order Summary -->
+    <div>
+      <div class="summary-card">
+        <div style="font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;">Order Summary</div>
+        <div class="sum-header">
+          <div class="sum-photo" id="sum-photo-wrap" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem;">👤</div>
+          <div>
+            <div class="sum-name" id="summary-name">—</div>
+            <div class="sum-sub" id="summary-mobile">—</div>
+            <div class="plan-pill" id="summary-plan">—</div>
           </div>
         </div>
-        <div class="plan-row"><span class="pr-label">Plan</span><span class="pr-val" id="planName">—</span></div>
-        <div class="plan-row"><span class="pr-label">Validity</span><span class="pr-val">365 Days</span></div>
-        <div class="plan-row"><span class="pr-label">Base Price</span><span class="pr-val" id="basePrice">₹0</span></div>
-        <div class="plan-row"><span class="pr-label">GST (18%)</span><span class="pr-val" id="gstAmt">₹0</span></div>
-        <div class="plan-row"><span class="pr-label">Discount</span><span class="pr-val" style="color:var(--green)">₹0</span></div>
-        <div class="total-row">
-          <span class="tl">Total Payable</span>
-          <span class="tv" id="totalAmt">₹0</span>
-        </div>
-      </div>
-    </div>
+        <div class="sum-row"><span>Plan (Base)</span><span id="sum-base">₹0</span></div>
+        <div class="sum-row"><span>CGST (9%)</span><span id="sum-cgst-disp">₹0</span></div>
+        <div class="sum-row"><span>SGST (9%)</span><span id="sum-sgst-disp">₹0</span></div>
+        <div class="sum-row total"><span>Total Payable</span><span id="sum-total">₹0</span></div>
 
-    <div class="order-card">
-      <div class="order-head"><h3><i class="fas fa-key"></i> Login Credentials</h3></div>
-      <div class="order-body">
-        <div class="plan-row"><span class="pr-label">Mobile Login</span><span class="pr-val" id="loginMobile" style="color:var(--gold)">—</span></div>
-        <div class="plan-row"><span class="pr-label">Email Login</span><span class="pr-val" id="loginEmail" style="font-size:.75rem">—</span></div>
-        <div class="plan-row"><span class="pr-label">Temp Password</span><span class="pr-val" id="loginPwd" style="color:var(--gold)">—</span></div>
-        <div style="margin-top:10px;padding:10px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;font-size:.74rem;color:#93c5fd">
-          <i class="fas fa-sms"></i> Credentials will be sent via SMS &amp; Email post-payment
+        <div class="commission-box">
+          <i class="fas fa-medal"></i> Agent Commission: <strong id="agent-commission">₹0</strong>
+          <span style="font-size:.7rem;color:var(--muted);margin-left:4px;">(credited on payment)</span>
         </div>
-      </div>
-    </div>
 
-    <div class="order-card">
-      <div class="order-head"><h3><i class="fas fa-gift"></i> Plan Benefits</h3></div>
-      <div class="order-body" id="benefitsBody">
-        <div style="font-size:.8rem;color:var(--muted)">Loading plan benefits…</div>
+        <div class="benefits-box" style="margin-top:10px;">
+          <div class="bx-title"><i class="fas fa-passport"></i> Plan Benefits</div>
+          <div id="plan-benefits-list" style="font-size:.75rem;"></div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SUCCESS OVERLAY -->
-<div class="success-overlay" id="successOverlay">
-  <div class="success-modal">
-    <div class="suc-icon"><i class="fas fa-check"></i></div>
-    <div class="suc-title">Payment Successful! 🎉</div>
-    <div class="suc-sub">Passport has been issued successfully</div>
-    <div class="suc-passport-id">
-      <div class="pid-label">Passport ID</div>
-      <div class="pid-val" id="newPassportId">WOW-PAX-XXXXXX</div>
-    </div>
-    <div class="receipt-info">
-      <div class="ri-row"><span class="rl">Customer</span><span class="rv" id="rcptName">—</span></div>
-      <div class="ri-row"><span class="rl">Plan</span><span class="rv" id="rcptPlan">—</span></div>
-      <div class="ri-row"><span class="rl">Amount Paid</span><span class="rv" id="rcptAmt">—</span></div>
-      <div class="ri-row"><span class="rl">Payment Mode</span><span class="rv" id="rcptMode">—</span></div>
-      <div class="ri-row"><span class="rl">Valid Until</span><span class="rv" id="rcptExpiry">—</span></div>
-      <div class="ri-row"><span class="rl">Agent</span><span class="rv" id="rcptAgent">—</span></div>
-    </div>
-    <button class="suc-btn" onclick="viewDigitalPassport()"><i class="fas fa-passport"></i> View Digital Passport</button>
-    <button class="suc-btn" onclick="newSale()"><i class="fas fa-plus"></i> New Sale</button>
-    <button class="suc-btn outline" onclick="window.location.href='passport-dashboard.html'"><i class="fas fa-tachometer-alt"></i> Back to Dashboard</button>
+<!-- Processing overlay -->
+<div class="processing-overlay" id="processing-overlay">
+  <div class="spin-ring"></div>
+  <div style="font-size:1.1rem;font-weight:800;color:var(--gold);" id="processing-text">Processing Payment…</div>
+  <div style="font-size:.85rem;color:var(--muted);">Please wait, do not close this page</div>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="success-overlay">
+  <div class="confetti-wrap" id="confetti-wrap"></div>
+  <div class="success-ring"><i class="fas fa-check success-check"></i></div>
+  <div style="font-size:1.5rem;font-weight:900;color:#fff;">Payment Successful! 🎉</div>
+  <div style="font-size:.85rem;color:var(--muted);margin-top:6px;">Transaction ID: <strong style="color:var(--gold);" id="txn-id">—</strong></div>
+  <div style="font-size:.82rem;color:var(--muted);margin-top:4px;">Mode: <strong id="pay-mode-display" style="color:#fff;">—</strong></div>
+  <div class="success-actions">
+    <button class="sa-btn gold" onclick="goToPassport()"><i class="fas fa-passport"></i> Issue Digital Passport</button>
+    <button class="sa-btn outline" onclick="printReceipt()"><i class="fas fa-receipt"></i> Print Receipt</button>
+    <button class="sa-btn outline" onclick="sendSms()"><i class="fas fa-sms"></i> Send SMS to Customer</button>
   </div>
 </div>
+
+<!-- Receipt Modal -->
+<div class="modal-overlay" id="receipt-modal">
+  <div class="receipt-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-size:1rem;font-weight:800;color:#fff;">Payment Receipt</div>
+      <button onclick="closeReceipt()" style="background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div id="receipt-content" style="font-size:.85rem;line-height:1.8;"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="window.print()" style="flex:1;padding:11px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:10px;color:var(--gold);font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+        <i class="fas fa-print"></i> Print
+      </button>
+      <button onclick="closeReceipt()" style="flex:1;padding:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:.85rem;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-const agent = JSON.parse(sessionStorage.getItem('sales_agent') || '{"name":"Demo Agent","id":"EMP-001"}');
-const kyc = JSON.parse(sessionStorage.getItem('current_kyc') || 'null');
-
-const BENEFITS = {
-  'Water Park Passport':['Unlimited water park entries (365d)','10% discount on F&B','2 guest passes/month','Priority queue','3 meal vouchers'],
-  'Amusement Passport':['Unlimited amusement park entries','15% off all rides','1 guest pass/month','Exclusive events','2 meal vouchers'],
-  'Combo Passport':['Both parks unlimited access','20% off F&B & merch','3 guest passes/month','VIP lounge access','5 meal vouchers','Free locker/visit'],
-};
-
-let basePrice = 0, totalAmt = 0, upiTimer = null;
+let kyc = {}, plan = {}, planPrice = 0, gstAmt = 0, cgst = 0, total = 0;
+let qrTimer = null, timerSecs = 300;
+let paymentMethod = 'cash', txnRecord = {};
 
 function init(){
-  if(!kyc){ window.location.href='passport-kyc.html'; return; }
-  // Customer info
-  document.getElementById('custName').textContent = kyc.fullName || kyc.fname+' '+kyc.lname;
-  document.getElementById('custPhone').textContent = '📱 '+kyc.phone;
-  document.getElementById('custEmail').textContent = '✉️ '+kyc.email;
+  try{ kyc = JSON.parse(sessionStorage.getItem('wow_passport_kyc')||'{}'); } catch(e){ kyc={}; }
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{"name":"Sales Agent","id":"EMP-001"}');
+  document.getElementById('agent-name').textContent = agent.name||'Sales Agent';
+
+  plan = kyc.plan || {name:'WOW Combo Passport',price:7999,id:'combo'};
+  planPrice = plan.price || 7999;
+  gstAmt = Math.round(planPrice * 18/118);
+  cgst = Math.round(gstAmt/2);
+  const base = planPrice - gstAmt;
+  total = planPrice;
+
+  // Summary
+  document.getElementById('summary-name').textContent = (kyc.fname||'Customer')+' '+(kyc.lname||'');
+  document.getElementById('summary-mobile').textContent = kyc.mobile ? '+91-'+kyc.mobile : '';
+  document.getElementById('summary-plan').textContent = plan.name||'—';
+  document.getElementById('sum-base').textContent = '₹'+base.toLocaleString('en-IN');
+  document.getElementById('sum-cgst-disp').textContent = '₹'+cgst.toLocaleString('en-IN');
+  document.getElementById('sum-sgst-disp').textContent = '₹'+cgst.toLocaleString('en-IN');
+  document.getElementById('sum-total').textContent = '₹'+total.toLocaleString('en-IN');
+  document.getElementById('agent-commission').textContent = '₹'+Math.round(total*(plan.commission||3)/100).toLocaleString('en-IN');
+  document.getElementById('cash-display').textContent = '₹'+total.toLocaleString('en-IN');
+  document.getElementById('cgst-val').textContent = cgst.toLocaleString('en-IN');
+  document.getElementById('sgst-val').textContent = cgst.toLocaleString('en-IN');
+  document.getElementById('upi-amount').textContent = '₹'+total.toLocaleString('en-IN');
+  document.getElementById('card-amount-btn').textContent = total.toLocaleString('en-IN');
+
+  // Photo
   if(kyc.photo){
-    const wrap = document.getElementById('custPhotoWrap');
-    wrap.innerHTML = `<img src="${kyc.photo}" alt="Photo" style="width:52px;height:62px;object-fit:cover;border-radius:6px"/>`;
+    const el = document.getElementById('sum-photo-wrap');
+    el.innerHTML = '';
+    el.style.fontSize='0';
+    const img = document.createElement('img');
+    img.src = kyc.photo;
+    img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:6px;';
+    el.appendChild(img);
   }
-  // Pricing
-  basePrice = kyc.price || 2999;
-  const gst = Math.round(basePrice*0.18);
-  totalAmt = basePrice; // price is inclusive
-  const base = Math.round(basePrice/1.18);
-  document.getElementById('planName').textContent = kyc.plan || '—';
-  document.getElementById('basePrice').textContent = '₹'+base.toLocaleString('en-IN');
-  document.getElementById('gstAmt').textContent = '₹'+(basePrice-base).toLocaleString('en-IN');
-  document.getElementById('totalAmt').textContent = '₹'+totalAmt.toLocaleString('en-IN');
-  document.getElementById('cashTotal').textContent = '₹'+totalAmt.toLocaleString('en-IN');
-  document.getElementById('upiAmtText').textContent = '₹'+totalAmt.toLocaleString('en-IN');
-  document.getElementById('cardAmtText').textContent = '₹'+totalAmt.toLocaleString('en-IN');
-  // Login
-  document.getElementById('loginMobile').textContent = kyc.phone;
-  document.getElementById('loginEmail').textContent = kyc.email;
-  document.getElementById('loginPwd').textContent = kyc.tempPwd || 'WOW@'+kyc.phone.slice(-4);
+
   // Benefits
-  const b = BENEFITS[kyc.plan] || [];
-  document.getElementById('benefitsBody').innerHTML = b.map(i=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.04)"><i class="fas fa-check" style="color:var(--gold);font-size:.72rem;flex-shrink:0"></i>${i}</div>`).join('');
-  // UPI QR
-  generateUPIQR();
-  startUPITimer();
+  const feats = plan.features||[];
+  document.getElementById('plan-benefits-list').innerHTML = feats.slice(0,4).map(f=>`
+    <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;"><i class="fas ${f.icon}" style="color:var(--gold);font-size:.65rem;flex-shrink:0;margin-top:3px;"></i><span>${f.text}</span></div>`).join('') || 'Plan benefits apply.';
+
+  // Quick cash
+  const denoms = [500,1000,2000,5000,10000,20000];
+  document.getElementById('qc-wrap').innerHTML = denoms.filter(d=>d>=total*.8).slice(0,6).map(d=>`
+    <button class="qc-btn" onclick="setTendered(${d})">₹${d.toLocaleString('en-IN')}</button>`).join('');
+
+  // Generate QR
+  generateQr();
 }
 
-function switchMode(mode){
-  ['cash','upi','card'].forEach(m=>{
-    document.getElementById('tab-'+m).classList.toggle('active',m===mode);
-    document.getElementById('panel-'+m).classList.toggle('active',m===mode);
+function switchMethod(m){
+  paymentMethod = m;
+  ['cash','upi','card'].forEach(x=>{
+    document.getElementById('mt-'+x).classList.toggle('active',x===m);
+    document.getElementById('pp-'+x).classList.toggle('active',x===m);
   });
-  if(mode==='upi') startUPITimer();
-  else clearInterval(upiTimer);
+  if(m==='upi') startQrTimer();
+  else { if(qrTimer){ clearInterval(qrTimer); qrTimer=null; } }
 }
+
+function setTendered(v){ document.getElementById('cash-tendered').value=v; calcChange(); }
 
 function calcChange(){
-  const recv = parseFloat(document.getElementById('cashReceived').value)||0;
-  const change = recv - totalAmt;
-  document.getElementById('changeAmt').textContent = '₹'+Math.max(0,change).toLocaleString('en-IN');
-  document.getElementById('changeAmt').style.color = change<0?'var(--red)':'var(--blue)';
+  const tendered = parseFloat(document.getElementById('cash-tendered').value)||0;
+  const change = tendered - total;
+  document.getElementById('cash-change').value = change >= 0 ? change.toFixed(0) : 0;
+  const box = document.getElementById('change-box');
+  if(change > 0){
+    box.style.display='flex';
+    document.getElementById('change-amount').textContent='₹'+change.toLocaleString('en-IN');
+  } else { box.style.display='none'; }
 }
 
-function generateUPIQR(){
-  const upiStr = `upi://pay?pa=wow@paytm&pn=WorldsOfWonder&am=${totalAmt}&cu=INR&tn=WOWPassport-${kyc.kycId||Date.now()}`;
-  document.getElementById('upiIdText').textContent = 'wow@paytm';
+function generateQr(){
+  const el = document.getElementById('qr-box');
+  el.innerHTML='';
   try{
-    document.getElementById('upiQr').innerHTML='';
-    new QRCode(document.getElementById('upiQr'),{text:upiStr,width:180,height:180,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
-  }catch(e){ document.getElementById('upiQr').innerHTML='<div style="font-size:.75rem;color:#333;padding:20px">QR Code<br>'+totalAmt+'</div>'; }
+    new QRCode(el,{
+      text:`upi://pay?pa=wow.passport@axisbank&pn=WorldsofWonder&am=${total}&cu=INR&tn=WOW+Passport`,
+      width:180,height:180,colorDark:'#000',colorLight:'#fff',
+      correctLevel:QRCode.CorrectLevel.H
+    });
+  }catch(e){ el.innerHTML='<div style="font-size:.7rem;color:#888;padding:10px;">QR unavailable</div>'; }
 }
 
-function copyUpiId(){
-  navigator.clipboard.writeText('wow@paytm').then(()=>alert('UPI ID copied!')).catch(()=>{});
+function regenerateQr(){
+  timerSecs = 300;
+  generateQr();
+  showToast('QR refreshed!');
 }
 
-let upiSecs = 600;
-function startUPITimer(){
-  clearInterval(upiTimer);
-  upiSecs = 600;
-  upiTimer = setInterval(()=>{
-    upiSecs--;
-    const m=Math.floor(upiSecs/60), s=upiSecs%60;
-    document.getElementById('upiCountdown').textContent = `${m}:${s.toString().padStart(2,'0')}`;
-    if(upiSecs<=0){ clearInterval(upiTimer); generateUPIQR(); upiSecs=600; }
+function startQrTimer(){
+  if(qrTimer) clearInterval(qrTimer);
+  timerSecs = 300;
+  qrTimer = setInterval(()=>{
+    timerSecs--;
+    const m = String(Math.floor(timerSecs/60)).padStart(2,'0');
+    const s = String(timerSecs%60).padStart(2,'0');
+    const el = document.getElementById('timer-num');
+    if(el) el.textContent = m+':'+s;
+    if(timerSecs<=0){ clearInterval(qrTimer); generateQr(); timerSecs=300; }
   },1000);
 }
 
+function shareUpiLink(){
+  const link = `upi://pay?pa=wow.passport@axisbank&pn=WorldsofWonder&am=${total}&cu=INR&tn=WOW+Passport`;
+  const text = `Hi, please pay ₹${total.toLocaleString('en-IN')} for your WOW Passport. UPI: wow.passport@axisbank | Amount: ₹${total.toLocaleString('en-IN')}`;
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
+}
+
+function checkUpiPayment(){
+  showProcessing('Checking payment status…','Querying UPI network…');
+  setTimeout(async ()=>{
+    hideProcessing();
+    if(Math.random() > 0.2){
+      const txn = genTxnId();
+      txnRecord = {txn, method:'UPI / QR', amount:total};
+      const upiRef = 'UPI-'+Date.now();
+      const payData = {mode:'UPI / QR', upi_ref:upiRef};
+      sessionStorage.setItem('wow_payment', JSON.stringify({txn,method:'UPI / QR',amount:total,upi_ref:upiRef,timestamp:new Date().toISOString()}));
+      await persistPaymentAndPassport(txn, 'UPI / QR', payData);
+      showSuccess(txn,'UPI / QR Code');
+    } else {
+      showToast('Payment not yet received. Please ask customer to retry.');
+    }
+  },2000);
+}
+
+function confirmCash(){
+  const tendered = parseFloat(document.getElementById('cash-tendered').value)||0;
+  if(tendered < total){ showToast(`Cash tendered (₹${tendered.toLocaleString('en-IN')}) is less than amount (₹${total.toLocaleString('en-IN')})`); return; }
+  showProcessing('Recording Cash Payment…','Updating agent cash book…');
+  setTimeout(async ()=>{
+    hideProcessing();
+    const txn = genTxnId();
+    txnRecord = {txn, method:'Cash', amount:total, tendered, change:tendered-total};
+    const payData = {mode:'Cash', cash_received:tendered, cash_change:tendered-total};
+    sessionStorage.setItem('wow_payment', JSON.stringify({txn,method:'Cash',amount:total,tendered,change:tendered-total,timestamp:new Date().toISOString()}));
+    await persistPaymentAndPassport(txn, 'Cash', payData);
+    showSuccess(txn,'Cash');
+  },1500);
+}
+
+function confirmCard(){
+  const num = document.getElementById('card-num').value.replace(/\s/g,'');
+  const name = document.getElementById('card-name').value.trim();
+  const exp = document.getElementById('card-expiry').value.trim();
+  const cvv = document.getElementById('card-cvv').value.trim();
+  if(num.length < 15){ showToast('Enter a valid card number'); return; }
+  if(!name){ showToast('Enter cardholder name'); return; }
+  if(!/^\d{2}\/\d{2}$/.test(exp)){ showToast('Enter valid expiry MM/YY'); return; }
+  if(cvv.length < 3){ showToast('Enter valid CVV'); return; }
+  showProcessing('Authorising Card…','Connecting to payment gateway…');
+  setTimeout(async ()=>{
+    document.getElementById('processing-text').textContent = 'OTP Verification…';
+    setTimeout(async ()=>{
+      hideProcessing();
+      const txn = genTxnId();
+      txnRecord = {txn, method:'Card/POS', amount:total};
+      const last4 = num.slice(-4);
+      const payData = {mode:'Card / POS', card_last4:last4};
+      sessionStorage.setItem('wow_payment', JSON.stringify({txn,method:'Card / POS',amount:total,card_last4:last4,timestamp:new Date().toISOString()}));
+      await persistPaymentAndPassport(txn, 'Card / POS', payData);
+      showSuccess(txn,'Card / POS');
+    },1500);
+  },2000);
+}
+
 function formatCard(el){
-  let v=el.value.replace(/\D/g,'').slice(0,16);
-  el.value=v.match(/.{1,4}/g)?.join(' ')||v;
-  document.getElementById('cvNum').textContent = (v+'●'.repeat(Math.max(0,16-v.length))).match(/.{1,4}/g)?.join(' ')||'●●●● ●●●● ●●●● ●●●●';
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  v = v.match(/.{1,4}/g)?.join(' ')||v;
+  el.value = v;
+  document.getElementById('cv-number').textContent = v||'•••• •••• •••• ••••';
+  const first = v.replace(/\s/g,'')[0];
+  document.getElementById('cv-network').textContent = first==='4'?'💳 Visa':first==='5'?'💳 MC':first==='3'?'💳 Amex':'💳';
 }
+
 function formatExpiry(el){
-  let v=el.value.replace(/\D/g,'');
-  if(v.length>=2) v=v.slice(0,2)+'/'+v.slice(2,4);
-  el.value=v;
-}
-function updateCardVisual(){}
-
-function confirmPayment(mode){
-  // Generate passport ID
-  const passportId = 'WOW-PAX-'+Date.now().toString(36).toUpperCase().slice(-6)+Math.random().toString(36).slice(2,5).toUpperCase();
-  const expiry = new Date(); expiry.setFullYear(expiry.getFullYear()+1);
-
-  if(mode==='Cash'){
-    const recv = parseFloat(document.getElementById('cashReceived').value)||0;
-    if(recv < totalAmt){ alert('Cash received is less than total amount.'); return; }
-  }
-  if(mode==='Card'){
-    const num = document.getElementById('cardNum').value.replace(/\s/g,'');
-    const exp = document.getElementById('cardExpiry').value;
-    const cvv = document.getElementById('cardCvv').value;
-    if(num.length<16||!exp||cvv.length<3){ alert('Please enter valid card details.'); return; }
-  }
-
-  // Save sale record
-  const sale = {
-    passportId, customerName: kyc.fullName||kyc.fname+' '+kyc.lname,
-    phone:kyc.phone, email:kyc.email, plan:kyc.plan, planType:kyc.planType,
-    amount:totalAmt, payMode:mode, agentId:agent.id||'EMP-001',
-    agentName:agent.name, timestamp:new Date().toISOString(),
-    expiresAt:expiry.toISOString(), status:'active',
-    photo:kyc.photo, dob:kyc.dob, address:kyc.addr,
-    tempPwd:kyc.tempPwd, kycId:kyc.kycId
-  };
-  const sales = JSON.parse(sessionStorage.getItem('passport_sales')||'[]');
-  sales.push(sale);
-  sessionStorage.setItem('passport_sales', JSON.stringify(sales));
-  sessionStorage.setItem('latest_passport', JSON.stringify(sale));
-
-  // Show success
-  document.getElementById('newPassportId').textContent = passportId;
-  document.getElementById('rcptName').textContent = sale.customerName;
-  document.getElementById('rcptPlan').textContent = sale.plan;
-  document.getElementById('rcptAmt').textContent = '₹'+totalAmt.toLocaleString('en-IN');
-  document.getElementById('rcptMode').textContent = mode;
-  document.getElementById('rcptExpiry').textContent = expiry.toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('rcptAgent').textContent = agent.name;
-  document.getElementById('successOverlay').classList.add('show');
-  clearInterval(upiTimer);
-
-  // Also persist to API
-  fetch('../tables/passport_holders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-    passport_id:passportId, full_name:sale.customerName, phone:kyc.phone, email:kyc.email,
-    dob:kyc.dob, address:kyc.addr+', '+kyc.city, plan:kyc.plan,
-    amount_paid:totalAmt, payment_mode:mode, agent_id:agent.id||'EMP-001',
-    agent_name:agent.name, status:'active', expires_at:expiry.toISOString(),
-    temp_password:kyc.tempPwd, kyc_id:kyc.kycId
-  })}).catch(()=>{});
+  let v = el.value.replace(/\D/g,'');
+  if(v.length>=2) v = v.substring(0,2)+'/'+v.substring(2,4);
+  el.value = v;
+  document.getElementById('cv-expiry').textContent = v||'MM/YY';
 }
 
-function viewDigitalPassport(){ window.location.href='passport-issued.html'; }
-function newSale(){
-  sessionStorage.removeItem('current_kyc');
-  window.location.href='passport-kyc.html';
+function genTxnId(){ return 'WOW-TXN-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).substr(2,4).toUpperCase(); }
+
+function showProcessing(t,s){
+  document.getElementById('processing-text').textContent = t;
+  document.getElementById('processing-overlay').classList.add('show');
+}
+function hideProcessing(){ document.getElementById('processing-overlay').classList.remove('show'); }
+
+function showSuccess(txn, mode){
+  document.getElementById('txn-id').textContent = txn;
+  document.getElementById('pay-mode-display').textContent = mode;
+  document.getElementById('success-overlay').classList.add('show');
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  const colors = ['#C9A84C','#F0D080','#22c55e','#3b82f6','#ef4444','#f59e0b'];
+  for(let i=0;i<80;i++){
+    const c = document.createElement('div');
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    c.style.cssText = `position:absolute;width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;background:${color};top:-10px;left:${Math.random()*100}%;border-radius:${Math.random()>.5?'50%':'0'};animation:fall${i%5} ${1.5+Math.random()*2}s ease-in ${Math.random()*2}s forwards;`;
+    wrap.appendChild(c);
+  }
+  // Create keyframes dynamically
+  const style = document.createElement('style');
+  for(let i=0;i<5;i++){
+    style.textContent += `@keyframes fall${i}{to{top:110%;transform:translateX(${(Math.random()-.5)*200}px) rotate(${360+Math.random()*360}deg);opacity:0;}}`;
+  }
+  document.head.appendChild(style);
+}
+
+function goToPassport(){
+  window.location.href = 'passport-issued.html';
+}
+
+function printReceipt(){
+  const kyc_data = kyc;
+  const payment = JSON.parse(sessionStorage.getItem('wow_payment')||'{}');
+  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{}');
+  const base = total - gstAmt;
+  document.getElementById('receipt-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:16px;border-bottom:1px dashed var(--border);padding-bottom:14px;">
+      <div style="font-size:1.1rem;font-weight:900;color:var(--gold);">WORLDS OF WONDER</div>
+      <div style="font-size:.75rem;color:var(--muted);">Sector 38-A, Noida · GST: 09AABCS1429B1Z1</div>
+      <div style="font-size:.72rem;color:var(--muted);">Payment Receipt — Passport Sale</div>
+    </div>
+    <div style="margin-bottom:4px;"><strong>Receipt:</strong> ${payment.txn||'—'}</div>
+    <div style="margin-bottom:4px;"><strong>Date:</strong> ${new Date().toLocaleString('en-IN')}</div>
+    <div style="margin-bottom:4px;"><strong>Agent:</strong> ${agent.name||'—'} (${agent.id||'—'})</div>
+    <div style="margin-bottom:12px;border-bottom:1px dashed var(--border);padding-bottom:10px;"><strong>Mode:</strong> ${payment.method||'—'}</div>
+    <div style="margin-bottom:4px;"><strong>Customer:</strong> ${(kyc_data.fname||'')+ ' '+(kyc_data.lname||'')}</div>
+    <div style="margin-bottom:4px;"><strong>Mobile:</strong> ${kyc_data.mobile||'—'}</div>
+    <div style="margin-bottom:12px;border-bottom:1px dashed var(--border);padding-bottom:10px;"><strong>Email:</strong> ${kyc_data.email||'—'}</div>
+    <div style="margin-bottom:4px;"><strong>Plan:</strong> ${plan.name||'—'}</div>
+    <div style="margin-bottom:4px;"><strong>Base Price:</strong> ₹${base.toLocaleString('en-IN')}</div>
+    <div style="margin-bottom:4px;"><strong>CGST (9%):</strong> ₹${cgst.toLocaleString('en-IN')}</div>
+    <div style="margin-bottom:4px;"><strong>SGST (9%):</strong> ₹${cgst.toLocaleString('en-IN')}</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--gold);margin-top:8px;border-top:1px solid var(--border);padding-top:8px;"><strong>Total Paid:</strong> ₹${total.toLocaleString('en-IN')}</div>
+    ${payment.method==='Cash'?`<div style="margin-top:6px;font-size:.82rem;color:var(--muted);">Cash Tendered: ₹${(payment.tendered||0).toLocaleString('en-IN')} | Change: ₹${(payment.change||0).toLocaleString('en-IN')}</div>`:''}
+    <div style="text-align:center;margin-top:16px;font-size:.72rem;color:var(--muted);border-top:1px dashed var(--border);padding-top:12px;">Thank you for your purchase! Passport validity: 365 days from issue.<br/>For support: 1800-WOW-HELP</div>
+  `;
+  document.getElementById('receipt-modal').classList.add('show');
+}
+
+function closeReceipt(){ document.getElementById('receipt-modal').classList.remove('show'); }
+
+async function persistPaymentAndPassport(txnId, mode, payExtra) {
+  try {
+    const kycData = WOW_API.getCurrentKYC() || {};
+    // Also try the legacy session kyc
+    const legacyKyc = JSON.parse(sessionStorage.getItem('wow_passport_kyc')||'{}');
+    const mergedKyc = { ...legacyKyc, ...kycData };
+
+    if (!mergedKyc.fname && !mergedKyc.holder_name) return; // no data to persist
+
+    // Normalise field names between legacy and API formats
+    const normKyc = {
+      id:            mergedKyc.id || sessionStorage.getItem('wow_kyc_id'),
+      passport_id:   mergedKyc.passport_id || sessionStorage.getItem('wow_pax_id'),
+      fname:         mergedKyc.fname || (mergedKyc.holder_name||'').split(' ')[0],
+      lname:         mergedKyc.lname || (mergedKyc.holder_name||'').split(' ').slice(1).join(' '),
+      mobile:        mergedKyc.mobile,
+      email:         mergedKyc.email,
+      plan:          mergedKyc.plan?.name || mergedKyc.plan,
+      plan_price:    mergedKyc.plan?.price || mergedKyc.plan_price || 0,
+      agent_id:      mergedKyc.agent_id,
+      agent_name:    mergedKyc.agent_name,
+      location:      mergedKyc.location,
+      dob:           mergedKyc.dob,
+    };
+
+    const agent = WOW_API.getLoggedInAgent() || {};
+    normKyc.agent_id   = normKyc.agent_id   || agent.id   || 'DEMO-001';
+    normKyc.agent_name = normKyc.agent_name || agent.name || 'Demo Agent';
+    normKyc.location   = normKyc.location   || agent.location || 'Main Gate';
+
+    // If no kyc record in DB yet, create one
+    if (!normKyc.id) {
+      const savedKyc = await WOW_API.saveKYC(normKyc);
+      normKyc.id = savedKyc.id;
+      normKyc.passport_id = savedKyc.passport_id;
+    }
+
+    // Save payment
+    const cgst = Math.round((normKyc.plan_price||0) * 0.09);
+    const sgst = cgst;
+    const totalAmt = (normKyc.plan_price||0) + cgst + sgst;
+    const payRecord = {
+      id: txnId,
+      passport_id: normKyc.passport_id || WOW_API.genPassportId(),
+      kyc_id: normKyc.id,
+      holder_name: `${normKyc.fname} ${normKyc.lname}`.trim(),
+      plan: normKyc.plan || '—',
+      base_amount: normKyc.plan_price || 0,
+      cgst, sgst,
+      total_amount: totalAmt,
+      payment_mode: mode,
+      agent_id:    normKyc.agent_id,
+      agent_name:  normKyc.agent_name,
+      agent_commission: Math.round(totalAmt * 0.03),
+      location:    normKyc.location,
+      status:      'Confirmed',
+      ...payExtra
+    };
+    const savedPay = await WOW_API.create('wow_payments', payRecord);
+    sessionStorage.setItem('wow_txn_id', txnId);
+    sessionStorage.setItem('wow_txn', JSON.stringify(savedPay));
+
+    // Issue passport
+    const savedPax = await WOW_API.issuePassport(normKyc, savedPay);
+    sessionStorage.setItem('wow_passport', JSON.stringify(savedPax));
+    console.log('✅ Payment & passport persisted to API', { txnId, passportId: savedPax.id });
+  } catch(err) {
+    console.warn('⚠️ API persist failed (offline mode):', err);
+  }
+}
+
+function sendSms(){ showToast(`SMS with receipt & login credentials sent to +91-${kyc.mobile||'—'} via your ERP`); }
+
+function showToast(msg,dur=2800){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',dur);
 }
 
 init();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="sales"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
