@@ -728,6 +728,68 @@
 
 .bk-consent a { color: var(--primary, #0055B3); text-decoration: underline; }
 
+/* ── Buffet Add-on ──────────────────────────────────────── */
+.bk-buffet-card {
+  background: linear-gradient(135deg, #fff8f0, #fff3e0);
+  border: 1.5px solid #fed7aa;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.bk-buffet-soldout {
+  background: #f9fafb;
+  border-color: #e2e8f0;
+  opacity: .8;
+}
+
+.bk-buffet-head {
+  font-size: 14px;
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bk-buffet-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: #fef3c7;
+  color: #b45309;
+  margin-left: auto;
+}
+
+.bk-buffet-desc { font-size: 12px; color: #78350f; margin-bottom: 10px; line-height: 1.4; }
+
+.bk-buffet-price-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.bk-buffet-old   { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
+.bk-buffet-price { font-size: 18px; font-weight: 900; color: #059669; font-family: 'Nunito', sans-serif; }
+.bk-buffet-save  { font-size: 11px; font-weight: 700; padding: 2px 8px; background: #d1fae5; color: #065f46; border-radius: 99px; }
+
+.bk-buffet-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bk-buffet-max { font-size: 11px; color: #9ca3af; margin-left: 4px; }
+
+.bk-buffet-msg { font-size: 12px; color: #4b5563; margin-bottom: 10px; line-height: 1.5; }
+.bk-buffet-alt { list-style: none; padding: 0; }
+.bk-buffet-alt li { font-size: 12px; color: #374151; padding: 4px 0; }
+
+.badge-soldout { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
 /* ── GST Info ───────────────────────────────────────────── */
 .bk-gst-block {
   background: var(--teal-lt, #E0F4FF);
