@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <link rel="stylesheet" href="../css/wow-design-system.css"/>
+<script src="../js/wow-auth.js"></script>
 <style>
 .pricing-tabs { display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px; }
 .pricing-tab { padding:10px 20px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s; }
@@ -292,5 +293,6 @@ function switchTab(el, tab) {
 function addRule() { alert('Opening Add Pricing Rule form...'); }
 function saveAll() { alert('✅ All pricing changes saved and published!'); }
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
