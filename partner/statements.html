@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/portal.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../js/wow-auth.js"></script>
 </head>
 <body>
 <div id="app">
@@ -122,5 +123,6 @@ document.getElementById('ledger-tbody').innerHTML = rows.map(r=>`
 // Chart
 new Chart(document.getElementById('ledgerChart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Purchases (₹K)',data:[68,54,82,91,78,164],backgroundColor:'rgba(26,86,219,.7)',borderRadius:6},{label:'Commission (₹K)',data:[8.2,6.5,9.8,10.9,9.4,19.7],backgroundColor:'rgba(124,58,237,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{callback:v=>'₹'+v+'K'}},x:{grid:{display:false}}}}});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="partner"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
