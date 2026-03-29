@@ -1,638 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notifications — Worlds of Wonder</title>
-  <meta name="description" content="Your WOW notification centre — booking updates, offers, loyalty alerts and system messages." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
-  <style>
-    /* ── Notification Items ── */
-    .notif-list-card {
-      background: #1a2235;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      padding: 0 24px;
-      margin-bottom: 20px;
-    }
-    .notif-item {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      padding: 18px 0;
-      border-bottom: 1px solid rgba(255,255,255,.05);
-      position: relative;
-      transition: background .2s;
-    }
-    .notif-item:last-child { border-bottom: none; }
-    .notif-item.unread { background: rgba(0,85,179,.04); margin: 0 -24px; padding: 18px 24px; }
-    .notif-item.unread::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: #0055B3;
-      border-radius: 50%;
-      position: absolute;
-      left: 6px;
-      top: 26px;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Notifications — WOW Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<style>
+:root {
+  --primary:#0055B3;--primary-dk:#003D82;--primary-lt:#EBF3FF;
+  --green:#0A9B5F;--green-lt:#E6F7F1;--green-dk:#077A4A;
+  --amber:#F5A800;--amber-lt:#FFF8E6;
+  --red:#E53E3E;--red-lt:#FFF5F5;
+  --teal:#007BB5;--teal-lt:#E0F4FF;
+  --purple:#5E35B1;--purple-lt:#EDE7F6;
+  --ink:#080E1E;--text:#1A2235;--text2:#4A5568;--text3:#94A3B8;
+  --bg:#F7F9FC;--bg2:#EEF2F8;--white:#FFFFFF;
+  --border:#DDE3EE;--border2:#C8D3E5;
+  --r-sm:10px;--r-md:16px;--r-lg:22px;
+  --s1:0 1px 4px rgba(0,30,80,.06);--s2:0 4px 24px rgba(0,30,80,.10);--s3:0 12px 48px rgba(0,30,80,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-    .notif-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .ni-booking   { background: rgba(0,85,179,.15); }
-    .ni-offer     { background: rgba(245,168,0,.15); }
-    .ni-loyalty   { background: rgba(139,92,246,.15); }
-    .ni-passport  { background: rgba(16,185,129,.15); }
-    .ni-system    { background: rgba(255,255,255,.07); }
-    .ni-alert     { background: rgba(239,68,68,.12); }
-    .ni-gate      { background: rgba(0,158,115,.15); }
+/* === Layout === */
+.p-layout{display:flex;min-height:100vh;}
+.p-sidebar{width:250px;min-height:100vh;background:linear-gradient(180deg,#080E1E 0%,#0D1A3A 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:200;}
+.p-sidebar-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.06);}
+.p-sidebar-logo img{height:40px;width:auto;object-fit:contain;}
+.p-sidebar-badge{font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-top:4px;}
+.p-nav{flex:1;padding:12px 0;overflow-y:auto;}
+.p-nav a{display:flex;align-items:center;gap:9px;padding:10px 18px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);text-decoration:none;transition:all .2s;border-left:3px solid transparent;}
+.p-nav a:hover{color:#fff;background:rgba(255,255,255,.05);}
+.p-nav a.active{color:#60a5fa;background:rgba(96,165,250,.08);border-left-color:#60a5fa;}
+.p-nav-section{padding:12px 18px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);}
+.p-nav-divider{height:1px;background:rgba(255,255,255,.06);margin:8px 14px;}
+.p-sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06);}
+.p-user{display:flex;align-items:center;gap:9px;}
+.p-user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--teal));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;}
+.p-user-name{font-size:13px;font-weight:700;color:#fff;}
+.p-user-sub{font-size:11px;color:rgba(255,255,255,.4);}
 
-    .notif-body { flex: 1; min-width: 0; }
-    .notif-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 3px;
-      line-height: 1.4;
-    }
-    .notif-desc {
-      font-size: 13px;
-      color: rgba(255,255,255,.5);
-      line-height: 1.5;
-    }
-    .notif-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-    .notif-time { font-size: 11px; color: rgba(255,255,255,.3); }
-    .notif-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #60a5fa;
-      text-decoration: none;
-    }
-    .notif-action:hover { color: #93c5fd; }
-    .notif-dismiss {
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      background: transparent;
-      color: rgba(255,255,255,.25);
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all .2s;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .notif-dismiss:hover { background: rgba(239,68,68,.12); color: #ef4444; }
+.p-main{margin-left:250px;flex:1;}
+.p-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.p-topbar-title{font-size:18px;font-weight:800;color:var(--ink);}
+.p-topbar-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+.p-content{padding:24px 28px;}
 
-    /* ── Tabs ── */
-    .notif-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .notif-tab {
-      padding: 7px 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: transparent;
-      color: rgba(255,255,255,.55);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      transition: all .2s;
-      position: relative;
-    }
-    .notif-tab.active, .notif-tab:hover { background: #0055B3; border-color: #0055B3; color: #fff; }
-    .notif-tab .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      background: #e11d48;
-      color: #fff;
-      border-radius: 50%;
-      font-size: 10px;
-      font-weight: 800;
-      margin-left: 6px;
-    }
+/* === Cards === */
+.card{background:var(--white);border-radius:var(--r-md);border:1.5px solid var(--border);padding:22px;box-shadow:var(--s1);}
+.card-title{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 
-    /* ── Top controls ── */
-    .notif-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .notif-count { font-size: 13px; color: rgba(255,255,255,.45); }
-    .notif-count span { color: #60a5fa; font-weight: 700; }
-    .ctrl-btns { display: flex; gap: 8px; }
-    .ctrl-btn {
-      padding: 7px 16px;
-      border-radius: 10px;
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.6);
-      border: 1px solid rgba(255,255,255,.1);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Nunito', sans-serif;
-      transition: all .2s;
-    }
-    .ctrl-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+/* === Notification Items === */
+.notif-item{display:flex;align-items:flex-start;gap:14px;padding:16px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;position:relative;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item:hover{background:var(--bg);}
+.notif-item.unread{background:var(--primary-lt);}
+.notif-item.unread::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0;background:var(--primary);}
+.notif-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.notif-body{flex:1;min-width:0;}
+.notif-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.notif-item.unread .notif-title{color:var(--primary-dk);}
+.notif-msg{font-size:13px;color:var(--text2);line-height:1.5;}
+.notif-meta{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.notif-time{font-size:11px;color:var(--text3);}
+.notif-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.notif-actions{display:flex;gap:6px;margin-top:8px;}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px;}
 
-    /* ── Section title ── */
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: rgba(255,255,255,.35);
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      margin: 24px 0 8px;
-    }
+/* === Filter bar === */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.filter-chip{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:700;border:1.5px solid var(--border);background:var(--white);cursor:pointer;transition:all .2s;color:var(--text2);}
+.filter-chip:hover{border-color:var(--primary);color:var(--primary);}
+.filter-chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
 
-    /* ── Notification Settings ── */
-    .settings-card {
-      background: #1a2235;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 20px;
-    }
-    .settings-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: rgba(255,255,255,.45);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 18px;
-    }
-    .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px 0;
-      border-bottom: 1px solid rgba(255,255,255,.05);
-    }
-    .setting-row:last-child { border-bottom: none; }
-    .setting-label { font-size: 14px; color: #fff; font-weight: 600; }
-    .setting-sub   { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
-    .toggle {
-      position: relative;
-      width: 44px;
-      height: 24px;
-      flex-shrink: 0;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,.15);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: .3s;
-    }
-    .toggle-slider:before {
-      content: '';
-      position: absolute;
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: .3s;
-    }
-    .toggle input:checked + .toggle-slider { background: #0055B3; }
-    .toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+/* === Preference panel === */
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.pref-row:last-child{border-bottom:none;}
+.pref-label{font-size:14px;font-weight:600;color:var(--ink);}
+.pref-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:12px;transition:.3s;}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle input:checked + .toggle-slider{background:var(--primary);}
+.toggle input:checked + .toggle-slider::before{left:23px;}
 
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center;
-      padding: 56px 24px;
-      color: rgba(255,255,255,.35);
-    }
-    .empty-icon { font-size: 56px; margin-bottom: 14px; }
-    .empty-title { font-size: 16px; font-weight: 700; color: rgba(255,255,255,.5); margin-bottom: 6px; }
-    .empty-sub { font-size: 13px; }
-  </style>
+/* === Stats grid === */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-md);padding:16px;text-align:center;}
+.stat-val{font-size:28px;font-weight:900;font-family:'Nunito',sans-serif;line-height:1;}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:4px;}
+
+/* === Buttons === */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;text-decoration:none;}
+.btn-primary{background:linear-gradient(135deg,var(--primary-dk),var(--primary));color:#fff;}
+.btn-primary:hover{box-shadow:0 4px 14px rgba(0,85,179,.3);}
+.btn-ghost{background:var(--white);border:1.5px solid var(--border);color:var(--text);}
+.btn-ghost:hover{border-color:var(--primary);color:var(--primary);}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-red{background:var(--red-lt);border:1.5px solid var(--red);color:var(--red);}
+.btn-green{background:var(--green-lt);border:1.5px solid var(--green);color:var(--green-dk);}
+
+/* === Tab === */
+.tab-bar{display:flex;gap:4px;background:var(--bg2);border-radius:var(--r-sm);padding:4px;margin-bottom:22px;}
+.tab-btn{flex:1;padding:9px 10px;border-radius:6px;font-size:13px;font-weight:700;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;}
+.tab-btn.active{background:var(--white);color:var(--ink);box-shadow:var(--s1);}
+
+/* === Empty state === */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state .icon{font-size:60px;margin-bottom:14px;}
+.empty-state h3{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:6px;}
+.empty-state p{font-size:14px;color:var(--text3);}
+
+/* === Badge === */
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:800;background:var(--red);color:#fff;}
+
+/* === Mobile === */
+@media(max-width:768px){
+  .p-sidebar{transform:translateX(-100%);}
+  .p-main{margin-left:0;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .filter-bar{gap:6px;}
+}
+</style>
 </head>
-<body class="portal-body">
-<div id="app">
-  <div class="portal-layout">
+<body>
+<div class="p-layout">
 
-    <!-- ═══ SIDEBAR ═══ -->
-    <aside class="portal-sidebar" id="portal-sidebar">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:44px;width:auto;object-fit:contain;filter:none!important;" onerror="this.style.display='none'" />
-        </a>
+  <!-- Sidebar -->
+  <aside class="p-sidebar">
+    <div class="p-sidebar-logo">
+      <a href="../index.html"><img src="../images/logo.png" alt="Worlds of Wonder" /></a>
+      <div class="p-sidebar-badge">MY WOW ACCOUNT</div>
+    </div>
+    <nav class="p-nav">
+      <div class="p-nav-section">My Account</div>
+      <a href="dashboard.html"><i class="fas fa-th-large" style="width:16px;"></i> Dashboard</a>
+      <a href="tickets.html"><i class="fas fa-ticket-alt" style="width:16px;"></i> My Tickets</a>
+      <a href="my-bookings.html"><i class="fas fa-calendar-check" style="width:16px;"></i> My Bookings</a>
+      <a href="wow-passport.html"><i class="fas fa-id-card" style="width:16px;"></i> WOW Passport</a>
+      <div class="p-nav-divider"></div>
+      <div class="p-nav-section">Rewards</div>
+      <a href="wallet.html"><i class="fas fa-wallet" style="width:16px;"></i> WOW Wallet</a>
+      <a href="loyalty.html"><i class="fas fa-coins" style="width:16px;"></i> Loyalty Coins</a>
+      <a href="referral.html"><i class="fas fa-gift" style="width:16px;"></i> Refer &amp; Earn</a>
+      <a href="offers.html"><i class="fas fa-tag" style="width:16px;"></i> Offers</a>
+      <div class="p-nav-divider"></div>
+      <div class="p-nav-section">Settings</div>
+      <a href="notifications.html" class="active"><i class="fas fa-bell" style="width:16px;"></i> Notifications <span class="badge" style="margin-left:auto;" id="sidebar-badge">4</span></a>
+      <a href="profile.html"><i class="fas fa-user-cog" style="width:16px;"></i> Profile &amp; Settings</a>
+      <div class="p-nav-divider"></div>
+      <a href="../index.html"><i class="fas fa-globe" style="width:16px;"></i> Back to WOW Site</a>
+      <a href="login.html"><i class="fas fa-sign-out-alt" style="width:16px;"></i> Sign Out</a>
+    </nav>
+    <div class="p-sidebar-footer">
+      <div class="p-user">
+        <div class="p-user-av">RS</div>
+        <div>
+          <div class="p-user-name">Ravi Sharma</div>
+          <div class="p-user-sub">WOW Gold Member</div>
+        </div>
       </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>Dashboard</span>
-        </a>
-        <a href="my-bookings.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>My Bookings</span>
-        </a>
-        <a href="tickets.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
-          <span>My Tickets</span>
-        </a>
-        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
-          <span>My Passport</span>
-        </a>
-        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span>Loyalty Points</span>
-        </a>
-        <a href="offers.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          <span>My Offers</span>
-        </a>
-        <a href="notifications.html" class="portal-sidenav-item active">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span>Notifications <span class="badge" id="sidebar-badge" style="display:none;"></span></span>
-        </a>
-        <a href="profile.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Profile</span>
-        </a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          <span>Back to Website</span>
-        </a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
-        </button>
-      </nav>
-    </aside>
+    </div>
+  </aside>
 
-    <!-- ═══ MAIN ═══ -->
-    <main class="portal-main">
-      <div id="portal-loading" class="portal-loading">
-        <div class="portal-spinner"></div>
-        <p>Loading notifications…</p>
+  <!-- Main -->
+  <main class="p-main">
+    <div class="p-topbar">
+      <div>
+        <div class="p-topbar-title">🔔 Notifications</div>
+        <div class="p-topbar-sub" id="topbar-sub">Loading…</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark All Read</button>
+        <button class="btn btn-red btn-sm" onclick="clearAll()"><i class="fas fa-trash"></i> Clear All</button>
+        <button class="btn btn-primary btn-sm" id="pref-btn" onclick="switchTab('preferences')"><i class="fas fa-sliders-h"></i> Preferences</button>
+      </div>
+    </div>
+
+    <div class="p-content">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-total">0</div>
+          <div class="stat-lbl">Total Notifications</div>
+        </div>
+        <div class="stat-card" style="border-color:var(--primary);">
+          <div class="stat-val" id="stat-unread" style="color:var(--primary);">0</div>
+          <div class="stat-lbl">Unread</div>
+        </div>
+        <div class="stat-card" style="border-color:var(--amber);">
+          <div class="stat-val" id="stat-today" style="color:var(--amber);">0</div>
+          <div class="stat-lbl">Today</div>
+        </div>
+        <div class="stat-card" style="border-color:var(--green);">
+          <div class="stat-val" id="stat-rewards" style="color:var(--green);">0</div>
+          <div class="stat-lbl">Rewards Earned</div>
+        </div>
       </div>
 
-      <div id="portal-content" style="display:none;">
-        <div class="portal-main-header">
-          <div>
-            <h1 class="portal-main-title">Notifications</h1>
-            <p class="portal-main-sub" id="unread-summary">All caught up!</p>
-          </div>
-        </div>
-
-        <!-- ── Tabs ── -->
-        <div class="notif-tabs">
-          <button class="notif-tab active" onclick="filterNotifs('all', this)">
-            All <span class="badge" id="badge-all">0</span>
-          </button>
-          <button class="notif-tab" onclick="filterNotifs('booking', this)">Bookings</button>
-          <button class="notif-tab" onclick="filterNotifs('offer', this)">Offers</button>
-          <button class="notif-tab" onclick="filterNotifs('loyalty', this)" data-module="loyalty_program">Loyalty</button>
-          <button class="notif-tab" onclick="filterNotifs('passport', this)" data-module="passport_system">Passport</button>
-          <button class="notif-tab" onclick="filterNotifs('system', this)">System</button>
-        </div>
-
-        <!-- ── Controls ── -->
-        <div class="notif-controls">
-          <div class="notif-count">Showing <span id="showing-count">—</span> notifications</div>
-          <div class="ctrl-btns">
-            <button class="ctrl-btn" onclick="markAllRead()">✓ Mark all read</button>
-            <button class="ctrl-btn" onclick="clearAll()">🗑 Clear all</button>
-          </div>
-        </div>
-
-        <!-- ── Notification List ── -->
-        <div id="notif-list"></div>
-
-        <!-- ── Settings ── -->
-        <div style="margin-top:12px;">
-          <div class="settings-title" style="font-size:13px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;">
-            Notification Preferences
-          </div>
-          <div class="settings-card">
-            <div class="settings-title">In-App Notifications</div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">Booking Confirmations</div>
-                <div class="setting-sub">When a booking is confirmed, modified or cancelled</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_booking', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">Flash Offers &amp; Deals</div>
-                <div class="setting-sub">Time-limited offers and personalised discounts</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_offers', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row" data-module="loyalty_program">
-              <div>
-                <div class="setting-label">Loyalty Points Updates</div>
-                <div class="setting-sub">When you earn, redeem or tier-up your WOW Points</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_loyalty', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">Visit Reminders</div>
-                <div class="setting-sub">24-hour reminder before your booked visit date</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_reminders', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">System Announcements</div>
-                <div class="setting-sub">Park closures, maintenance and safety updates</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('inapp_system', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-
-          <div class="settings-card">
-            <div class="settings-title">Push Notifications (Email / SMS)</div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">Email — Booking Updates</div>
-                <div class="setting-sub">Confirmation PDFs and ticket changes</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('email_booking', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">SMS — Entry Reminders</div>
-                <div class="setting-sub">Day-before visit reminder and gate instructions</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('sms_reminder', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row" data-module="whatsapp_campaigns">
-              <div>
-                <div class="setting-label">WhatsApp — Instant Ticket Delivery</div>
-                <div class="setting-sub">Receive your e-ticket and QR code via WhatsApp</div>
-              </div>
-              <label class="toggle"><input type="checkbox" checked onchange="savePref('wa_ticket', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-            <div class="setting-row">
-              <div>
-                <div class="setting-label">Promotional Emails</div>
-                <div class="setting-sub">Seasonal offers and new ride announcements</div>
-              </div>
-              <label class="toggle"><input type="checkbox" onchange="savePref('email_promo', this.checked)" /><span class="toggle-slider"></span></label>
-            </div>
-          </div>
-        </div>
-
+      <!-- Main Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tb-all"         onclick="switchTab('all')">🔔 All</button>
+        <button class="tab-btn"        id="tb-unread"      onclick="switchTab('unread')">📌 Unread <span id="unread-cnt" style="background:var(--primary);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;">0</span></button>
+        <button class="tab-btn"        id="tb-bookings"    onclick="switchTab('bookings')">🎟 Bookings</button>
+        <button class="tab-btn"        id="tb-rewards"     onclick="switchTab('rewards')">🏆 Rewards</button>
+        <button class="tab-btn"        id="tb-promotions"  onclick="switchTab('promotions')">🎯 Promotions</button>
+        <button class="tab-btn"        id="tb-system"      onclick="switchTab('system')">⚙️ System</button>
+        <button class="tab-btn"        id="tb-preferences" onclick="switchTab('preferences')">⚙ Prefs</button>
       </div>
-    </main>
-  </div>
+
+      <!-- Filter Bar (hidden for preferences) -->
+      <div id="filter-section">
+        <div class="filter-bar">
+          <input type="text" id="notif-search" placeholder="🔍 Search notifications…"
+            style="padding:7px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;background:var(--white);outline:none;min-width:220px;font-family:'Poppins',sans-serif;"
+            oninput="applyFilters()" />
+          <select id="notif-sort" class="filter-chip" style="border-radius:20px;" onchange="applyFilters()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="unread">Unread First</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" id="bulk-sel-btn" onclick="toggleBulkSelect()" style="border-radius:20px;"><i class="fas fa-check-square"></i> Select</button>
+          <div id="bulk-actions" style="display:none;gap:6px;display:none;">
+            <button class="btn btn-green btn-sm" onclick="bulkMarkRead()">✓ Mark Read</button>
+            <button class="btn btn-red btn-sm" onclick="bulkDelete()">🗑 Delete</button>
+            <button class="btn btn-ghost btn-sm" onclick="cancelBulk()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications List -->
+      <div id="notif-list-container">
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div id="notif-list"></div>
+        </div>
+        <!-- Pagination -->
+        <div id="pagination" style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;color:var(--text3);">
+          <span id="page-info"></span>
+          <div style="display:flex;gap:6px;" id="page-btns"></div>
+        </div>
+      </div>
+
+      <!-- Preferences Panel -->
+      <div id="preferences-panel" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          
+          <!-- Notification types -->
+          <div class="card">
+            <div class="card-title"><i class="fas fa-bell" style="color:var(--primary);"></i> Notification Types</div>
+            <div id="pref-types"></div>
+          </div>
+
+          <!-- Channels -->
+          <div class="card">
+            <div class="card-title"><i class="fas fa-satellite-dish" style="color:var(--green);"></i> Delivery Channels</div>
+            <div id="pref-channels"></div>
+          </div>
+
+          <!-- Quiet hours -->
+          <div class="card">
+            <div class="card-title"><i class="fas fa-moon" style="color:var(--purple);"></i> Quiet Hours</div>
+            <div class="pref-row">
+              <div><div class="pref-label">Enable Quiet Hours</div><div class="pref-sub">Pause non-urgent notifications</div></div>
+              <label class="toggle"><input type="checkbox" id="quiet-toggle" checked /><span class="toggle-slider"></span></label>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+              <div>
+                <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px;">Start Time</label>
+                <input type="time" value="22:00" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;width:100%;" />
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px;">End Time</label>
+                <input type="time" value="08:00" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;width:100%;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Frequency -->
+          <div class="card">
+            <div class="card-title"><i class="fas fa-clock" style="color:var(--amber);"></i> Email Digest Frequency</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="digest" value="realtime" checked /> Real-time (immediate)
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="digest" value="daily" /> Daily digest (8 AM)
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="digest" value="weekly" /> Weekly summary (Mondays)
+              </label>
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;">
+                <input type="radio" name="digest" value="none" /> Off (unsubscribe all emails)
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:12px;justify-content:flex-end;">
+          <button class="btn btn-ghost" onclick="resetPrefs()"><i class="fas fa-undo"></i> Reset to Defaults</button>
+          <button class="btn btn-primary" onclick="savePrefs()"><i class="fas fa-save"></i> Save Preferences</button>
+        </div>
+      </div>
+
+    </div><!-- /p-content -->
+  </main>
+
 </div>
 
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:11px 18px;border-radius:var(--r-sm);font-size:13px;font-weight:600;box-shadow:var(--s3);z-index:9999;display:none;max-width:320px;"></div>
+
 <script>
-  /* ── Sample notifications ── */
-  const NOTIFS = [
-    {
-      id: 'n1', type: 'booking', icon: '🎟', iconClass: 'ni-booking', unread: true,
-      title: 'Booking Confirmed — Water Park',
-      desc: 'Your Water Park booking for 2 Adults on 15 Apr 2026 is confirmed. Booking ID: BK-2026-08142.',
-      time: '2 hours ago',
-      action: { label: 'View Ticket', href: 'tickets.html' },
-    },
-    {
-      id: 'n2', type: 'offer', icon: '⚡', iconClass: 'ni-offer', unread: true,
-      title: 'Flash Deal: Weekend Water Park at ₹999!',
-      desc: 'This weekend only — Water Park tickets are just ₹999 (was ₹1,299). Use code FLASH300. Expires Sunday midnight.',
-      time: '5 hours ago',
-      action: { label: 'Book Now', href: '../book/water-park.html?promo=FLASH300' },
-    },
-    {
-      id: 'n3', type: 'loyalty', icon: '⭐', iconClass: 'ni-loyalty', unread: true,
-      title: 'You earned 260 WOW Points!',
-      desc: 'Great news! Your recent Water Park visit earned you 260 WOW Points. You now have 1,010 points. Just 490 more to reach Gold Tier!',
-      time: '1 day ago',
-      action: { label: 'View Points', href: 'loyalty.html' },
-    },
-    {
-      id: 'n4', type: 'passport', icon: '🪪', iconClass: 'ni-passport', unread: false,
-      title: 'Passport Renewal Reminder',
-      desc: 'Your WOW Combo Passport expires in 45 days. Renew now and get 30 extra days free with code RENEW30!',
-      time: '3 days ago',
-      action: { label: 'Renew Passport', href: 'passport.html' },
-    },
-    {
-      id: 'n5', type: 'booking', icon: '📅', iconClass: 'ni-booking', unread: false,
-      title: 'Visit Reminder — Tomorrow!',
-      desc: 'You have a booked visit tomorrow (Water Park, 2 Adults). Gates open at 10:00 AM. Don\'t forget to carry a photo ID!',
-      time: '4 days ago',
-      action: { label: 'View Booking', href: 'my-bookings.html' },
-    },
-    {
-      id: 'n6', type: 'offer', icon: '🎂', iconClass: 'ni-offer', unread: false,
-      title: 'Birthday Month Special Unlocked! 🎉',
-      desc: 'Happy birthday month! Your exclusive birthday offer is now active — free entry + 50% companion discount. Use code BDAY2026.',
-      time: '5 days ago',
-      action: { label: 'Use Offer', href: 'offers.html' },
-    },
-    {
-      id: 'n7', type: 'system', icon: '⚠️', iconClass: 'ni-alert', unread: false,
-      title: 'Scheduled Maintenance — Wave Pool',
-      desc: 'The Wave Pool will be temporarily closed for maintenance on 20 Apr 2026. All other rides remain open. We apologise for the inconvenience.',
-      time: '1 week ago',
-    },
-    {
-      id: 'n8', type: 'system', icon: 'ℹ️', iconClass: 'ni-system', unread: false,
-      title: 'New Ride Opening — Cyclone Coaster',
-      desc: 'Exciting news! The Cyclone Coaster (Amusement Park) is now open to the public. Height requirement: 120 cm. Come experience the thrill!',
-      time: '2 weeks ago',
-      action: { label: 'Learn More', href: '../rides-attractions.html' },
-    },
-    {
-      id: 'n9', type: 'booking', icon: '✅', iconClass: 'ni-gate', unread: false,
-      title: 'Entry Scanned — 5 Feb 2026',
-      desc: 'Your ticket BK-2026-00041 was successfully scanned at Gate 2. Enjoy your day at WOW! 🎉',
-      time: '7 weeks ago',
-    },
-  ];
+// ===== NOTIFICATIONS DATA =====
+const CATEGORIES = {
+  bookings: { icon:'🎟', color:'var(--primary)',    bg:'var(--primary-lt)' },
+  rewards:  { icon:'🏆', color:'var(--amber)',      bg:'var(--amber-lt)'   },
+  promotions:{ icon:'🎯', color:'var(--green)',     bg:'var(--green-lt)'   },
+  system:   { icon:'⚙️', color:'var(--text2)',      bg:'var(--bg2)'        },
+  alert:    { icon:'⚠️', color:'var(--red)',         bg:'var(--red-lt)'     },
+  passport: { icon:'🪪', color:'var(--purple)',      bg:'var(--purple-lt)'  },
+  wallet:   { icon:'💳', color:'var(--teal)',        bg:'var(--teal-lt)'    },
+};
 
-  let currentFilter = 'all';
-  let notifs = JSON.parse(localStorage.getItem('wow_notifs') || 'null') || NOTIFS;
+let allNotifs = [
+  { id:1,  cat:'bookings',   title:'Booking Confirmed! 🎉', msg:'Your Water Park booking for 2 Adults on 30 Mar 2026 is confirmed. Booking ID: WOW2026-08421. E-tickets sent to your email.', time:'2 mins ago', today:true, unread:true, pinned:true },
+  { id:2,  cat:'rewards',    title:'150 WOW Coins Earned! 🪙', msg:'You earned 150 loyalty coins for your recent Water Park visit. Coins credited to your account. Current balance: 2,680 coins.', time:'1 hour ago', today:true, unread:true },
+  { id:3,  cat:'promotions', title:'🔥 Flash Sale – 30% OFF This Weekend!', msg:'Book Water Park + Amusement Combo for ₹1,399 (was ₹1,999). Offer valid for bookings made by Sunday, 29 Mar 2026. Use code FLASH30.', time:'3 hours ago', today:true, unread:true },
+  { id:4,  cat:'wallet',     title:'Wallet Top-up Successful ✅', msg:'₹2,000 added to your WOW Wallet. Available balance: ₹2,850. Transaction ID: TXN-WLT-2026-448821.', time:'5 hours ago', today:true, unread:true },
+  { id:5,  cat:'system',     title:'OTP Verified Successfully', msg:'Your mobile number +91 98765 43210 was verified using OTP. All features are now fully unlocked.', time:'Yesterday', today:false, unread:false },
+  { id:6,  cat:'bookings',   title:'Reminder: Visit Tomorrow!', msg:'You have a Water Park booking for tomorrow, 29 Mar. Remember to carry a valid photo ID. Park opens at 10 AM.', time:'Yesterday', today:false, unread:false },
+  { id:7,  cat:'rewards',    title:'Tier Upgrade: Bronze → Silver 🥈', msg:'Congratulations! You\'ve been upgraded to Silver tier. You now earn 1.5× coins on all purchases and get priority support.', time:'2 days ago', today:false, unread:false },
+  { id:8,  cat:'promotions', title:'Birthday Month Special 🎂', msg:'This month is your birthday month! Enjoy 20% off on any booking. Discount applied automatically at checkout. Valid for March 2026.', time:'3 days ago', today:false, unread:false },
+  { id:9,  cat:'passport',   title:'WOW Passport Expiry Reminder', msg:'Your WOW Silver Passport expires in 30 days (28 Apr 2026). Renew now to enjoy uninterrupted access. 10% renewal discount available.', time:'4 days ago', today:false, unread:false },
+  { id:10, cat:'bookings',   title:'Group Booking Quote Ready', msg:'Your group quote for 45 people on 15 Apr 2026 is ready. Total: ₹35,955 (incl. GST). Quote valid for 48 hours. Confirm or request changes.', time:'5 days ago', today:false, unread:false },
+  { id:11, cat:'rewards',    title:'Referral Bonus: ₹200 Credited 🎁', msg:'Your friend Priya Sharma used your referral code WOW-RAVI50 and completed a booking. ₹200 has been credited to your WOW Wallet.', time:'6 days ago', today:false, unread:false },
+  { id:12, cat:'promotions', title:'New Ride Opening: Aqua Blaster 🌊', msg:'Worlds of Wonder is excited to announce the opening of Aqua Blaster on 1 Apr 2026. Be among the first 100 riders to get a free souvenir!', time:'1 week ago', today:false, unread:false },
+  { id:13, cat:'system',     title:'Login from New Device Detected', msg:'A login to your account was detected from a new device (Chrome, Windows) at 2026-03-22 08:45 PM IST. If this was you, no action needed.', time:'1 week ago', today:false, unread:false },
+  { id:14, cat:'wallet',     title:'Auto-reload Triggered', msg:'Your WOW Wallet balance fell below ₹200. ₹1,000 auto-reloaded via UPI (UPI ID: ravi@okaxis). New balance: ₹1,180.', time:'2 weeks ago', today:false, unread:false },
+  { id:15, cat:'bookings',   title:'Ticket Used: Water Park Visit ✅', msg:'Your ticket BK-2026-03142 for Water Park was successfully scanned at Gate 2 on 15 Mar 2026 at 10:32 AM. We hope you had a blast!', time:'2 weeks ago', today:false, unread:false },
+  { id:16, cat:'promotions', title:'Annual Passport – Early Bird Offer', msg:'Book an Annual WOW Passport before 31 Mar 2026 and save ₹500. Passport includes unlimited visits for 12 months + 10% F&B discount.', time:'3 weeks ago', today:false, unread:false },
+  { id:17, cat:'rewards',    title:'Coins Expiring Soon ⏰', msg:'500 WOW Coins from your March 2025 purchase expire on 31 Mar 2026. Use them before they lapse! Redeem for ticket discounts, F&B, or merchandise.', time:'3 weeks ago', today:false, unread:false },
+  { id:18, cat:'system',     title:'Profile Updated Successfully', msg:'Your profile information (mobile number, date of birth) was updated on 10 Mar 2026. If you did not make this change, contact support immediately.', time:'3 weeks ago', today:false, unread:false },
+];
 
-  function saveNotifs() {
-    localStorage.setItem('wow_notifs', JSON.stringify(notifs));
-  }
+const PREF_TYPES = [
+  {key:'bookings',   label:'Booking Confirmations', sub:'Order receipts, QR tickets, reminders', default:true},
+  {key:'reminders',  label:'Visit Reminders',        sub:'Reminders 24h and 2h before visit',     default:true},
+  {key:'rewards',    label:'Rewards & Coins',         sub:'Coin credits, tier upgrades, expiry',   default:true},
+  {key:'promotions', label:'Promotions & Offers',     sub:'Flash sales, discount codes, new rides',default:true},
+  {key:'wallet',     label:'Wallet Transactions',     sub:'Top-ups, deductions, auto-reload',      default:true},
+  {key:'passport',   label:'Passport Updates',        sub:'Expiry reminders, tier changes',        default:true},
+  {key:'security',   label:'Security Alerts',         sub:'Login, password change, device alerts', default:true},
+  {key:'referral',   label:'Referral Rewards',        sub:'When friends use your code',            default:true},
+  {key:'marketing',  label:'Marketing & Newsletters', sub:'Monthly digest, park news',             default:false},
+];
+const PREF_CHANNELS = [
+  {key:'push',  icon:'fa-mobile-alt', label:'Push Notifications',  sub:'Instant alerts on app/browser', default:true},
+  {key:'email', icon:'fa-envelope',   label:'Email',               sub:'ravi.sharma@email.com',          default:true},
+  {key:'sms',   icon:'fa-sms',        label:'SMS',                 sub:'+91 98765 43210',                default:true},
+  {key:'whatsapp', icon:'fa-whatsapp',label:'WhatsApp',            sub:'Booking confirmations only',     default:true},
+];
 
-  function getUnreadCount(type = null) {
-    return notifs.filter(n => n.unread && (!type || n.type === type)).length;
-  }
+// ===== STATE =====
+let currentTab = 'all';
+let currentPage = 1;
+const PAGE_SIZE = 8;
+let bulkMode = false;
+let selectedIds = new Set();
+const prefs = {};
+PREF_TYPES.forEach(p => prefs[p.key] = p.default);
+PREF_CHANNELS.forEach(p => prefs['ch_'+p.key] = p.default);
 
-  function updateBadges() {
-    const unread = getUnreadCount();
-    document.getElementById('badge-all').textContent = unread;
-    document.getElementById('badge-all').style.display = unread ? 'inline-flex' : 'none';
-    const sb = document.getElementById('sidebar-badge');
-    if (sb) { sb.textContent = unread; sb.style.display = unread ? 'inline-flex' : 'none'; }
-    const unreadTxt = unread
-      ? `You have <b style="color:#60a5fa">${unread} unread</b> notification${unread > 1 ? 's' : ''}`
-      : 'You\'re all caught up! 🎉';
-    document.getElementById('unread-summary').innerHTML = unreadTxt;
-  }
+// ===== HELPERS =====
+function getFiltered(tab) {
+  let list = [...allNotifs];
+  if (tab === 'unread')     list = list.filter(n => n.unread);
+  else if (tab === 'bookings')   list = list.filter(n => n.cat === 'bookings');
+  else if (tab === 'rewards')    list = list.filter(n => n.cat === 'rewards' || n.cat === 'passport' || n.cat === 'wallet');
+  else if (tab === 'promotions') list = list.filter(n => n.cat === 'promotions');
+  else if (tab === 'system')     list = list.filter(n => n.cat === 'system' || n.cat === 'alert');
+  
+  const search = document.getElementById('notif-search')?.value.toLowerCase()||'';
+  if (search) list = list.filter(n => n.title.toLowerCase().includes(search) || n.msg.toLowerCase().includes(search));
+  
+  const sort = document.getElementById('notif-sort')?.value||'newest';
+  if (sort === 'oldest') list.reverse();
+  else if (sort === 'unread') list = [...list.filter(n=>n.unread), ...list.filter(n=>!n.unread)];
+  
+  return list;
+}
 
-  function renderNotifs(filter = 'all') {
-    const list = document.getElementById('notif-list');
-    const filtered = filter === 'all' ? notifs : notifs.filter(n => n.type === filter);
-    document.getElementById('showing-count').textContent = filtered.length;
+function updateStats() {
+  const unread = allNotifs.filter(n=>n.unread).length;
+  document.getElementById('stat-total').textContent = allNotifs.length;
+  document.getElementById('stat-unread').textContent = unread;
+  document.getElementById('stat-today').textContent = allNotifs.filter(n=>n.today).length;
+  document.getElementById('stat-rewards').textContent = allNotifs.filter(n=>n.cat==='rewards').length;
+  document.getElementById('unread-cnt').textContent = unread;
+  document.getElementById('sidebar-badge').textContent = unread;
+  document.getElementById('topbar-sub').textContent = `${unread} unread of ${allNotifs.length} total · Last updated just now`;
+}
 
-    if (filtered.length === 0) {
-      list.innerHTML = `
-        <div class="notif-list-card">
-          <div class="empty-state">
-            <div class="empty-icon">🔔</div>
-            <div class="empty-title">No notifications here</div>
-            <div class="empty-sub">You don't have any ${filter === 'all' ? '' : filter + ' '}notifications yet.</div>
-          </div>
-        </div>`;
-      return;
-    }
+// ===== RENDER =====
+function renderList() {
+  if (currentTab === 'preferences') return;
+  const filtered = getFiltered(currentTab);
+  const total = filtered.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const paged = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
 
-    // Group by today / this week / older
-    const now = Date.now();
-    const groups = { today: [], week: [], older: [] };
-    filtered.forEach(n => {
-      if (n.time.includes('hour') || n.time === 'Just now') groups.today.push(n);
-      else if (n.time.includes('day') && !n.time.includes('week')) groups.week.push(n);
-      else groups.older.push(n);
-    });
-
-    let html = '';
-    const renderGroup = (label, items) => {
-      if (!items.length) return '';
-      return `<div class="section-title">${label}</div>
-              <div class="notif-list-card">` +
-        items.map(n => `
-          <div class="notif-item${n.unread ? ' unread' : ''}" id="notif-${n.id}">
-            <div class="notif-icon-wrap ${n.iconClass}">${n.icon}</div>
-            <div class="notif-body">
-              <div class="notif-title">${n.title}</div>
-              <div class="notif-desc">${n.desc}</div>
-              <div class="notif-meta">
-                <div class="notif-time">${n.time}</div>
-                ${n.action ? `<a href="${n.action.href}" class="notif-action">${n.action.label} →</a>` : ''}
-                ${n.unread ? `<button onclick="markRead('${n.id}')" class="notif-action" style="background:none;border:none;cursor:pointer;padding:0;font-family:inherit;">Mark read</button>` : ''}
-              </div>
+  const container = document.getElementById('notif-list');
+  if (!paged.length) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">🔕</div><h3>No Notifications</h3><p>Nothing here in this category.</p></div>`;
+  } else {
+    container.innerHTML = paged.map(n => {
+      const cat = CATEGORIES[n.cat] || CATEGORIES.system;
+      const checkHtml = bulkMode ? `<input type="checkbox" ${selectedIds.has(n.id)?'checked':''} onclick="toggleSelect(${n.id}, event)" style="margin-right:4px;width:16px;height:16px;cursor:pointer;" />` : '';
+      return `
+        <div class="notif-item ${n.unread?'unread':''}" id="notif-${n.id}" onclick="markRead(${n.id})">
+          ${bulkMode ? `<input type="checkbox" ${selectedIds.has(n.id)?'checked':''} onclick="toggleSelect(${n.id}, event)" style="flex-shrink:0;width:16px;height:16px;cursor:pointer;margin-top:4px;" />` : ''}
+          <div class="notif-icon" style="background:${cat.bg};color:${cat.color};">${cat.icon}</div>
+          <div class="notif-body">
+            <div class="notif-title">${n.title}${n.pinned?'<span style="font-size:10px;margin-left:6px;background:var(--amber-lt);color:var(--amber);padding:1px 6px;border-radius:8px;font-weight:700;">📌 Pinned</span>':''}</div>
+            <div class="notif-msg">${n.msg}</div>
+            <div class="notif-meta">
+              <span class="notif-time"><i class="fas fa-clock" style="font-size:10px;"></i> ${n.time}</span>
+              <span class="notif-tag" style="background:${cat.bg};color:${cat.color};">${n.cat}</span>
+              ${n.unread ? '<span class="notif-tag" style="background:var(--primary-lt);color:var(--primary);">NEW</span>' : ''}
             </div>
-            <button class="notif-dismiss" onclick="dismissNotif('${n.id}')" title="Dismiss">✕</button>
-          </div>`).join('') +
-      `</div>`;
-    };
-
-    html += renderGroup('Today', groups.today);
-    html += renderGroup('This Week', groups.week);
-    html += renderGroup('Earlier', groups.older);
-    list.innerHTML = html;
-    updateBadges();
+            <div class="notif-actions">
+              <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="deleteNotif(${n.id}, event)"><i class="fas fa-trash"></i> Delete</button>
+              ${n.unread ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="markRead(${n.id})"><i class="fas fa-check"></i> Mark Read</button>` : ''}
+              ${n.cat==='bookings' ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="showToast('Opening booking details…')"><i class="fas fa-eye"></i> View</button>` : ''}
+              ${n.cat==='rewards' ? `<button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="showToast('Opening loyalty dashboard…')"><i class="fas fa-coins"></i> Coins</button>` : ''}
+              ${n.cat==='promotions' ? `<button class="btn btn-green btn-sm" style="font-size:11px;" onclick="showToast('Copying promo code…')"><i class="fas fa-copy"></i> Copy Code</button>` : ''}
+            </div>
+          </div>
+          ${n.unread ? '<div class="notif-dot" style="flex-shrink:0;"></div>' : ''}
+        </div>`;
+    }).join('');
   }
 
-  window.filterNotifs = function(filter, btn) {
-    currentFilter = filter;
-    document.querySelectorAll('.notif-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    renderNotifs(filter);
-  };
-
-  window.markRead = function(id) {
-    const n = notifs.find(x => x.id === id);
-    if (n) { n.unread = false; saveNotifs(); renderNotifs(currentFilter); }
-  };
-
-  window.dismissNotif = function(id) {
-    notifs = notifs.filter(n => n.id !== id);
-    saveNotifs();
-    renderNotifs(currentFilter);
-  };
-
-  window.markAllRead = function() {
-    notifs.forEach(n => n.unread = false);
-    saveNotifs();
-    renderNotifs(currentFilter);
-  };
-
-  window.clearAll = function() {
-    if (confirm('Clear all notifications? This cannot be undone.')) {
-      notifs = [];
-      saveNotifs();
-      renderNotifs(currentFilter);
+  // Pagination
+  document.getElementById('page-info').textContent = `Showing ${Math.min((currentPage-1)*PAGE_SIZE+1,total)}–${Math.min(currentPage*PAGE_SIZE,total)} of ${total}`;
+  const btns = document.getElementById('page-btns');
+  btns.innerHTML = '';
+  if (totalPages > 1) {
+    btns.innerHTML += `<button class="btn btn-ghost btn-sm" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled style="opacity:.4;"':''}>← Prev</button>`;
+    for (let i=1; i<=totalPages; i++) {
+      btns.innerHTML += `<button class="btn ${i===currentPage?'btn-primary':'btn-ghost'} btn-sm" onclick="goPage(${i})">${i}</button>`;
     }
-  };
-
-  window.savePref = function(key, val) {
-    const prefs = JSON.parse(localStorage.getItem('wow_notif_prefs') || '{}');
-    prefs[key] = val;
-    localStorage.setItem('wow_notif_prefs', JSON.stringify(prefs));
-  };
-
-  // Load saved prefs
-  function loadPrefs() {
-    const prefs = JSON.parse(localStorage.getItem('wow_notif_prefs') || '{}');
-    document.querySelectorAll('.toggle input').forEach(input => {
-      const key = input.getAttribute('onchange')?.match(/'([^']+)'/)?.[1];
-      if (key && key in prefs) input.checked = prefs[key];
-    });
+    btns.innerHTML += `<button class="btn btn-ghost btn-sm" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled style="opacity:.4;"':''}>Next →</button>`;
   }
 
-  // Initial render
-  renderNotifs('all');
-  loadPrefs();
-</script>
+  updateStats();
+}
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
+function goPage(p) {
+  const filtered = getFiltered(currentTab);
+  const max = Math.ceil(filtered.length/PAGE_SIZE);
+  if (p < 1 || p > max) return;
+  currentPage = p;
+  renderList();
+}
 
-  const app  = initializeApp(WOW_FB_CONFIG);
-  const auth = getAuth(app);
+// ===== ACTIONS =====
+function markRead(id, e) {
+  if (e) e.stopPropagation();
+  const n = allNotifs.find(x=>x.id===id);
+  if (n) n.unread = false;
+  renderList();
+}
+function deleteNotif(id, e) {
+  if (e) e.stopPropagation();
+  allNotifs = allNotifs.filter(x=>x.id!==id);
+  renderList();
+  showToast('Notification deleted');
+}
+function markAllRead() {
+  allNotifs.forEach(n=>n.unread=false);
+  renderList();
+  showToast('✅ All notifications marked as read');
+}
+function clearAll() {
+  if (!confirm('Clear all notifications? This cannot be undone.')) return;
+  allNotifs = [];
+  renderList();
+  showToast('🗑 All notifications cleared');
+}
 
-  onAuthStateChanged(auth, (user) => {
-    if (!user) { window.location.href = 'login.html'; return; }
-    document.getElementById('portal-loading').style.display = 'none';
-    document.getElementById('portal-content').style.display = 'block';
+// ===== BULK SELECT =====
+function toggleBulkSelect() {
+  bulkMode = !bulkMode;
+  selectedIds.clear();
+  document.getElementById('bulk-actions').style.display = bulkMode ? 'flex' : 'none';
+  document.getElementById('bulk-sel-btn').innerHTML = bulkMode ? '<i class="fas fa-times"></i> Cancel' : '<i class="fas fa-check-square"></i> Select';
+  renderList();
+}
+function cancelBulk() { bulkMode=false; selectedIds.clear(); document.getElementById('bulk-actions').style.display='none'; renderList(); }
+function toggleSelect(id, e) {
+  e.stopPropagation();
+  selectedIds.has(id) ? selectedIds.delete(id) : selectedIds.add(id);
+}
+function bulkMarkRead() {
+  selectedIds.forEach(id=>{ const n=allNotifs.find(x=>x.id===id); if(n) n.unread=false; });
+  showToast(`✅ ${selectedIds.size} notifications marked read`);
+  cancelBulk();
+}
+function bulkDelete() {
+  allNotifs = allNotifs.filter(n=>!selectedIds.has(n.id));
+  showToast(`🗑 ${selectedIds.size} notifications deleted`);
+  cancelBulk();
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  currentTab = tab;
+  currentPage = 1;
+  ['all','unread','bookings','rewards','promotions','system','preferences'].forEach(t=>{
+    document.getElementById('tb-'+t)?.classList.toggle('active', t===tab);
   });
+  const isPref = tab==='preferences';
+  document.getElementById('notif-list-container').style.display = isPref ? 'none' : 'block';
+  document.getElementById('preferences-panel').style.display = isPref ? 'block' : 'none';
+  document.getElementById('filter-section').style.display = isPref ? 'none' : 'block';
+  if (!isPref) renderList();
+}
 
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await signOut(auth);
-    window.location.href = '../index.html';
-  });
+function applyFilters() { currentPage=1; renderList(); }
+
+// ===== PREFERENCES =====
+function renderPreferences() {
+  document.getElementById('pref-types').innerHTML = PREF_TYPES.map(p=>`
+    <div class="pref-row">
+      <div><div class="pref-label">${p.label}</div><div class="pref-sub">${p.sub}</div></div>
+      <label class="toggle">
+        <input type="checkbox" id="pref-${p.key}" ${prefs[p.key]?'checked':''} />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`).join('');
+
+  document.getElementById('pref-channels').innerHTML = PREF_CHANNELS.map(c=>`
+    <div class="pref-row">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fab ${c.icon}" style="width:20px;font-size:16px;color:var(--text3);"></i>
+        <div><div class="pref-label">${c.label}</div><div class="pref-sub">${c.sub}</div></div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="pref-ch-${c.key}" ${prefs['ch_'+c.key]?'checked':''} />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`).join('');
+}
+
+function savePrefs() {
+  PREF_TYPES.forEach(p=>{const el=document.getElementById('pref-'+p.key);if(el) prefs[p.key]=el.checked;});
+  PREF_CHANNELS.forEach(c=>{const el=document.getElementById('pref-ch-'+c.key);if(el) prefs['ch_'+c.key]=el.checked;});
+  showToast('✅ Notification preferences saved');
+}
+function resetPrefs() {
+  PREF_TYPES.forEach(p=>{prefs[p.key]=p.default;});
+  PREF_CHANNELS.forEach(c=>{prefs['ch_'+c.key]=c.default;});
+  renderPreferences();
+  showToast('Preferences reset to defaults');
+}
+
+// ===== TOAST =====
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.style.display='none', dur);
+}
+
+// ===== INIT =====
+(function init() {
+  renderList();
+  renderPreferences();
+  updateStats();
+  // Simulate new notification after 5s
+  setTimeout(()=>{
+    allNotifs.unshift({
+      id:99, cat:'promotions', title:'⚡ Just Added: 25% OFF on Monday Bookings!',
+      msg:'Plan your midweek escape! Get 25% discount on all ticket types every Monday. Use code MON25. Valid for visits in April 2026.',
+      time:'Just now', today:true, unread:true
+    });
+    if(currentTab==='all'||currentTab==='promotions') renderList();
+    showToast('🔔 New notification received!');
+  }, 5000);
+})();
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
