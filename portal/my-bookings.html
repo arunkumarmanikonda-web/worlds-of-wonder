@@ -1,396 +1,817 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Bookings — Worlds of Wonder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/portal.css" />
-  <link rel="stylesheet" href="../css/forms.css" />
-  <script src="../js/wow-modules.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Bookings — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --brand:#ff6b35;--brand-dark:#e55a22;--brand-light:#fff3ee;
+  --navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --bg:#f0f4f8;--white:#fff;
+  --green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#7c3aed;--blue:#3b82f6;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--slate);min-height:100vh;display:flex;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:40;overflow-y:auto;}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07);}
+.sb-logo img{height:36px;width:auto;object-fit:contain;filter:none!important;}
+.sb-user{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:var(--brand);display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;}
+.sb-uname{font-size:12.5px;font-weight:700;color:#fff;}
+.sb-utier{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px;}
+.sb-nav{padding:12px 8px;flex:1;}
+.sb-section{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:8px 10px 4px;font-weight:700;}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:600;transition:.15s;margin-bottom:1px;}
+.sb-link:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.sb-link.active{background:rgba(255,107,53,.15);color:var(--brand);}
+.sb-link i{width:16px;text-align:center;font-size:13px;}
+.sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:10px;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:30;}
+.topbar-title{font-size:17px;font-weight:800;color:var(--navy);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:.15s;font-family:inherit;}
+.btn-brand{background:var(--brand);color:#fff;}
+.btn-brand:hover{background:var(--brand-dark);}
+.btn-outline{background:var(--white);border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-ghost{background:transparent;border:none;color:var(--muted);padding:8px;}
+.btn-ghost:hover{color:var(--brand);}
+
+/* ── PAGE BODY ── */
+.page-body{padding:24px 28px;max-width:1080px;}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand);}
+.stat-card.blue::after{background:var(--blue);}
+.stat-card.green::after{background:var(--green);}
+.stat-card.purple::after{background:var(--purple);}
+.stat-val{font-size:26px;font-weight:900;color:var(--navy);font-family:'Nunito',sans-serif;line-height:1;margin-bottom:4px;}
+.stat-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.filter-tabs{display:flex;gap:4px;background:#f1f5f9;border-radius:9px;padding:3px;}
+.ftab{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:inherit;transition:.15s;}
+.ftab.active{background:var(--white);color:var(--slate);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+.filter-sep{flex:1;}
+.search-wrap{position:relative;}
+.search-wrap input{padding:8px 12px 8px 32px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:200px;outline:none;transition:.15s;font-family:inherit;}
+.search-wrap input:focus{border-color:var(--brand);}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;}
+.sort-select{border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--slate);outline:none;cursor:pointer;font-family:inherit;}
+.sort-select:focus{border-color:var(--brand);}
+
+/* ── BOOKING CARDS ── */
+.booking-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;transition:.2s;cursor:pointer;}
+.booking-card:hover{border-color:var(--brand);box-shadow:0 4px 16px rgba(255,107,53,.1);}
+.bc-top{display:flex;align-items:stretch;}
+.bc-accent{width:6px;flex-shrink:0;}
+.bc-accent.water{background:linear-gradient(180deg,#0ea5e9,#0284c7);}
+.bc-accent.amusement{background:linear-gradient(180deg,#7c3aed,#6d28d9);}
+.bc-accent.combo{background:linear-gradient(180deg,var(--brand),var(--brand-dark));}
+.bc-accent.passport{background:linear-gradient(180deg,#f59e0b,#d97706);}
+.bc-accent.group{background:linear-gradient(180deg,#10b981,#059669);}
+.bc-body{padding:16px 20px;flex:1;display:flex;align-items:center;gap:16px;}
+.bc-icon-wrap{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:26px;flex-shrink:0;}
+.bc-icon-wrap.water{background:#e0f2fe;}
+.bc-icon-wrap.amusement{background:#ede9fe;}
+.bc-icon-wrap.combo{background:#fff3ee;}
+.bc-icon-wrap.passport{background:#fffbeb;}
+.bc-icon-wrap.group{background:#d1fae5;}
+.bc-info{flex:1;}
+.bc-name{font-size:15px;font-weight:800;color:var(--navy);}
+.bc-meta{font-size:12px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.bc-meta span{display:flex;align-items:center;gap:4px;}
+.bc-ref{font-family:'Nunito',monospace;font-size:11px;color:var(--muted);background:#f1f5f9;padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;}
+.bc-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.bc-amount{font-size:17px;font-weight:900;color:var(--navy);font-family:'Nunito',sans-serif;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.status-upcoming{background:#dbeafe;color:#1d4ed8;}
+.status-today{background:#fef3c7;color:#92400e;animation:pulse 2s infinite;}
+.status-completed{background:#d1fae5;color:#065f46;}
+.status-cancelled{background:#fee2e2;color:#991b1b;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.bc-actions{display:flex;gap:6px;margin-top:6px;}
+
+/* ── TIMELINE ── */
+.timeline{padding:0 20px 16px 78px;}
+.tl-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;position:relative;}
+.tl-item::before{content:'';position:absolute;left:-20px;top:12px;bottom:-6px;width:1px;background:var(--border);}
+.tl-item:last-child::before{display:none;}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px;position:relative;left:-24px;margin-right:-14px;}
+.tl-dot.pending{background:var(--amber);}
+.tl-dot.cancelled{background:var(--red);}
+.tl-content{flex:1;}
+.tl-label{font-size:12px;font-weight:700;color:var(--slate);}
+.tl-time{font-size:11px;color:var(--muted);margin-top:1px;}
+
+/* ── DETAIL PANEL (expanded) ── */
+.bc-detail{background:#f8fafc;border-top:1px solid var(--border);padding:20px 20px 20px 78px;display:none;}
+.bc-detail.open{display:block;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+.detail-block{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.detail-block-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.detail-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);}
+.detail-row:last-child{border:none;}
+.detail-row .key{color:var(--muted);}
+.detail-row .val{font-weight:700;color:var(--slate);}
+.ticket-line{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);}
+.ticket-line:last-child{border:none;}
+.ticket-total{display:flex;justify-content:space-between;font-size:14px;font-weight:800;padding:10px 0 0;color:var(--navy);}
+.qr-wrap{display:flex;justify-content:center;padding:12px;background:var(--white);border:1px solid var(--border);border-radius:10px;}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+
+/* ── CANCEL/RESCHEDULE MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.7);z-index:100;display:none;place-items:center;padding:20px;}
+.modal-overlay.open{display:grid;}
+.modal-box{background:var(--white);border-radius:18px;max-width:480px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.25);}
+.modal-head{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.modal-head h3{font-size:16px;font-weight:800;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+.form-input{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:.15s;font-family:inherit;}
+.form-input:focus{border-color:var(--brand);}
+.warn-box{background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;font-size:13px;color:#9a3412;margin-bottom:16px;}
+.warn-box strong{display:block;margin-bottom:4px;}
+.refund-table{width:100%;font-size:13px;border-collapse:collapse;margin-top:8px;}
+.refund-table td{padding:6px 0;border-bottom:1px solid var(--border);}
+.refund-table td:last-child{text-align:right;font-weight:700;}
+.refund-table tr:last-child td{border:none;color:var(--green);font-size:15px;}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state .em-icon{font-size:56px;margin-bottom:16px;}
+.empty-state h3{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px;}
+.empty-state p{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--slate);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:200;transform:translateY(80px);opacity:0;transition:.3s;box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:.25s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .detail-grid{grid-template-columns:1fr;}
+  .bc-actions{flex-direction:column;}
+}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr;}
+  .page-body{padding:16px;}
+  .bc-body{flex-wrap:wrap;}
+  .bc-right{flex-direction:row;align-items:center;}
+}
+</style>
 </head>
 <body>
-<div id="app">
 
-  <!-- Portal layout -->
-  <div class="portal-dashboard">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <a href="../index.html"><img src="../images/logo.png" alt="WOW"/></a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-avatar">R</div>
+    <div><div class="sb-uname">Rajesh Kumar</div><div class="sb-utier">⭐ Silver Member</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a href="dashboard.html" class="sb-link"><i class="fa fa-th-large"></i> Dashboard</a>
+    <a href="my-bookings.html" class="sb-link active"><i class="fa fa-calendar-check"></i> My Bookings <span class="sb-badge">5</span></a>
+    <a href="tickets.html" class="sb-link"><i class="fa fa-ticket-alt"></i> My Tickets</a>
+    <a href="wow-passport.html" class="sb-link"><i class="fa fa-passport"></i> WOW Passport</a>
+    <div class="sb-section">Rewards</div>
+    <a href="loyalty.html" class="sb-link"><i class="fa fa-star"></i> Loyalty Points <span class="sb-badge" style="background:#f59e0b;">1240</span></a>
+    <a href="wallet.html" class="sb-link"><i class="fa fa-wallet"></i> WOW Wallet</a>
+    <a href="offers.html" class="sb-link"><i class="fa fa-tags"></i> My Offers</a>
+    <div class="sb-section">Account</div>
+    <a href="notifications.html" class="sb-link"><i class="fa fa-bell"></i> Notifications <span class="sb-badge">3</span></a>
+    <a href="profile.html" class="sb-link"><i class="fa fa-user"></i> Profile</a>
+    <div class="sb-section">Quick Book</div>
+    <a href="../book/water-park.html" class="sb-link"><i class="fa fa-water" style="color:#0ea5e9;"></i> Water Park</a>
+    <a href="../book/amusement-park.html" class="sb-link"><i class="fa fa-dharmachakra" style="color:#7c3aed;"></i> Amusement Park</a>
+    <a href="../book/combo.html" class="sb-link"><i class="fa fa-ticket-alt" style="color:var(--brand);"></i> Combo Deal</a>
+    <div style="margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,.07);">
+      <a href="../index.html" class="sb-link"><i class="fa fa-globe"></i> Public Site</a>
+      <a href="login.html" class="sb-link" style="color:rgba(239,68,68,.7);"><i class="fa fa-sign-out-alt"></i> Sign Out</a>
+    </div>
+  </nav>
+</aside>
 
-    <!-- Sidebar -->
-    <aside class="portal-sidebar" id="portal-sidebar">
-      <div class="portal-sidebar-logo">
-        <a href="../index.html">
-          <img src="../images/logo.png" alt="Worlds of Wonder" style="height:52px;width:auto;object-fit:contain;filter:none!important;" />
-        </a>
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-ghost" id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fa fa-bars"></i></button>
+      <div>
+        <div class="topbar-title">My Bookings</div>
       </div>
-      <nav class="portal-sidenav">
-        <a href="dashboard.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>Dashboard</span>
-        </a>
-        <a href="my-bookings.html" class="portal-sidenav-item active">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>My Bookings</span>
-        </a>
-        <a href="tickets.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9a3 3 0 010 6v2a2 2 0 002 2h16a2 2 0 002-2v-2a3 3 0 010-6V7a2 2 0 00-2-2H4a2 2 0 00-2 2v2z"/></svg>
-          <span>My Tickets</span>
-        </a>
-        <a href="passport.html" class="portal-sidenav-item" data-module="passport_system">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M2 9h6M2 15h6"/></svg>
-          <span>My Passport</span>
-        </a>
-        <a href="loyalty.html" class="portal-sidenav-item" data-module="loyalty_program">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span>Loyalty Points</span>
-        </a>
-        <a href="offers.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-          <span>My Offers</span>
-        </a>
-        <a href="notifications.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span>Notifications</span>
-        </a>
-        <a href="profile.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span>Profile</span>
-        </a>
-        <div class="portal-sidenav-divider"></div>
-        <a href="../index.html" class="portal-sidenav-item">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-          <span>Back to Website</span>
-        </a>
-        <button class="portal-sidenav-item portal-signout-btn" id="signout-btn">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span>Sign Out</span>
-        </button>
-      </nav>
-    </aside>
-
-    <!-- Main content -->
-    <main class="portal-main">
-
-      <!-- Loading state -->
-      <div id="portal-loading" class="portal-loading">
-        <div class="portal-spinner"></div>
-        <p>Loading your bookings…</p>
-      </div>
-
-      <!-- Authenticated content (hidden until auth confirmed) -->
-      <div id="portal-content" style="display:none;">
-
-        <!-- Header -->
-        <div class="portal-main-header">
-          <div>
-            <h1 class="portal-main-title" id="greeting">My Bookings</h1>
-            <p class="portal-main-sub">All your Worlds of Wonder visits in one place</p>
-          </div>
-          <a href="../book/water-park.html" class="btn btn-primary" style="white-space:nowrap;">+ Book New Visit</a>
-        </div>
-
-        <!-- Welcome banner (shown once) -->
-        <div class="portal-welcome-banner hidden" id="welcome-banner">
-          <div class="portal-welcome-inner">
-            <span class="portal-welcome-emoji">🎉</span>
-            <div>
-              <div class="portal-welcome-title">Welcome to Worlds of Wonder!</div>
-              <div class="portal-welcome-sub">Your account is all set. Start by booking your first visit below.</div>
-            </div>
-            <button class="portal-welcome-close" id="close-welcome">✕</button>
-          </div>
-        </div>
-
-        <!-- Stats row -->
-        <div class="portal-stats-row" id="stats-row">
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-total">—</div>
-            <div class="portal-stat-label">Total Visits Booked</div>
-          </div>
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-upcoming">—</div>
-            <div class="portal-stat-label">Upcoming Visits</div>
-          </div>
-          <div class="portal-stat-card">
-            <div class="portal-stat-num" id="stat-spent">—</div>
-            <div class="portal-stat-label">Total Spent</div>
-          </div>
-          <div class="portal-stat-card portal-stat-card--passport" id="passport-stat">
-            <div class="portal-stat-num">🪪</div>
-            <div class="portal-stat-label">Passport Status</div>
-            <div class="portal-stat-badge" id="passport-badge">Check →</div>
-          </div>
-        </div>
-
-        <!-- Filter tabs -->
-        <div class="portal-filter-tabs">
-          <button class="portal-filter-tab active" data-filter="all" onclick="filterBookings('all',this)">All</button>
-          <button class="portal-filter-tab" data-filter="upcoming" onclick="filterBookings('upcoming',this)">Upcoming</button>
-          <button class="portal-filter-tab" data-filter="past" onclick="filterBookings('past',this)">Past</button>
-        </div>
-
-        <!-- Bookings list -->
-        <div id="bookings-list" class="portal-bookings-list">
-          <!-- Injected by JS -->
-        </div>
-
-        <!-- Empty state -->
-        <div class="portal-empty" id="bookings-empty" style="display:none;">
-          <div class="portal-empty-icon">🎢</div>
-          <h3>No bookings yet</h3>
-          <p>Your next adventure is just one click away. Book a visit and it'll appear here instantly.</p>
-          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
-            <a href="../book/water-park.html" class="btn btn-primary">🌊 Book Water Park</a>
-            <a href="../book/amusement-park.html" class="btn btn-outline">🎢 Book Amusement Park</a>
-          </div>
-        </div>
-
-      </div><!-- /#portal-content -->
-
-    </main>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--muted);">Sat, 28 Mar 2026</span>
+      <a href="notifications.html" class="btn btn-ghost"><i class="fa fa-bell"></i></a>
+      <a href="../book/combo.html" class="btn btn-brand btn-sm"><i class="fa fa-plus"></i> Book New Visit</a>
+    </div>
   </div>
 
-</div><!-- #app -->
+  <div class="page-body">
 
-<!-- Booking detail modal -->
-<div id="booking-modal" class="portal-modal-overlay hidden">
-  <div class="portal-modal">
-    <div class="portal-modal-header" id="modal-header">
-      <div class="portal-modal-icon" id="modal-icon"></div>
-      <div>
-        <div class="portal-modal-title" id="modal-title"></div>
-        <div class="portal-modal-sub" id="modal-sub"></div>
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val">5</div>
+        <div class="stat-lbl">Total Bookings</div>
       </div>
-      <button class="portal-modal-close" id="modal-close">✕</button>
+      <div class="stat-card blue">
+        <div class="stat-val">1</div>
+        <div class="stat-lbl">Upcoming Visits</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-val">₹11,490</div>
+        <div class="stat-lbl">Total Spent</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-val">620 pts</div>
+        <div class="stat-lbl">WOW Coins Earned</div>
+      </div>
     </div>
-    <div class="portal-modal-body" id="modal-body"></div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterBy('all',this)">All (5)</button>
+        <button class="ftab" onclick="filterBy('upcoming',this)">Upcoming (1)</button>
+        <button class="ftab" onclick="filterBy('completed',this)">Completed (3)</button>
+        <button class="ftab" onclick="filterBy('cancelled',this)">Cancelled (1)</button>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="search-wrap">
+        <i class="fa fa-search"></i>
+        <input type="text" id="search-input" placeholder="Search by ID or park…" oninput="searchBookings(this.value)"/>
+      </div>
+      <select class="sort-select" onchange="sortBookings(this.value)">
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="amount-desc">Highest Amount</option>
+      </select>
+    </div>
+
+    <!-- BOOKINGS LIST -->
+    <div id="bookings-list"></div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="em-icon">🎢</div>
+      <h3>No bookings found</h3>
+      <p>Try changing your filter or search term.</p>
+      <a href="../book/combo.html" class="btn btn-brand"><i class="fa fa-plus"></i> Book a Visit</a>
+    </div>
+
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-  import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-  import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-  import { WOW_FB_CONFIG } from '../js/firebase-config.js';
-
-  const app  = initializeApp(WOW_FB_CONFIG);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  let allBookings = [];
-
-  // Auth guard
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
-      return;
-    }
-    document.getElementById('portal-loading').style.display = 'none';
-    document.getElementById('portal-content').style.display = 'block';
-
-    const name = user.displayName?.split(' ')[0] || 'there';
-    document.getElementById('greeting').textContent = `Hey ${name}, your bookings 👋`;
-
-    // Welcome banner (first visit)
-    if (new URLSearchParams(window.location.search).get('welcome')) {
-      document.getElementById('welcome-banner').classList.remove('hidden');
-    }
-
-    // Load bookings from Firestore
-    loadBookings(user.uid);
-
-    // Load passport status
-    loadPassport(user.uid);
-  });
-
-  document.getElementById('close-welcome')?.addEventListener('click', () => {
-    document.getElementById('welcome-banner').classList.add('hidden');
-  });
-
-  document.getElementById('signout-btn')?.addEventListener('click', async () => {
-    await signOut(auth);
-    window.location.href = '../index.html';
-  });
-
-  function inr(n) {
-    return '₹\u202F' + Number(Math.round(n)).toLocaleString('en-IN');
-  }
-
-  function statusBadge(booking) {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const visitDate = new Date(booking.visitDate);
-    if (booking.cancelled) return { cls:'cancelled', label:'Cancelled' };
-    if (visitDate < today) return { cls:'past', label:'Completed' };
-    if (visitDate.toDateString() === today.toDateString()) return { cls:'today', label:'Today!' };
-    return { cls:'upcoming', label:'Upcoming' };
-  }
-
-  function parkIcon(parkKey) {
-    if (parkKey === 'WATER_DAY') return '🌊';
-    if (parkKey === 'AMUSEMENT_DAY') return '🎢';
-    return '🎟';
-  }
-  function parkLabel(parkKey) {
-    if (parkKey === 'WATER_DAY') return 'Water Park';
-    if (parkKey === 'AMUSEMENT_DAY') return 'Amusement Park';
-    return 'Combo — Both Parks';
-  }
-  function parkColor(parkKey) {
-    if (parkKey === 'WATER_DAY') return '#0057b3';
-    if (parkKey === 'AMUSEMENT_DAY') return '#5b21b6';
-    return '#c2410c';
-  }
-
-  function renderBookingCard(b) {
-    const st = statusBadge(b);
-    const date = new Date(b.visitDate).toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
-    const icon = parkIcon(b.parkKey);
-    const lbl  = parkLabel(b.parkKey);
-    const clr  = parkColor(b.parkKey);
-    const tickets = b.tickets || [];
-    const ticketSummary = tickets.map(t => `${t.qty}× ${t.label}`).join(', ') || `${b.totalTickets || '—'} ticket(s)`;
-
-    return `
-    <div class="portal-booking-card" data-booking-id="${b.id}">
-      <div class="pbc-left" style="background:${clr};">
-        <div class="pbc-icon">${icon}</div>
-        <div class="pbc-park">${lbl}</div>
-        <div class="pbc-date">${date}</div>
+<!-- ── CANCEL MODAL ── -->
+<div class="modal-overlay" id="cancel-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>🚫 Cancel Booking</h3>
+      <button class="btn btn-ghost" onclick="closeModal('cancel-modal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="warn-box">
+        <strong>⚠️ Cancellation Policy</strong>
+        Cancellations made more than 48 hrs before the visit date are eligible for a full refund minus ₹50 processing fee. Cancellations within 48 hrs are non-refundable.
       </div>
-      <div class="pbc-body">
-        <div class="pbc-top">
-          <div class="pbc-ref">Booking #${(b.id || '').slice(-8).toUpperCase()}</div>
-          <span class="pbc-status pbc-status--${st.cls}">${st.label}</span>
-        </div>
-        <div class="pbc-guest"><strong>${b.guestName || '—'}</strong> &nbsp;·&nbsp; 📞 ${b.mobile || '—'}</div>
-        <div class="pbc-tickets">${ticketSummary}</div>
-        <div class="pbc-footer">
-          <div class="pbc-total">${inr(b.totalPaid || 0)}</div>
-          <button class="pbc-view-btn" onclick="viewBooking('${b.id}')">View Details →</button>
-        </div>
+      <div class="form-group">
+        <label class="form-label">Reason for Cancellation</label>
+        <select class="form-input" id="cancel-reason">
+          <option value="">Select a reason…</option>
+          <option>Change of plans</option>
+          <option>Travel disruption</option>
+          <option>Health / Medical</option>
+          <option>Duplicate booking</option>
+          <option>Other</option>
+        </select>
       </div>
-    </div>`;
-  }
+      <div class="form-group">
+        <label class="form-label">Additional Comments (optional)</label>
+        <textarea class="form-input" rows="2" placeholder="Tell us more…" id="cancel-comments"></textarea>
+      </div>
+      <table class="refund-table" id="refund-table">
+        <tr><td>Booking Total</td><td id="cancel-total">₹0</td></tr>
+        <tr><td>Processing Fee</td><td>−₹50</td></tr>
+        <tr><td>Refund Amount</td><td id="cancel-refund">₹0</td></tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('cancel-modal')">Keep Booking</button>
+      <button class="btn" style="background:#ef4444;color:#fff;" onclick="confirmCancel()"><i class="fa fa-times-circle"></i> Confirm Cancellation</button>
+    </div>
+  </div>
+</div>
 
-  window.filterBookings = function(filter, btn) {
-    document.querySelectorAll('.portal-filter-tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    renderList(filter);
+<!-- ── RESCHEDULE MODAL ── -->
+<div class="modal-overlay" id="reschedule-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>📅 Reschedule Booking</h3>
+      <button class="btn btn-ghost" onclick="closeModal('reschedule-modal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="warn-box" style="background:#eff6ff;border-color:#bfdbfe;color:#1e40af;">
+        <strong>ℹ️ Reschedule Policy</strong>
+        One free reschedule allowed up to 24 hours before the visit. A ₹99 fee applies for subsequent changes.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Current Visit Date</label>
+        <input type="text" class="form-input" id="rs-current-date" disabled/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Visit Date *</label>
+        <input type="date" class="form-input" id="rs-new-date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason (optional)</label>
+        <input type="text" class="form-input" placeholder="e.g. Work commitment" id="rs-reason"/>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;font-size:12px;color:#166534;margin-top:4px;">
+        ✅ This is your <strong>first reschedule</strong> — no fee will be charged.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('reschedule-modal')">Cancel</button>
+      <button class="btn btn-brand" onclick="confirmReschedule()"><i class="fa fa-calendar-check"></i> Confirm New Date</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const BOOKINGS = [
+  {
+    id: 'WOW-2025-49820',
+    type: 'combo',
+    icon: '🎟',
+    park: 'WOW Combo — Both Parks',
+    date: '2026-04-05',
+    status: 'upcoming',
+    guest: 'Rajesh Kumar',
+    mobile: '+91 98765 43210',
+    email: 'rajesh@email.com',
+    tickets: [
+      {emoji:'🧑',label:'Adult',qty:2,unit:1999},
+      {emoji:'🧒',label:'Child',qty:1,unit:1399}
+    ],
+    groupDisc: 0,
+    gst: 820,
+    total: 5397,
+    coinsEarned: 270,
+    timeline: [
+      {label:'Booking Confirmed',time:'28 Mar 2026, 10:14 AM',dot:''},
+      {label:'Payment Received (UPI)',time:'28 Mar 2026, 10:14 AM',dot:''},
+      {label:'QR Ticket Sent via WhatsApp',time:'28 Mar 2026, 10:15 AM',dot:''},
+      {label:'Visit Scheduled',time:'05 Apr 2026',dot:'pending'},
+    ]
+  },
+  {
+    id: 'WOW-2025-38412',
+    type: 'amusement',
+    icon: '🎢',
+    park: 'Amusement Park',
+    date: '2026-02-15',
+    status: 'completed',
+    guest: 'Rajesh Kumar',
+    mobile: '+91 98765 43210',
+    email: 'rajesh@email.com',
+    tickets: [
+      {emoji:'🧑',label:'Adult',qty:2,unit:1199},
+      {emoji:'🧒',label:'Child',qty:2,unit:799}
+    ],
+    groupDisc: 0,
+    gst: 576,
+    total: 3996,
+    coinsEarned: 200,
+    timeline: [
+      {label:'Booking Confirmed',time:'12 Feb 2026, 3:05 PM',dot:''},
+      {label:'Payment Received (Card)',time:'12 Feb 2026, 3:06 PM',dot:''},
+      {label:'QR Ticket Generated',time:'12 Feb 2026, 3:06 PM',dot:''},
+      {label:'Visit Completed ✅',time:'15 Feb 2026',dot:''},
+      {label:'WOW Coins Credited: +200',time:'15 Feb 2026, 7:00 PM',dot:''},
+    ]
+  },
+  {
+    id: 'WOW-2025-29991',
+    type: 'water',
+    icon: '🌊',
+    park: 'Water Park',
+    date: '2026-01-12',
+    status: 'completed',
+    guest: 'Rajesh Kumar',
+    mobile: '+91 98765 43210',
+    email: 'rajesh@email.com',
+    tickets: [
+      {emoji:'🧑',label:'Adult',qty:1,unit:1299}
+    ],
+    groupDisc: 0,
+    gst: 197,
+    total: 1299,
+    coinsEarned: 65,
+    timeline: [
+      {label:'Booking Confirmed',time:'10 Jan 2026, 9:21 AM',dot:''},
+      {label:'Payment Received (Paytm)',time:'10 Jan 2026, 9:22 AM',dot:''},
+      {label:'Visit Completed ✅',time:'12 Jan 2026',dot:''},
+    ]
+  },
+  {
+    id: 'WOW-2025-19283',
+    type: 'combo',
+    icon: '🎟',
+    park: 'WOW Combo — Both Parks',
+    date: '2025-12-25',
+    status: 'completed',
+    guest: 'Rajesh Kumar',
+    mobile: '+91 98765 43210',
+    email: 'rajesh@email.com',
+    tickets: [
+      {emoji:'🧑',label:'Adult',qty:1,unit:1999},
+      {emoji:'🧒',label:'Child',qty:1,unit:1399}
+    ],
+    groupDisc: 0,
+    gst: 611,
+    total: 3398,
+    coinsEarned: 170,
+    timeline: [
+      {label:'Booking Confirmed',time:'20 Dec 2025, 11:48 AM',dot:''},
+      {label:'Visit Completed ✅',time:'25 Dec 2025',dot:''},
+      {label:'WOW Coins Credited: +170',time:'25 Dec 2025, 8:00 PM',dot:''},
+    ]
+  },
+  {
+    id: 'WOW-2025-08847',
+    type: 'water',
+    icon: '🌊',
+    park: 'Water Park',
+    date: '2025-10-15',
+    status: 'cancelled',
+    guest: 'Rajesh Kumar',
+    mobile: '+91 98765 43210',
+    email: 'rajesh@email.com',
+    tickets: [
+      {emoji:'🧑',label:'Adult',qty:2,unit:1299}
+    ],
+    groupDisc: 0,
+    gst: 394,
+    total: 2598,
+    coinsEarned: 0,
+    cancelReason: 'Travel disruption',
+    refundAmount: 2548,
+    timeline: [
+      {label:'Booking Confirmed',time:'10 Oct 2025, 6:15 PM',dot:''},
+      {label:'Cancelled by Guest',time:'13 Oct 2025, 2:30 PM',dot:'cancelled'},
+      {label:'Refund Processed: ₹2,548',time:'15 Oct 2025',dot:''},
+    ]
+  }
+];
+
+let displayedBookings = [...BOOKINGS];
+let activeFilter = 'all';
+let activeBookingId = null;
+let cancelTargetId = null;
+let rescheduleTargetId = null;
+
+// ── RENDER ──────────────────────────────────────────────────
+function fmt(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+function inr(n) { return '₹' + Number(Math.round(n)).toLocaleString('en-IN'); }
+
+function daysUntil(dateStr) {
+  const diff = Math.ceil((new Date(dateStr) - new Date()) / 86400000);
+  if (diff < 0) return null;
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  return diff + ' days away';
+}
+
+function renderAll() {
+  const list = document.getElementById('bookings-list');
+  const empty = document.getElementById('empty-state');
+  if (displayedBookings.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = displayedBookings.map(renderCard).join('');
+  // Regenerate QR codes for expanded cards
+  displayedBookings.forEach(b => {
+    if (document.getElementById('qr-' + b.id)) {
+      renderQR(b.id);
+    }
+  });
+}
+
+function renderCard(b) {
+  const isOpen = activeBookingId === b.id;
+  const due = daysUntil(b.date);
+  const subtotal = b.tickets.reduce((s,t)=>s+t.unit*t.qty,0);
+
+  const statusMap = {
+    upcoming: `<span class="status-badge status-upcoming"><i class="fa fa-clock" style="font-size:9px;"></i> Upcoming${due ? ' · ' + due : ''}</span>`,
+    completed: `<span class="status-badge status-completed"><i class="fa fa-check" style="font-size:9px;"></i> Completed</span>`,
+    cancelled: `<span class="status-badge status-cancelled"><i class="fa fa-times" style="font-size:9px;"></i> Cancelled</span>`,
+    today: `<span class="status-badge status-today"><i class="fa fa-fire" style="font-size:9px;"></i> Today!</span>`,
   };
 
-  function renderList(filter = 'all') {
-    const today = new Date(); today.setHours(0,0,0,0);
-    let filtered = allBookings;
-    if (filter === 'upcoming') filtered = allBookings.filter(b => new Date(b.visitDate) >= today && !b.cancelled);
-    if (filter === 'past')     filtered = allBookings.filter(b => new Date(b.visitDate) < today || b.cancelled);
+  const actions = b.status === 'upcoming' ? `
+    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openReschedule('${b.id}')"><i class="fa fa-calendar-alt"></i> Reschedule</button>
+    <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;" onclick="event.stopPropagation();openCancel('${b.id}')"><i class="fa fa-times"></i> Cancel</button>
+    <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;" onclick="event.stopPropagation();downloadTicket('${b.id}')"><i class="fa fa-download"></i> Ticket</button>
+  ` : b.status === 'completed' ? `
+    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();downloadInvoice('${b.id}')"><i class="fa fa-file-invoice"></i> Invoice</button>
+    <button class="btn btn-sm" style="background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe;" onclick="event.stopPropagation();reBook('${b.id}')"><i class="fa fa-redo"></i> Book Again</button>
+    <button class="btn btn-sm" style="background:#fff3ee;color:var(--brand);border:1px solid #fed7aa;" onclick="event.stopPropagation();shareWhatsApp('${b.id}')"><i class="fab fa-whatsapp"></i> Share</button>
+  ` : `
+    <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();viewRefund('${b.id}')"><i class="fa fa-receipt"></i> Refund Status</button>
+    <button class="btn btn-sm" style="background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;" onclick="event.stopPropagation();reBook('${b.id}')"><i class="fa fa-redo"></i> Book Again</button>
+  `;
 
-    const list  = document.getElementById('bookings-list');
-    const empty = document.getElementById('bookings-empty');
-    if (!list) return;
+  const ticketLines = b.tickets.map(t =>
+    `<div class="ticket-line"><span>${t.emoji} ${t.label} × ${t.qty}</span><span>${inr(t.unit * t.qty)}</span></div>`
+  ).join('');
 
-    if (filtered.length === 0) {
-      list.innerHTML = '';
-      empty.style.display = 'block';
-    } else {
-      empty.style.display = 'none';
-      list.innerHTML = filtered.map(renderBookingCard).join('');
-    }
-  }
+  const timelineHTML = b.timeline.map(t =>
+    `<div class="tl-item">
+       <div class="tl-dot ${t.dot}"></div>
+       <div class="tl-content"><div class="tl-label">${t.label}</div><div class="tl-time">${t.time}</div></div>
+     </div>`
+  ).join('');
 
-  function updateStats() {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const upcoming = allBookings.filter(b => new Date(b.visitDate) >= today && !b.cancelled).length;
-    const spent    = allBookings.reduce((s, b) => s + (b.totalPaid || 0), 0);
-    const total    = allBookings.length;
-    document.getElementById('stat-total').textContent    = total;
-    document.getElementById('stat-upcoming').textContent = upcoming;
-    document.getElementById('stat-spent').textContent    = inr(spent);
-  }
+  return `
+  <div class="booking-card" onclick="toggleDetail('${b.id}')">
+    <div class="bc-top">
+      <div class="bc-accent ${b.type}"></div>
+      <div class="bc-body">
+        <div class="bc-icon-wrap ${b.type}">${b.icon}</div>
+        <div class="bc-info">
+          <div class="bc-name">${b.park}</div>
+          <div class="bc-meta">
+            <span><i class="fa fa-calendar-alt"></i> ${fmt(b.date)}</span>
+            <span><i class="fa fa-user"></i> ${b.guest}</span>
+            <span><i class="fa fa-ticket-alt"></i> ${b.tickets.reduce((s,t)=>s+t.qty,0)} ticket(s)</span>
+          </div>
+          <div class="bc-ref">${b.id}</div>
+        </div>
+        <div class="bc-right">
+          <div class="bc-amount">${inr(b.total)}</div>
+          ${statusMap[b.status] || ''}
+          <div class="bc-actions" onclick="event.stopPropagation()">
+            ${actions}
+          </div>
+        </div>
+      </div>
+    </div>
 
-  function loadBookings(uid) {
-    const q = query(
-      collection(db, 'bookings'),
-      where('userId', '==', uid),
-      orderBy('visitDate', 'desc')
-    );
-    onSnapshot(q, (snap) => {
-      allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderList('all');
-      updateStats();
+    <!-- EXPANDED DETAIL -->
+    <div class="bc-detail ${isOpen ? 'open' : ''}" id="detail-${b.id}">
+      <div class="detail-grid">
+
+        <div class="detail-block">
+          <div class="detail-block-title">Booking Info</div>
+          <div class="detail-row"><span class="key">Booking ID</span><span class="val" style="font-family:monospace;">${b.id}</span></div>
+          <div class="detail-row"><span class="key">Park</span><span class="val">${b.icon} ${b.park}</span></div>
+          <div class="detail-row"><span class="key">Visit Date</span><span class="val">${fmt(b.date)}</span></div>
+          <div class="detail-row"><span class="key">Guest</span><span class="val">${b.guest}</span></div>
+          <div class="detail-row"><span class="key">Mobile</span><span class="val">${b.mobile}</span></div>
+          <div class="detail-row"><span class="key">Email</span><span class="val">${b.email}</span></div>
+          ${b.coinsEarned > 0 ? `<div class="detail-row"><span class="key">WOW Coins</span><span class="val" style="color:#f59e0b;">+${b.coinsEarned} ⭐</span></div>` : ''}
+          ${b.cancelReason ? `<div class="detail-row"><span class="key">Cancelled For</span><span class="val">${b.cancelReason}</span></div>` : ''}
+          ${b.refundAmount ? `<div class="detail-row"><span class="key">Refund</span><span class="val" style="color:var(--green);">${inr(b.refundAmount)}</span></div>` : ''}
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-block-title">Ticket Breakdown</div>
+          ${ticketLines}
+          ${b.groupDisc > 0 ? `<div class="ticket-line" style="color:var(--green);"><span>Group Discount</span><span>−${inr(b.groupDisc)}</span></div>` : ''}
+          <div class="ticket-line"><span style="color:var(--muted);">GST 18% (incl.)</span><span style="color:var(--muted);">${inr(b.gst)}</span></div>
+          <div class="ticket-total"><span>Total Paid</span><span style="color:var(--brand);">${inr(b.total)}</span></div>
+          <div style="margin-top:12px;">
+            <div class="detail-block-title" style="margin-bottom:6px;">Status Timeline</div>
+            ${timelineHTML}
+          </div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-block-title">QR Ticket</div>
+          <div class="qr-wrap" id="qr-${b.id}"></div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px;">Show this QR at the park gate<br>Valid for ${fmt(b.date)} only</div>
+          <div class="action-bar">
+            ${b.status === 'upcoming' || b.status === 'completed' ? `
+              <button class="btn btn-brand btn-sm" style="flex:1;" onclick="downloadTicket('${b.id}')"><i class="fa fa-download"></i> Download</button>
+              <button class="btn btn-sm" style="background:#25d366;color:#fff;flex:1;" onclick="shareWhatsApp('${b.id}')"><i class="fab fa-whatsapp"></i></button>
+            ` : ''}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── QR GENERATION ──────────────────────────────────────────
+function renderQR(id) {
+  const el = document.getElementById('qr-' + id);
+  if (!el || el.querySelector('canvas, img')) return;
+  const b = BOOKINGS.find(x => x.id === id);
+  if (!b) return;
+  try {
+    new QRCode(el, {
+      text: b.id + '|' + b.park + '|' + b.date + '|' + b.guest,
+      width: 120, height: 120,
+      colorDark: '#0a1628', colorLight: '#ffffff'
     });
+  } catch(e) {}
+}
+
+// ── TOGGLE DETAIL ──────────────────────────────────────────
+function toggleDetail(id) {
+  if (activeBookingId === id) {
+    activeBookingId = null;
+  } else {
+    activeBookingId = id;
   }
-
-  async function loadPassport(uid) {
-    try {
-      const snap = await getDoc(doc(db, 'passports', uid));
-      const badge = document.getElementById('passport-badge');
-      if (snap.exists()) {
-        const p = snap.data();
-        const exp = p.expiresAt?.toDate();
-        const active = exp && exp > new Date();
-        if (badge) badge.textContent = active ? '✅ Active' : '⚠️ Expired';
-        if (badge) badge.style.color = active ? '#10b981' : '#f59e0b';
-      } else {
-        if (badge) badge.textContent = 'Get Passport →';
-        document.getElementById('passport-stat')?.addEventListener('click', () => { window.location.href = 'passport.html'; });
-      }
-    } catch {}
+  renderAll();
+  if (activeBookingId) {
+    setTimeout(() => renderQR(activeBookingId), 50);
   }
+}
 
-  // Booking detail modal
-  window.viewBooking = function(id) {
-    const b = allBookings.find(x => x.id === id);
-    if (!b) return;
-    const icon  = parkIcon(b.parkKey);
-    const lbl   = parkLabel(b.parkKey);
-    const clr   = parkColor(b.parkKey);
-    const date  = new Date(b.visitDate).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-    const st    = statusBadge(b);
+// ── FILTER / SEARCH / SORT ─────────────────────────────────
+function filterBy(filter, btn) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = filter;
+  applyFilters();
+}
 
-    document.getElementById('modal-icon').textContent = icon;
-    document.getElementById('modal-title').textContent = lbl;
-    document.getElementById('modal-sub').textContent = `Booking #${(b.id||'').slice(-8).toUpperCase()}`;
-    document.getElementById('modal-header').style.background = clr;
+function searchBookings(q) {
+  applyFilters(q);
+}
 
-    const tickets = (b.tickets || []).map(t =>
-      `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f4fb;">
-         <span>${t.emoji || ''} ${t.label} × ${t.qty}</span>
-         <strong>₹${(t.unit * t.qty).toLocaleString('en-IN')}</strong>
-       </div>`).join('');
+function sortBookings(val) {
+  if (val === 'date-asc') {
+    displayedBookings.sort((a,b) => new Date(a.date) - new Date(b.date));
+  } else if (val === 'date-desc') {
+    displayedBookings.sort((a,b) => new Date(b.date) - new Date(a.date));
+  } else if (val === 'amount-desc') {
+    displayedBookings.sort((a,b) => b.total - a.total);
+  }
+  renderAll();
+}
 
-    document.getElementById('modal-body').innerHTML = `
-      <div class="portal-modal-section">
-        <div class="portal-modal-row"><span>Status</span><span class="pbc-status pbc-status--${st.cls}">${st.label}</span></div>
-        <div class="portal-modal-row"><span>Visit Date</span><strong>${date}</strong></div>
-        <div class="portal-modal-row"><span>Lead Guest</span><strong>${b.guestName || '—'}</strong></div>
-        <div class="portal-modal-row"><span>Mobile</span><strong>${b.mobile || '—'}</strong></div>
-      </div>
-      <div class="portal-modal-section">
-        <div class="portal-modal-section-title">Ticket Breakdown</div>
-        ${tickets || '<p style="color:#9ca3af;font-size:13px;">No ticket details recorded.</p>'}
-        ${b.groupDisc > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#059669;font-weight:700;"><span>🎉 Group Discount</span><span>−₹${b.groupDisc.toLocaleString('en-IN')}</span></div>` : ''}
-      </div>
-      <div class="portal-modal-section">
-        <div class="portal-modal-row"><span>GST (18%, incl.)</span><span>₹${(b.gstAmt||0).toLocaleString('en-IN')}</span></div>
-        <div class="portal-modal-row portal-modal-total"><span>Total Paid</span><strong>₹${(b.totalPaid||0).toLocaleString('en-IN')}</strong></div>
-      </div>
-      <div style="text-align:center;margin-top:20px;padding:16px;background:#f4f7fb;border-radius:12px;">
-        <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">📱 Your QR ticket was sent via SMS & WhatsApp</div>
-        <div style="font-size:12px;color:#9ca3af;">Show your booking ID at the park gate</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:#0a1020;margin-top:8px;letter-spacing:2px;">${(b.id||'').slice(-8).toUpperCase()}</div>
-      </div>`;
+function applyFilters(search = document.getElementById('search-input').value) {
+  let filtered = [...BOOKINGS];
+  if (activeFilter !== 'all') filtered = filtered.filter(b => b.status === activeFilter);
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    filtered = filtered.filter(b =>
+      b.id.toLowerCase().includes(q) ||
+      b.park.toLowerCase().includes(q) ||
+      b.guest.toLowerCase().includes(q)
+    );
+  }
+  displayedBookings = filtered;
+  renderAll();
+}
 
-    document.getElementById('booking-modal').classList.remove('hidden');
-  };
+// ── CANCEL FLOW ────────────────────────────────────────────
+function openCancel(id) {
+  cancelTargetId = id;
+  const b = BOOKINGS.find(x => x.id === id);
+  document.getElementById('cancel-total').textContent = inr(b.total);
+  document.getElementById('cancel-refund').textContent = inr(b.total - 50);
+  document.getElementById('cancel-modal').classList.add('open');
+}
 
-  document.getElementById('modal-close')?.addEventListener('click', () => {
-    document.getElementById('booking-modal').classList.add('hidden');
+function confirmCancel() {
+  const reason = document.getElementById('cancel-reason').value;
+  if (!reason) { showToast('Please select a reason', 'error'); return; }
+  const b = BOOKINGS.find(x => x.id === cancelTargetId);
+  if (b) {
+    b.status = 'cancelled';
+    b.cancelReason = reason;
+    b.refundAmount = b.total - 50;
+    b.timeline.push({label:'Cancelled by Guest',time:new Date().toLocaleString('en-IN'),dot:'cancelled'});
+    b.timeline.push({label:'Refund Initiated: ' + inr(b.total - 50),time:'Within 5–7 business days',dot:''});
+  }
+  closeModal('cancel-modal');
+  applyFilters();
+  showToast('Booking cancelled. Refund of ' + inr((b?.total||0) - 50) + ' initiated.', 'success');
+}
+
+// ── RESCHEDULE FLOW ────────────────────────────────────────
+function openReschedule(id) {
+  rescheduleTargetId = id;
+  const b = BOOKINGS.find(x => x.id === id);
+  const inp = document.getElementById('rs-current-date');
+  if (inp) inp.value = fmt(b.date);
+  const newInp = document.getElementById('rs-new-date');
+  if (newInp) {
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0,10);
+    newInp.min = tomorrow;
+    newInp.value = '';
+  }
+  document.getElementById('reschedule-modal').classList.add('open');
+}
+
+function confirmReschedule() {
+  const newDate = document.getElementById('rs-new-date').value;
+  if (!newDate) { showToast('Please select a new date', 'error'); return; }
+  const b = BOOKINGS.find(x => x.id === rescheduleTargetId);
+  if (b) {
+    const oldDate = b.date;
+    b.date = newDate;
+    b.timeline.push({label:'Rescheduled from ' + fmt(oldDate),time:new Date().toLocaleString('en-IN'),dot:''});
+    b.timeline.push({label:'New Visit Date: ' + fmt(newDate),time:'Confirmed',dot:'pending'});
+  }
+  closeModal('reschedule-modal');
+  applyFilters();
+  showToast('✅ Booking rescheduled to ' + fmt(newDate), 'success');
+}
+
+// ── ACTIONS ────────────────────────────────────────────────
+function downloadTicket(id) {
+  showToast('📄 Downloading QR ticket PDF…', 'success');
+}
+
+function downloadInvoice(id) {
+  const b = BOOKINGS.find(x => x.id === id);
+  showToast('🧾 Downloading invoice for ' + b.id + '…', 'success');
+}
+
+function reBook(id) {
+  const b = BOOKINGS.find(x => x.id === id);
+  const urls = {water:'../book/water-park.html',amusement:'../book/amusement-park.html',combo:'../book/combo.html'};
+  window.location.href = urls[b.type] || '../book/combo.html';
+}
+
+function shareWhatsApp(id) {
+  const b = BOOKINGS.find(x => x.id === id);
+  const msg = `🎉 My WOW Booking is confirmed!\n🎟 ${b.park}\n📅 ${fmt(b.date)}\n🆔 ${b.id}\nSee you at Worlds of Wonder, Noida!`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function viewRefund(id) {
+  const b = BOOKINGS.find(x => x.id === id);
+  showToast('💳 Refund of ' + inr(b.refundAmount || 0) + ' processed within 5–7 days', 'success');
+}
+
+// ── MODAL HELPERS ──────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ── TOAST ──────────────────────────────────────────────────
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
   });
-  document.getElementById('booking-modal')?.addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
-  });
+});
 </script>
+<script src="../js/wow-auth-guard.js" data-portal="portal"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
