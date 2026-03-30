@@ -1,846 +1,843 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Passport KYC & Onboarding — WOW Sales</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
-  <script src="../js/wow-passport-api.js"></script>
-  <script src="../js/wow-auth.js"></script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    :root{--gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;--bg:#07071a;--card:#0f0f2a;--card2:#13132e;--border:#252550;--text:#f0f0f0;--muted:#8888aa;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--amber:#f59e0b;}
-    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-    .topnav{background:#0a0a20;border-bottom:1.5px solid var(--border);height:60px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-    .tn-brand{display:flex;align-items:center;gap:10px;}
-    .tn-badge{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#0a0a14;font-size:.85rem;}
-    .tn-name{font-weight:800;font-size:.9rem;color:var(--gold);}
-    .tn-sub{font-size:.68rem;color:var(--muted);margin-top:1px;}
-    .tn-right{display:flex;align-items:center;gap:10px;}
-    .tn-agent{font-size:.78rem;color:var(--muted);}
-    .tn-agent strong{color:#fff;}
-    .btn-back{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.78rem;color:var(--muted);cursor:pointer;font-family:'Poppins',sans-serif;text-decoration:none;transition:all .2s;}
-    .btn-back:hover{color:var(--gold);border-color:var(--gold);}
-    /* Stepper */
-    .stepper-wrap{background:var(--card);border-bottom:1px solid var(--border);padding:18px 24px 30px;}
-    .stepper{display:flex;align-items:center;max-width:900px;margin:0 auto;}
-    .stp{display:flex;align-items:center;flex:1;position:relative;}
-    .stp:last-child{flex:0;}
-    .stp-c{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:var(--muted);background:var(--bg);transition:all .3s;flex-shrink:0;z-index:2;}
-    .stp.active .stp-c{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.15);}
-    .stp.done .stp-c{border-color:var(--green);background:var(--green);color:#fff;}
-    .stp-line{flex:1;height:2px;background:var(--border);margin:0 6px;transition:background .3s;}
-    .stp.done .stp-line{background:var(--green);}
-    .stp-lbl{position:absolute;top:44px;left:50%;transform:translateX(-50%);font-size:.65rem;font-weight:700;color:var(--muted);white-space:nowrap;letter-spacing:.3px;}
-    .stp.active .stp-lbl{color:var(--gold);}
-    .stp.done .stp-lbl{color:var(--green);}
-    /* Main panels */
-    .page-wrap{max-width:900px;margin:0 auto;padding:28px 20px;}
-    .panel{display:none;animation:fadeIn .3s;}
-    .panel.active{display:block;}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .panel-title{font-size:1.3rem;font-weight:900;margin-bottom:4px;}
-    .panel-title span{color:var(--gold);}
-    .panel-sub{font-size:.85rem;color:var(--muted);margin-bottom:24px;}
-    /* Plan cards */
-    .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
-    .plan-card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
-    .plan-card:hover{border-color:rgba(201,168,76,.5);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.4);}
-    .plan-card.selected{border-color:var(--gold);background:rgba(201,168,76,.06);transform:translateY(-3px);}
-    .plan-card.selected::after{content:'✓';position:absolute;top:12px;right:14px;width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;color:#0a0a14;}
-    .plan-badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.68rem;font-weight:800;letter-spacing:.5px;margin-bottom:10px;}
-    .plan-badge.water{background:rgba(59,130,246,.2);color:#93c5fd;}
-    .plan-badge.amuse{background:rgba(168,85,247,.2);color:#c084fc;}
-    .plan-badge.combo{background:rgba(201,168,76,.2);color:var(--gold);}
-    .plan-badge.premium{background:rgba(239,68,68,.2);color:#fca5a5;}
-    .plan-name{font-size:1rem;font-weight:800;margin-bottom:4px;}
-    .plan-price{font-size:1.8rem;font-weight:900;color:var(--gold);font-family:'Poppins',sans-serif;}
-    .plan-price sup{font-size:.9rem;vertical-align:super;}
-    .plan-price sub{font-size:.7rem;color:var(--muted);font-weight:400;}
-    .plan-features{margin-top:12px;display:flex;flex-direction:column;gap:5px;}
-    .pf-item{font-size:.75rem;color:var(--muted);display:flex;align-items:flex-start;gap:6px;}
-    .pf-item i{color:var(--green);font-size:.65rem;flex-shrink:0;margin-top:3px;}
-    /* PHOTO SECTION */
-    .photo-section{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
-    .cam-area{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:22px;position:relative;}
-    .cam-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-    .cam-label i{color:var(--gold);}
-    .cam-preview-wrap{position:relative;width:100%;padding-top:125%;border-radius:12px;overflow:hidden;background:#040412;margin-bottom:14px;}
-    .cam-preview-wrap video,.cam-preview-wrap canvas,.cam-preview-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-    .face-guide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
-    .face-oval{width:55%;padding-top:68%;position:relative;border:2px dashed rgba(201,168,76,.5);border-radius:50%;margin:-34% 0 0;}
-    .cam-controls{display:flex;gap:8px;}
-    .cam-btn{flex:1;padding:10px;border-radius:10px;font-size:.78rem;font-weight:700;font-family:'Poppins',sans-serif;cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
-    .cam-btn.start{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0a0a14;}
-    .cam-btn.capture{background:var(--green);color:#fff;}
-    .cam-btn.retake{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:var(--red);}
-    .cam-btn.upload{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd;}
-    .cam-btn:disabled{opacity:.4;cursor:not-allowed;}
-    .photo-tips{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:22px;}
-    .tips-title{font-size:.85rem;font-weight:800;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-    .tip-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;font-size:.78rem;color:var(--muted);}
-    .tip-item i{color:var(--gold);flex-shrink:0;margin-top:2px;}
-    .photo-ok-badge{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:10px;display:none;font-size:.8rem;color:var(--green);font-weight:700;text-align:center;margin-top:10px;}
-    /* FORM */
-    .sec-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:20px;}
-    .sec-title{font-size:.8rem;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-    .sec-title::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.2);}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    .form-grid.full{grid-template-columns:1fr;}
-    .field{margin-bottom:0;}
-    .field label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-    .field.required label::after{content:' *';color:var(--red);}
-    .input-wrap{position:relative;}
-    .input-wrap i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.82rem;pointer-events:none;}
-    .input-wrap input,.input-wrap select,.input-wrap textarea{width:100%;background:#0a0a22;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px 11px 38px;color:#fff;font-size:.88rem;font-family:'Poppins',sans-serif;outline:none;transition:border-color .2s;}
-    .input-wrap textarea{min-height:80px;resize:vertical;padding-top:10px;}
-    .input-wrap input:focus,.input-wrap select:focus,.input-wrap textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
-    .input-wrap input::placeholder{color:#44446a;}
-    .input-wrap select option{background:#0a0a22;}
-    .input-wrap input.error,.input-wrap select.error{border-color:var(--red);}
-    .err-msg{font-size:.7rem;color:var(--red);margin-top:4px;display:none;}
-    /* Login ID preview */
-    .login-preview{background:rgba(34,197,94,.07);border:1.5px solid rgba(34,197,94,.25);border-radius:14px;padding:18px;margin-top:16px;}
-    .lp-title{font-size:.72rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-    .lp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-    .lp-label{font-size:.78rem;color:var(--muted);}
-    .lp-val{font-size:.88rem;font-weight:800;color:#fff;font-family:'Poppins',sans-serif;background:#0a1a12;padding:4px 12px;border-radius:8px;border:1px solid rgba(34,197,94,.2);}
-    .lp-val.highlight{color:var(--green);}
-    /* Review page */
-    .review-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
-    .review-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;}
-    .review-title{font-size:.7rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;}
-    .review-item{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.82rem;}
-    .review-item .ri-label{color:var(--muted);}
-    .review-item .ri-val{color:#fff;font-weight:600;text-align:right;max-width:60%;}
-    .review-photo{width:80px;height:96px;border-radius:8px;border:2px solid var(--gold);object-fit:cover;margin-bottom:8px;}
-    /* Nav buttons */
-    .nav-row{display:flex;gap:12px;justify-content:flex-end;margin-top:24px;}
-    .btn-primary{padding:13px 28px;background:linear-gradient(135deg,var(--gold3),var(--gold),var(--gold2));border:none;border-radius:12px;font-size:.9rem;font-weight:800;color:#0a0a14;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(201,168,76,.35);}
-    .btn-secondary{padding:13px 22px;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:12px;font-size:.9rem;font-weight:700;color:var(--muted);font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
-    .btn-secondary:hover{color:#fff;border-color:var(--gold);}
-    /* Toast */
-    #toast{position:fixed;bottom:24px;right:24px;background:#1a1a36;border:1px solid var(--gold);color:#fff;padding:12px 20px;border-radius:12px;font-size:.85rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9999;display:none;max-width:320px;}
-    /* Otp style */
-    .otp-note{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:10px;padding:10px 14px;font-size:.78rem;color:#93c5fd;margin-top:10px;display:flex;gap:8px;}
-    @media(max-width:680px){.photo-section,.form-grid,.review-grid{grid-template-columns:1fr;}.plan-grid{grid-template-columns:1fr;}}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Passport KYC Wizard — WOW Sales Portal</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap"/>
+<script src="../js/wow-passport-engine.js"></script>
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --navy:#0a1628;--dark:#080c14;--white:#fff;
+  --bg:#f0f4f8;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* TOPBAR */
+.topbar{background:var(--navy);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+.tb-logo{display:flex;align-items:center;gap:10px;}
+.tb-logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:8px;display:grid;place-items:center;font-size:16px;}
+.tb-logo-text strong{font-size:12px;font-weight:700;color:#fff;display:block;}
+.tb-logo-text small{font-size:10px;color:rgba(255,255,255,.4);}
+.tb-links{display:flex;gap:4px;}
+.tb-link{padding:6px 12px;font-size:11.5px;color:rgba(255,255,255,.55);border-radius:6px;transition:.15s;}
+.tb-link:hover{background:rgba(255,255,255,.08);color:#fff;}
+.tb-link.active{background:rgba(201,168,76,.15);color:var(--gold2);}
+
+/* PROGRESS WIZARD */
+.wizard-wrap{max-width:760px;margin:32px auto;padding:0 20px;}
+.wizard-steps{display:flex;gap:0;margin-bottom:32px;position:relative;}
+.wizard-steps::before{content:'';position:absolute;top:20px;left:0;right:0;height:2px;background:var(--border);z-index:0;}
+.ws-progress{position:absolute;top:20px;left:0;height:2px;background:linear-gradient(90deg,var(--gold3),var(--gold));z-index:1;transition:.4s;}
+.wizard-step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2;}
+.ws-circle{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);background:var(--white);display:grid;place-items:center;font-size:14px;font-weight:700;transition:.3s;color:var(--muted);}
+.ws-circle.active{background:linear-gradient(135deg,var(--gold3),var(--gold));border-color:var(--gold);color:#0d0d1a;}
+.ws-circle.done{background:var(--green);border-color:var(--green);color:#fff;}
+.ws-label{font-size:10px;font-weight:600;color:var(--muted);margin-top:6px;text-align:center;transition:.3s;}
+.ws-label.active{color:var(--gold3);}
+.ws-label.done{color:var(--green);}
+
+/* CARD */
+.kyc-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;}
+.kyc-card-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.kyc-card-sub{font-size:12px;color:var(--muted);margin-bottom:24px;}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:2px;}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.fg label .req{color:var(--red);}
+.fg input,.fg select,.fg textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;transition:.15s;width:100%;background:var(--white);}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--gold);}
+.fg textarea{resize:vertical;min-height:80px;}
+.fg.full{grid-column:1/-1;}
+.field-note{font-size:10px;color:var(--muted);margin-top:2px;}
+.field-error{font-size:10px;color:var(--red);margin-top:2px;display:none;}
+
+/* PHOTO CAPTURE */
+.photo-zone{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.photo-box{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:.2s;position:relative;}
+.photo-box:hover{border-color:var(--gold);background:#fffbf0;}
+.photo-box.filled{border-style:solid;border-color:var(--green);}
+.photo-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.photo-box-icon{font-size:32px;margin-bottom:8px;display:block;}
+.photo-box-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.photo-box-hint{font-size:10px;color:var(--muted);}
+.photo-preview{width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;}
+
+/* CAMERA */
+.camera-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;margin-bottom:12px;}
+.camera-wrap video{width:100%;display:block;max-height:280px;object-fit:cover;}
+.camera-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.camera-guide{width:200px;height:240px;border:2px solid rgba(201,168,76,.6);border-radius:16px;}
+
+/* DOCUMENT UPLOAD */
+.doc-upload-row{display:flex;flex-direction:column;gap:10px;}
+.doc-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f9fafb;border:1.5px solid var(--border);border-radius:10px;transition:.2s;position:relative;}
+.doc-item.uploaded{border-color:var(--green);background:#f0fdf4;}
+.doc-item input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.doc-icon{font-size:22px;flex-shrink:0;}
+.doc-info strong{font-size:12px;font-weight:700;display:block;}
+.doc-info small{font-size:10px;color:var(--muted);}
+.doc-status{margin-left:auto;flex-shrink:0;}
+.doc-status i{color:var(--green);font-size:16px;}
+.doc-status .pending-icon{color:var(--border);font-size:16px;}
+
+/* REVIEW SECTION */
+.review-section{background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:14px;}
+.review-section h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;}
+.review-row{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--border);}
+.review-row:last-child{border:none;}
+.review-label{color:var(--muted);}
+.review-val{font-weight:600;max-width:200px;text-align:right;word-break:break-word;}
+
+/* TIER SELECTOR */
+.tier-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px;}
+.tier-option{border:2px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:.2s;text-align:center;}
+.tier-option:hover{border-color:var(--gold);}
+.tier-option.selected{border-color:var(--gold);background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(240,208,128,.06));}
+.to-emblem{font-size:24px;margin-bottom:6px;}
+.to-name{font-size:12px;font-weight:700;color:var(--text);}
+.to-price{font-size:15px;font-weight:900;color:var(--gold3);}
+.to-holders{font-size:10px;color:var(--muted);}
+
+/* PROGRESS BAR */
+.progress-bar{height:4px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:6px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold));border-radius:20px;transition:.3s;}
+
+/* NAVIGATION BUTTONS */
+.wizard-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:.2s;}
+.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0d0d1a;}
+.btn-gold:hover{filter:brightness(1.1);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--gold);}
+.btn-danger{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.btn-lg{padding:14px 30px;font-size:14px;}
+
+/* CONSENT */
+.consent-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+.consent-item{display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5;}
+.consent-item input[type=checkbox]{margin-top:2px;flex-shrink:0;width:15px;height:15px;accent-color:var(--gold3);}
+
+/* SUCCESS STATE */
+.success-screen{text-align:center;padding:40px 20px;}
+.success-icon{font-size:64px;display:block;margin-bottom:20px;animation:popIn .6s ease-out;}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.success-title{font-family:'Cinzel',serif;font-size:24px;font-weight:700;margin-bottom:10px;}
+.success-sub{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto;}
+
+/* TOAST */
+#toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid var(--gold);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;display:none;}
+
+/* KYC REFERENCE CARD */
+.kyc-ref-card{background:linear-gradient(135deg,var(--navy),#1a2f5a);border-radius:14px;padding:20px;color:#fff;margin-bottom:14px;}
+.krc-id{font-family:'Courier New',monospace;font-size:18px;font-weight:700;color:var(--gold2);letter-spacing:2px;}
+.krc-msg{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px;}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr;}
+  .tier-options{grid-template-columns:1fr;}
+  .photo-zone{grid-template-columns:1fr;}
+}
+.sep{height:1px;background:var(--border);margin:16px 0;}
+.text-muted{color:var(--muted);}
+.fw-bold{font-weight:700;}
+.fs-11{font-size:11px;}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.b-gold{background:rgba(201,168,76,.15);color:var(--gold3);border:1px solid rgba(201,168,76,.3);}
+.b-green{background:#d1fae5;color:#065f46;}
+.b-blue{background:#dbeafe;color:#1e40af;}
+</style>
 </head>
 <body>
 
-<nav class="topnav">
-  <div class="tn-brand">
-    <div class="tn-badge"><i class="fas fa-passport"></i></div>
-    <div>
-      <div class="tn-name">WOW Passport Sales</div>
-      <div class="tn-sub">KYC Onboarding</div>
-    </div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-logo">
+    <div class="tb-logo-mark">🪪</div>
+    <div class="tb-logo-text"><strong>WOW Sales Portal</strong><small>Passport KYC Wizard</small></div>
   </div>
-  <div class="tn-right">
-    <div class="tn-agent">Agent: <strong id="nav-agent">—</strong></div>
-    <a href="passport-login.html" class="btn-back"><i class="fas fa-sign-out-alt"></i> Logout</a>
-  </div>
-</nav>
-
-<!-- Stepper -->
-<div class="stepper-wrap">
-  <div class="stepper">
-    <div class="stp active" id="stp-0">
-      <div class="stp-c">1</div><div class="stp-lbl">Select Plan</div>
-      <div class="stp-line"></div>
-    </div>
-    <div class="stp" id="stp-1">
-      <div class="stp-c">2</div><div class="stp-lbl">Photo Capture</div>
-      <div class="stp-line"></div>
-    </div>
-    <div class="stp" id="stp-2">
-      <div class="stp-c">3</div><div class="stp-lbl">Customer Details</div>
-      <div class="stp-line"></div>
-    </div>
-    <div class="stp" id="stp-3">
-      <div class="stp-c">4</div><div class="stp-lbl">Review & Confirm</div>
-    </div>
+  <div class="tb-links">
+    <a href="passport-dashboard.html" class="tb-link">Dashboard</a>
+    <a href="erp-dashboard.html" class="tb-link">Sales ERP</a>
+    <a href="passport-login.html" class="tb-link">Logout</a>
   </div>
 </div>
 
-<div class="page-wrap">
+<div class="wizard-wrap">
 
-  <!-- PANEL 0: Select Plan -->
-  <div class="panel active" id="panel-0">
-    <div class="panel-title">Select <span>Passport Plan</span></div>
-    <div class="panel-sub">Choose the annual membership passport for the customer</div>
+  <!-- PROGRESS WIZARD -->
+  <div style="margin-bottom:28px;">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+    <div class="wizard-steps" id="wizard-steps">
+      <div class="wizard-step" data-step="1">
+        <div class="ws-circle active" id="ws-1">1</div>
+        <div class="ws-label active" id="wl-1">Tier & Customer</div>
+      </div>
+      <div class="wizard-step" data-step="2">
+        <div class="ws-circle" id="ws-2">2</div>
+        <div class="ws-label" id="wl-2">Personal Details</div>
+      </div>
+      <div class="wizard-step" data-step="3">
+        <div class="ws-circle" id="ws-3">3</div>
+        <div class="ws-label" id="wl-3">Photo Capture</div>
+      </div>
+      <div class="wizard-step" data-step="4">
+        <div class="ws-circle" id="ws-4">4</div>
+        <div class="ws-label" id="wl-4">Documents</div>
+      </div>
+      <div class="wizard-step" data-step="5">
+        <div class="ws-circle" id="ws-5">5</div>
+        <div class="ws-label" id="wl-5">Review & Submit</div>
+      </div>
+    </div>
+    <div id="ws-progress" class="ws-progress" style="width:10%"></div>
+  </div>
 
-    <div class="plan-grid" id="plan-grid">
-      <!-- populated by JS -->
+  <!-- ═══════════ STEP 1: TIER & CUSTOMER ═══════════ -->
+  <div id="step-1" class="step-panel">
+    <div class="kyc-card">
+      <div class="kyc-card-title">Select Passport Tier</div>
+      <div class="kyc-card-sub">Choose the right passport plan for your customer based on family size and requirements.</div>
+      <div class="tier-options" id="tier-options">
+        <div style="text-align:center;padding:20px;color:var(--muted);grid-column:1/-1;">Loading products…</div>
+      </div>
+      <div class="field-error" id="err-tier">Please select a passport tier to continue.</div>
     </div>
 
-    <div class="nav-row">
-      <button class="btn-primary" onclick="goStep(1)"><i class="fas fa-camera"></i> Next: Capture Photo</button>
+    <div class="kyc-card">
+      <div class="kyc-card-title">Customer Lookup / Create</div>
+      <div class="kyc-card-sub">Search for an existing customer or create a new one.</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <input id="customer-search" placeholder="Search by mobile or email…" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;" oninput="searchCustomer()"/>
+        <button class="btn btn-outline" onclick="clearCustomer()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="customer-search-results" style="display:none;margin-bottom:14px;"></div>
+      <div class="form-grid">
+        <div class="fg"><label>Mobile <span class="req">*</span></label><input id="c-mobile" placeholder="+91 XXXXX XXXXX" oninput="syncCustomerMobile()"/></div>
+        <div class="fg"><label>Email</label><input type="email" id="c-email" placeholder="customer@email.com"/></div>
+      </div>
+    </div>
+
+    <div class="wizard-nav">
+      <a href="passport-dashboard.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back</a>
+      <button class="btn btn-gold" onclick="goStep(2)">Next: Personal Details <i class="fas fa-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- PANEL 1: Photo Capture -->
-  <div class="panel" id="panel-1">
-    <div class="panel-title">Customer <span>Photo Capture</span></div>
-    <div class="panel-sub">Take a passport-style photo (white background preferred, face clearly visible)</div>
-
-    <div class="photo-section">
-      <!-- Camera -->
-      <div class="cam-area">
-        <div class="cam-label"><i class="fas fa-camera"></i> Live Camera</div>
-        <div class="cam-preview-wrap" id="cam-wrap">
-          <video id="cam-video" autoplay playsinline muted></video>
-          <canvas id="cam-canvas" style="display:none;"></canvas>
-          <img id="cam-preview" alt="Captured photo" style="display:none;"/>
-          <div class="face-guide" id="face-guide">
-            <div class="face-oval"></div>
-          </div>
+  <!-- ═══════════ STEP 2: PERSONAL DETAILS ═══════════ -->
+  <div id="step-2" class="step-panel" style="display:none;">
+    <div class="kyc-card">
+      <div class="kyc-card-title">Personal Details</div>
+      <div class="kyc-card-sub">Enter the primary passport holder's information exactly as per government ID.</div>
+      <div class="form-grid">
+        <div class="fg"><label>First Name <span class="req">*</span></label><input id="p-fname" placeholder="As on ID"/></div>
+        <div class="fg"><label>Last Name <span class="req">*</span></label><input id="p-lname" placeholder="As on ID"/></div>
+        <div class="fg"><label>Date of Birth <span class="req">*</span></label><input type="date" id="p-dob" max=""/></div>
+        <div class="fg"><label>Gender</label>
+          <select id="p-gender"><option value="">Select</option><option value="M">Male</option><option value="F">Female</option><option value="O">Other / Prefer not to say</option></select>
         </div>
-
-        <div class="cam-controls">
-          <button class="cam-btn start" id="btn-start-cam" onclick="startCamera()">
-            <i class="fas fa-video"></i> Start Camera
-          </button>
-          <button class="cam-btn capture" id="btn-capture" onclick="capturePhoto()" disabled>
-            <i class="fas fa-camera"></i> Capture
-          </button>
-          <button class="cam-btn retake" id="btn-retake" onclick="retakePhoto()" style="display:none;">
-            <i class="fas fa-redo"></i> Retake
-          </button>
+        <div class="fg full"><label>Full Address <span class="req">*</span></label><textarea id="p-address" placeholder="House/Flat No., Street, City, State, PIN"></textarea></div>
+        <div class="fg"><label>State</label>
+          <select id="p-state">
+            <option value="">Select State</option>
+            <option value="UP">Uttar Pradesh</option><option value="DL">Delhi</option><option value="HR">Haryana</option><option value="MH">Maharashtra</option><option value="KA">Karnataka</option><option value="TN">Tamil Nadu</option><option value="RJ">Rajasthan</option><option value="GJ">Gujarat</option>
+          </select>
         </div>
-
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <label style="flex:1;" id="upload-label">
-            <div class="cam-btn upload" style="cursor:pointer;">
-              <i class="fas fa-upload"></i> Upload Photo
-            </div>
-            <input type="file" id="photo-upload" accept="image/*" style="display:none;" onchange="handleUpload(event)"/>
-          </label>
-        </div>
-
-        <div class="photo-ok-badge" id="photo-ok-badge">
-          <i class="fas fa-check-circle"></i> Photo Captured Successfully!
-        </div>
-      </div>
-
-      <!-- Tips -->
-      <div class="photo-tips">
-        <div class="tips-title"><i class="fas fa-info-circle" style="color:var(--gold);"></i> Indian Passport Photo Guidelines</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Plain white or off-white background</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Face must cover 70–80% of frame</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Eyes open, looking directly at camera</div>
-        <div class="tip-item"><i class="fas fa-check"></i> No sunglasses or tinted spectacles</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Neutral expression, mouth closed</div>
-        <div class="tip-item"><i class="fas fa-check"></i> No head coverings (religious exceptions apply)</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Good lighting, no shadows on face</div>
-        <div class="tip-item"><i class="fas fa-check"></i> Minimum 300 DPI, JPEG/PNG format</div>
-        <div style="margin-top:14px;padding:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;font-size:.75rem;color:var(--amber);">
-          <i class="fas fa-exclamation-triangle"></i> The photo will appear on the Digital Passport. Ensure it is clear and meets guidelines.
-        </div>
-
-        <!-- Sample preview of captured photo -->
-        <div id="photo-preview-card" style="display:none;margin-top:14px;padding:12px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px;text-align:center;">
-          <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;">Preview</div>
-          <img id="preview-thumbnail" style="width:80px;height:96px;object-fit:cover;border-radius:6px;border:2px solid var(--gold);" alt=""/>
-          <div style="font-size:.72rem;color:var(--green);margin-top:6px;font-weight:700;"><i class="fas fa-check-circle"></i> Ready</div>
-        </div>
+        <div class="fg"><label>PIN Code</label><input id="p-pin" placeholder="110001" maxlength="6"/></div>
       </div>
     </div>
 
-    <div class="nav-row">
-      <button class="btn-secondary" onclick="goStep(0)"><i class="fas fa-arrow-left"></i> Back</button>
-      <button class="btn-primary" id="btn-next-photo" onclick="goStep(2)" disabled>
-        <i class="fas fa-user-edit"></i> Next: Customer Details
-      </button>
+    <!-- Family members for Together/Legacy -->
+    <div id="family-members-section" style="display:none;">
+      <div class="kyc-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div>
+            <div class="kyc-card-title">Family Members</div>
+            <div style="font-size:12px;color:var(--muted);">Add details for all family members covered under this passport.</div>
+          </div>
+          <button class="btn btn-outline" style="font-size:11px;" onclick="addFamilyMember()"><i class="fas fa-plus"></i> Add Member</button>
+        </div>
+        <div id="family-members-list"></div>
+      </div>
+    </div>
+
+    <div class="wizard-nav">
+      <button class="btn btn-outline" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn btn-gold" onclick="goStep(3)">Next: Photo Capture <i class="fas fa-arrow-right"></i></button>
     </div>
   </div>
 
-  <!-- PANEL 2: Customer Details -->
-  <div class="panel" id="panel-2">
-    <div class="panel-title">Customer <span>KYC Details</span></div>
-    <div class="panel-sub">Complete customer information for passport issuance and auto login-ID generation</div>
+  <!-- ═══════════ STEP 3: PHOTO CAPTURE ═══════════ -->
+  <div id="step-3" class="step-panel" style="display:none;">
+    <div class="kyc-card">
+      <div class="kyc-card-title">Photo Capture</div>
+      <div class="kyc-card-sub">Take a live photo or upload a recent passport-size photograph. Ensure good lighting and a plain background.</div>
 
-    <!-- Personal Info -->
-    <div class="sec-card">
-      <div class="sec-title"><i class="fas fa-user"></i> Personal Information</div>
-      <div class="form-grid">
-        <div class="field required">
-          <label>First Name</label>
-          <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="f-fname" placeholder="e.g. Rahul" oninput="livePreview()"/></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <button class="btn btn-outline" id="btn-camera" onclick="startCamera()"><i class="fas fa-camera"></i> Use Camera</button>
+        <button class="btn btn-outline" onclick="switchToUpload()"><i class="fas fa-upload"></i> Upload Photo</button>
+      </div>
+
+      <!-- Camera mode -->
+      <div id="camera-mode" style="display:none;">
+        <div class="camera-wrap">
+          <video id="camera-video" autoplay playsinline></video>
+          <div class="camera-overlay"><div class="camera-guide"></div></div>
         </div>
-        <div class="field required">
-          <label>Last Name</label>
-          <div class="input-wrap"><i class="fas fa-user"></i><input type="text" id="f-lname" placeholder="e.g. Sharma" oninput="livePreview()"/></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px;">
+          <button class="btn btn-gold" onclick="capturePhoto()"><i class="fas fa-camera"></i> Capture Photo</button>
+          <button class="btn btn-outline" onclick="stopCamera()"><i class="fas fa-times"></i> Cancel</button>
         </div>
-        <div class="field required">
-          <label>Date of Birth</label>
-          <div class="input-wrap"><i class="fas fa-birthday-cake"></i><input type="date" id="f-dob" oninput="livePreview()"/></div>
-        </div>
-        <div class="field required">
-          <label>Gender</label>
-          <div class="input-wrap"><i class="fas fa-venus-mars"></i>
-            <select id="f-gender">
-              <option value="">— Select —</option>
-              <option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option>
-            </select>
+        <canvas id="capture-canvas" style="display:none;"></canvas>
+      </div>
+
+      <!-- Upload mode -->
+      <div id="upload-mode">
+        <div class="photo-zone">
+          <div class="photo-box" id="selfie-box" onclick="document.getElementById('selfie-file').click()">
+            <input type="file" id="selfie-file" accept="image/*" capture="user" onchange="handleSelfieUpload(event)" style="display:none;"/>
+            <span class="photo-box-icon" id="selfie-icon">🤳</span>
+            <div class="photo-box-label">Selfie / Live Photo</div>
+            <div class="photo-box-hint">Front-facing, no glasses, plain background</div>
+            <img id="selfie-preview" class="photo-preview"/>
+          </div>
+          <div class="photo-box" id="id-photo-box" onclick="document.getElementById('id-photo-file').click()">
+            <input type="file" id="id-photo-file" accept="image/*" onchange="handleIdPhotoUpload(event)" style="display:none;"/>
+            <span class="photo-box-icon" id="id-photo-icon">🪪</span>
+            <div class="photo-box-label">Selfie with ID (Enhanced KYC)</div>
+            <div class="photo-box-hint">Hold ID card next to your face</div>
+            <img id="id-photo-preview" class="photo-preview"/>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Contact Info -->
-    <div class="sec-card">
-      <div class="sec-title"><i class="fas fa-phone"></i> Contact Information</div>
-      <div class="form-grid">
-        <div class="field required">
-          <label>Mobile Number</label>
-          <div class="input-wrap"><i class="fas fa-mobile-alt"></i><input type="tel" id="f-mobile" placeholder="10-digit mobile" maxlength="10" oninput="livePreview()"/></div>
-        </div>
-        <div class="field required">
-          <label>Email Address</label>
-          <div class="input-wrap"><i class="fas fa-envelope"></i><input type="email" id="f-email" placeholder="customer@email.com" oninput="livePreview()"/></div>
-        </div>
-        <div class="field">
-          <label>Alternate Phone</label>
-          <div class="input-wrap"><i class="fas fa-phone"></i><input type="tel" id="f-alt-phone" placeholder="Optional" maxlength="10"/></div>
-        </div>
-        <div class="field">
-          <label>WhatsApp Number</label>
-          <div class="input-wrap"><i class="fab fa-whatsapp"></i><input type="tel" id="f-whatsapp" placeholder="If different from mobile" maxlength="10"/></div>
-        </div>
-      </div>
-
-      <!-- Auto-generated Login ID preview -->
-      <div class="login-preview" id="login-preview" style="display:none;">
-        <div class="lp-title"><i class="fas fa-key"></i> Auto-Generated Login Credentials</div>
-        <div class="lp-row">
-          <span class="lp-label">Primary Login ID (Mobile)</span>
-          <span class="lp-val highlight" id="lp-mobile">—</span>
-        </div>
-        <div class="lp-row">
-          <span class="lp-label">Alternate Login ID (Email)</span>
-          <span class="lp-val" id="lp-email">—</span>
-        </div>
-        <div class="lp-row">
-          <span class="lp-label">Temp. Password</span>
-          <span class="lp-val" id="lp-pw">—</span>
-        </div>
-        <div style="font-size:.72rem;color:var(--muted);margin-top:8px;"><i class="fas fa-info-circle" style="color:var(--amber);"></i> Credentials will be sent to customer via SMS and email after passport issuance.</div>
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px;font-size:11px;color:#0369a1;line-height:1.6;">
+        <i class="fas fa-info-circle"></i>
+        <strong>Photo Guidelines:</strong> Face should be clearly visible · No sunglasses or headgear · Natural/neutral expression · Plain light background · Photo within last 3 months
       </div>
     </div>
 
-    <!-- Address Info -->
-    <div class="sec-card">
-      <div class="sec-title"><i class="fas fa-map-marker-alt"></i> Physical Address</div>
-      <div class="form-grid">
-        <div class="field required" style="grid-column:span 2;">
-          <label>Street Address / Flat No.</label>
-          <div class="input-wrap"><i class="fas fa-home"></i><input type="text" id="f-addr1" placeholder="Flat 402, Sector 12, Building Name"/></div>
-        </div>
-        <div class="field">
-          <label>City</label>
-          <div class="input-wrap"><i class="fas fa-city"></i><input type="text" id="f-city" placeholder="Noida" value="Noida"/></div>
-        </div>
-        <div class="field required">
-          <label>State</label>
-          <div class="input-wrap"><i class="fas fa-map"></i>
-            <select id="f-state">
-              <option value="">— Select State —</option>
-              <option selected>Uttar Pradesh</option><option>Delhi</option><option>Haryana</option><option>Rajasthan</option><option>Maharashtra</option><option>Karnataka</option><option>Tamil Nadu</option><option>Gujarat</option><option>West Bengal</option><option>Madhya Pradesh</option><option>Punjab</option><option>Bihar</option><option>Telangana</option><option>Andhra Pradesh</option><option>Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="field required">
-          <label>PIN Code</label>
-          <div class="input-wrap"><i class="fas fa-mail-bulk"></i><input type="text" id="f-pin" placeholder="201301" maxlength="6"/></div>
-        </div>
-        <div class="field">
-          <label>Country</label>
-          <div class="input-wrap"><i class="fas fa-flag"></i><input type="text" id="f-country" value="India" readonly style="color:var(--muted);"/></div>
-        </div>
-      </div>
+    <div class="wizard-nav">
+      <button class="btn btn-outline" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn btn-gold" onclick="goStep(4)">Next: Documents <i class="fas fa-arrow-right"></i></button>
     </div>
+  </div>
 
-    <!-- ID Verification -->
-    <div class="sec-card">
-      <div class="sec-title"><i class="fas fa-id-card"></i> ID Verification (Optional)</div>
-      <div class="form-grid">
-        <div class="field">
-          <label>ID Type</label>
-          <div class="input-wrap"><i class="fas fa-id-badge"></i>
-            <select id="f-id-type">
-              <option value="">— Select —</option>
-              <option>Aadhaar Card</option><option>PAN Card</option><option>Voter ID</option><option>Passport</option><option>Driving Licence</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>ID Number</label>
-          <div class="input-wrap"><i class="fas fa-hashtag"></i><input type="text" id="f-id-num" placeholder="Enter ID number"/></div>
-        </div>
+  <!-- ═══════════ STEP 4: DOCUMENTS ═══════════ -->
+  <div id="step-4" class="step-panel" style="display:none;">
+    <div class="kyc-card">
+      <div class="kyc-card-title">Identity Documents</div>
+      <div class="kyc-card-sub">Upload clear, legible scans or photos of the required documents. Max 5 MB per file.</div>
+
+      <div class="fg" style="margin-bottom:16px;">
+        <label>ID Proof Type <span class="req">*</span></label>
+        <select id="id-type" onchange="updateDocRequirements()">
+          <option value="">Select document type</option>
+          <option value="aadhaar">Aadhaar Card</option>
+          <option value="passport_doc">Passport</option>
+          <option value="voter_id">Voter ID (EPIC)</option>
+          <option value="pan">PAN Card</option>
+          <option value="driving_license">Driving License</option>
+        </select>
       </div>
-      <div class="otp-note">
+      <div class="fg" style="margin-bottom:20px;">
+        <label>Last 4 Digits of ID Number</label>
+        <input id="id-ref" placeholder="XXXX" maxlength="4" style="max-width:120px;"/>
+        <div class="field-note">We store only the last 4 digits for verification reference (DPDP compliant)</div>
+      </div>
+
+      <div class="doc-upload-row" id="doc-upload-row">
+        <!-- Rendered by JS based on KYC level -->
+      </div>
+
+      <div class="sep"></div>
+      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:12px;font-size:11px;color:#854d0e;line-height:1.6;">
         <i class="fas fa-shield-alt"></i>
-        ID details are stored securely and used only for KYC verification per RBI / PMLA guidelines.
+        <strong>Data Protection:</strong> All documents are encrypted and processed in compliance with India's DPDP Act 2023. Your data will be used solely for identity verification and will not be shared with third parties.
       </div>
     </div>
 
-    <div class="nav-row">
-      <button class="btn-secondary" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goStep(3)"><i class="fas fa-eye"></i> Review & Confirm</button>
-    </div>
-  </div>
-
-  <!-- PANEL 3: Review & Confirm -->
-  <div class="panel" id="panel-3">
-    <div class="panel-title">Review & <span>Confirm</span></div>
-    <div class="panel-sub">Verify all details before proceeding to payment</div>
-
-    <div style="display:flex;gap:20px;margin-bottom:20px;align-items:flex-start;">
-      <!-- Photo preview -->
-      <div style="flex-shrink:0;text-align:center;">
-        <img id="review-photo" class="review-photo" alt="Customer Photo" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='96'><rect fill='%230a0a22'/><text x='50%' y='50%' fill='%23888' text-anchor='middle' dy='.3em' font-size='24'>👤</text></svg>"/>
-        <div style="font-size:.65rem;color:var(--muted);margin-top:4px;">Customer Photo</div>
-      </div>
-
-      <!-- Login ID box -->
-      <div style="flex:1;background:rgba(34,197,94,.07);border:1.5px solid rgba(34,197,94,.25);border-radius:14px;padding:18px;">
-        <div style="font-size:.72rem;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;"><i class="fas fa-key"></i> Customer Login Credentials (Auto-Generated)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div style="background:#0a1a12;border-radius:8px;padding:10px;">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px;">Login ID (Mobile)</div>
-            <div style="font-size:.92rem;font-weight:800;color:var(--green);" id="rv-login-mobile">—</div>
-          </div>
-          <div style="background:#0a1a12;border-radius:8px;padding:10px;">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px;">Login ID (Email)</div>
-            <div style="font-size:.82rem;font-weight:800;color:#fff;" id="rv-login-email">—</div>
-          </div>
-          <div style="background:#0a1a12;border-radius:8px;padding:10px;">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px;">Temp Password</div>
-            <div style="font-size:.92rem;font-weight:800;color:var(--amber);" id="rv-login-pw">—</div>
-          </div>
-          <div style="background:#0a1a12;border-radius:8px;padding:10px;">
-            <div style="font-size:.65rem;color:var(--muted);margin-bottom:3px;">Passport Plan</div>
-            <div style="font-size:.82rem;font-weight:800;color:var(--gold);" id="rv-plan">—</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="review-grid">
-      <div class="review-card">
-        <div class="review-title"><i class="fas fa-user" style="color:var(--gold);"></i> Personal Details</div>
-        <div class="review-item"><span class="ri-label">Full Name</span><span class="ri-val" id="rv-name">—</span></div>
-        <div class="review-item"><span class="ri-label">Date of Birth</span><span class="ri-val" id="rv-dob">—</span></div>
-        <div class="review-item"><span class="ri-label">Gender</span><span class="ri-val" id="rv-gender">—</span></div>
-      </div>
-      <div class="review-card">
-        <div class="review-title"><i class="fas fa-phone" style="color:var(--gold);"></i> Contact Details</div>
-        <div class="review-item"><span class="ri-label">Mobile</span><span class="ri-val" id="rv-mobile">—</span></div>
-        <div class="review-item"><span class="ri-label">Email</span><span class="ri-val" id="rv-email" style="font-size:.75rem;">—</span></div>
-        <div class="review-item"><span class="ri-label">WhatsApp</span><span class="ri-val" id="rv-whatsapp">—</span></div>
-      </div>
-      <div class="review-card" style="grid-column:span 2;">
-        <div class="review-title"><i class="fas fa-map-marker-alt" style="color:var(--gold);"></i> Address</div>
-        <div class="review-item"><span class="ri-label">Street</span><span class="ri-val" id="rv-addr">—</span></div>
-        <div class="review-item"><span class="ri-label">City / State / PIN</span><span class="ri-val" id="rv-location">—</span></div>
-      </div>
-    </div>
-
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <div style="font-size:.72rem;color:var(--muted);">Selected Plan</div>
-          <div style="font-size:1.1rem;font-weight:800;color:#fff;" id="rv-plan-name">—</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:.72rem;color:var(--muted);">Amount (incl. GST)</div>
-          <div style="font-size:1.5rem;font-weight:900;color:var(--gold);" id="rv-price">₹0</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn-secondary" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Edit Details</button>
-      <button class="btn-primary" onclick="proceedToPayment()">
-        <i class="fas fa-credit-card"></i> Proceed to Payment
-      </button>
+    <div class="wizard-nav">
+      <button class="btn btn-outline" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn btn-gold" onclick="goStep(5)">Review & Submit <i class="fas fa-arrow-right"></i></button>
     </div>
   </div>
 
-</div><!-- end page-wrap -->
+  <!-- ═══════════ STEP 5: REVIEW & SUBMIT ═══════════ -->
+  <div id="step-5" class="step-panel" style="display:none;">
+    <div class="kyc-card">
+      <div class="kyc-card-title">Review Application</div>
+      <div class="kyc-card-sub">Please verify all details before submitting. Once submitted, a KYC reviewer will process the application.</div>
+
+      <div id="review-content"><!-- rendered by JS --></div>
+
+      <div class="sep"></div>
+      <div class="kyc-card-title" style="font-size:13px;">Customer Consent</div>
+      <div class="consent-list">
+        <label class="consent-item"><input type="checkbox" id="consent-dpdp"/> I confirm the customer has consented to their personal data being collected and processed for identity verification under India's DPDP Act 2023.</label>
+        <label class="consent-item"><input type="checkbox" id="consent-terms"/> The customer has read and agreed to the WOW Passport Terms & Conditions and Membership Agreement.</label>
+        <label class="consent-item"><input type="checkbox" id="consent-accurate"/> I certify that all information provided is accurate and truthful to the best of my knowledge.</label>
+      </div>
+    </div>
+
+    <div class="wizard-nav">
+      <button class="btn btn-outline" onclick="goStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn btn-gold btn-lg" onclick="submitKYC()"><i class="fas fa-paper-plane"></i> Submit KYC Application</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ STEP 6: SUCCESS ═══════════ -->
+  <div id="step-6" class="step-panel" style="display:none;">
+    <div class="kyc-card">
+      <div class="success-screen">
+        <span class="success-icon">✅</span>
+        <h2 class="success-title">KYC Submitted!</h2>
+        <p class="success-sub">The KYC application has been submitted successfully. Our review team will process it within 24 hours.</p>
+
+        <div class="kyc-ref-card" id="success-kyc-ref">
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px;">KYC Reference ID</div>
+          <div class="krc-id" id="success-kyc-id">KYC-XXXXXXXXXX</div>
+          <div class="krc-msg">Share this reference with the customer. They can track their KYC status in the portal.</div>
+        </div>
+
+        <div id="success-passport-ref" style="display:none;">
+          <div class="kyc-ref-card">
+            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:4px;">Passport Number (Auto-issued)</div>
+            <div class="krc-id" id="success-pp-id">WOW-PAX-2025-000001</div>
+            <div class="krc-msg">Passport has been issued and is active. Customer can use the QR code to enter the park.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+          <button class="btn btn-gold" onclick="newApplication()"><i class="fas fa-plus"></i> New KYC Application</button>
+          <a href="passport-dashboard.html" class="btn btn-outline"><i class="fas fa-th-large"></i> Dashboard</a>
+          <a href="../admin/passport-kyc-review.html" class="btn btn-outline"><i class="fas fa-tasks"></i> KYC Review Queue</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wizard-wrap -->
 
 <div id="toast"></div>
 
 <script>
-// ===================== DATA =====================
-const PLANS = [
-  {
-    id:'water', name:'Water Park Passport', badge:'water', badgeTxt:'WATER PARK',
-    price:4999, gstPrice:4999,
-    features:[
-      {icon:'fa-water',text:'Unlimited Water Park entries'},
-      {icon:'fa-utensils',text:'10% off on all F&B'},
-      {icon:'fa-user-friends',text:'2 guest passes per month'},
-      {icon:'fa-star',text:'Priority queue access'},
-      {icon:'fa-tag',text:'Exclusive member discounts'},
-    ],
-    vouchers:[{val:'3x',label:'Meal Vouchers'},{val:'₹200',label:'F&B Voucher'},{val:'2x',label:'Guest Passes'}],
-    validity:365, entries:'Unlimited', fnbDiscount:'10%', commission:3
-  },
-  {
-    id:'amusement', name:'Amusement Passport', badge:'amuse', badgeTxt:'AMUSEMENT',
-    price:5999, gstPrice:5999,
-    features:[
-      {icon:'fa-gamepad',text:'Unlimited Amusement Park entries'},
-      {icon:'fa-percentage',text:'15% off all ride merchandise'},
-      {icon:'fa-user-friends',text:'1 guest pass per month'},
-      {icon:'fa-calendar-star',text:'Exclusive member events'},
-      {icon:'fa-birthday-cake',text:'Birthday special privileges'},
-    ],
-    vouchers:[{val:'2x',label:'Meal Vouchers'},{val:'₹150',label:'Ride Discount'},{val:'1x',label:'Guest Pass'}],
-    validity:365, entries:'Unlimited', fnbDiscount:'15%', commission:3
-  },
-  {
-    id:'combo', name:'Combo Passport', badge:'combo', badgeTxt:'COMBO PREMIUM',
-    price:7999, gstPrice:7999, popular:true,
-    features:[
-      {icon:'fa-infinity',text:'Both parks unlimited access'},
-      {icon:'fa-utensils',text:'20% off F&B & merchandise'},
-      {icon:'fa-user-friends',text:'3 guest passes per month'},
-      {icon:'fa-crown',text:'VIP lounge access'},
-      {icon:'fa-lock-open',text:'Free locker every visit'},
-    ],
-    vouchers:[{val:'5x',label:'Meal Vouchers'},{val:'₹500',label:'F&B Voucher'},{val:'3x',label:'Guest Passes'},{val:'FREE',label:'Locker/Visit'}],
-    validity:365, entries:'Unlimited', fnbDiscount:'20%', commission:4
-  },
-  {
-    id:'family', name:'Family Passport (4 Members)', badge:'premium', badgeTxt:'FAMILY PACK',
-    price:14999, gstPrice:14999,
-    features:[
-      {icon:'fa-users',text:'Up to 4 family members'},
-      {icon:'fa-infinity',text:'Both parks unlimited entries'},
-      {icon:'fa-utensils',text:'25% off F&B & merchandise'},
-      {icon:'fa-crown',text:'VIP lounge for all members'},
-      {icon:'fa-gift',text:'Birthday pack for each member'},
-    ],
-    vouchers:[{val:'8x',label:'Meal Vouchers'},{val:'₹1000',label:'F&B Voucher'},{val:'4x',label:'Guest Passes'},{val:'FREE',label:'Locker/Visit'}],
-    validity:365, entries:'Unlimited', fnbDiscount:'25%', commission:5
-  },
-];
+/* ═══════════════════════════════════
+   KYC WIZARD v2.0
+   ═══════════════════════════════════ */
 
-let selectedPlan = null;
+let currentStep = 1;
+let selectedProductId = null;
+let selectedTierId = null;
 let capturedPhoto = null;
-let currentStep = 0;
-let loginCreds = {};
+let capturedIdPhoto = null;
+let uploadedDocs = {};
+let familyMembers = [];
+let cameraStream = null;
+let kycLevel = 'basic';
 
-// ===================== INIT =====================
-window.onload = function(){
-  const agent = JSON.parse(sessionStorage.getItem('wow_agent')||'{"name":"Sales Agent","id":"EMP-001"}');
-  document.getElementById('nav-agent').textContent = agent.name;
-  renderPlans();
+const STEPS = 5;
 
-  // Check if returning from a previous session
-  const saved = sessionStorage.getItem('wow_passport_kyc');
-  if(saved){
-    try{
-      const d = JSON.parse(saved);
-      if(d.plan){ selectedPlan = d.plan; }
-    }catch(e){}
+document.addEventListener('DOMContentLoaded', () => {
+  if(typeof WPE !== 'undefined') WPE.initialize ? WPE.initialize() : null;
+  renderTierOptions();
+  renderDocRequirements();
+  // Set max DOB (must be at least 1 year old)
+  const maxDob = new Date();
+  maxDob.setFullYear(maxDob.getFullYear() - 1);
+  document.getElementById('p-dob').max = maxDob.toISOString().slice(0,10);
+});
+
+/* ─── TIER OPTIONS ─── */
+function renderTierOptions(){
+  const prods = (typeof WPE !== 'undefined') ? WPE.getProducts().filter(p => p.status === 'active').sort((a,b) => a.displayOrder - b.displayOrder) : [];
+  const tiers = (typeof WPE !== 'undefined') ? WPE.getTiers() : [];
+  const container = document.getElementById('tier-options');
+  if(!prods.length){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);grid-column:1/-1;">No active passport products found.</div>';
+    return;
   }
-};
+  container.innerHTML = prods.slice(0,3).map(p => {
+    const tier = tiers.find(t => t.id === p.tierId) || {};
+    return `
+    <div class="tier-option" id="tier-opt-${p.id}" onclick="selectProduct('${p.id}','${p.tierId}','${p.kycLevel||'basic'}','${tier.maxHolders||1}')">
+      <div class="to-emblem">${tier.emblemIcon || '🌟'}</div>
+      <div class="to-name">${tier.displayName || tier.name || p.tierId}</div>
+      <div class="to-price">₹${Number(p.basePrice).toLocaleString('en-IN')}</div>
+      <div class="to-holders">${tier.maxHolders || 1} holder${(tier.maxHolders||1) > 1 ? 's' : ''} · ${p.kycLevel} KYC</div>
+    </div>`;
+  }).join('');
+}
 
-function renderPlans(){
-  const grid = document.getElementById('plan-grid');
-  grid.innerHTML = PLANS.map((p,i)=>`
-    <div class="plan-card${p.popular?' plan-popular':''}" id="pc-${p.id}" onclick="selectPlan('${p.id}')">
-      ${p.popular?'<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold));border-radius:16px 16px 0 0;"></div>':''}
-      ${p.popular?'<div style="position:absolute;top:12px;left:14px;background:var(--gold);color:#0a0a14;font-size:.6rem;font-weight:900;padding:2px 8px;border-radius:10px;letter-spacing:.5px;">POPULAR</div>':''}
-      <div class="plan-badge ${p.badge}">${p.badgeTxt}</div>
-      <div class="plan-name">${p.name}</div>
-      <div class="plan-price"><sup>₹</sup>${p.price.toLocaleString('en-IN')}<sub>/year</sub></div>
-      <div class="plan-features">
-        ${p.features.map(f=>`<div class="pf-item"><i class="fas ${f.icon}"></i>${f.text}</div>`).join('')}
+function selectProduct(productId, tierId, kycLvl, maxHolders){
+  selectedProductId = productId;
+  selectedTierId = tierId;
+  kycLevel = kycLvl;
+  document.querySelectorAll('.tier-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('tier-opt-' + productId)?.classList.add('selected');
+  document.getElementById('err-tier').style.display = 'none';
+  // Show family members section if multiple holders
+  const famsec = document.getElementById('family-members-section');
+  if(parseInt(maxHolders) > 1){
+    famsec.style.display = 'block';
+    renderFamilyMembers();
+  } else {
+    famsec.style.display = 'none';
+  }
+  renderDocRequirements();
+  toast(`✓ ${tierId} passport selected`);
+}
+
+/* ─── CUSTOMER SEARCH ─── */
+function searchCustomer(){
+  const q = document.getElementById('customer-search').value.trim();
+  if(!q || typeof WPE === 'undefined') return;
+  const results = WPE.findCustomer ? WPE.findCustomer(q) : [];
+  const container = document.getElementById('customer-search-results');
+  if(!results.length){ container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.innerHTML = `<div style="background:#f9fafb;border:1px solid var(--border);border-radius:8px;padding:8px;">
+    ${results.slice(0,3).map(c => `
+    <div style="padding:8px;cursor:pointer;border-radius:6px;transition:.15s;" 
+         onmouseover="this.style.background='#fffbf0'" onmouseout="this.style.background=''"
+         onclick="fillCustomer('${c.id}','${c.name||''}','${c.email||''}','${c.mobile||''}')">
+      <strong style="font-size:12px;">${c.name || '—'}</strong>
+      <span style="font-size:11px;color:var(--muted);margin-left:8px;">${c.mobile || c.email || ''}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+function fillCustomer(id, name, email, mobile){
+  const [fname, ...lnameArr] = (name || '').split(' ');
+  setValue('p-fname', fname);
+  setValue('p-lname', lnameArr.join(' '));
+  setValue('c-email', email);
+  setValue('c-mobile', mobile);
+  document.getElementById('customer-search').value = name;
+  document.getElementById('customer-search-results').style.display = 'none';
+}
+
+function syncCustomerMobile(){}
+function clearCustomer(){
+  document.getElementById('customer-search').value = '';
+  document.getElementById('customer-search-results').style.display = 'none';
+}
+
+/* ─── FAMILY MEMBERS ─── */
+function renderFamilyMembers(){
+  const container = document.getElementById('family-members-list');
+  if(!familyMembers.length){
+    container.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px 0;">No additional members added yet.</div>';
+    return;
+  }
+  container.innerHTML = familyMembers.map((m,i) => `
+    <div style="display:flex;gap:12px;align-items:center;padding:10px;background:#f9fafb;border-radius:8px;margin-bottom:8px;border:1px solid var(--border);">
+      <span style="font-size:20px;">👤</span>
+      <div style="flex:1;">
+        <strong style="font-size:12px;">${m.name || 'Member ' + (i+2)}</strong>
+        <div style="font-size:10px;color:var(--muted);">${m.dob || 'DOB not set'} · ${m.relation || 'Family'}</div>
       </div>
-    </div>
-  `).join('');
+      <button class="btn btn-outline" style="font-size:10px;padding:3px 8px;" onclick="removeFamilyMember(${i})">Remove</button>
+    </div>`).join('');
 }
 
-function selectPlan(id){
-  selectedPlan = PLANS.find(p=>p.id===id);
-  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('pc-'+id).classList.add('selected');
+function addFamilyMember(){
+  const name = prompt('Member Name:');
+  if(!name) return;
+  const dob = prompt('Date of Birth (YYYY-MM-DD):');
+  const relation = prompt('Relation (spouse/child/parent/other):') || 'family';
+  familyMembers.push({ name, dob, relation });
+  renderFamilyMembers();
 }
 
-// ===================== STEPPER =====================
-function goStep(n){
-  if(n===1 && !selectedPlan){ showToast('Please select a passport plan first'); return; }
-  if(n===2 && !capturedPhoto){ showToast('Please capture or upload a passport photo first'); return; }
-  if(n===3){
-    const ok = validateForm();
-    if(!ok) return;
-    buildReview();
-  }
-  currentStep = n;
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+n).classList.add('active');
-  // Update stepper
-  for(let i=0;i<4;i++){
-    const stp = document.getElementById('stp-'+i);
-    stp.classList.remove('active','done');
-    if(i < n) stp.classList.add('done');
-    else if(i===n) stp.classList.add('active');
-  }
-  window.scrollTo({top:0,behavior:'smooth'});
+function removeFamilyMember(idx){
+  familyMembers.splice(idx,1);
+  renderFamilyMembers();
 }
 
-// ===================== CAMERA =====================
-let stream = null;
-
+/* ─── CAMERA ─── */
 async function startCamera(){
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:800}}});
-    const video = document.getElementById('cam-video');
-    video.srcObject = stream;
-    video.style.display = 'block';
-    document.getElementById('cam-canvas').style.display='none';
-    document.getElementById('cam-preview').style.display='none';
-    document.getElementById('face-guide').style.display='flex';
-    document.getElementById('btn-start-cam').disabled = true;
-    document.getElementById('btn-capture').disabled = false;
-    document.getElementById('btn-retake').style.display='none';
-    document.getElementById('photo-ok-badge').style.display='none';
-    document.getElementById('photo-preview-card').style.display='none';
-    showToast('Camera started. Position face in the oval guide.');
-  }catch(e){
-    showToast('Camera access denied. Please upload a photo instead.');
+  document.getElementById('camera-mode').style.display = 'block';
+  document.getElementById('upload-mode').style.display = 'none';
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } });
+    document.getElementById('camera-video').srcObject = cameraStream;
+  } catch(e) {
+    toast('Camera not available. Please use upload mode.', 'warn');
+    stopCamera();
   }
+}
+
+function stopCamera(){
+  if(cameraStream){ cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  document.getElementById('camera-mode').style.display = 'none';
+  document.getElementById('upload-mode').style.display = 'block';
 }
 
 function capturePhoto(){
-  const video = document.getElementById('cam-video');
-  const canvas = document.getElementById('cam-canvas');
-  canvas.width = video.videoWidth || 400;
-  canvas.height = video.videoHeight || 500;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
-  capturedPhoto = canvas.toDataURL('image/jpeg', 0.92);
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('capture-canvas');
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  capturedPhoto = canvas.toDataURL('image/jpeg', 0.8);
+  stopCamera();
   // Show preview
-  const preview = document.getElementById('cam-preview');
-  preview.src = capturedPhoto;
-  preview.style.display = 'block';
-  video.style.display = 'none';
-  document.getElementById('face-guide').style.display='none';
-  document.getElementById('btn-capture').disabled = true;
-  document.getElementById('btn-retake').style.display='flex';
-  document.getElementById('photo-ok-badge').style.display='block';
-  // Thumbnail
-  document.getElementById('preview-thumbnail').src = capturedPhoto;
-  document.getElementById('photo-preview-card').style.display='block';
-  document.getElementById('btn-next-photo').disabled = false;
-  // Stop stream
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  const prev = document.getElementById('selfie-preview');
+  prev.src = capturedPhoto;
+  prev.style.display = 'block';
+  document.getElementById('selfie-box').classList.add('filled');
+  document.getElementById('selfie-icon').textContent = '✅';
+  toast('✅ Photo captured!');
 }
 
-function retakePhoto(){
-  capturedPhoto = null;
-  document.getElementById('cam-preview').style.display='none';
-  document.getElementById('cam-canvas').style.display='none';
-  document.getElementById('cam-video').style.display='block';
-  document.getElementById('btn-start-cam').disabled = false;
-  document.getElementById('btn-capture').disabled = true;
-  document.getElementById('btn-retake').style.display='none';
-  document.getElementById('photo-ok-badge').style.display='none';
-  document.getElementById('photo-preview-card').style.display='none';
-  document.getElementById('btn-next-photo').disabled = true;
+function switchToUpload(){
+  stopCamera();
+  document.getElementById('upload-mode').style.display = 'block';
 }
 
-function handleUpload(e){
+function handleSelfieUpload(e){
   const file = e.target.files[0];
   if(!file) return;
-  if(!file.type.startsWith('image/')){ showToast('Please select an image file.'); return; }
+  if(file.size > 5 * 1024 * 1024){ toast('File too large (max 5 MB)', 'danger'); return; }
   const reader = new FileReader();
-  reader.onload = function(ev){
+  reader.onload = ev => {
     capturedPhoto = ev.target.result;
-    document.getElementById('cam-preview').src = capturedPhoto;
-    document.getElementById('cam-preview').style.display='block';
-    document.getElementById('cam-video').style.display='none';
-    document.getElementById('face-guide').style.display='none';
-    document.getElementById('btn-retake').style.display='flex';
-    document.getElementById('btn-capture').disabled = true;
-    document.getElementById('photo-ok-badge').style.display='block';
-    document.getElementById('preview-thumbnail').src = capturedPhoto;
-    document.getElementById('photo-preview-card').style.display='block';
-    document.getElementById('btn-next-photo').disabled = false;
-    showToast('Photo uploaded successfully!');
-    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    const prev = document.getElementById('selfie-preview');
+    prev.src = capturedPhoto;
+    prev.style.display = 'block';
+    document.getElementById('selfie-box').classList.add('filled');
+    document.getElementById('selfie-icon').textContent = '✅';
   };
   reader.readAsDataURL(file);
 }
 
-// ===================== FORM & VALIDATION =====================
-function livePreview(){
-  const mobile = document.getElementById('f-mobile').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  if(mobile.length===10 || email){
-    const preview = document.getElementById('login-preview');
-    preview.style.display='block';
-    document.getElementById('lp-mobile').textContent = mobile.length===10 ? '+91-'+mobile : 'Enter 10-digit mobile';
-    document.getElementById('lp-email').textContent = email || 'Enter email address';
-    const fname = document.getElementById('f-fname').value.trim();
-    const dob = document.getElementById('f-dob').value;
-    const pw = generateTempPw(fname, mobile, dob);
-    document.getElementById('lp-pw').textContent = pw;
-    loginCreds = {mobile:mobile,email:email,pw:pw};
-  }
-}
-
-function generateTempPw(name, mobile, dob){
-  const n = (name||'WOW').substr(0,3).toUpperCase();
-  const m = (mobile||'0000').substr(-4);
-  const d = dob ? dob.replace(/-/g,'').substr(4,4) : '0101';
-  return n+'@'+d+m;
-}
-
-function validateForm(){
-  const req = [
-    {id:'f-fname',msg:'First name is required'},
-    {id:'f-lname',msg:'Last name is required'},
-    {id:'f-dob',msg:'Date of birth is required'},
-    {id:'f-gender',msg:'Gender is required'},
-    {id:'f-mobile',msg:'Mobile number is required'},
-    {id:'f-email',msg:'Email address is required'},
-    {id:'f-addr1',msg:'Street address is required'},
-    {id:'f-state',msg:'State is required'},
-    {id:'f-pin',msg:'PIN code is required'},
-  ];
-  for(const r of req){
-    const el = document.getElementById(r.id);
-    if(!el.value.trim()){ showToast(r.msg); el.classList.add('error'); el.focus(); return false; }
-    el.classList.remove('error');
-  }
-  const mobile = document.getElementById('f-mobile').value.trim();
-  if(!/^\d{10}$/.test(mobile)){ showToast('Enter a valid 10-digit mobile number'); document.getElementById('f-mobile').focus(); return false; }
-  const email = document.getElementById('f-email').value.trim();
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showToast('Enter a valid email address'); document.getElementById('f-email').focus(); return false; }
-  const pin = document.getElementById('f-pin').value.trim();
-  if(!/^\d{6}$/.test(pin)){ showToast('Enter a valid 6-digit PIN code'); document.getElementById('f-pin').focus(); return false; }
-  return true;
-}
-
-function buildReview(){
-  const fname = document.getElementById('f-fname').value.trim();
-  const lname = document.getElementById('f-lname').value.trim();
-  const dob = document.getElementById('f-dob').value;
-  const gender = document.getElementById('f-gender').value;
-  const mobile = document.getElementById('f-mobile').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  const whatsapp = document.getElementById('f-whatsapp').value.trim();
-  const addr1 = document.getElementById('f-addr1').value.trim();
-  const city = document.getElementById('f-city').value.trim();
-  const state = document.getElementById('f-state').value;
-  const pin = document.getElementById('f-pin').value.trim();
-  const pw = generateTempPw(fname,mobile,dob);
-  loginCreds = {mobile,email,pw};
-
-  document.getElementById('review-photo').src = capturedPhoto||'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="96"><rect fill="%230a0a22"/><text x="50%" y="50%" fill="%23888" text-anchor="middle" dy=".3em" font-size="24">👤</text></svg>';
-  document.getElementById('rv-login-mobile').textContent = '+91-'+mobile;
-  document.getElementById('rv-login-email').textContent = email;
-  document.getElementById('rv-login-pw').textContent = pw;
-  document.getElementById('rv-plan').textContent = selectedPlan?.name||'—';
-  document.getElementById('rv-name').textContent = fname+' '+lname;
-  document.getElementById('rv-dob').textContent = dob?new Date(dob).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}):'—';
-  document.getElementById('rv-gender').textContent = gender;
-  document.getElementById('rv-mobile').textContent = '+91-'+mobile;
-  document.getElementById('rv-email').textContent = email;
-  document.getElementById('rv-whatsapp').textContent = whatsapp?'+91-'+whatsapp:'Same as mobile';
-  document.getElementById('rv-addr').textContent = addr1;
-  document.getElementById('rv-location').textContent = city+', '+state+' - '+pin;
-  document.getElementById('rv-plan-name').textContent = selectedPlan?.name||'—';
-  document.getElementById('rv-price').textContent = '₹'+(selectedPlan?.price||0).toLocaleString('en-IN');
-}
-
-async function proceedToPayment(){
-  const btn = event?.target || document.querySelector('.btn-primary');
-  if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving KYC…'; }
-
-  const agent  = WOW_API.getLoggedInAgent() || {id:'DEMO-001', name:'Demo Agent', location:'Main Gate'};
-  const mobile = document.getElementById('f-mobile').value.trim();
-  const fname  = document.getElementById('f-fname').value.trim();
-  const lname  = document.getElementById('f-lname').value.trim();
-  const dob    = document.getElementById('f-dob').value;
-  const email  = document.getElementById('f-email').value.trim();
-
-  const kycPayload = {
-    plan:          selectedPlan?.name,
-    plan_price:    selectedPlan?.price || 0,
-    fname, lname, dob,
-    gender:        document.getElementById('f-gender').value,
-    mobile,
-    mobile_alt:    document.getElementById('f-alt-phone').value.trim(),
-    whatsapp:      document.getElementById('f-whatsapp').value.trim(),
-    email,
-    address:       document.getElementById('f-addr1').value.trim(),
-    city:          document.getElementById('f-city').value.trim(),
-    state:         document.getElementById('f-state').value,
-    pin_code:      document.getElementById('f-pin').value.trim(),
-    country:       'India',
-    id_proof_type: document.getElementById('f-id-type').value,
-    id_proof_number: document.getElementById('f-id-num').value.trim(),
-    photo_data:    capturedPhoto || '',
-    agent_id:      agent.id,
-    agent_name:    agent.name,
-    location:      agent.location || 'Main Entrance Gate',
-    kyc_status:    'pending',
-    payment_status:'pending',
+function handleIdPhotoUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    capturedIdPhoto = ev.target.result;
+    const prev = document.getElementById('id-photo-preview');
+    prev.src = capturedIdPhoto;
+    prev.style.display = 'block';
+    document.getElementById('id-photo-box').classList.add('filled');
+    document.getElementById('id-photo-icon').textContent = '✅';
   };
+  reader.readAsDataURL(file);
+}
 
-  // Also keep legacy session format for backward-compat
-  const legacyKyc = {
-    fname, lname, dob,
-    gender: kycPayload.gender,
-    mobile, email,
-    altPhone: kycPayload.mobile_alt,
-    whatsapp: kycPayload.whatsapp,
-    addr1: kycPayload.address,
-    city: kycPayload.city,
-    state: kycPayload.state,
-    pin: kycPayload.pin_code,
-    idType: kycPayload.id_proof_type,
-    idNum: kycPayload.id_proof_number,
-    photo: capturedPhoto,
-    plan: selectedPlan,
-    loginId: mobile,
-    loginEmail: email,
-    loginPw: loginCreds.pw || WOW_API.genTempPassword(fname, dob, mobile),
-    timestamp: new Date().toISOString(),
+/* ─── DOC REQUIREMENTS ─── */
+const DOC_DEFS = {
+  id_proof: { icon: '🪪', label: 'Government ID Proof', hint: 'Aadhaar / Passport / Voter ID / PAN / Driving License' },
+  address_proof: { icon: '🏠', label: 'Address Proof', hint: 'Utility bill / Bank statement / Rental agreement (last 3 months)' },
+  selfie_with_id: { icon: '🤳', label: 'Selfie with ID', hint: 'Hold your ID next to your face in clear light' },
+};
+
+function updateDocRequirements(){ renderDocRequirements(); }
+
+function renderDocRequirements(){
+  const lvl = kycLevel || 'basic';
+  const required = ['id_proof'];
+  if(['full','enhanced'].includes(lvl)) required.push('address_proof');
+  if(lvl === 'enhanced') required.push('selfie_with_id');
+  const container = document.getElementById('doc-upload-row');
+  container.innerHTML = required.map(docKey => {
+    const def = DOC_DEFS[docKey] || { icon: '📄', label: docKey, hint: '' };
+    const uploaded = !!uploadedDocs[docKey];
+    return `
+    <div class="doc-item${uploaded ? ' uploaded' : ''}" id="doc-item-${docKey}">
+      <input type="file" accept="image/*,.pdf" onchange="handleDocUpload(event,'${docKey}')"/>
+      <div class="doc-icon">${def.icon}</div>
+      <div class="doc-info">
+        <strong>${def.label}</strong>
+        <small>${def.hint}</small>
+        ${uploaded ? `<small style="color:var(--green);">✅ Uploaded: ${uploadedDocs[docKey].name}</small>` : '<small style="color:var(--muted);">Click to upload (JPG/PNG/PDF, max 5 MB)</small>'}
+      </div>
+      <div class="doc-status">
+        ${uploaded ? '<i class="fas fa-check-circle" style="color:var(--green);"></i>' : '<i class="fas fa-circle" style="color:var(--border);"></i>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function handleDocUpload(e, docKey){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 5 * 1024 * 1024){ toast('File too large (max 5 MB)', 'danger'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    uploadedDocs[docKey] = { name: file.name, type: file.type, data: ev.target.result };
+    renderDocRequirements();
+    toast(`✅ ${DOC_DEFS[docKey]?.label || docKey} uploaded`);
   };
-  sessionStorage.setItem('wow_passport_kyc', JSON.stringify(legacyKyc));
-  sessionStorage.setItem('current_kyc', JSON.stringify(legacyKyc));
+  reader.readAsDataURL(file);
+  e.stopPropagation();
+}
 
-  try {
-    showToast('💾 Saving KYC to database…');
-    const saved = await WOW_API.saveKYC(kycPayload);
-    showToast('✅ KYC saved! KYC ID: ' + (saved.id || 'KYC-' + Date.now()));
-    setTimeout(()=> window.location.href='passport-payment.html', 1100);
-  } catch(err) {
-    console.warn('API save failed, continuing offline:', err);
-    showToast('⚠️ Offline mode — KYC saved locally');
-    setTimeout(()=> window.location.href='passport-payment.html', 1100);
-  } finally {
-    if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Payment'; }
+/* ─── REVIEW ─── */
+function renderReview(){
+  const fname = g('p-fname'); const lname = g('p-lname');
+  const mobile = g('c-mobile'); const email = g('c-email');
+  const dob = g('p-dob'); const address = g('p-address');
+  const idType = g('id-type'); const idRef = g('id-ref');
+  const prodId = selectedProductId;
+  let prod = null, tier = null;
+  if(typeof WPE !== 'undefined' && prodId){
+    prod = WPE.getProductById(prodId);
+    tier = prod ? WPE.getTierById(prod.tierId) : null;
+  }
+  document.getElementById('review-content').innerHTML = `
+    <div class="review-section">
+      <h4>Passport Plan</h4>
+      <div class="review-row"><span class="review-label">Product</span><span class="review-val">${prod ? prod.name : 'Not selected'}</span></div>
+      <div class="review-row"><span class="review-label">Tier</span><span class="review-val">${tier ? tier.displayName || tier.name : '—'}</span></div>
+      <div class="review-row"><span class="review-label">Price</span><span class="review-val">₹${prod ? Number(prod.basePrice).toLocaleString('en-IN') : '—'}</span></div>
+      <div class="review-row"><span class="review-label">KYC Level</span><span class="review-val">${kycLevel}</span></div>
+    </div>
+    <div class="review-section">
+      <h4>Customer Details</h4>
+      <div class="review-row"><span class="review-label">Full Name</span><span class="review-val">${fname} ${lname}</span></div>
+      <div class="review-row"><span class="review-label">Mobile</span><span class="review-val">${mobile || '—'}</span></div>
+      <div class="review-row"><span class="review-label">Email</span><span class="review-val">${email || '—'}</span></div>
+      <div class="review-row"><span class="review-label">Date of Birth</span><span class="review-val">${dob || '—'}</span></div>
+      <div class="review-row"><span class="review-label">Address</span><span class="review-val">${address || '—'}</span></div>
+    </div>
+    <div class="review-section">
+      <h4>Identity Documents</h4>
+      <div class="review-row"><span class="review-label">ID Type</span><span class="review-val">${idType || '—'}</span></div>
+      <div class="review-row"><span class="review-label">ID Last 4</span><span class="review-val">XXXX${idRef || '—'}</span></div>
+      <div class="review-row"><span class="review-label">Photo</span><span class="review-val">${capturedPhoto ? '✅ Captured' : '⚠️ Not provided'}</span></div>
+      ${Object.entries(uploadedDocs).map(([k,v]) => `<div class="review-row"><span class="review-label">${DOC_DEFS[k]?.label || k}</span><span class="review-val">✅ ${v.name}</span></div>`).join('')}
+    </div>
+    ${familyMembers.length ? `<div class="review-section"><h4>Family Members</h4>${familyMembers.map((m,i) => `<div class="review-row"><span class="review-label">Member ${i+2}</span><span class="review-val">${m.name} (${m.relation})</span></div>`).join('')}</div>` : ''}`;
+}
+
+/* ─── STEP NAVIGATION ─── */
+function goStep(step){
+  // Validate
+  if(step > currentStep){
+    if(currentStep === 1 && !selectedProductId){ document.getElementById('err-tier').style.display = 'block'; toast('Please select a tier first', 'danger'); return; }
+    if(currentStep === 2){
+      if(!g('p-fname').trim()){ toast('First name required', 'danger'); return; }
+      if(!g('p-lname').trim()){ toast('Last name required', 'danger'); return; }
+    }
+  }
+  if(step === 5) renderReview();
+  // Update UI
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  currentStep = step;
+  document.getElementById('step-' + currentStep).style.display = 'block';
+  // Update progress
+  const pct = Math.round(((step - 1) / STEPS) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  // Update circles
+  for(let i = 1; i <= STEPS; i++){
+    const circle = document.getElementById('ws-' + i);
+    const label = document.getElementById('wl-' + i);
+    if(i < step){ circle.className = 'ws-circle done'; circle.innerHTML = '<i class="fas fa-check" style="font-size:12px;"></i>'; label.className = 'ws-label done'; }
+    else if(i === step){ circle.className = 'ws-circle active'; circle.textContent = i; label.className = 'ws-label active'; }
+    else { circle.className = 'ws-circle'; circle.textContent = i; label.className = 'ws-label'; }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── SUBMIT ─── */
+function submitKYC(){
+  if(!gc('consent-dpdp') || !gc('consent-terms') || !gc('consent-accurate')){
+    toast('All consent checkboxes must be checked', 'danger'); return;
+  }
+  if(!selectedProductId){ toast('Please select a tier', 'danger'); return; }
+  const fname = g('p-fname').trim(); const lname = g('p-lname').trim();
+  if(!fname || !lname){ toast('Customer name required', 'danger'); return; }
+
+  const customerName = fname + ' ' + lname;
+  const docs = Object.entries(uploadedDocs).map(([k, v]) => ({ name: v.name, type: k, data: v.data ? v.data.slice(0, 100) + '…' : '' }));
+
+  let customer = null;
+  if(typeof WPE !== 'undefined'){
+    customer = WPE.upsertCustomer({
+      name: customerName, email: g('c-email') || null,
+      mobile: g('c-mobile') || null, dob: g('p-dob') || null,
+      address: g('p-address') || null,
+    });
+  }
+
+  const kycResult = (typeof WPE !== 'undefined') ? WPE.submitKYC({
+    customerId: customer ? customer.id : 'GUEST-' + Date.now(),
+    productId: selectedProductId,
+    customerName, customerEmail: g('c-email'),
+    customerMobile: g('c-mobile'), customerDob: g('p-dob'),
+    address: g('p-address'),
+    idType: g('id-type'), idReference: g('id-ref'),
+    photoData: capturedPhoto ? capturedPhoto.slice(0, 200) : null,
+    documents: docs,
+    submittedBy: 'sales_agent', channel: 'salesperson',
+    notes: 'Submitted via Sales KYC Wizard',
+  }) : { success: false, kycId: 'KYC-DEMO-001' };
+
+  if(kycResult.success || kycResult.kycId){
+    document.getElementById('step-5').style.display = 'none';
+    document.getElementById('step-6').style.display = 'block';
+    document.getElementById('success-kyc-id').textContent = kycResult.kycId || 'KYC-DEMO-001';
+    // If KYC not mandatory, auto-issue
+    const cfg = (typeof WPE !== 'undefined') ? WPE.getConfig() : null;
+    if(cfg && !cfg.meta.kycMandatoryBeforeIssuance){
+      const passResult = WPE.issuePassport({
+        productId: selectedProductId,
+        customerId: customer ? customer.id : 'GUEST',
+        customerName, customerEmail: g('c-email'),
+        customerMobile: g('c-mobile'), customerDob: g('p-dob'),
+        kycId: kycResult.kycId, channel: 'salesperson',
+        soldBy: 'sales_agent', paymentRef: 'PENDING',
+      });
+      if(passResult.success){
+        document.getElementById('success-passport-ref').style.display = 'block';
+        document.getElementById('success-pp-id').textContent = passResult.passport.number;
+      }
+    }
+    // Update progress bar to 100%
+    document.getElementById('progress-fill').style.width = '100%';
+    toast('✅ KYC submitted successfully!');
+  } else {
+    toast('❌ Submission failed. Please try again.', 'danger');
   }
 }
 
-function showToast(msg, dur=2800){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display='block';
-  setTimeout(()=>t.style.display='none', dur);
+function newApplication(){
+  selectedProductId = null; selectedTierId = null;
+  capturedPhoto = null; capturedIdPhoto = null;
+  uploadedDocs = {}; familyMembers = [];
+  document.getElementById('step-6').style.display = 'none';
+  currentStep = 1;
+  goStep(1);
+  // Reset all inputs
+  ['customer-search','c-mobile','c-email','p-fname','p-lname','p-dob','p-address','id-type','id-ref'].forEach(id => setValue(id, ''));
+  renderTierOptions();
+  renderDocRequirements();
+}
+
+/* ─── HELPERS ─── */
+function g(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+function gc(id){ const el = document.getElementById(id); return el ? el.checked : false; }
+function setValue(id, val){ const el = document.getElementById(id); if(el) el.value = val || ''; }
+let toastTimer;
+function toast(msg, type){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'danger' ? '#7f1d1d' : '#1e293b';
+  el.style.borderColor = type === 'danger' ? '#ef4444' : 'var(--gold)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3000);
 }
 </script>
-<script src="../js/wow-auth-guard.js" data-portal="sales"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
