@@ -1,788 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WOW Passport — Annual Unlimited Membership | Worlds of Wonder, Noida</title>
-  <meta name="description" content="WOW Passport: Unlimited visits to both Worlds of Wonder parks for an entire year at just ₹4,999. Digital KYC, instant activation, exclusive member benefits." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <style>
-    /* ── Passport Gold Theme ── */
-    .pp-gold { color: #B8860B; }
-    .pp-hero {
-      background: linear-gradient(135deg, #0a0800 0%, #2a1a00 40%, #B8860B 100%);
-      min-height: 580px;
-      position: relative;
-      overflow: hidden;
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WOW Passport — Worlds of Wonder, Noida</title>
+<meta name="description" content="The WOW Passport is your all-year key to unlimited park access, VIP privileges, F&B discounts, birthday experiences, and more at Worlds of Wonder, Noida."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="css/style.css"/>
+<script src="js/wow-passport-engine.js"></script>
+<script src="js/wow-content-control.js"></script>
+<style>
+/* ── TOKENS ── */
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --navy:#0a1628;--navy2:#111d35;--dark:#0d0d1a;
+  --white:#ffffff;--off:#f8f5ef;
+  --tier-explore-from:#0f2057;--tier-explore-to:#1a56db;
+  --tier-together-from:#2d1b69;--tier-together-to:#7c3aed;
+  --tier-legacy-from:#1a0a00;--tier-legacy-to:#92400e;
+  --border:#e8e0d0;--text:#1a1a2e;--muted:#6b5e4c;
+}
 
-    .pp-hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 80% 30%, rgba(255,215,0,.1) 0%, transparent 70%);
-      pointer-events: none;
-    }
+/* ── RESET / BASE ── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--off);color:var(--text);overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;display:block;}
 
-    /* ── Passport Card Visual ── */
-    .pp-card-visual {
-      background: linear-gradient(135deg, #2a1a00, #B8860B, #D4A017);
-      border-radius: 20px;
-      padding: 28px 24px;
-      position: relative;
-      overflow: hidden;
-      max-width: 340px;
-      box-shadow: 0 16px 56px rgba(0,0,0,.45);
-      color: #fff;
-    }
+/* ── HERO ── */
+.pp-hero{
+  background:var(--dark);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.pp-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 60%,rgba(201,168,76,.08) 0%,transparent 70%);
+}
+.pp-hero-particles{position:absolute;inset:0;pointer-events:none;}
+.particle{position:absolute;width:2px;height:2px;background:var(--gold);border-radius:50%;opacity:.4;animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.4}90%{opacity:.4}100%{transform:translateY(-20px) scale(1.5);opacity:0}}
 
-    .pp-card-visual::before {
-      content: '';
-      position: absolute;
-      top: -30px;
-      right: -30px;
-      width: 120px;
-      height: 120px;
-      background: rgba(255,255,255,.1);
-      border-radius: 50%;
-    }
+/* NAVBAR */
+.pp-nav{padding:20px 32px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10;border-bottom:1px solid rgba(201,168,76,.12);}
+.nav-logo{display:flex;align-items:center;gap:12px;}
+.nav-logo-mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:20px;}
+.nav-logo-text strong{font-family:'Cinzel',serif;font-size:14px;color:var(--white);display:block;letter-spacing:.5px;}
+.nav-logo-text small{font-size:10px;color:rgba(255,255,255,.4);}
+.nav-links{display:flex;gap:8px;align-items:center;}
+.nav-link{padding:8px 16px;font-size:12px;font-weight:600;color:rgba(255,255,255,.65);border-radius:8px;transition:.2s;}
+.nav-link:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-btn{padding:9px 18px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0d0d1a;font-size:12px;font-weight:700;border-radius:10px;transition:.2s;}
+.nav-btn:hover{filter:brightness(1.1);}
 
-    .pp-card-chip { font-size: 32px; margin-bottom: 16px; }
-    .pp-card-name { font-size: 18px; font-weight: 900; font-family: 'Nunito', sans-serif; margin-bottom: 4px; }
-    .pp-card-type { font-size: 12px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 16px; }
-    .pp-card-id   { font-family: 'Courier New', monospace; font-size: 14px; letter-spacing: .15em; color: rgba(255,255,255,.8); margin-bottom: 16px; }
+/* HERO CONTENT */
+.pp-hero-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 40px;position:relative;z-index:5;}
+.pp-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:20px;margin-bottom:28px;}
+.pp-eyebrow span{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold2);}
+.pp-hero-title{font-family:'Cinzel',serif;font-size:clamp(2.8rem,8vw,5.5rem);font-weight:800;color:var(--white);line-height:1.1;margin-bottom:20px;}
+.pp-hero-title span{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.pp-hero-sub{font-size:clamp(1rem,2.5vw,1.25rem);font-weight:400;color:rgba(255,255,255,.55);max-width:560px;line-height:1.7;margin-bottom:40px;}
+.pp-hero-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:48px;}
+.cta-primary{padding:16px 36px;background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0d0d1a;font-size:15px;font-weight:800;border-radius:12px;border:none;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;}
+.cta-primary:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,168,76,.3);}
+.cta-secondary{padding:16px 36px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.18);color:#fff;font-size:15px;font-weight:700;border-radius:12px;cursor:pointer;transition:.2s;}
+.cta-secondary:hover{background:rgba(255,255,255,.1);}
 
-    .pp-card-meta { display: flex; justify-content: space-between; }
-    .pp-card-meta .cm-label { font-size: 9px; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .1em; }
-    .pp-card-meta .cm-val   { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+/* TRUST STRIP */
+.trust-strip{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;}
+.trust-item{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.5);}
+.trust-item i{color:var(--gold);font-size:14px;}
 
-    /* ── Stats Row ── */
-    .pp-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: rgba(255,255,255,.1);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 28px;
-    }
+/* TIER CARDS ROW */
+.tier-showcase{background:var(--dark);padding:16px 24px 80px;position:relative;z-index:5;}
+.tier-cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1080px;margin:0 auto;}
 
-    .pp-stat-cell {
-      background: rgba(255,255,255,.07);
-      padding: 16px 12px;
-      text-align: center;
-    }
+.tier-card{border-radius:20px;overflow:hidden;position:relative;cursor:pointer;transition:.3s;border:1.5px solid rgba(255,255,255,.07);}
+.tier-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.tier-card.featured{transform:scale(1.04);box-shadow:0 20px 60px rgba(124,58,237,.3);}
+.tier-card.featured:hover{transform:scale(1.04) translateY(-6px);}
 
-    .pp-stat-num   { font-size: 26px; font-weight: 900; font-family: 'Nunito', sans-serif; color: #F5D679; }
-    .pp-stat-label { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 4px; }
+.tc-gradient{padding:28px 24px 20px;}
+.explore .tc-gradient{background:linear-gradient(145deg,#0f2057,#1a56db);}
+.together .tc-gradient{background:linear-gradient(145deg,#2d1b69,#7c3aed);}
+.legacy .tc-gradient{background:linear-gradient(145deg,#1a0a00,#92400e);}
+.tc-badge-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.tc-badge{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.explore .tc-badge{background:rgba(147,197,253,.2);color:#93c5fd;border:1px solid rgba(147,197,253,.3);}
+.together .tc-badge{background:rgba(196,181,253,.2);color:#c4b5fd;border:1px solid rgba(196,181,253,.3);}
+.legacy .tc-badge{background:rgba(253,230,138,.2);color:#fde68a;border:1px solid rgba(253,230,138,.3);}
+.together .tc-badge-row .feat-label{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(201,168,76,.2);color:var(--gold2);border:1px solid rgba(201,168,76,.3);}
+.tc-emblem{font-size:42px;margin-bottom:12px;display:block;}
+.tc-name{font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;}
+.tc-tagline{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;}
 
-    /* ── Plans Grid ── */
-    .pp-plan {
-      background: #fff;
-      border: 2px solid #DDE3EE;
-      border-radius: 20px;
-      padding: 28px;
-      position: relative;
-      transition: transform .2s, box-shadow .2s;
-      cursor: pointer;
-    }
+.tc-price-block{margin:20px 0;padding:16px 0;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);}
+.tc-price{font-size:36px;font-weight:900;color:#fff;line-height:1;}
+.tc-price small{font-size:13px;font-weight:400;color:rgba(255,255,255,.5);}
+.tc-price-note{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;}
 
-    .pp-plan:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.12); }
+.tc-body{padding:20px 24px 24px;background:rgba(0,0,0,.3);}
+.tc-benefit-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.tc-benefit-list li{display:flex;align-items:center;gap:10px;font-size:12.5px;color:rgba(255,255,255,.8);}
+.tc-benefit-list li .ico{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+.tc-cta{display:block;text-align:center;padding:14px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;border:none;width:100%;}
+.explore .tc-cta{background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;}
+.together .tc-cta{background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;}
+.legacy .tc-cta{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#0d0d1a;}
+.tc-cta:hover{filter:brightness(1.12);transform:translateY(-1px);}
 
-    .pp-plan.featured {
-      border-color: #B8860B;
-      box-shadow: 0 8px 32px rgba(184,134,11,.2);
-    }
+/* SECTIONS */
+.section{padding:80px 24px;}
+.section-inner{max-width:1080px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.section-title{font-family:'Cinzel',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:16px;color:var(--navy);}
+.section-sub{font-size:1.05rem;color:var(--muted);max-width:560px;line-height:1.7;margin-bottom:48px;}
 
-    .pp-plan-badge {
-      position: absolute;
-      top: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #B8860B, #D4A017);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 16px;
-      border-radius: 20px;
-      white-space: nowrap;
-      letter-spacing: .04em;
-    }
+/* BENEFIT MATRIX TABLE */
+.benefit-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.benefit-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
+.benefit-table th{padding:14px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.6);text-align:center;}
+.benefit-table th:first-child{text-align:left;color:var(--muted);}
+.benefit-table td{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.05);text-align:center;}
+.benefit-table td:first-child{text-align:left;font-weight:600;font-size:13px;color:rgba(255,255,255,.85);}
+.benefit-table tr:last-child td{border-bottom:none;}
+.benefit-table thead tr{background:rgba(255,255,255,.04);}
+.bm-wrap{background:linear-gradient(145deg,#0a1628,#111d35);border-radius:20px;border:1px solid rgba(201,168,76,.12);overflow:hidden;}
+.bm-explore-h{background:linear-gradient(145deg,#0f2057,#1a56db)!important;}
+.bm-together-h{background:linear-gradient(145deg,#2d1b69,#7c3aed)!important;}
+.bm-legacy-h{background:linear-gradient(145deg,#1a0a00,#92400e)!important;}
+.bm-check{color:#4ade80;font-size:16px;}
+.bm-cross{color:rgba(255,255,255,.15);}
+.bm-text{font-size:12px;color:rgba(255,255,255,.7);}
+.tier-h-cell{padding:20px;border-radius:0;}
+.tier-h-name{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:#fff;margin:8px 0 2px;}
+.tier-h-price{font-size:20px;font-weight:900;color:#fff;}
+.tier-h-sub{font-size:10px;color:rgba(255,255,255,.5);}
+.tier-h-emblem{font-size:28px;}
 
-    .pp-plan-icon  { font-size: 36px; margin-bottom: 14px; }
-    .pp-plan-name  { font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 900; color: #080E1E; margin-bottom: 8px; }
-    .pp-plan-price { font-size: 42px; font-weight: 900; color: #B8860B; line-height: 1; margin-bottom: 4px; font-family: 'Nunito', sans-serif; }
-    .pp-plan-price sub { font-size: 14px; color: #6B7280; font-weight: 600; }
-    .pp-plan-gst   { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
+/* VOUCHER CARDS */
+.voucher-showcase{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.voucher-preview{background:linear-gradient(135deg,#0f1f3d,#1a2f5a);border-radius:14px;padding:18px;border:1px solid rgba(201,168,76,.12);transition:.2s;}
+.voucher-preview:hover{border-color:rgba(201,168,76,.3);transform:translateY(-3px);}
+.vp-icon{font-size:30px;margin-bottom:10px;}
+.vp-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;}
+.vp-desc{font-size:11px;color:rgba(255,255,255,.5);line-height:1.5;}
+.vp-tag{display:inline-block;margin-top:8px;padding:3px 10px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:20px;font-size:10px;font-weight:700;color:var(--gold2);}
 
-    .pp-plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-    .pp-plan-features li { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #1A2235; }
-    .pp-plan-features .chk { color: #B8860B; font-size: 15px; font-weight: 800; flex-shrink: 0; }
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:10px;max-width:720px;margin:0 auto;}
+.faq-item{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.faq-q{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:600;font-size:14px;transition:.2s;}
+.faq-q:hover{background:#fffdf5;}
+.faq-q i{transition:.3s;color:var(--gold);}
+.faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:.3s;font-size:13px;line-height:1.7;color:var(--muted);}
+.faq-a.open{padding:0 20px 16px;max-height:300px;}
+.faq-item.open .faq-q i{transform:rotate(180deg);}
 
-    .pp-value-note {
-      background: #FFF8E6;
-      border: 1px solid rgba(184,134,11,.2);
-      border-radius: 10px;
-      padding: 10px 14px;
-      text-align: center;
-      font-size: 13px;
-      color: #7A5000;
-      font-weight: 700;
-      margin-top: 16px;
-    }
+/* PROCESS STEPS */
+.steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+.step-card{text-align:center;padding:24px 16px;}
+.step-num{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;margin:0 auto 16px;font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#0d0d1a;}
+.step-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6;}
 
-    /* ── Benefits Grid ── */
-    .pp-benefit-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-      border: 1px solid #DDE3EE;
-      text-align: center;
-    }
+/* FINAL CTA */
+.final-cta{background:var(--dark);padding:100px 24px;text-align:center;position:relative;overflow:hidden;}
+.final-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,168,76,.08),transparent 70%);}
+.final-cta-title{font-family:'Cinzel',serif;font-size:clamp(2.5rem,6vw,4rem);font-weight:800;color:var(--white);margin-bottom:16px;position:relative;z-index:2;}
+.final-cta-sub{font-size:1.1rem;color:rgba(255,255,255,.5);max-width:500px;margin:0 auto 40px;position:relative;z-index:2;}
 
-    .pp-benefit-icon { font-size: 36px; margin-bottom: 12px; }
-    .pp-benefit-title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: #080E1E; margin-bottom: 6px; }
-    .pp-benefit-desc  { font-size: 13px; color: #6B7280; line-height: 1.5; }
+/* PRICING BADGE */
+.new-price{font-family:'Cinzel',serif;}
 
-    /* ── Process Steps ── */
-    .pp-process-step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      padding: 20px 0;
-      border-bottom: 1px solid #DDE3EE;
-    }
-
-    .pp-process-step:last-child { border-bottom: none; }
-
-    .pp-step-num {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2a1a00, #B8860B);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    .pp-step-content h4 { font-size: 15px; font-weight: 800; color: #080E1E; margin-bottom: 4px; }
-    .pp-step-content p  { font-size: 13px; color: #6B7280; line-height: 1.5; }
-
-    /* ── FAQ ── */
-    .pp-faq-item { border-bottom: 1px solid #DDE3EE; }
-    .pp-faq-item:last-child { border-bottom: none; }
-
-    .pp-faq-q {
-      width: 100%;
-      background: none;
-      border: none;
-      padding: 16px 0;
-      text-align: left;
-      font-family: 'Nunito', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #080E1E;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pp-faq-q span { font-size: 20px; transition: transform .2s; }
-    .pp-faq-q.open span { transform: rotate(45deg); }
-
-    .pp-faq-a {
-      font-size: 14px;
-      color: #6B7280;
-      line-height: 1.6;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .3s ease, padding .3s ease;
-    }
-
-    .pp-faq-a.open {
-      max-height: 200px;
-      padding-bottom: 16px;
-    }
-
-    /* ── Testimonials ── */
-    .pp-testimonial {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-      border: 1px solid #DDE3EE;
-    }
-
-    .pp-stars { font-size: 16px; margin-bottom: 10px; color: #F5A800; }
-    .pp-quote { font-size: 14px; color: #1A2235; line-height: 1.6; margin-bottom: 14px; font-style: italic; }
-    .pp-reviewer { display: flex; align-items: center; gap: 10px; }
-    .pp-reviewer-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #B8860B, #D4A017); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; font-family: 'Nunito', sans-serif; }
-    .pp-reviewer-name   { font-size: 14px; font-weight: 700; color: #080E1E; }
-    .pp-reviewer-meta   { font-size: 12px; color: #6B7280; }
-  </style>
+/* MOBILE */
+@media(max-width:800px){
+  .pp-nav{padding:16px 20px;}
+  .nav-links .nav-link{display:none;}
+  .tier-cards-row{grid-template-columns:1fr;gap:16px;}
+  .tier-card.featured{transform:none;}
+  .steps-row{grid-template-columns:1fr 1fr;}
+  .section{padding:60px 20px;}
+  .pp-hero-body{padding:40px 20px 30px;}
+}
+@media(max-width:500px){
+  .steps-row{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
-<div id="app">
 
-<!-- ── HERO ─────────────────────────────────────────────── -->
-<section class="pp-hero">
-  <div class="container" style="position:relative;z-index:2;padding-top:120px;padding-bottom:80px;">
-    <div style="display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;">
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="pp-hero" id="hero-section" data-wow-section="hero">
 
-      <!-- Left: Hero Text -->
-      <div>
-        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);border-radius:30px;padding:6px 20px;font-size:13px;font-weight:700;color:#F5D679;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;">
-          ⭐ Platinum Membership
-        </div>
+  <!-- Floating particles -->
+  <div class="pp-hero-particles" id="particles"></div>
 
-        <h1 style="font-family:'Nunito',sans-serif;font-size:clamp(34px,5vw,60px);font-weight:900;color:#fff;line-height:1.1;margin-bottom:16px;">
-          WOW Passport<br>
-          <span style="color:#F5D679;">Unlimited Fun.</span><br>
-          All Year Long.
-        </h1>
-
-        <p style="font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.8);margin-bottom:28px;max-width:500px;line-height:1.7;">
-          One pass. Both parks. Every single day of the year. Access to Water Park and Amusement Park with unlimited visits, priority gate entry, and exclusive member-only benefits.
-        </p>
-
-        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:28px;">
-          <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:14px 20px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:4px;">Annual Price</div>
-            <div style="font-size:38px;font-weight:900;color:#F5D679;font-family:'Nunito',sans-serif;line-height:1;">₹4,999</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.6);">incl. 18% GST</div>
-          </div>
-          <div>
-            <div style="font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;">
-              ✓ Just ₹1,042 per park visit (at 4 visits)<br>
-              ✓ Pays for itself in only 4 trips<br>
-              ✓ Valid 365 days from activation<br>
-              ✓ Priority scan at all gates
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <a href="book/passport.html" class="btn btn-accent" style="font-size:17px;padding:16px 36px;">
-            🌟 Get WOW Passport
-          </a>
-          <a href="#how-it-works" class="btn" style="font-size:16px;padding:15px 28px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);">
-            How It Works
-          </a>
-        </div>
-
-        <!-- Stats row -->
-        <div class="pp-stats">
-          <div class="pp-stat-cell">
-            <div class="pp-stat-num">365</div>
-            <div class="pp-stat-label">Days Valid</div>
-          </div>
-          <div class="pp-stat-cell">
-            <div class="pp-stat-num">2</div>
-            <div class="pp-stat-label">Parks Included</div>
-          </div>
-          <div class="pp-stat-cell">
-            <div class="pp-stat-num">∞</div>
-            <div class="pp-stat-label">Unlimited Visits</div>
-          </div>
-          <div class="pp-stat-cell">
-            <div class="pp-stat-num">50+</div>
-            <div class="pp-stat-label">Rides Access</div>
-          </div>
-        </div>
-
+  <!-- NAV -->
+  <nav class="pp-nav">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">🎢</div>
+      <div class="nav-logo-text">
+        <strong>Worlds of Wonder</strong>
+        <small>Noida, India</small>
       </div>
-
-      <!-- Right: Card Visual -->
-      <div style="flex-shrink:0;">
-        <div class="pp-card-visual">
-          <div class="pp-card-chip">💳</div>
-          <div class="pp-card-name">WOW PASSPORT</div>
-          <div class="pp-card-type">Annual Membership · Platinum</div>
-          <div class="pp-card-id">•••• •••• •••• 0001</div>
-          <div class="pp-card-meta">
-            <div>
-              <div class="cm-label">Valid Until</div>
-              <div class="cm-val" id="pp-expiry-disp">--/----</div>
-            </div>
-            <div>
-              <div class="cm-label">Park Access</div>
-              <div class="cm-val">BOTH PARKS</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── OFFER STRIP ─────────────────────────────────────── -->
-<div class="offer-strip" style="background:linear-gradient(90deg,#2a1a00,#7A5000,#2a1a00);">
-  <div class="offer-strip-inner">
-    <span style="color:#F5D679;">⭐ Annual Pass — ₹4,999</span>
-    <span>🌊 Water Park Unlimited</span>
-    <span>🎢 Amusement Park Unlimited</span>
-    <span>🥇 Priority Gate Access</span>
-    <span>💰 10% Off F&amp;B</span>
-    <span>🎁 Exclusive Member Events</span>
-  </div>
-</div>
-
-<!-- ── MEMBERSHIP PLANS ─────────────────────────────────── -->
-<section style="padding:80px 0;background:#F7F9FC;">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:56px;">
-      <div class="section-tag" style="background:#FFF8E6;color:#7A5000;border-color:rgba(184,134,11,.2);">Choose Your Plan</div>
-      <h2 class="section-title">WOW Passport Plans</h2>
-      <p class="section-sub">Pick the right membership for you and your family.</p>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;max-width:1000px;margin:0 auto;">
-
-      <!-- Individual Plan -->
-      <div class="pp-plan" onclick="selectPlan('individual')">
-        <div class="pp-plan-icon">🧑</div>
-        <div class="pp-plan-name">Individual</div>
-        <div class="pp-plan-price">₹4,999 <sub>/year</sub></div>
-        <div class="pp-plan-gst">Incl. 18% GST</div>
-        <ul class="pp-plan-features">
-          <li><span class="chk">★</span> 1 person — unlimited visits</li>
-          <li><span class="chk">★</span> Both Water and Amusement Parks</li>
-          <li><span class="chk">★</span> Priority QR entry at all gates</li>
-          <li><span class="chk">★</span> 10% discount on Food and Beverages</li>
-          <li><span class="chk">★</span> Exclusive member events access</li>
-          <li><span class="chk">★</span> Early access to new rides</li>
-          <li><span class="chk">★</span> Digital passport on your phone</li>
-        </ul>
-        <a href="book/passport.html?plan=individual" class="btn" style="display:block;text-align:center;background:linear-gradient(135deg,#2a1a00,#B8860B);color:#fff;padding:14px;font-size:15px;font-weight:800;">
-          Get Individual Passport
-        </a>
-        <div class="pp-value-note">Pays for itself in just 4 visits!</div>
-      </div>
-
-      <!-- Couple Plan -->
-      <div class="pp-plan featured" onclick="selectPlan('couple')">
-        <div class="pp-plan-badge">Most Popular</div>
-        <div class="pp-plan-icon">💑</div>
-        <div class="pp-plan-name">Couple</div>
-        <div class="pp-plan-price">₹8,999 <sub>/year</sub></div>
-        <div class="pp-plan-gst">For 2 persons · Incl. 18% GST</div>
-        <ul class="pp-plan-features">
-          <li><span class="chk">★</span> 2 persons — unlimited visits</li>
-          <li><span class="chk">★</span> Both Water and Amusement Parks</li>
-          <li><span class="chk">★</span> Priority QR entry at all gates</li>
-          <li><span class="chk">★</span> 15% discount on Food and Beverages</li>
-          <li><span class="chk">★</span> Exclusive couple events and surprises</li>
-          <li><span class="chk">★</span> Early access to new rides</li>
-          <li><span class="chk">★</span> Save ₹999 vs two individual passes</li>
-        </ul>
-        <a href="book/passport.html?plan=couple" class="btn btn-accent" style="display:block;text-align:center;padding:14px;font-size:15px;font-weight:800;">
-          Get Couple Passport
-        </a>
-        <div class="pp-value-note">Save ₹999 vs two individual passes!</div>
-      </div>
-
-      <!-- Family Plan -->
-      <div class="pp-plan" onclick="selectPlan('family')">
-        <div class="pp-plan-icon">👨‍👩‍👧‍👦</div>
-        <div class="pp-plan-name">Family</div>
-        <div class="pp-plan-price">₹15,999 <sub>/year</sub></div>
-        <div class="pp-plan-gst">For 2+2 (2 adults + 2 children) · Incl. GST</div>
-        <ul class="pp-plan-features">
-          <li><span class="chk">★</span> 2 adults + 2 children (up to 14 yrs)</li>
-          <li><span class="chk">★</span> Both Water and Amusement Parks</li>
-          <li><span class="chk">★</span> Priority QR entry for all members</li>
-          <li><span class="chk">★</span> 20% discount on Food and Beverages</li>
-          <li><span class="chk">★</span> Kids special birthday event discount</li>
-          <li><span class="chk">★</span> Additional children at ₹2,999 each</li>
-          <li><span class="chk">★</span> Save ₹4,997 vs separate tickets</li>
-        </ul>
-        <a href="book/passport.html?plan=family" class="btn" style="display:block;text-align:center;background:linear-gradient(135deg,#2a1a00,#B8860B);color:#fff;padding:14px;font-size:15px;font-weight:800;">
-          Get Family Passport
-        </a>
-        <div class="pp-value-note">Best value for families with kids!</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── MEMBER BENEFITS ──────────────────────────────────── -->
-<section style="padding:72px 0;background:#fff;">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:48px;">
-      <div class="section-tag" style="background:#FFF8E6;color:#7A5000;border-color:rgba(184,134,11,.2);">Exclusive Privileges</div>
-      <h2 class="section-title">What Passport Members Get</h2>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🌊</div>
-        <div class="pp-benefit-title">Unlimited Park Access</div>
-        <div class="pp-benefit-desc">Visit Water Park and Amusement Park as many times as you like for 365 days.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🥇</div>
-        <div class="pp-benefit-title">Priority Gate Entry</div>
-        <div class="pp-benefit-desc">Skip the regular queue. Dedicated passport lane for faster entry at all park gates.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🍔</div>
-        <div class="pp-benefit-title">F&amp;B Discounts</div>
-        <div class="pp-benefit-desc">10-20% off at all food courts, restaurants, and kiosks inside the park.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🎪</div>
-        <div class="pp-benefit-title">Exclusive Events</div>
-        <div class="pp-benefit-desc">Invitation-only member events, night parties, holiday specials, and new ride unveilings.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🎁</div>
-        <div class="pp-benefit-title">Discounted Guest Passes</div>
-        <div class="pp-benefit-desc">Bring friends and family at 20% discounted day-entry rates anytime.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">📱</div>
-        <div class="pp-benefit-title">Digital Passport</div>
-        <div class="pp-benefit-desc">Your passport lives on your phone. No physical card needed. Scan and walk in.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🔔</div>
-        <div class="pp-benefit-title">Flash Offer Alerts</div>
-        <div class="pp-benefit-desc">Get first access to flash sales, seasonal offers, and member-only promotions via WhatsApp.</div>
-      </div>
-
-      <div class="pp-benefit-card">
-        <div class="pp-benefit-icon">🛍</div>
-        <div class="pp-benefit-title">Merchandise Discount</div>
-        <div class="pp-benefit-desc">15% off all WOW merchandise, costumes, and souvenir items at park shops.</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── HOW IT WORKS ──────────────────────────────────────── -->
-<section id="how-it-works" style="padding:72px 0;background:#F7F9FC;">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 420px;gap:56px;align-items:center;">
-
-      <div>
-        <div class="section-tag" style="background:#FFF8E6;color:#7A5000;border-color:rgba(184,134,11,.2);">Simple Onboarding</div>
-        <h2 class="section-title" style="text-align:left;">How to Get Your WOW Passport</h2>
-        <p class="section-sub" style="text-align:left;max-width:100%;">The entire process is digital. Takes less than 5 minutes from your phone.</p>
-
-        <div style="margin-top:28px;">
-
-          <div class="pp-process-step">
-            <div class="pp-step-num">1</div>
-            <div class="pp-step-content">
-              <h4>Choose Your Plan and Pay Online</h4>
-              <p>Select Individual, Couple, or Family plan. Pay securely via UPI, Card, Net Banking, or Wallet. Instant confirmation.</p>
-            </div>
-          </div>
-
-          <div class="pp-process-step">
-            <div class="pp-step-num">2</div>
-            <div class="pp-step-content">
-              <h4>Complete Digital KYC</h4>
-              <p>Upload a selfie and Aadhaar/PAN for quick identity verification. Automated OCR reads your details. Takes under 2 minutes.</p>
-            </div>
-          </div>
-
-          <div class="pp-process-step">
-            <div class="pp-step-num">3</div>
-            <div class="pp-step-content">
-              <h4>Verification and Activation (24-48 hours)</h4>
-              <p>Our team verifies your KYC. You receive an SMS and WhatsApp confirmation once your passport is activated.</p>
-            </div>
-          </div>
-
-          <div class="pp-process-step">
-            <div class="pp-step-num">4</div>
-            <div class="pp-step-content">
-              <h4>Receive Your Digital Passport</h4>
-              <p>Your unique QR code and passport ID arrive via WhatsApp and Email. Valid for 365 days from activation date.</p>
-            </div>
-          </div>
-
-          <div class="pp-process-step">
-            <div class="pp-step-num">5</div>
-            <div class="pp-step-content">
-              <h4>Visit Anytime — Show and Scan</h4>
-              <p>Show your digital passport at the dedicated passport lane. Scan and walk straight in. No queuing.</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Timeline visual -->
-      <div style="background:linear-gradient(135deg,#2a1a00,#B8860B);border-radius:24px;padding:32px;color:#fff;">
-        <h3 style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;margin-bottom:20px;color:#F5D679;">Validity Timeline</h3>
-
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-            <div style="font-size:24px;">📅</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.06em;">Activation</div>
-              <div style="font-size:14px;font-weight:700;">Day 1: Passport Activated</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-            <div style="font-size:24px;">🌊</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.06em;">Day 7</div>
-              <div style="font-size:14px;font-weight:700;">First Visit — You've Recouped 25%</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-            <div style="font-size:24px;">💰</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.06em;">Visit 4</div>
-              <div style="font-size:14px;font-weight:700;">Break Even — All Further Visits FREE!</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;border:1px solid rgba(255,215,0,.3);">
-            <div style="font-size:24px;">🎉</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,215,0,.8);text-transform:uppercase;letter-spacing:.06em;">Day 30 Reminder</div>
-              <div style="font-size:14px;font-weight:700;">Renewal Reminder via WhatsApp</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-            <div style="font-size:24px;">🔄</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.06em;">Day 335</div>
-              <div style="font-size:14px;font-weight:700;">Early Renewal Offer Unlocked</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
-            <div style="font-size:24px;">📆</div>
-            <div>
-              <div style="font-size:11px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.06em;">Day 365</div>
-              <div style="font-size:14px;font-weight:700;">Passport Expires (Renew to Continue)</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── TESTIMONIALS ──────────────────────────────────────── -->
-<section style="padding:72px 0;background:#fff;">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:48px;">
-      <div class="section-tag" style="background:#FFF8E6;color:#7A5000;border-color:rgba(184,134,11,.2);">Member Stories</div>
-      <h2 class="section-title">What Our Passport Members Say</h2>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
-
-      <div class="pp-testimonial">
-        <div class="pp-stars">★★★★★</div>
-        <div class="pp-quote">"We visit almost every weekend! The passport paid for itself in the first month. Priority entry is a game-changer on busy days. Highly recommend for families."</div>
-        <div class="pp-reviewer">
-          <div class="pp-reviewer-avatar">R</div>
-          <div>
-            <div class="pp-reviewer-name">Rahul Verma</div>
-            <div class="pp-reviewer-meta">Family Passport · Member since 2023</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pp-testimonial">
-        <div class="pp-stars">★★★★★</div>
-        <div class="pp-quote">"My kids absolutely love WOW. With the family passport, we come whenever we feel like it without worrying about the cost. The F&B discount is a nice bonus too!"</div>
-        <div class="pp-reviewer">
-          <div class="pp-reviewer-avatar">P</div>
-          <div>
-            <div class="pp-reviewer-name">Priya Sharma</div>
-            <div class="pp-reviewer-meta">Family Passport · Noida Sector 50</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pp-testimonial">
-        <div class="pp-stars">★★★★★</div>
-        <div class="pp-quote">"Perfect for a couple like us. The passport has unlocked so many exclusive events that we would have missed. The digital KYC process was super quick and easy."</div>
-        <div class="pp-reviewer">
-          <div class="pp-reviewer-avatar">A</div>
-          <div>
-            <div class="pp-reviewer-name">Amit and Neha</div>
-            <div class="pp-reviewer-meta">Couple Passport · Delhi NCR</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── FAQ ──────────────────────────────────────────────── -->
-<section style="padding:72px 0;background:#F7F9FC;">
-  <div class="container">
-    <div style="max-width:720px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:48px;">
-        <div class="section-tag" style="background:#FFF8E6;color:#7A5000;border-color:rgba(184,134,11,.2);">Got Questions?</div>
-        <h2 class="section-title">WOW Passport FAQ</h2>
-      </div>
-
-      <div style="background:#fff;border-radius:20px;padding:8px 28px;box-shadow:0 4px 24px rgba(0,0,0,.07);border:1px solid #DDE3EE;">
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            Can I visit on any day of the year? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            Yes! Your WOW Passport is valid on any day that the park is open — 365 days a year, including weekends, public holidays, and festivals. No blackout dates for standard passport holders.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            Is the passport transferable? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            No. The WOW Passport is strictly non-transferable and linked to the registered holder's identity verified during KYC. Photo ID must match at the gate.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            What documents are needed for KYC? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            You need a valid government-issued photo ID such as Aadhaar Card, PAN Card, Passport, or Driving Licence, plus a recent selfie for face-match verification.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            When does my passport start? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            Your 365-day validity begins from the date of KYC approval and activation, not from the date of purchase. KYC approval typically takes 24 to 48 hours after submission.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            Can I upgrade my plan later? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            Yes! You can upgrade from Individual to Couple or Family at any time during your membership by paying the difference. Contact our helpline or visit the portal to upgrade.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            Is there an early renewal offer? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            Yes! Renew your passport within 30 days before expiry and get a special loyalty discount of up to ₹500 off. You will be notified via WhatsApp and SMS 30 days before expiry.
-          </div>
-        </div>
-
-        <div class="pp-faq-item">
-          <button class="pp-faq-q" onclick="toggleFaq(this)">
-            What is the refund policy? <span>+</span>
-          </button>
-          <div class="pp-faq-a">
-            Passports are non-refundable after KYC activation. However, if activation is delayed beyond 7 days due to our processing issues, a full refund is available. Contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6d1e181d1d021f192d1a021f01091e020b1a020309081f430403">[email&#160;protected]</a>.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA ───────────────────────────────────────────────── -->
-<section style="padding:80px 0;background:linear-gradient(135deg,#0a0800,#2a1a00,#B8860B);">
-  <div class="container" style="text-align:center;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);border-radius:30px;padding:6px 20px;font-size:12px;font-weight:700;color:#F5D679;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;">
-      Limited Slots Available
-    </div>
-    <h2 style="font-family:'Nunito',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:900;color:#fff;margin-bottom:14px;">
-      Join 25,000+ WOW Passport Members
-    </h2>
-    <p style="font-size:16px;color:rgba(255,255,255,.8);max-width:480px;margin:0 auto 32px;line-height:1.6;">
-      Start your unlimited adventure today. Apply online in minutes. No physical paperwork.
-    </p>
-    <a href="book/passport.html" class="btn btn-accent" style="font-size:18px;padding:18px 48px;">
-      🌟 Get WOW Passport — From ₹4,999/year
     </a>
-    <div style="margin-top:14px;font-size:13px;color:rgba(255,255,255,.6);">
-      Digital KYC · Instant confirmation · Valid 365 days
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="water-park.html" class="nav-link">Water Park</a>
+      <a href="amusement-park.html" class="nav-link">Amusement Park</a>
+      <a href="offers.html" class="nav-link">Offers</a>
+      <a href="portal/login.html" class="nav-link">My Account</a>
+      <a href="#buy-now" class="nav-btn"><i class="fas fa-passport"></i> Get Passport</a>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="pp-hero-body">
+    <div class="pp-eyebrow">
+      <i class="fas fa-crown" style="font-size:12px;color:var(--gold);"></i>
+      <span>WOW Passport — Annual Membership</span>
+    </div>
+    <h1 class="pp-hero-title">Your World,<br><span>Unlimited.</span></h1>
+    <p class="pp-hero-sub">One premium membership. Both parks. 365 days. Exclusive F&B discounts, priority lanes, birthday privileges, guest passes, and more.</p>
+    <div class="pp-hero-ctas">
+      <a href="#buy-now" class="cta-primary"><i class="fas fa-arrow-down"></i> Choose Your Tier</a>
+      <a href="#compare" class="cta-secondary">Compare Benefits</a>
+    </div>
+    <div class="trust-strip">
+      <div class="trust-item"><i class="fas fa-check-circle"></i><span>Unlimited park entry</span></div>
+      <div class="trust-item"><i class="fas fa-check-circle"></i><span>Digital passport + QR</span></div>
+      <div class="trust-item"><i class="fas fa-check-circle"></i><span>Instant issuance</span></div>
+      <div class="trust-item"><i class="fas fa-check-circle"></i><span>Transferable on renewal</span></div>
+      <div class="trust-item"><i class="fas fa-check-circle"></i><span>India DPDP compliant KYC</span></div>
     </div>
   </div>
 </section>
 
-</div><!-- /app -->
+<!-- ═══════════════ TIER SHOWCASE ═══════════════ -->
+<section class="tier-showcase" id="buy-now">
+  <div style="text-align:center;padding:0 0 40px;position:relative;z-index:5;">
+    <div class="pp-eyebrow" style="display:inline-flex;margin-bottom:16px;"><span>Choose Your Plan</span></div>
+    <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:var(--white);">Three Tiers of Wonder</h2>
+    <p style="color:rgba(255,255,255,.45);font-size:1rem;margin-top:8px;">All tiers include unlimited access to both Worlds of Wonder parks</p>
+  </div>
+  <div class="tier-cards-row" id="tier-cards-container">
+    <!-- Rendered by JS -->
+    <div style="text-align:center;padding:40px;color:rgba(255,255,255,.3);grid-column:1/-1;">Loading passport tiers…</div>
+  </div>
+</section>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/wow-content-control.js"></script>
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<section class="section" style="background:var(--white);">
+  <div class="section-inner">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div class="section-label">Simple Process</div>
+      <h2 class="section-title" style="margin:0 auto 12px;text-align:center;">Get Your Passport in 4 Steps</h2>
+      <p class="section-sub" style="text-align:center;margin:0 auto;">From choosing your tier to walking through our gates — it's fast, digital, and completely paperless.</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-title">Choose Your Tier</div>
+        <div class="step-desc">Select Explore, Together, or Legacy based on your family size and needs.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-title">Complete KYC</div>
+        <div class="step-desc">Quick identity verification — upload your photo and ID proof securely online.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-title">Make Payment</div>
+        <div class="step-desc">Pay via UPI, card, or net banking. Your invoice is generated instantly.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <div class="step-title">Enter the Park</div>
+        <div class="step-desc">Scan your digital passport QR at the gate. No printing required.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ BENEFIT MATRIX ═══════════════ -->
+<section class="section" style="background:var(--off);" id="compare">
+  <div class="section-inner">
+    <div class="section-label">Full Comparison</div>
+    <h2 class="section-title">Compare All Benefits</h2>
+    <div class="bm-wrap" id="benefit-matrix">
+      <div style="text-align:center;padding:40px;color:rgba(255,255,255,.3);">Loading comparison table…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ VOUCHERS ═══════════════ -->
+<section class="section" style="background:var(--dark);">
+  <div class="section-inner">
+    <div class="section-label" style="color:var(--gold);">Included Vouchers</div>
+    <h2 class="section-title" style="color:var(--white);">Your Voucher Collection</h2>
+    <p class="section-sub" style="color:rgba(255,255,255,.5);">Every WOW Passport comes loaded with premium vouchers — redeemable digitally at the park.</p>
+    <div class="voucher-showcase" id="voucher-showcase">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FAQ ═══════════════ -->
+<section class="section" style="background:var(--white);">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">Questions Answered</div>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <div class="faq-list" id="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How many times can I visit with a WOW Passport? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">WOW Passport gives you unlimited visits to both Worlds of Wonder parks for the full validity period (365 days from purchase). There is no cap on the number of visits.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is the passport digital only or does it include a physical card? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Your WOW Passport is digital-first — a beautifully designed digital card with your photo, name, and unique QR code. You can save it to your phone or print it. An optional premium physical card can be requested at the park counter.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I add family members after purchasing the Together or Legacy plan? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Family members must be enrolled at the time of purchase for Together (up to 4) and Legacy (up to 6) plans. Adding members post-purchase requires contacting our support team and may involve an additional fee.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What documents are required for KYC? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">For Explore (Basic KYC): a recent photo/selfie. For Together (Full KYC): photo, government ID, and address proof. For Legacy (Enhanced KYC): photo, government ID, address proof, and a selfie-with-ID. All documents are processed under India's DPDP Act 2023.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What happens if my KYC is rejected? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Our KYC team will raise a query explaining what's needed. You can re-submit up to 3 times. If rejected permanently, a full refund will be processed within 5–7 business days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I renew my passport before it expires? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Yes! You can renew up to 30 days before expiry (60 days for Legacy). Early renewal adds a bonus validity period on top of your new year. Renewal rates are discounted.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Are F&B vouchers valid on all food outlets? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Yes, the F&B discount applies to all food and beverage outlets within Worlds of Wonder. Some exclusions may apply during special events or on combo/meal deals already at discounted rates.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FINAL CTA ═══════════════ -->
+<section class="final-cta">
+  <div style="position:relative;z-index:2;">
+    <div class="pp-eyebrow" style="display:inline-flex;margin-bottom:20px;"><span>Limited Time — Launch Offer</span></div>
+    <h2 class="final-cta-title">Ready to Make It <span style="background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Unlimited?</span></h2>
+    <p class="final-cta-sub">Join thousands of WOW Passport holders enjoying unlimited access, priority entry, and premium privileges year-round.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="#buy-now" class="cta-primary"><i class="fas fa-passport"></i> Get Your WOW Passport</a>
+      <a href="tel:08069090000" class="cta-secondary"><i class="fas fa-phone"></i> Call to Purchase</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (injected by shell.js) -->
 <script src="js/wow-modules.js"></script>
 <script src="js/shell.js"></script>
+<script src="js/wow-content-control.js"></script>
 <script>
-(function() {
-  if (typeof WOWContent !== 'undefined') {
-    var pCfg = WOWContent.getProductCfg();
-    if (pCfg.PASSPORT && pCfg.PASSPORT.enabled === false) {
-      var app = document.getElementById('app');
-      if (app) app.innerHTML = '<div style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;"><div style="font-size:56px;margin-bottom:16px;">&#129370;</div><h2 style="font-family:Nunito,sans-serif;font-size:26px;font-weight:900;color:#003D82;margin-bottom:12px;">WOW Passport Temporarily Unavailable</h2><p style="font-size:16px;color:#6B7280;max-width:480px;margin-bottom:28px;">Annual Passport sales are currently paused. Please check back soon or contact us for assistance.</p><a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:#003D82;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;">&#8592; Back to Home</a></div>';
+/* ══════════════════════════════════════
+   PASSPORT STOREFRONT — dynamic render
+   ══════════════════════════════════════ */
+
+(function(){
+  // Initialize engine
+  if(typeof WPE !== 'undefined'){
+    if(WPE.initialize) WPE.initialize();
+    renderTierCards();
+    renderBenefitMatrix();
+    renderVoucherShowcase();
+  }
+
+  // Floating particles
+  const container = document.getElementById('particles');
+  if(container){
+    for(let i=0;i<40;i++){
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.cssText = `left:${Math.random()*100}%;animation-delay:${Math.random()*12}s;animation-duration:${8+Math.random()*8}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+      container.appendChild(p);
+    }
+  }
+
+  function renderTierCards(){
+    const products = WPE.getProducts().filter(p => p.status === 'active').sort((a,b) => a.displayOrder - b.displayOrder);
+    const tiers = WPE.getTiers();
+    const container = document.getElementById('tier-cards-container');
+    if(!products.length){
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,.3);grid-column:1/-1;">No passport products available at this time.</div>';
       return;
     }
-    WOWContent.apply();
+    const tierClassMap = {explore:'explore',together:'together together',legacy:'legacy'};
+    const isFeatured = (idx) => idx === 1;
+    container.innerHTML = products.slice(0,3).map((p, idx) => {
+      const tier = tiers.find(t => t.id === p.tierId) || {};
+      const tClass = tierClassMap[tier.id] || 'explore';
+      const featured = isFeatured(idx);
+      const benefits = (p.benefits || []).slice(0,6);
+      const gst = p.taxInclusive ? '(GST incl.)' : '+ 18% GST';
+      return `
+      <div class="tier-card ${tClass}${featured ? ' featured' : ''}">
+        ${featured ? '<div style="text-align:center;padding:6px;background:linear-gradient(90deg,var(--gold3),var(--gold));font-size:10px;font-weight:700;color:#0d0d1a;letter-spacing:1px;">⭐ MOST POPULAR</div>' : ''}
+        <div class="tc-gradient">
+          <div class="tc-badge-row">
+            <span class="tc-badge">${tier.code || tier.id}</span>
+            ${featured ? '<span class="feat-label">Family Plan</span>' : ''}
+          </div>
+          <span class="tc-emblem">${tier.emblemIcon || '🌟'}</span>
+          <div class="tc-name">${tier.displayName || tier.name}</div>
+          <div class="tc-tagline">${tier.tagline || ''}</div>
+          <div class="tc-price-block">
+            <div class="tc-price">₹${Number(p.basePrice).toLocaleString('en-IN')}<small>/year</small></div>
+            <div class="tc-price-note">${gst} · ${tier.maxHolders} holder${tier.maxHolders > 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <div class="tc-body">
+          <ul class="tc-benefit-list">
+            ${benefits.map(b => `<li><span class="ico">${b.icon}</span>${b.text}</li>`).join('')}
+            ${benefits.length < (p.benefits||[]).length ? `<li style="color:rgba(255,255,255,.4);font-size:11px;padding-left:30px;">+${(p.benefits||[]).length - benefits.length} more benefits…</li>` : ''}
+          </ul>
+          <a href="book/passport.html?product=${p.id}" class="tc-cta">
+            <i class="fas fa-passport"></i> Get ${tier.name} Passport
+          </a>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderBenefitMatrix(){
+    const products = WPE.getProducts().filter(p => p.status === 'active').sort((a,b) => a.displayOrder - b.displayOrder).slice(0,3);
+    const tiers = WPE.getTiers();
+    const allBenefits = [
+      {key:'park_access', label:'Park Access', values:['Both parks unlimited','Both parks unlimited','Both parks unlimited']},
+      {key:'validity', label:'Validity', values:['365 days','365 days','365 days']},
+      {key:'holders', label:'Holders Covered', values:['1 person','Up to 4 members','Up to 6 members']},
+      {key:'fnb', label:'F&B Discount', values:['10% off','15% off','25% off']},
+      {key:'locker', label:'Free Locker', values:['Once/month','Every visit','Unlimited']},
+      {key:'vip_lane', label:'Priority / VIP Lane', values:['', 'check', 'check']},
+      {key:'birthday', label:'Birthday Experience', values:['Birthday upgrade','Party pack','VIP birthday suite']},
+      {key:'guest', label:'Guest Passes', values:['', '2 passes/year','4 passes/year']},
+      {key:'photo', label:'Photo Session', values:['', 'check','check']},
+      {key:'merch', label:'Merchandise Credit', values:['','','₹1,000 credit']},
+      {key:'lounge', label:'VIP Lounge', values:['','','check']},
+      {key:'concierge', label:'Concierge Service', values:['','','check']},
+    ];
+    const tierClassesH = ['bm-explore-h','bm-together-h','bm-legacy-h'];
+    const tierEmblem = products.map((p,i) => {
+      const tier = tiers.find(t => t.id === p.tierId) || {};
+      return `<th class="tier-h-cell ${tierClassesH[i] || ''}">
+        <div class="tier-h-emblem">${tier.emblemIcon || '🌟'}</div>
+        <div class="tier-h-name">${tier.displayName || tier.name}</div>
+        <div class="tier-h-price">₹${Number(p.basePrice).toLocaleString('en-IN')}</div>
+        <div class="tier-h-sub">/year</div>
+      </th>`;
+    });
+    const rows = allBenefits.map(b => {
+      const vals = b.values.map(v => {
+        if(!v) return `<td><span class="bm-cross">—</span></td>`;
+        if(v === 'check') return `<td><i class="fas fa-check-circle bm-check"></i></td>`;
+        return `<td><span class="bm-text">${v}</span></td>`;
+      });
+      return `<tr><td>${b.label}</td>${vals.join('')}</tr>`;
+    });
+    document.getElementById('benefit-matrix').innerHTML = `
+    <div class="benefit-table-wrap">
+      <table class="benefit-table">
+        <thead><tr>
+          <th>Benefit</th>
+          ${tierEmblem.join('')}
+        </tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
+  function renderVoucherShowcase(){
+    const vouchers = WPE.getVouchers().filter(v => v.status === 'active');
+    const container = document.getElementById('voucher-showcase');
+    // Show highlight vouchers
+    const highlights = vouchers.filter(v => ['fnb_discount','birthday','guest_entry','locker','merchandise','lounge'].includes(v.category)).slice(0,8);
+    container.innerHTML = highlights.map(v => `
+      <div class="voucher-preview">
+        <div class="vp-icon">${v.displayIcon || '🎟'}</div>
+        <div class="vp-name">${v.name}</div>
+        <div class="vp-desc">${v.description || ''}</div>
+        <span class="vp-tag">${v.redeemQty === -1 ? 'Unlimited' : v.redeemQty + ' use'} · ${v.redeemFreq.replace('_',' ')}</span>
+      </div>`).join('');
   }
 })();
-</script>
-<script>
-// Set expiry display
-const d = new Date();
-d.setFullYear(d.getFullYear() + 1);
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const el = document.getElementById('pp-expiry-disp');
-if(el) el.textContent = months[d.getMonth()] + '/' + d.getFullYear();
 
 // FAQ toggle
-function toggleFaq(btn) {
-  const a = btn.nextElementSibling;
-  const isOpen = a.classList.contains('open');
-  // Close all
-  document.querySelectorAll('.pp-faq-a').forEach(el => el.classList.remove('open'));
-  document.querySelectorAll('.pp-faq-q').forEach(el => el.classList.remove('open'));
-  // Open selected if was closed
-  if (!isOpen) {
-    a.classList.add('open');
-    btn.classList.add('open');
+function toggleFaq(el){
+  const item = el.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => {
+    i.classList.remove('open');
+    i.querySelector('.faq-a').classList.remove('open');
+  });
+  if(!wasOpen){
+    item.classList.add('open');
+    item.querySelector('.faq-a').classList.add('open');
   }
 }
 
-// Plan selection
-function selectPlan(plan) {
-  window.location.href = 'book/passport.html?plan=' + plan;
-}
+// Apply content control
+if(typeof WOWContent !== 'undefined') WOWContent.apply();
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
