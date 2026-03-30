@@ -3,499 +3,1020 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Reseller ERP Portal — Worlds of Wonder</title>
+<title>Reseller ERP — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
 <script src="../js/wow-auth.js"></script>
+<script src="../js/reseller-engine.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
-:root{--brand:#ff6b35;--brand-dark:#e85a22;--brand-light:#fff3ee;--teal:#00b4d8;--green:#06d6a0;--red:#ef233c;--yellow:#ffd60a;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f8fafc;--white:#fff;--sidebar:260px;}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
-.shell{display:flex;min-height:100vh;}
-.sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
-.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
-.sidebar-logo .mark{width:38px;height:38px;background:var(--purple);border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:14px;}
-.sidebar-logo span{font-weight:700;font-size:14px;color:#fff;display:block;}
-.sidebar-logo small{font-size:10px;color:rgba(255,255,255,.5);}
-.reseller-badge{margin:14px;background:rgba(255,255,255,.07);border-radius:10px;padding:12px;}
-.reseller-badge .rname{font-size:13px;font-weight:700;}
-.reseller-badge .rcode{font-size:10px;color:rgba(255,255,255,.5);font-family:monospace;}
-.reseller-badge .rtier{display:inline-block;margin-top:6px;background:var(--purple);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
-.nav-section{padding:14px 0 6px;}
-.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.35);padding:0 18px 6px;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
-.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--purple);}
-.nav-item i{width:18px;text-align:center;font-size:13px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brand:#7c3aed;--brand2:#4f46e5;--navy:#0a1628;--teal:#0891b2;--green:#059669;
+  --red:#dc2626;--amber:#d97706;--blue:#1a56db;--orange:#ea580c;
+  --border:#e2e8f0;--text:#1e293b;--muted:#64748b;--surface:#f8fafc;
+  --white:#fff;--sidebar:264px;
+}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);display:flex;min-height:100vh;}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sb-brand{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sb-brand .logo-row{display:flex;align-items:center;gap:10px;}
+.sb-brand .mark{width:40px;height:40px;background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:900;color:#fff;}
+.sb-brand .name{font-size:14px;font-weight:800;color:#fff;}
+.sb-brand .sub{font-size:10px;color:rgba(255,255,255,.4);}
+.reseller-chip{margin:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;}
+.reseller-chip .rname{font-size:13px;font-weight:700;color:#fff;}
+.reseller-chip .rcode{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
+.reseller-chip .rtier{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:800;}
+.tier-platinum{background:rgba(124,58,237,.25);color:#c4b5fd;}
+.tier-gold{background:rgba(217,119,6,.2);color:#fcd34d;}
+.tier-silver{background:rgba(100,116,139,.2);color:#cbd5e1;}
+.tier-bronze{background:rgba(234,88,12,.2);color:#fdba74;}
+.sb-section{padding:10px 0 4px;}
+.sb-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:4px 18px 6px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:rgba(255,255,255,.65);cursor:pointer;border-left:3px solid transparent;transition:.15s;text-decoration:none;}
+.sb-item:hover,.sb-item.active{background:rgba(255,255,255,.06);color:#fff;border-left-color:var(--brand);}
+.sb-item i{width:18px;text-align:center;font-size:13px;}
+/* MAIN */
 .main{margin-left:var(--sidebar);flex:1;}
 .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-title{font-size:17px;font-weight:700;}
+.topbar-title{font-size:17px;font-weight:800;}
 .topbar-right{display:flex;align-items:center;gap:12px;}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
-.btn-purple{background:var(--purple);color:#fff;}
-.btn-purple:hover{background:#6d28d9;}
-.btn-brand{background:var(--brand);color:#fff;}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
-.btn-outline:hover{border-color:var(--purple);color:var(--purple);}
-.btn-sm{padding:5px 11px;font-size:12px;}
-.btn-green{background:var(--green);color:#fff;}
 .content{padding:24px 28px;}
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.stat-label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:26px;font-weight:900;margin:4px 0 2px;}
+.stat-sub{font-size:11px;color:var(--muted);}
+/* TABS */
 .tab-bar{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;flex-wrap:wrap;}
-.tab{padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
-.tab.active{background:var(--purple);color:#fff;}
+.tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.tab.active{background:var(--brand);color:#fff;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
-.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px;}
 .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
-.card-title{font-size:14px;font-weight:700;}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
-.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-.stat-value{font-size:26px;font-weight:800;margin:4px 0 2px;}
-.stat-sub{font-size:11px;color:var(--muted);}
+.card-title{font-size:14px;font-weight:800;color:var(--text);}
+/* TABLES */
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:13px;}
-thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
 tbody tr{border-bottom:1px solid var(--border);}
 tbody tr:last-child{border:none;}
-tbody td{padding:11px 14px;vertical-align:middle;}
+tbody td{padding:12px 14px;vertical-align:middle;}
 tbody tr:hover{background:#f9fafb;}
+/* CODES */
+.code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;border:1px solid;white-space:nowrap;}
+.code-res{background:#f0f4ff;color:#3730a3;border-color:#c7d2fe;}
+.code-bat{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.code-emp{background:#ecfeff;color:#155e75;border-color:#a5f3fc;}
+.code-tkt{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.code-alc{background:#faf5ff;color:#6d28d9;border-color:#e9d5ff;}
+/* BADGES */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .badge-green{background:#d1fae5;color:#065f46;}
-.badge-yellow{background:#fef9c3;color:#854d0e;}
-.badge-red{background:#fee2e2;color:#991b1b;}
 .badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-amber{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
 .badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-gray{background:#f3f4f6;color:#374151;}
 .badge-orange{background:#ffedd5;color:#9a3412;}
-/* INVENTORY CARDS */
-.inv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.inv-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px;transition:.2s;}
-.inv-card:hover{border-color:var(--purple);box-shadow:0 2px 12px rgba(124,58,237,.1);}
-.inv-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.inv-card-name{font-size:14px;font-weight:700;}
-.inv-card-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.inv-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
-.inv-stat{background:#f8fafc;border-radius:8px;padding:8px;text-align:center;}
-.inv-stat-val{font-size:16px;font-weight:800;}
-.inv-stat-lbl{font-size:10px;color:var(--muted);}
-/* QR GRID */
-.qr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
-.qr-ticket{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
-.qr-ticket .ticket-type{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;}
-.qr-ticket .ticket-id{font-family:monospace;font-size:10px;color:var(--muted);margin-top:6px;}
-.qr-ticket.used{opacity:.4;background:#f8fafc;}
-/* PROGRESS BAR */
-.progress-bar{height:7px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:4px;}
-.progress-fill{height:100%;border-radius:20px;transition:width .6s;}
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;}
-.modal-overlay.show{display:grid;}
-.modal{background:var(--white);border-radius:16px;width:90%;max-width:650px;max-height:90vh;overflow-y:auto;padding:28px;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.modal-title{font-size:17px;font-weight:700;}
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-purple{background:var(--brand);color:#fff;} .btn-purple:hover{background:#6d28d9;}
+.btn-green{background:var(--green);color:#fff;} .btn-green:hover{background:#047857;}
+.btn-red{background:#fef2f2;color:var(--red);border:1.5px solid #fecaca;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);} .btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:6px 13px;font-size:12px;}
+.btn-xs{padding:3px 9px;font-size:11px;}
+/* FILTERS */
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+.filter-row input,.filter-row select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;outline:none;font-family:'Inter',sans-serif;}
+.filter-row input:focus,.filter-row select:focus{border-color:var(--brand);}
+/* PROGRESS */
+.prog{height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;}
+/* ID CHAIN */
+.id-chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.idc{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:5px;border:1px solid;}
+.idc-r{background:#f0f4ff;color:#3730a3;border-color:#c7d2fe;}
+.idc-b{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.idc-e{background:#ecfeff;color:#155e75;border-color:#a5f3fc;}
+.idc-t{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:600px;box-shadow:0 24px 64px rgba(0,0,0,.2);margin:auto;}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:800;}
 .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
-.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
-label{font-size:12px;font-weight:600;color:var(--slate);}
-input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;width:100%;transition:.15s;}
-input:focus,select:focus{outline:none;border-color:var(--purple);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-@media(max-width:1000px){.grid-4{grid-template-columns:repeat(2,1fr);}.inv-grid{grid-template-columns:1fr 1fr;}.qr-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:600px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.grid-4,.inv-grid,.qr-grid{grid-template-columns:1fr;}}
+.modal-body{padding:24px;max-height:70vh;overflow-y:auto;}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.form-group label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;}
+.form-group input,.form-group select{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;font-family:'Inter',sans-serif;}
+.form-group input:focus,.form-group select:focus{border-color:var(--brand);}
+.form-group .hint{font-size:11px;color:var(--muted);}
+.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+/* PERF CARDS */
+.perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.perf-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px;transition:.2s;}
+.perf-card:hover{border-color:var(--brand);box-shadow:0 2px 12px rgba(124,58,237,.1);}
+.perf-card-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.perf-card-name{font-size:14px;font-weight:700;}
+.perf-card-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.perf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.ps{background:#f8fafc;border-radius:8px;padding:8px;text-align:center;}
+.ps-v{font-size:16px;font-weight:800;}
+.ps-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:10000;display:none;align-items:center;gap:8px;max-width:380px;}
+.toast.show{display:flex;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block;opacity:.35;}
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.stats-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
-<div class="shell">
+
+<!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="mark"><i class="fa fa-store" style="font-size:14px;"></i></div>
-    <div><span>Reseller Portal</span><small>Worlds of Wonder</small></div>
+  <div class="sb-brand">
+    <div class="logo-row">
+      <div class="mark">R</div>
+      <div><div class="name">Reseller ERP</div><div class="sub">Worlds of Wonder</div></div>
+    </div>
   </div>
-  <div class="reseller-badge">
-    <div class="rname">TravelMart India Pvt Ltd</div>
-    <div class="rcode">RS-CODE: TM-2024-1182</div>
-    <div class="rtier">💎 Platinum Reseller</div>
+  <div class="reseller-chip" id="sidebar-chip">
+    <div class="rname" id="chip-name">Loading…</div>
+    <div class="rcode" id="chip-code">—</div>
+    <span class="rtier" id="chip-tier">—</span>
   </div>
   <nav>
-    <div class="nav-section">
-      <div class="nav-label">ERP Modules</div>
-      <a class="nav-item active" href="index.html"><i class="fa fa-th-large"></i>Dashboard</a>
-      <a class="nav-item" href="#" onclick="switchTab('inventory',event)"><i class="fa fa-boxes"></i>Inventory</a>
-      <a class="nav-item" href="#" onclick="switchTab('bulk-qr',event)"><i class="fa fa-qrcode"></i>Bulk QR Tickets</a>
-      <a class="nav-item" href="#" onclick="switchTab('orders',event)"><i class="fa fa-shopping-cart"></i>Orders</a>
-      <a class="nav-item" href="#" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i>Commission Ledger</a>
-      <a class="nav-item" href="#" onclick="switchTab('team',event)"><i class="fa fa-users"></i>Team Management</a>
-      <a class="nav-item" href="#" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i>Reports</a>
+    <div class="sb-section">
+      <div class="sb-lbl">Dashboard</div>
+      <a class="sb-item active" onclick="showTab('dashboard')"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+      <a class="sb-item" onclick="showTab('batches')"><i class="fas fa-layer-group"></i>My Batches</a>
+      <a class="sb-item" onclick="showTab('allocations')"><i class="fas fa-sitemap"></i>Allocations</a>
+      <a class="sb-item" onclick="showTab('tickets')"><i class="fas fa-ticket-alt"></i>Issued Tickets</a>
     </div>
-    <div class="nav-section">
-      <div class="nav-label">Resources</div>
-      <a class="nav-item" href="#"><i class="fa fa-file-contract"></i>Agreement</a>
-      <a class="nav-item" href="#"><i class="fa fa-images"></i>Marketing Assets</a>
-      <a class="nav-item" href="#"><i class="fa fa-headset"></i>Partner Support</a>
+    <div class="sb-section">
+      <div class="sb-lbl">Team</div>
+      <a class="sb-item" onclick="showTab('salespersons')"><i class="fas fa-users"></i>Salespersons</a>
+      <a class="sb-item" href="salesperson.html"><i class="fas fa-chart-line"></i>Performance Reports</a>
     </div>
-    <div class="nav-section">
-      <div class="nav-label">Admin</div>
-      <a class="nav-item" href="../admin/index.html"><i class="fa fa-cog"></i>Back-office</a>
-      <a class="nav-item" href="../partner/onboarding.html"><i class="fa fa-handshake"></i>Onboarding</a>
+    <div class="sb-section">
+      <div class="sb-lbl">Finance</div>
+      <a class="sb-item" onclick="showTab('statements')"><i class="fas fa-file-invoice-dollar"></i>Statements</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-lbl">Admin</div>
+      <a class="sb-item" href="../admin/reseller-engine.html"><i class="fas fa-cog"></i>Super Admin Engine</a>
     </div>
   </nav>
 </aside>
 
+<!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-title"><i class="fa fa-store" style="color:var(--purple);margin-right:8px;"></i>Reseller ERP Portal</div>
+  <div class="topbar-title" id="topbar-title">Reseller ERP Dashboard</div>
   <div class="topbar-right">
-    <button class="btn btn-outline btn-sm" onclick="switchTab('bulk-qr',null)"><i class="fa fa-qrcode"></i> Generate QR</button>
-    <button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> New Order</button>
-    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#f1f5f9;border-radius:20px;">
-      <img src="https://api.dicebear.com/7.x/initials/svg?seed=TM" width="26" height="26" style="border-radius:50%;"/>
-      <span style="font-size:12px;font-weight:600;">TravelMart India</span>
-    </div>
+    <div id="topbar-auth"></div>
+    <button class="btn btn-purple btn-sm" onclick="showTab('tickets');setTimeout(openIssueModal,100)"><i class="fas fa-plus"></i> Issue Ticket</button>
+    <button class="btn btn-outline btn-sm" onclick="exportAll()"><i class="fas fa-download"></i> Export</button>
   </div>
 </div>
 
 <div class="content">
-<div class="grid-4">
-  <div class="stat-card"><div class="stat-label">Tickets Sold (MTD)</div><div class="stat-value" style="color:var(--purple);">2,847</div><div class="stat-sub">↑ 342 this week</div></div>
-  <div class="stat-card"><div class="stat-label">Revenue Generated</div><div class="stat-value" style="color:var(--green);">₹38.2L</div><div class="stat-sub">FY 2024–25</div></div>
-  <div class="stat-card"><div class="stat-label">Commission Earned</div><div class="stat-value" style="color:var(--brand);">₹5.73L</div><div class="stat-sub">15% Platinum rate</div></div>
-  <div class="stat-card"><div class="stat-label">QR Inventory</div><div class="stat-value" style="color:var(--teal);">1,240</div><div class="stat-sub">480 used · 760 pending</div></div>
-</div>
 
-<div class="tab-bar">
-  <div class="tab active" id="tab-btn-overview" onclick="switchTab('overview',event)"><i class="fa fa-home"></i> Overview</div>
-  <div class="tab" id="tab-btn-inventory" onclick="switchTab('inventory',event)"><i class="fa fa-boxes"></i> Inventory</div>
-  <div class="tab" id="tab-btn-bulk-qr" onclick="switchTab('bulk-qr',event)"><i class="fa fa-qrcode"></i> Bulk QR</div>
-  <div class="tab" id="tab-btn-orders" onclick="switchTab('orders',event)"><i class="fa fa-shopping-cart"></i> Orders</div>
-  <div class="tab" id="tab-btn-commission" onclick="switchTab('commission',event)"><i class="fa fa-coins"></i> Commission</div>
-  <div class="tab" id="tab-btn-team" onclick="switchTab('team',event)"><i class="fa fa-users"></i> Team</div>
-  <div class="tab" id="tab-btn-reports" onclick="switchTab('reports',event)"><i class="fa fa-chart-bar"></i> Reports</div>
-</div>
+<!-- TAB: DASHBOARD -->
+<div id="tab-dashboard" class="tab-panel active">
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Active Batches</div><div class="stat-value" id="ds-batches" style="color:var(--blue);">—</div><div class="stat-sub" id="ds-batches-s">—</div></div>
+    <div class="stat-card"><div class="stat-label">Ticket Balance</div><div class="stat-value" id="ds-balance" style="color:var(--amber);">—</div><div class="stat-sub">unissued tickets</div></div>
+    <div class="stat-card"><div class="stat-label">Tickets Issued</div><div class="stat-value" id="ds-issued" style="color:var(--brand);">—</div><div class="stat-sub" id="ds-issued-s">today: —</div></div>
+    <div class="stat-card"><div class="stat-label">Tickets Redeemed</div><div class="stat-value" id="ds-redeemed" style="color:var(--green);">—</div><div class="stat-sub" id="ds-red-rate">—% rate</div></div>
+    <div class="stat-card"><div class="stat-label">Revenue Generated</div><div class="stat-value" id="ds-revenue" style="color:var(--teal);">—</div><div class="stat-sub" id="ds-commission">Commission: —</div></div>
+  </div>
 
-<!-- OVERVIEW -->
-<div id="tab-overview" class="tab-panel active">
   <div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;">
-    <div class="card"><div class="card-header"><span class="card-title">Monthly Sales Trend</span></div><div style="height:220px;"><canvas id="sales-trend"></canvas></div></div>
     <div class="card">
-      <div class="card-header"><span class="card-title">Ticket Mix</span></div>
-      <div style="height:220px;"><canvas id="ticket-mix"></canvas></div>
+      <div class="card-header"><span class="card-title">Batch Portfolio — Reseller-Coded References</span></div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Batch Code <i class="fas fa-lock" style="color:var(--amber);font-size:9px;"></i></th>
+            <th>Product</th><th>Total</th><th>Issued</th><th>Balance</th><th>Valid To</th><th>Status</th>
+          </tr></thead>
+          <tbody id="dash-batch-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Inventory Status</span></div>
+      <div style="height:240px;"><canvas id="chart-inv"></canvas></div>
     </div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-    <div class="card">
-      <div class="card-header"><span class="card-title">QR Inventory Status</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-        <div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#15803d;">760</div><div style="font-size:10px;font-weight:700;color:#15803d;">AVAILABLE</div></div>
-        <div style="background:#fff3ee;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--brand);">480</div><div style="font-size:10px;font-weight:700;color:var(--brand);">USED</div></div>
-        <div style="background:#fef9c3;border-radius:10px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;color:#854d0e;">42</div><div style="font-size:10px;font-weight:700;color:#854d0e);">EXPIRED</div></div>
-      </div>
-      <div style="margin-top:14px;">
-        <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:4px;"><span>Utilization Rate</span><span style="color:var(--purple);">38.7%</span></div>
-        <div class="progress-bar"><div class="progress-fill" style="width:38.7%;background:var(--purple);"></div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Top Performing Products</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">💧 Water Park (Adult)</span><span style="font-weight:700;color:var(--teal);">1,240 sold</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎭 Combo Ticket</span><span style="font-weight:700;color:var(--green);">842 sold</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎢 Amusement (Adult)</span><span style="font-weight:700;color:var(--brand);">523 sold</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:600;">🎪 Corporate Package</span><span style="font-weight:700;color:var(--purple);">242 sold</span></div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- INVENTORY -->
-<div id="tab-inventory" class="tab-panel">
+  <!-- Identity Chain display -->
   <div class="card">
     <div class="card-header">
-      <span class="card-title">Ticket Inventory</span>
-      <div style="display:flex;gap:8px;"><select style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:auto;" onchange="renderInventory(this.value)"><option value="all">All Types</option><option value="water">Water Park</option><option value="amusement">Amusement</option><option value="combo">Combo</option><option value="corporate">Corporate</option></select><button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> Request Stock</button></div>
+      <span class="card-title"><i class="fas fa-link" style="color:var(--brand);margin-right:6px;"></i>Your Identity Chain</span>
+      <span class="badge badge-purple"><i class="fas fa-lock"></i> Immutable</span>
     </div>
-    <div class="inv-grid" id="inv-grid"></div>
+    <div id="identity-chain-display" style="padding:16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);"></div>
   </div>
-</div>
 
-<!-- BULK QR -->
-<div id="tab-bulk-qr" class="tab-panel">
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-header"><span class="card-title">Generate Bulk QR Tickets</span></div>
-    <div style="display:grid;grid-template-columns:200px 200px 160px 160px auto;gap:12px;align-items:end;flex-wrap:wrap;">
-      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Ticket Type</label>
-        <select id="qr-type" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">
-          <option value="water">Water Park — Adult</option><option value="water-child">Water Park — Child</option>
-          <option value="amusement">Amusement — Adult</option><option value="combo">Combo Ticket</option>
-        </select>
-      </div>
-      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Visit Date</label><input type="date" id="qr-date" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Quantity</label><input type="number" id="qr-qty" value="10" min="1" max="200" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;">Batch ID</label><input type="text" id="qr-batch" placeholder="AUTO" style="width:100%;"/></div>
-      <button class="btn btn-purple" onclick="generateBulkQR()"><i class="fa fa-qrcode"></i> Generate</button>
-    </div>
-  </div>
+  <!-- Salesperson Performance -->
   <div class="card">
-    <div class="card-header">
-      <span class="card-title" id="qr-panel-title">QR Ticket Panel</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline btn-sm" onclick="printAllQR()"><i class="fa fa-print"></i> Print All</button>
-        <button class="btn btn-outline btn-sm" onclick="downloadQRZip()"><i class="fa fa-download"></i> Download ZIP</button>
-      </div>
-    </div>
-    <div class="qr-grid" id="qr-panel">
-      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);"><i class="fa fa-qrcode" style="font-size:48px;opacity:.2;display:block;margin-bottom:12px;"></i>Set parameters above and click Generate</div>
-    </div>
+    <div class="card-header"><span class="card-title">Salesperson Performance</span><a class="btn btn-outline btn-sm" onclick="showTab('salespersons')">View All</a></div>
+    <div class="perf-grid" id="dash-perf-grid"></div>
   </div>
-  <div class="card" style="margin-top:18px;">
-    <div class="card-header"><span class="card-title">QR Batch History</span></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Batch ID</th><th>Type</th><th>Qty</th><th>Visit Date</th><th>Generated</th><th>Used</th><th>Expired</th><th>Actions</th></tr></thead>
-    <tbody id="batch-history">
-      <tr><td><code>BATCH-20250315-001</code></td><td>Water Park Adult</td><td>100</td><td>15–31 Mar 2025</td><td>100</td><td>87</td><td>0</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
-      <tr><td><code>BATCH-20250301-002</code></td><td>Combo Ticket</td><td>50</td><td>Mar 2025</td><td>50</td><td>38</td><td>4</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
-      <tr><td><code>BATCH-20250220-001</code></td><td>Corporate Package</td><td>30</td><td>Feb–Mar 2025</td><td>30</td><td>28</td><td>2</td><td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>
-    </tbody>
-    </table></div>
-  </div>
-</div>
 
-<!-- ORDERS -->
-<div id="tab-orders" class="tab-panel">
+  <!-- Recent Tickets -->
   <div class="card">
-    <div class="card-header"><span class="card-title">Purchase Orders</span><button class="btn btn-purple btn-sm" onclick="openOrderModal()"><i class="fa fa-plus"></i> New Order</button></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Order ID</th><th>Type</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="orders-body"></tbody></table></div>
-  </div>
-</div>
-
-<!-- COMMISSION -->
-<div id="tab-commission" class="tab-panel">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
-    <div class="card">
-      <div class="card-header"><span class="card-title">Commission Summary</span></div>
-      <table style="width:100%;font-size:13px;">
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Total Earned (FY)</td><td style="text-align:right;font-weight:700;color:var(--green);">₹5,73,750</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Paid Out</td><td style="text-align:right;font-weight:700;">₹4,80,000</td></tr>
-        <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 0;color:var(--muted);">Pending Payout</td><td style="text-align:right;font-weight:700;color:var(--yellow);">₹93,750</td></tr>
-        <tr><td style="padding:8px 0;font-weight:700;">Current Tier Rate</td><td style="text-align:right;font-weight:800;color:var(--purple);font-size:16px;">15%</td></tr>
+    <div class="card-header"><span class="card-title">Recent Ticket Issuances</span><button class="btn btn-outline btn-sm" onclick="showTab('tickets')">View All</button></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Ticket Code</th><th>Batch Code</th><th>Employee Code</th><th>Customer</th><th>Product</th><th>Visit Date</th><th>Price</th><th>Status</th></tr></thead>
+        <tbody id="dash-ticket-tbody"></tbody>
       </table>
-      <div style="margin-top:14px;background:#f8f5ff;border-radius:8px;padding:12px;">
-        <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:6px;">NEXT BONUS THRESHOLD</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:77%;background:var(--purple);"></div></div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">₹38.2L of ₹50L annual target · 77% · Bonus: ₹2L</div>
-      </div>
     </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Tier Structure</span></div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="padding:12px;background:#f5f3ff;border-radius:10px;border-left:4px solid var(--purple);"><div style="font-size:12px;font-weight:800;color:var(--purple);">PLATINUM — 15% <span style="background:var(--purple);color:#fff;padding:1px 6px;border-radius:4px;font-size:10px;">CURRENT</span></div><div style="font-size:11px;color:var(--muted);">Revenue ≥ ₹25L/year + dedicated manager</div></div>
-        <div style="padding:12px;background:#fef9c3;border-radius:10px;border-left:4px solid #ca8a04;"><div style="font-size:12px;font-weight:800;color:#ca8a04;">GOLD — 12%</div><div style="font-size:11px;color:var(--muted);">Revenue ₹10L–₹24.9L/year</div></div>
-        <div style="padding:12px;background:#dbeafe;border-radius:10px;border-left:4px solid #1e40af;"><div style="font-size:12px;font-weight:800;color:#1e40af;">SILVER — 10%</div><div style="font-size:11px;color:var(--muted);">Revenue ₹5L–₹9.9L/year</div></div>
-        <div style="padding:12px;background:#f8fafc;border-radius:10px;border-left:4px solid var(--border);"><div style="font-size:12px;font-weight:800;color:var(--muted);">BRONZE — 8%</div><div style="font-size:11px;color:var(--muted);">Revenue &lt; ₹5L/year</div></div>
-      </div>
-    </div>
+  </div>
+</div>
+
+<!-- TAB: BATCHES -->
+<div id="tab-batches" class="tab-panel">
+  <div class="filter-row">
+    <input id="bat-q" placeholder="🔍 Search batch code, product…" style="min-width:260px;" oninput="renderMyBatches()"/>
+    <select id="bat-status" onchange="renderMyBatches()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="depleted">Depleted</option>
+      <option value="expired">Expired</option>
+    </select>
+    <select id="bat-prod" onchange="renderMyBatches()">
+      <option value="">All Products</option>
+      <option value="WP_ADULT">Water Park Adult</option>
+      <option value="WP_CHILD">Water Park Child</option>
+      <option value="AP_ADULT">Amusement Adult</option>
+      <option value="AP_CHILD">Amusement Child</option>
+      <option value="CB_ADULT">Combo Adult</option>
+      <option value="CB_CHILD">Combo Child</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('batches')"><i class="fas fa-file-csv"></i> Export</button>
   </div>
   <div class="card">
-    <div class="card-header"><span class="card-title">Commission Ledger</span><button class="btn btn-outline btn-sm"><i class="fa fa-download"></i> Export</button></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Month</th><th>Tickets Sold</th><th>Revenue</th><th>Rate</th><th>Gross</th><th>TDS 2%</th><th>Net</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td>Mar 2025</td><td>342</td><td>₹5,13,000</td><td>15%</td><td>₹76,950</td><td>₹1,539</td><td>₹75,411</td><td><span class="badge badge-yellow">Pending</span></td></tr>
-      <tr><td>Feb 2025</td><td>398</td><td>₹5,97,000</td><td>15%</td><td>₹89,550</td><td>₹1,791</td><td>₹87,759</td><td><span class="badge badge-green">Paid</span></td></tr>
-      <tr><td>Jan 2025</td><td>312</td><td>₹4,68,000</td><td>15%</td><td>₹70,200</td><td>₹1,404</td><td>₹68,796</td><td><span class="badge badge-green">Paid</span></td></tr>
-      <tr><td>Dec 2024</td><td>520</td><td>₹7,80,000</td><td>15%</td><td>₹1,17,000</td><td>₹2,340</td><td>₹1,14,660</td><td><span class="badge badge-green">Paid</span></td></tr>
-    </tbody>
-    </table></div>
-  </div>
-</div>
-
-<!-- TEAM -->
-<div id="tab-team" class="tab-panel">
-  <div class="card">
-    <div class="card-header"><span class="card-title">Sales Team</span><button class="btn btn-purple btn-sm" onclick="openTeamModal()"><i class="fa fa-user-plus"></i> Add Member</button></div>
-    <div class="tbl-wrap"><table><thead><tr><th>Agent</th><th>Role</th><th>Region</th><th>Tickets Sold</th><th>Revenue</th><th>Commission</th><th>Conversion</th><th>Status</th><th>Actions</th></tr></thead><tbody id="team-body"></tbody></table></div>
-  </div>
-</div>
-
-<!-- REPORTS -->
-<div id="tab-reports" class="tab-panel">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-    <div class="card"><div class="card-header"><span class="card-title">Sales by Ticket Type</span></div><div style="height:250px;"><canvas id="type-rpt-chart"></canvas></div></div>
-    <div class="card"><div class="card-header"><span class="card-title">Monthly Revenue</span></div><div style="height:250px;"><canvas id="rev-rpt-chart"></canvas></div></div>
-    <div class="card" style="grid-column:span 2;"><div class="card-header"><span class="card-title">Commission Trend</span></div><div style="height:220px;"><canvas id="comm-rpt-chart"></canvas></div></div>
-  </div>
-</div>
-
-</div></div></div>
-
-<!-- ORDER MODAL -->
-<div class="modal-overlay" id="order-modal">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">New Stock Order</div><button class="modal-close" onclick="closeModal('order-modal')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Ticket Type</label><select id="om-type"><option>Water Park Adult</option><option>Water Park Child</option><option>Amusement Adult</option><option>Amusement Child</option><option>Combo Ticket</option><option>Corporate Package</option></select></div><div class="form-group"><label>Quantity</label><input type="number" id="om-qty" placeholder="100" min="1"/></div></div>
-    <div class="form-row"><div class="form-group"><label>Validity Period</label><select id="om-validity"><option>7 days</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option></select></div><div class="form-group"><label>Special Instructions</label><input type="text" id="om-notes" placeholder="e.g. weekend only"/></div></div>
-    <div style="background:var(--brand-light);border:1.5px solid #ffd8c4;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;">
-      <div style="font-weight:700;margin-bottom:6px;">Price Preview</div>
-      <div style="display:flex;justify-content:space-between;"><span>Unit Reseller Price</span><span id="unit-price">₹679 (15% off MRP)</span></div>
-      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-top:6px;border-top:1px solid #ffd8c4;padding-top:6px;"><span>Total Order Value</span><span id="order-total" style="color:var(--brand);">₹67,900</span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Batch Code</th><th>Reseller Code</th><th>Product</th><th>Park</th>
+          <th>Total Qty</th><th>Allocated</th><th>Issued</th><th>Redeemed</th><th>Balance</th>
+          <th>Purchase Rate</th><th>Face Value</th><th>Valid From</th><th>Valid To</th>
+          <th>Payment</th><th>Status</th><th>Detail</th>
+        </tr></thead>
+        <tbody id="batches-tbody"></tbody>
+      </table>
     </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline" onclick="closeModal('order-modal')">Cancel</button><button class="btn btn-purple" onclick="saveOrder()"><i class="fa fa-save"></i> Place Order</button></div>
   </div>
 </div>
 
-<!-- TEAM MODAL -->
-<div class="modal-overlay" id="team-modal">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">Add Team Member</div><button class="modal-close" onclick="closeModal('team-modal')">✕</button></div>
-    <div class="form-row"><div class="form-group"><label>Full Name</label><input type="text" id="tm-name" placeholder="e.g. Anjali Sharma"/></div><div class="form-group"><label>Role</label><select id="tm-role"><option>Sales Executive</option><option>Area Manager</option><option>Regional Head</option><option>Key Accounts</option></select></div></div>
-    <div class="form-row"><div class="form-group"><label>Mobile</label><input type="text" id="tm-mobile" placeholder="+91 9XXXXXXXXX"/></div><div class="form-group"><label>Region</label><select id="tm-region"><option>Delhi NCR</option><option>Mumbai</option><option>Bengaluru</option><option>Kolkata</option><option>Others</option></select></div></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('team-modal')">Cancel</button><button class="btn btn-purple" onclick="saveTeamMember()"><i class="fa fa-save"></i> Add Member</button></div>
+<!-- TAB: ALLOCATIONS -->
+<div id="tab-allocations" class="tab-panel">
+  <div class="filter-row">
+    <input id="alloc-q" placeholder="🔍 Search allocation code, employee…" style="min-width:280px;" oninput="renderMyAllocations()"/>
+    <select id="alloc-emp" onchange="renderMyAllocations()"><option value="">All Employees</option></select>
+    <select id="alloc-bat" onchange="renderMyAllocations()"><option value="">All Batches</option></select>
+    <select id="alloc-status" onchange="renderMyAllocations()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="depleted">Depleted</option>
+      <option value="recalled">Recalled</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openNewAllocModal()"><i class="fas fa-plus"></i> New Allocation</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('allocations')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Allocation Code</th><th>Reseller Code</th><th>Batch Code</th>
+          <th>Employee Code</th><th>Employee Name</th><th>Product</th>
+          <th>Qty</th><th>Issued</th><th>Redeemed</th><th>Recalled</th><th>Balance</th>
+          <th>Valid To</th><th>Status</th><th>Date</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="allocations-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
+
+<!-- TAB: TICKETS -->
+<div id="tab-tickets" class="tab-panel">
+  <div class="filter-row">
+    <input id="tkt-q" placeholder="🔍 Search ticket code, customer, batch…" style="min-width:280px;" oninput="renderMyTickets()"/>
+    <select id="tkt-emp" onchange="renderMyTickets()"><option value="">All Employees</option></select>
+    <select id="tkt-bat" onchange="renderMyTickets()"><option value="">All Batches</option></select>
+    <select id="tkt-status" onchange="renderMyTickets()">
+      <option value="">All Statuses</option>
+      <option value="issued">Issued</option>
+      <option value="redeemed">Redeemed</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="expired">Expired</option>
+    </select>
+    <input type="date" id="tkt-from" onchange="renderMyTickets()"/>
+    <input type="date" id="tkt-to" onchange="renderMyTickets()"/>
+    <button class="btn btn-purple btn-sm" onclick="openIssueModal()"><i class="fas fa-plus"></i> Issue Ticket</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('tickets')"><i class="fas fa-file-csv"></i> Export CSV</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Ticket Code</th><th>Reseller Code</th><th>Batch Code</th><th>Employee Code</th>
+          <th>Alloc Code</th><th>Customer</th><th>Product</th><th>Visit Date</th>
+          <th>Sale Price</th><th>Status</th><th>Issued At</th><th>Detail</th>
+        </tr></thead>
+        <tbody id="tickets-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: SALESPERSONS -->
+<div id="tab-salespersons" class="tab-panel">
+  <div class="filter-row">
+    <input id="sp-q" placeholder="🔍 Search name, code…" style="min-width:260px;" oninput="renderSalespersons()"/>
+    <select id="sp-status" onchange="renderSalespersons()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="suspended">Suspended</option>
+    </select>
+    <select id="sp-channel" onchange="renderSalespersons()">
+      <option value="">All Channels</option>
+      <option value="counter">Counter</option>
+      <option value="online">Online</option>
+      <option value="field">Field</option>
+    </select>
+    <input type="date" id="sp-from" onchange="renderSalespersons()"/>
+    <input type="date" id="sp-to" onchange="renderSalespersons()"/>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('employees')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Employee Code</th><th>Name</th><th>Role</th><th>Channel</th>
+          <th>Allocated</th><th>Tickets Sold</th><th>Redeemed</th><th>Expired</th>
+          <th>Balance</th><th>Revenue</th><th>Redemption %</th><th>Utilization %</th>
+          <th>Last Sale</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="salespersons-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: STATEMENTS -->
+<div id="tab-statements" class="tab-panel">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Financial Statement</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;" id="stmt-kpis"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Batch Code</th><th>Product</th><th>Qty Issued</th><th>Face Value</th><th>Revenue</th><th>Commission %</th><th>Commission Earned</th><th>Net Cost</th><th>Period</th></tr></thead>
+        <tbody id="stmt-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.content -->
+</div><!-- /.main -->
+
+<!-- MODAL: ISSUE TICKET -->
+<div class="modal-overlay" id="modal-issue">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-title">Issue Ticket to Customer</div>
+    <button class="modal-close" onclick="closeModal('modal-issue')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px;font-size:12px;color:#3730a3;margin-bottom:14px;"><i class="fas fa-link"></i> Ticket will embed: <strong>Reseller Code → Batch Code → Employee Code → Customer</strong></div>
+    <div class="form-group"><label>Select Allocation *</label>
+      <select id="i-alloc" onchange="loadAllocInfo()"><option value="">— Select Allocation —</option></select>
+    </div>
+    <div id="i-alloc-info" style="display:none;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);font-size:12px;margin-bottom:12px;"></div>
+    <div class="fg-2">
+      <div class="form-group" style="grid-column:span 2;"><label>Customer Name *</label><input id="i-name" placeholder="Ravi Shankar"/></div>
+      <div class="form-group"><label>Mobile *</label><input id="i-mobile" placeholder="9876543210"/></div>
+      <div class="form-group"><label>Email</label><input id="i-email" placeholder="ravi@email.com"/></div>
+      <div class="form-group"><label>Visit Date *</label><input id="i-date" type="date"/></div>
+      <div class="form-group"><label>Sale Price (₹)</label><input id="i-price" type="number" value="1299"/></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-issue')">Cancel</button>
+    <button class="btn btn-purple" onclick="issueTicket()"><i class="fas fa-ticket-alt"></i> Issue Ticket</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: NEW ALLOCATION -->
+<div class="modal-overlay" id="modal-alloc">
+<div class="modal" style="max-width:480px;">
+  <div class="modal-head">
+    <div class="modal-title">New Sub-Allocation</div>
+    <button class="modal-close" onclick="closeModal('modal-alloc')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group"><label>Batch *</label><select id="na-batch"><option value="">— Select Active Batch —</option></select></div>
+    <div class="form-group"><label>Salesperson *</label><select id="na-employee"><option value="">— Select Salesperson —</option></select></div>
+    <div class="form-group"><label>Quantity *</label><input id="na-qty" type="number" value="10" min="1"/></div>
+    <div class="form-group"><label>Notes</label><input id="na-notes" placeholder="e.g. Q2 counter allocation"/></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-alloc')">Cancel</button>
+    <button class="btn btn-purple" onclick="saveAllocation()"><i class="fas fa-sitemap"></i> Create Allocation</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: TICKET DETAIL -->
+<div class="modal-overlay" id="modal-tkt-detail">
+<div class="modal">
+  <div class="modal-head"><div class="modal-title">Ticket Detail</div><button class="modal-close" onclick="closeModal('modal-tkt-detail')">&times;</button></div>
+  <div class="modal-body" id="tkt-detail-body"></div>
+  <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal('modal-tkt-detail')">Close</button></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
 
 <script>
-/* ── DATA ── */
-const invData=[
-  {id:1,name:'Water Park — Adult',cat:'water',price:799,reseller:679,total:400,used:180,reserved:40},
-  {id:2,name:'Water Park — Child',cat:'water',price:499,reseller:424,total:200,used:90,reserved:20},
-  {id:3,name:'Amusement Park — Adult',cat:'amusement',price:699,reseller:594,total:300,used:120,reserved:30},
-  {id:4,name:'Amusement Park — Child',cat:'amusement',price:449,reseller:382,total:150,used:60,reserved:15},
-  {id:5,name:'Combo Ticket',cat:'combo',price:1299,reseller:1104,total:250,used:100,reserved:25},
-  {id:6,name:'Corporate Package',cat:'corporate',price:1899,reseller:1614,total:100,used:40,reserved:10},
-];
-let orders=[
-  {id:'ORD-2025-0342',type:'Water Park Adult',qty:200,unit:679,total:135800,date:'2025-03-20',status:'fulfilled'},
-  {id:'ORD-2025-0298',type:'Combo Ticket',qty:100,unit:1104,total:110400,date:'2025-03-08',status:'fulfilled'},
-  {id:'ORD-2025-0261',type:'Amusement Adult',qty:150,unit:594,total:89100,date:'2025-02-15',status:'fulfilled'},
-  {id:'ORD-2025-0352',type:'Corporate Package',qty:50,unit:1614,total:80700,date:'2025-03-25',status:'processing'},
-];
-let team=[
-  {name:'Priya Sharma',role:'Area Manager',region:'Delhi NCR',sold:1240,rev:842000,comm:126300,conv:72},
-  {name:'Ravi Kapoor',role:'Sales Executive',region:'Delhi NCR',sold:820,rev:557400,comm:83610,conv:68},
-  {name:'Anjali Singh',role:'Regional Head',region:'Noida',sold:787,rev:534700,comm:80205,conv:74},
-];
-let generatedQRs=[];
+'use strict';
+var _RE = window.ResellerEngine;
+var _currentReseller = null;
+var _currentTab = 'dashboard';
+var _charts = {};
 
-/* ── RENDER INVENTORY ── */
-function renderInventory(filter='all'){
-  const list=filter==='all'?invData:invData.filter(i=>i.cat===filter);
-  document.getElementById('inv-grid').innerHTML=list.map(item=>{
-    const available=item.total-item.used-item.reserved;
-    const usedPct=Math.round(item.used/item.total*100);
-    return `<div class="inv-card">
-      <div class="inv-card-header">
-        <div><div class="inv-card-name">${item.name}</div><div class="inv-card-meta">MRP ₹${item.price} · Reseller ₹${item.reseller}</div></div>
-        <span class="badge ${available<20?'badge-red':available<50?'badge-yellow':'badge-green'}">${available<20?'⚠ Low':available<50?'Limited':'✓ Good'}</span>
-      </div>
-      <div class="inv-stats">
-        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--teal);">${item.total}</div><div class="inv-stat-lbl">Total</div></div>
-        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--green);">${available}</div><div class="inv-stat-lbl">Available</div></div>
-        <div class="inv-stat"><div class="inv-stat-val" style="color:var(--brand);">${item.used}</div><div class="inv-stat-lbl">Sold</div></div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${usedPct}%;background:${usedPct>80?'var(--red)':usedPct>50?'var(--yellow)':'var(--purple)'};"></div></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px;">${usedPct}% sold</div>
-      <div style="display:flex;gap:6px;margin-top:10px;">
-        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="switchTab('bulk-qr',null)"><i class="fa fa-qrcode"></i> QR</button>
-        <button class="btn btn-purple btn-sm" style="flex:1;" onclick="openOrderModal()"><i class="fa fa-plus"></i> Reorder</button>
-      </div>
-    </div>`;
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function inr(v){ return '₹'+(v||0).toLocaleString('en-IN'); }
+function dtFmt(ts){ if(!ts) return '—'; return new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function dFmt(d){ if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.style.background=type==='error'?'#dc2626':type==='warn'?'#d97706':'#1e293b';
+  t.querySelector('i').className='fas '+(type==='error'?'fa-times-circle':type==='warn'?'fa-exclamation-triangle':'fa-check-circle');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3500);
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function statusBadge(s){
+  var map={active:'badge-green',draft:'badge-gray',pending_approval:'badge-amber',paused:'badge-blue',suspended:'badge-red',expired:'badge-red',archived:'badge-gray',depleted:'badge-orange',recalled:'badge-red',issued:'badge-blue',redeemed:'badge-green',cancelled:'badge-red',paid:'badge-green',unpaid:'badge-red',partial:'badge-amber'};
+  return '<span class="badge '+(map[s]||'badge-gray')+'">'+(s||'—').replace(/_/g,' ')+'</span>';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  if (window.WOWAuth) WOWAuth.renderTopbarWidget('topbar-auth');
+  _RE.seedDemoData();
+  // Pick first active reseller for demo
+  var resellers = _RE.loadResellers().filter(function(r){ return r.status==='active'; });
+  _currentReseller = resellers[0] || _RE.loadResellers()[0] || null;
+  updateSidebarChip();
+  populateDropdowns();
+  renderDashboard();
+}
+
+function updateSidebarChip() {
+  if (!_currentReseller) return;
+  document.getElementById('chip-name').textContent = _currentReseller.tradeName || _currentReseller.name;
+  document.getElementById('chip-code').textContent = _currentReseller.resellerCode;
+  var tierMap = { platinum:'tier-platinum 💎 Platinum', gold:'tier-gold 🥇 Gold', silver:'tier-silver 🥈 Silver', bronze:'tier-bronze 🥉 Bronze' };
+  var tc = tierMap[_currentReseller.tier] || 'tier-silver —';
+  var parts = tc.split(' ');
+  var cls = parts[0]; var lbl = parts.slice(1).join(' ');
+  document.getElementById('chip-tier').className = 'rtier ' + cls;
+  document.getElementById('chip-tier').textContent = lbl;
+}
+
+// ─── TAB ───────────────────────────────────────────────────────────────────
+function showTab(tab) {
+  _currentTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  var panel = document.getElementById('tab-'+tab);
+  if (panel) panel.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(function(i){
+    if (i.getAttribute('onclick') && i.getAttribute('onclick').indexOf("'"+tab+"'")!==-1) i.classList.add('active');
+  });
+  var map={dashboard:renderDashboard,batches:renderMyBatches,allocations:renderMyAllocations,tickets:renderMyTickets,salespersons:renderSalespersons,statements:renderStatements};
+  if (map[tab]) map[tab]();
+}
+
+// ─── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDashboard() {
+  if (!_currentReseller) return;
+  var rid = _currentReseller.id;
+  var s   = _RE.dashboardSummary(rid);
+  var batches   = _RE.getBatchesByReseller(rid);
+  var tickets   = _RE.loadTickets().filter(function(t){ return t.resellerId===rid; });
+  var allocs    = _RE.getAllocationsByReseller(rid);
+  var today     = new Date().toISOString().slice(0,10);
+  var todayIssued = tickets.filter(function(t){ return new Date(t.issuedAt).toISOString().slice(0,10)===today; }).length;
+  var redeemed  = tickets.filter(function(t){ return t.status==='redeemed'; }).length;
+  var rdRate    = tickets.length > 0 ? Math.round(redeemed/tickets.length*100) : 0;
+  var revenue   = tickets.reduce(function(s,t){ return s+(t.salePrice||0); },0);
+  var commission= Math.round(revenue * (_currentReseller.commissionRate||0) / 100);
+
+  document.getElementById('ds-batches').textContent   = batches.filter(function(b){ return b.status==='active'; }).length;
+  document.getElementById('ds-batches-s').textContent = batches.length + ' total batches';
+  document.getElementById('ds-balance').textContent   = allocs.reduce(function(s,a){ return s+a.balance; },0).toLocaleString();
+  document.getElementById('ds-issued').textContent    = tickets.length.toLocaleString();
+  document.getElementById('ds-issued-s').textContent  = 'today: ' + todayIssued;
+  document.getElementById('ds-redeemed').textContent  = redeemed.toLocaleString();
+  document.getElementById('ds-red-rate').textContent  = rdRate + '% redemption rate';
+  document.getElementById('ds-revenue').textContent   = inr(revenue);
+  document.getElementById('ds-commission').textContent= 'Commission: ' + inr(commission);
+
+  // Identity chain
+  document.getElementById('identity-chain-display').innerHTML =
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Every ticket issued by your team carries this embedded identity chain:</div>' +
+    '<div class="id-chain">' +
+      '<span class="idc idc-r"><i class="fas fa-building" style="margin-right:3px;"></i>' + _currentReseller.resellerCode + '</span>' +
+      '<span style="color:var(--muted);font-size:13px;">→</span>' +
+      '<span class="idc idc-b"><i class="fas fa-boxes" style="margin-right:3px;"></i>{BATCH-CODE}</span>' +
+      '<span style="color:var(--muted);font-size:13px;">→</span>' +
+      '<span class="idc idc-e"><i class="fas fa-user" style="margin-right:3px;"></i>{SP-CODE}</span>' +
+      '<span style="color:var(--muted);font-size:13px;">→</span>' +
+      '<span class="idc idc-t"><i class="fas fa-ticket-alt" style="margin-right:3px;"></i>{TICKET-CODE}</span>' +
+    '</div>' +
+    '<div style="font-size:11px;color:var(--muted);margin-top:8px;">Reseller Code is <strong>immutable</strong> and flows into all batches, allocations, tickets, QR payloads, and redemption logs.</div>';
+
+  // Batch list in dashboard
+  var actBatches = batches.filter(function(b){ return b.status==='active'; }).slice(0,8);
+  document.getElementById('dash-batch-tbody').innerHTML = actBatches.length === 0 ?
+    '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">No active batches</td></tr>' :
+    actBatches.map(function(b){
+      var pct = b.quantity > 0 ? Math.round(b.issued/b.quantity*100) : 0;
+      return '<tr>' +
+        '<td><span class="code code-bat">' + b.batchCode + '</span></td>' +
+        '<td style="font-size:12px;">' + (b.productName||b.productId||'—') + '</td>' +
+        '<td style="font-weight:700;">' + b.quantity + '</td>' +
+        '<td><div style="display:flex;align-items:center;gap:6px;"><div class="prog" style="width:50px;"><div class="prog-fill" style="width:'+pct+'%;background:var(--blue);"></div></div><span style="font-size:11px;">'+b.issued+'</span></div></td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + b.balance + '</td>' +
+        '<td style="font-size:12px;">' + (b.validTo ? dFmt(b.validTo) : '—') + '</td>' +
+        '<td>' + statusBadge(b.status) + '</td></tr>';
+    }).join('');
+
+  // Inventory chart
+  var issued  = s.totalIssued - s.totalRedeemed;
+  var balance = s.totalBalance;
+  var red     = s.totalRedeemed;
+  if (_charts['inv']) _charts['inv'].destroy();
+  _charts['inv'] = new Chart(document.getElementById('chart-inv'), {
+    type:'doughnut',
+    data:{ labels:['Issued (Not Redeemed)','Redeemed','Balance'],
+           datasets:[{ data:[issued,red,balance], backgroundColor:['#1a56db','#059669','#d97706'] }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } } }
+  });
+
+  // Salesperson performance cards
+  var empRpt = _RE.reportByEmployee({ resellerId: rid }).slice(0,6);
+  var perfHtml = empRpt.length === 0 ? '<div style="color:var(--muted);font-size:13px;">No salespersons found.</div>' :
+    empRpt.map(function(e){
+      var rdPct = e.issued > 0 ? Math.round(e.redeemed/e.issued*100) : 0;
+      return '<div class="perf-card">' +
+        '<div class="perf-card-hdr"><div><div class="perf-card-name">' + (e.employeeName||'—') + '</div><div class="perf-card-meta"><span class="code code-emp">' + e.employeeCode + '</span></div></div>' + statusBadge(e.status) + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Channel: ' + (e.channel||'all') + ' &nbsp;|&nbsp; Role: ' + (e.role||'—') + '</div>' +
+        '<div><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span>Redemption Rate</span><span style="font-weight:700;">' + rdPct + '%</span></div>' +
+        '<div class="prog"><div class="prog-fill" style="width:' + rdPct + '%;background:' + (rdPct>70?'#059669':rdPct>40?'#d97706':'#dc2626') + ';"></div></div></div>' +
+        '<div class="perf-stats"><div class="ps"><div class="ps-v">' + e.issued + '</div><div class="ps-l">Sold</div></div>' +
+        '<div class="ps"><div class="ps-v" style="color:var(--amber);">' + e.balance + '</div><div class="ps-l">Balance</div></div>' +
+        '<div class="ps"><div class="ps-v" style="color:var(--teal);">' + inr(e.revenue).replace('₹','') + '</div><div class="ps-l">Revenue</div></div></div>' +
+        '</div>';
+    }).join('');
+  document.getElementById('dash-perf-grid').innerHTML = perfHtml;
+
+  // Recent tickets
+  var recentTkts = tickets.sort(function(a,b){ return b.issuedAt-a.issuedAt; }).slice(0,8);
+  document.getElementById('dash-ticket-tbody').innerHTML = recentTkts.length === 0 ?
+    '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted);">No tickets issued yet</td></tr>' :
+    recentTkts.map(function(t){
+      return '<tr>' +
+        '<td><span class="code code-tkt">' + t.ticketCode + '</span></td>' +
+        '<td><span class="code code-bat">' + t.batchCode + '</span></td>' +
+        '<td><span class="code code-emp">' + t.employeeCode + '</span></td>' +
+        '<td style="font-weight:600;font-size:12px;">' + (t.customerName||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (t.productName||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (t.visitDate||'—') + '</td>' +
+        '<td style="font-weight:700;color:var(--teal);">' + inr(t.salePrice) + '</td>' +
+        '<td>' + statusBadge(t.status) + '</td></tr>';
+    }).join('');
+}
+
+// ─── MY BATCHES ────────────────────────────────────────────────────────────
+function renderMyBatches() {
+  if (!_currentReseller) return;
+  var q      = document.getElementById('bat-q').value || '';
+  var status = document.getElementById('bat-status').value || '';
+  var prod   = document.getElementById('bat-prod').value || '';
+  var list   = _RE.getBatchesByReseller(_currentReseller.id);
+
+  if (q)      list = list.filter(function(b){ return (b.batchCode+(b.productName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (status) list = list.filter(function(b){ return b.status===status; });
+  if (prod)   list = list.filter(function(b){ return b.productId===prod; });
+
+  var tbody = document.getElementById('batches-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="16"><div class="empty-state"><i class="fas fa-layer-group"></i><p>No batches found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(b){
+    return '<tr>' +
+      '<td><span class="code code-bat">' + b.batchCode + '</span></td>' +
+      '<td><span class="code code-res">' + b.resellerCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (b.productName||'—') + '</td>' +
+      '<td style="font-size:12px;color:var(--blue);">' + (b.parkKey||'—') + '</td>' +
+      '<td style="font-weight:700;">' + b.quantity + '</td>' +
+      '<td>' + b.allocated + '</td>' +
+      '<td style="color:var(--blue);font-weight:600;">' + b.issued + '</td>' +
+      '<td style="color:var(--green);">' + b.redeemed + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + b.balance + '</td>' +
+      '<td style="font-size:12px;">' + inr(b.purchaseRate) + '</td>' +
+      '<td style="font-size:12px;">' + inr(b.faceValue) + '</td>' +
+      '<td style="font-size:12px;">' + (b.validFrom ? dFmt(b.validFrom) : '—') + '</td>' +
+      '<td style="font-size:12px;">' + (b.validTo ? dFmt(b.validTo) : '—') + '</td>' +
+      '<td>' + statusBadge(b.paymentStatus) + '</td>' +
+      '<td>' + statusBadge(b.status) + '</td>' +
+      '<td><button class="btn btn-outline btn-xs" onclick="viewBatchDetail(\'' + b.id + '\')"><i class="fas fa-eye"></i></button></td>' +
+    '</tr>';
   }).join('');
 }
-renderInventory();
 
-/* ── BULK QR ── */
-function generateBulkQR(){
-  const type=document.getElementById('qr-type').value;
-  const date=document.getElementById('qr-date').value||'Open';
-  const qty=Math.min(+document.getElementById('qr-qty').value||10,200);
-  const batch=document.getElementById('qr-batch').value||('BATCH-'+Date.now().toString().slice(-8));
-  document.getElementById('qr-panel-title').textContent=`QR Tickets — ${batch} (${qty} tickets)`;
-  generatedQRs=[];
-  const panel=document.getElementById('qr-panel');
-  panel.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;"><i class="fa fa-spinner fa-spin fa-2x" style="color:var(--purple);"></i><div style="margin-top:8px;font-size:13px;color:var(--muted);">Generating QR codes…</div></div>';
-  setTimeout(()=>{
-    panel.innerHTML='';
-    for(let i=0;i<qty;i++){
-      const tid='WOW-'+batch+'-'+String(i+1).padStart(3,'0');
-      generatedQRs.push(tid);
-      const el=document.createElement('div');
-      el.className='qr-ticket';
-      const typeLabel={water:'Water Park',amusement:'Amusement','water-child':'Water Park Child',combo:'Combo'}[type]||'Ticket';
-      el.innerHTML=`<div class="ticket-type">${typeLabel}</div><div id="qr-c-${i}"></div><div class="ticket-id">${tid}</div><div style="font-size:10px;color:var(--muted);">${date}</div>`;
-      panel.appendChild(el);
-      try{new QRCode(el.querySelector('#qr-c-'+i),{text:tid+'|'+type+'|'+date,width:72,height:72,colorDark:'#0a1628',colorLight:'#ffffff'});}catch(e){}
-    }
-    alert(`✅ ${qty} QR tickets generated for batch ${batch}!`);
-  },800);
-}
-function printAllQR(){window.print();}
-function downloadQRZip(){alert('📦 Downloading QR batch as ZIP ('+generatedQRs.length+' tickets)…');}
+function viewBatchDetail(id) {
+  var b = _RE.getBatch(id);
+  if (!b) return;
+  var allocs = _RE.getAllocationsByBatch(id);
+  var html =
+    '<div style="background:linear-gradient(135deg,#451a03,#92400e);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">' +
+    '<div style="width:44px;height:44px;background:rgba(255,255,255,.1);border-radius:10px;display:grid;place-items:center;font-size:18px;color:#fcd34d;"><i class="fas fa-boxes"></i></div>' +
+    '<div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;">Batch Code (Immutable)</div>' +
+    '<div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;">' + b.batchCode + '</div>' +
+    '<div style="font-size:10px;color:rgba(255,255,255,.4);">Reseller: ' + b.resellerCode + ' · Season: ' + (b.season||'—') + ' · Product: ' + (b.productName||'—') + '</div></div></div>' +
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">' +
+    [['Total',b.quantity,''],['Allocated',b.allocated,'var(--blue)'],['Issued',b.issued,'var(--blue)'],['Redeemed',b.redeemed,'var(--green)'],['Balance',b.balance,'var(--amber)'],['Purchase Rate',inr(b.purchaseRate),''],['Face Value',inr(b.faceValue),''],['Payment',b.paymentStatus,'']].map(function(x){
+      return '<div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:10px;color:var(--muted);margin-bottom:3px;">'+x[0]+'</div><div style="font-size:16px;font-weight:800;color:'+( x[2]||'var(--text)')+';">'+x[1]+'</div></div>';
+    }).join('') + '</div>' +
+    '<div style="font-size:13px;font-weight:700;margin-bottom:10px;"><i class="fas fa-sitemap" style="margin-right:6px;color:var(--brand);"></i>Sub-Allocation Records</div>' +
+    (allocs.length === 0 ? '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">No allocations yet</div>' :
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="padding:6px;border-bottom:1px solid var(--border);">Alloc Code</th><th>Employee</th><th>Qty</th><th>Issued</th><th>Recalled</th><th>Balance</th><th>Status</th></tr></thead><tbody>' +
+    allocs.map(function(a){
+      return '<tr><td style="padding:6px;border-bottom:1px solid #f1f5f9;"><span class="code code-alc" style="font-size:10px;">' + a.allocationCode + '</span></td>' +
+        '<td><span class="code code-emp" style="font-size:10px;">' + a.employeeCode + '</span><br><span style="font-size:11px;color:var(--muted);">' + a.employeeName + '</span></td>' +
+        '<td style="font-weight:700;">' + a.quantity + '</td><td>' + a.issued + '</td><td style="color:var(--red);">' + a.recalled + '</td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + a.balance + '</td>' +
+        '<td>' + statusBadge(a.status) + '</td></tr>';
+    }).join('') + '</tbody></table>');
 
-/* ── ORDERS ── */
-function renderOrders(){
-  const sm={fulfilled:'badge-green',processing:'badge-yellow',pending:'badge-blue',cancelled:'badge-red'};
-  document.getElementById('orders-body').innerHTML=orders.map(o=>`
-  <tr><td><code style="font-size:11px;">${o.id}</code></td><td>${o.type}</td><td>${o.qty}</td><td>₹${o.unit.toLocaleString('en-IN')}</td>
-  <td><strong>₹${o.total.toLocaleString('en-IN')}</strong></td><td>${o.date}</td>
-  <td><span class="badge ${sm[o.status]||'badge-blue'}">${o.status}</span></td>
-  <td><button class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></button></td></tr>`).join('');
-}
-renderOrders();
-
-/* ── TEAM ── */
-function renderTeam(){
-  document.getElementById('team-body').innerHTML=team.map(m=>`
-  <tr><td><div style="display:flex;align-items:center;gap:8px;"><img src="https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(m.name)}" width="30" height="30" style="border-radius:50%;"/><strong>${m.name}</strong></div></td>
-  <td>${m.role}</td><td>${m.region}</td><td>${m.sold.toLocaleString('en-IN')}</td>
-  <td>₹${m.rev.toLocaleString('en-IN')}</td><td style="color:var(--green);font-weight:700;">₹${m.comm.toLocaleString('en-IN')}</td>
-  <td><span style="font-weight:700;color:${m.conv>=70?'var(--green)':'var(--yellow)'};">${m.conv}%</span></td>
-  <td><span class="badge badge-green">Active</span></td>
-  <td><button class="btn btn-outline btn-sm"><i class="fa fa-edit"></i></button></td></tr>`).join('');
-}
-renderTeam();
-
-/* ── TABS ── */
-function switchTab(id,e){
-  if(e)e.preventDefault();
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+id).classList.add('active');
-  const b=document.getElementById('tab-btn-'+id);if(b)b.classList.add('active');
-  if(id==='overview')initOv();
-  if(id==='reports')initRp();
-  if(id==='orders')renderOrders();
-  if(id==='team')renderTeam();
+  document.getElementById('tkt-detail-body').innerHTML = html;
+  openModal('modal-tkt-detail');
 }
 
-let ovInited=false,rpInited=false;
-function initOv(){
-  if(ovInited)return;ovInited=true;
-  new Chart(document.getElementById('sales-trend'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Tickets',data:[420,510,720,380,490,342],borderColor:'var(--purple)',backgroundColor:'rgba(124,58,237,.1)',tension:.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  new Chart(document.getElementById('ticket-mix'),{type:'doughnut',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[43,18,30,9],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{plugins:{legend:{position:'right'}},responsive:true,maintainAspectRatio:false}});
-}
-function initRp(){
-  if(rpInited)return;rpInited=true;
-  new Chart(document.getElementById('type-rpt-chart'),{type:'pie',data:{labels:['Water Park','Amusement','Combo','Corporate'],datasets:[{data:[43,18,30,9],backgroundColor:['#00b4d8','#ff6b35','#06d6a0','#7c3aed']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
-  new Chart(document.getElementById('rev-rpt-chart'),{type:'bar',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'₹',data:[520000,630000,900000,470000,605000,513000],backgroundColor:'rgba(124,58,237,.7)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  new Chart(document.getElementById('comm-rpt-chart'),{type:'line',data:{labels:['Oct','Nov','Dec','Jan','Feb','Mar'],datasets:[{label:'Commission ₹',data:[78000,94500,135000,70500,90750,76950],borderColor:'var(--green)',tension:.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-}
-setTimeout(initOv,100);
+// ─── ALLOCATIONS ───────────────────────────────────────────────────────────
+function renderMyAllocations() {
+  if (!_currentReseller) return;
+  var q      = document.getElementById('alloc-q').value || '';
+  var empId  = document.getElementById('alloc-emp').value || '';
+  var batId  = document.getElementById('alloc-bat').value || '';
+  var status = document.getElementById('alloc-status').value || '';
+  var list   = _RE.getAllocationsByReseller(_currentReseller.id);
 
-/* ── MODALS ── */
-function openOrderModal(){document.getElementById('order-modal').classList.add('show');}
-function openTeamModal(){document.getElementById('team-modal').classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-function saveOrder(){
-  const type=document.getElementById('om-type').value;
-  const qty=+document.getElementById('om-qty').value||100;
-  const unitMap={'Water Park Adult':679,'Water Park Child':424,'Amusement Adult':594,'Amusement Child':382,'Combo Ticket':1104,'Corporate Package':1614};
-  const unit=unitMap[type]||679;
-  orders.unshift({id:'ORD-2025-'+String(Math.floor(Math.random()*9000+1000)),type,qty,unit,total:unit*qty,date:new Date().toISOString().slice(0,10),status:'processing'});
-  renderOrders();closeModal('order-modal');switchTab('orders',null);alert('✅ Order placed! Processing…');
+  if (q)      list = list.filter(function(a){ return (a.allocationCode+a.batchCode+a.employeeCode+(a.employeeName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (empId)  list = list.filter(function(a){ return a.employeeId===empId; });
+  if (batId)  list = list.filter(function(a){ return a.batchId===batId; });
+  if (status) list = list.filter(function(a){ return a.status===status; });
+
+  var tbody = document.getElementById('allocations-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="15"><div class="empty-state"><i class="fas fa-sitemap"></i><p>No allocations found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(a){
+    return '<tr>' +
+      '<td><span class="code code-alc">' + a.allocationCode + '</span></td>' +
+      '<td><span class="code code-res">' + a.resellerCode + '</span></td>' +
+      '<td><span class="code code-bat">' + a.batchCode + '</span></td>' +
+      '<td><span class="code code-emp">' + a.employeeCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (a.employeeName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (a.productName||a.productId||'—') + '</td>' +
+      '<td style="font-weight:700;">' + a.quantity + '</td>' +
+      '<td style="color:var(--blue);">' + a.issued + '</td>' +
+      '<td style="color:var(--green);">' + a.redeemed + '</td>' +
+      '<td style="color:var(--red);">' + a.recalled + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + a.balance + '</td>' +
+      '<td style="font-size:12px;">' + (a.validTo ? dFmt(a.validTo) : '—') + '</td>' +
+      '<td>' + statusBadge(a.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + (a.allocatedAt ? new Date(a.allocatedAt).toLocaleDateString('en-IN') : '—') + '</td>' +
+      '<td>' + (a.status==='active' && a.balance>0 ? '<button class="btn btn-red btn-xs" onclick="recallAlloc(\'' + a.id + '\')"><i class="fas fa-undo"></i></button>' : '') + '</td>' +
+    '</tr>';
+  }).join('');
 }
-function saveTeamMember(){
-  const name=document.getElementById('tm-name').value.trim();
-  if(!name){alert('Name required.');return;}
-  team.push({name,role:document.getElementById('tm-role').value,region:document.getElementById('tm-region').value,sold:0,rev:0,comm:0,conv:0});
-  renderTeam();closeModal('team-modal');
+
+function openNewAllocModal() {
+  var batSel = document.getElementById('na-batch');
+  var empSel = document.getElementById('na-employee');
+  batSel.innerHTML = '<option value="">— Select Active Batch —</option>';
+  empSel.innerHTML = '<option value="">— Select Salesperson —</option>';
+  if (!_currentReseller) return;
+  _RE.getBatchesByReseller(_currentReseller.id).filter(function(b){ return b.status==='active' && b.balance>0; }).forEach(function(b){
+    batSel.innerHTML += '<option value="' + b.id + '">' + b.batchCode + ' — ' + (b.productName||b.productId) + ' (Bal: ' + b.balance + ')</option>';
+  });
+  _RE.getEmployeesByReseller(_currentReseller.id).filter(function(e){ return e.status==='active'; }).forEach(function(e){
+    empSel.innerHTML += '<option value="' + e.id + '">' + e.employeeCode + ' — ' + e.name + '</option>';
+  });
+  openModal('modal-alloc');
 }
+
+function saveAllocation() {
+  var batId = document.getElementById('na-batch').value;
+  var empId = document.getElementById('na-employee').value;
+  var qty   = parseInt(document.getElementById('na-qty').value) || 0;
+  if (!batId || !empId) { toast('Select batch and salesperson', 'error'); return; }
+  if (qty < 1) { toast('Quantity must be at least 1', 'error'); return; }
+  try {
+    var a = _RE.allocateToEmployee(_currentReseller.id, empId, batId, qty, document.getElementById('na-notes').value);
+    toast('Allocation created: ' + a.allocationCode);
+    closeModal('modal-alloc');
+    renderMyAllocations();
+    if (_currentTab === 'dashboard') renderDashboard();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function recallAlloc(id) {
+  var qty = prompt('Quantity to recall (blank = full balance):');
+  if (qty === null) return;
+  try {
+    _RE.recallAllocation(id, parseInt(qty)||undefined, 'Reseller recall');
+    toast('Recalled successfully');
+    renderMyAllocations();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── TICKETS ───────────────────────────────────────────────────────────────
+function renderMyTickets() {
+  if (!_currentReseller) return;
+  var q      = document.getElementById('tkt-q').value || '';
+  var empId  = document.getElementById('tkt-emp').value || '';
+  var batId  = document.getElementById('tkt-bat').value || '';
+  var status = document.getElementById('tkt-status').value || '';
+  var from   = document.getElementById('tkt-from').value;
+  var to     = document.getElementById('tkt-to').value;
+  var list   = _RE.loadTickets().filter(function(t){ return t.resellerId===_currentReseller.id; });
+
+  if (q)      list = list.filter(function(t){ return (t.ticketCode+t.batchCode+t.employeeCode+(t.customerName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (empId)  list = list.filter(function(t){ return t.employeeId===empId; });
+  if (batId)  list = list.filter(function(t){ return t.batchId===batId; });
+  if (status) list = list.filter(function(t){ return t.status===status; });
+  if (from)   list = list.filter(function(t){ return new Date(t.issuedAt)>=new Date(from); });
+  if (to)     list = list.filter(function(t){ return new Date(t.issuedAt)<=new Date(to+'T23:59:59'); });
+
+  var tbody = document.getElementById('tickets-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><i class="fas fa-ticket-alt"></i><p>No tickets found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.slice(0,200).map(function(t){
+    return '<tr>' +
+      '<td><span class="code code-tkt">' + t.ticketCode + '</span></td>' +
+      '<td><span class="code code-res">' + t.resellerCode + '</span></td>' +
+      '<td><span class="code code-bat">' + t.batchCode + '</span></td>' +
+      '<td><span class="code code-emp">' + t.employeeCode + '</span></td>' +
+      '<td><span class="code code-alc" style="font-size:10px;">' + (t.allocationCode||'—') + '</span></td>' +
+      '<td><div style="font-weight:600;font-size:12px;">' + (t.customerName||'—') + '</div><div style="font-size:11px;color:var(--muted);">' + (t.customerMobile||'') + '</div></td>' +
+      '<td style="font-size:12px;">' + (t.productName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (t.visitDate||'—') + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(t.salePrice) + '</td>' +
+      '<td>' + statusBadge(t.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + dtFmt(t.issuedAt) + '</td>' +
+      '<td><button class="btn btn-outline btn-xs" onclick="viewTicketDetail(\'' + t.id + '\')"><i class="fas fa-eye"></i></button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function openIssueModal() {
+  if (!_currentReseller) { toast('No active reseller found', 'error'); return; }
+  var sel = document.getElementById('i-alloc');
+  sel.innerHTML = '<option value="">— Select Allocation —</option>';
+  _RE.getAllocationsByReseller(_currentReseller.id).filter(function(a){ return a.status==='active' && a.balance>0; }).forEach(function(a){
+    sel.innerHTML += '<option value="' + a.id + '">' + a.allocationCode + ' (' + a.employeeCode + ' / Bal:' + a.balance + ')</option>';
+  });
+  document.getElementById('i-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('i-alloc-info').style.display = 'none';
+  openModal('modal-issue');
+}
+
+function loadAllocInfo() {
+  var aId  = document.getElementById('i-alloc').value;
+  var info = document.getElementById('i-alloc-info');
+  if (!aId) { info.style.display='none'; return; }
+  var a = _RE.loadAllocations().find(function(x){ return x.id===aId; });
+  if (a) {
+    info.style.display = 'block';
+    info.innerHTML = '<strong>Chain:</strong> <span class="code code-res" style="font-size:10px;">' + a.resellerCode + '</span> → <span class="code code-bat" style="font-size:10px;">' + a.batchCode + '</span> → <span class="code code-emp" style="font-size:10px;">' + a.employeeCode + '</span> &nbsp;|&nbsp; Product: ' + (a.productName||'—') + ' &nbsp;|&nbsp; Balance: <strong>' + a.balance + '</strong>';
+    var b = _RE.loadBatches().find(function(x){ return x.id===a.batchId; });
+    if (b) document.getElementById('i-price').value = b.faceValue || 1299;
+  }
+}
+
+function issueTicket() {
+  var aId  = document.getElementById('i-alloc').value;
+  var name = document.getElementById('i-name').value.trim();
+  var mob  = document.getElementById('i-mobile').value.trim();
+  if (!aId)  { toast('Select an allocation', 'error'); return; }
+  if (!name) { toast('Customer name required', 'error'); return; }
+  try {
+    var t = _RE.issueTicket(aId, {
+      name: name, mobile: mob,
+      email: document.getElementById('i-email').value.trim(),
+      visitDate: document.getElementById('i-date').value,
+      salePrice: parseInt(document.getElementById('i-price').value)||0
+    });
+    toast('Ticket issued: ' + t.ticketCode);
+    closeModal('modal-issue');
+    renderMyTickets();
+    if (_currentTab==='dashboard') renderDashboard();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function viewTicketDetail(id) {
+  var t = _RE.loadTickets().find(function(x){ return x.id===id; });
+  if (!t) return;
+  var html =
+    '<div style="background:linear-gradient(135deg,#052e16,#166534);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">' +
+    '<div style="width:44px;height:44px;background:rgba(255,255,255,.1);border-radius:10px;display:grid;place-items:center;font-size:18px;color:#86efac;"><i class="fas fa-ticket-alt"></i></div>' +
+    '<div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;">Ticket Code</div>' +
+    '<div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;">' + t.ticketCode + '</div>' +
+    '<div style="font-size:10px;color:rgba(255,255,255,.4);">Status: ' + t.status + (t.redeemedAt ? ' · Redeemed: ' + dtFmt(t.redeemedAt) : '') + '</div></div></div>' +
+    '<div class="id-chain" style="margin-bottom:14px;">' +
+    '<span class="idc idc-r"><i class="fas fa-building" style="margin-right:3px;"></i>' + t.resellerCode + '</span>' +
+    '<span style="color:var(--muted);">→</span>' +
+    '<span class="idc idc-b"><i class="fas fa-boxes" style="margin-right:3px;"></i>' + t.batchCode + '</span>' +
+    '<span style="color:var(--muted);">→</span>' +
+    '<span class="idc idc-e"><i class="fas fa-user" style="margin-right:3px;"></i>' + t.employeeCode + '</span>' +
+    '<span style="color:var(--muted);">→</span>' +
+    '<span class="idc code-alc" style="font-size:10px;background:#faf5ff;color:#6d28d9;border-color:#e9d5ff;border:1px solid;">' + (t.allocationCode||'—') + '</span></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">CUSTOMER</div><div style="font-weight:600;">' + (t.customerName||'—') + '</div><div style="font-size:12px;color:var(--muted);">' + (t.customerMobile||'') + (t.customerEmail?' · '+t.customerEmail:'') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">PRODUCT</div><div style="font-weight:600;">' + (t.productName||'—') + '</div><div style="font-size:12px;color:var(--muted);">Category: ' + (t.category||'—') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">VISIT DATE</div><div style="font-weight:600;">' + (t.visitDate||'—') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">SALE PRICE</div><div style="font-weight:800;color:var(--teal);font-size:18px;">' + inr(t.salePrice) + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">ISSUED AT</div><div style="font-size:12px;">' + dtFmt(t.issuedAt) + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">SALESPERSON</div><div style="font-size:12px;">' + (t.employeeName||'—') + '</div></div>' +
+    '</div>';
+
+  document.getElementById('tkt-detail-body').innerHTML = html;
+  openModal('modal-tkt-detail');
+}
+
+// ─── SALESPERSONS ──────────────────────────────────────────────────────────
+function renderSalespersons() {
+  if (!_currentReseller) return;
+  var q      = document.getElementById('sp-q').value || '';
+  var status = document.getElementById('sp-status').value || '';
+  var channel= document.getElementById('sp-channel').value || '';
+  var from   = document.getElementById('sp-from').value;
+  var to     = document.getElementById('sp-to').value;
+  var filters = { resellerId: _currentReseller.id, fromDate: from||undefined, toDate: to||undefined };
+  var data = _RE.reportByEmployee(filters);
+
+  if (q)       data = data.filter(function(e){ return (e.employeeCode+e.employeeName).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (status)  data = data.filter(function(e){ return e.status===status; });
+  if (channel) data = data.filter(function(e){ return e.channel===channel; });
+
+  var tbody = document.getElementById('salespersons-tbody');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="15"><div class="empty-state"><i class="fas fa-users"></i><p>No salespersons found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(function(e){
+    var rdPct = e.issued>0 ? Math.round(e.redeemed/e.issued*100) : 0;
+    var utPct = e.allocated>0 ? Math.round(e.issued/e.allocated*100) : 0;
+    return '<tr>' +
+      '<td><span class="code code-emp">' + e.employeeCode + '</span></td>' +
+      '<td style="font-weight:600;">' + (e.employeeName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (e.role||'—') + '</td>' +
+      '<td><span class="badge badge-blue">' + (e.channel||'all') + '</span></td>' +
+      '<td style="font-weight:700;">' + e.allocated + '</td>' +
+      '<td style="color:var(--blue);font-weight:700;">' + e.issued + '</td>' +
+      '<td style="color:var(--green);">' + e.redeemed + '</td>' +
+      '<td style="color:var(--red);">' + e.expired + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + e.balance + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(e.revenue) + '</td>' +
+      '<td><div style="display:flex;align-items:center;gap:5px;"><div class="prog" style="width:50px;"><div class="prog-fill" style="width:'+rdPct+'%;background:'+(rdPct>70?'#059669':rdPct>40?'#d97706':'#dc2626')+'"></div></div><span style="font-size:11px;font-weight:700;">'+rdPct+'%</span></div></td>' +
+      '<td style="font-weight:700;">' + utPct + '%</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + (e.lastIssuance||'—') + '</td>' +
+      '<td>' + statusBadge(e.status) + '</td>' +
+      '<td><a href="salesperson.html?emp=' + encodeURIComponent(e.employeeCode) + '" class="btn btn-outline btn-xs"><i class="fas fa-chart-line"></i> Report</a></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ─── STATEMENTS ────────────────────────────────────────────────────────────
+function renderStatements() {
+  if (!_currentReseller) return;
+  var batches  = _RE.getBatchesByReseller(_currentReseller.id);
+  var tickets  = _RE.loadTickets().filter(function(t){ return t.resellerId===_currentReseller.id; });
+  var comm     = _currentReseller.commissionRate || 0;
+  var totalRev = 0, totalComm = 0, totalCost = 0;
+
+  var rows = batches.map(function(b){
+    var bt = tickets.filter(function(t){ return t.batchId===b.id; });
+    var rev  = bt.reduce(function(s,t){ return s+(t.salePrice||0); },0);
+    var cost = bt.length * (b.purchaseRate||0);
+    var c    = Math.round(rev * comm / 100);
+    totalRev += rev; totalComm += c; totalCost += cost;
+    return '<tr>' +
+      '<td><span class="code code-bat">' + b.batchCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (b.productName||'—') + '</td>' +
+      '<td>' + bt.length + '</td>' +
+      '<td>' + inr(b.faceValue) + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(rev) + '</td>' +
+      '<td>' + comm + '%</td>' +
+      '<td style="font-weight:700;color:var(--brand);">' + inr(c) + '</td>' +
+      '<td style="color:var(--muted);">' + inr(cost) + '</td>' +
+      '<td style="font-size:12px;">' + (b.validFrom ? dFmt(b.validFrom) : '—') + ' – ' + (b.validTo ? dFmt(b.validTo) : 'Open') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  document.getElementById('stmt-tbody').innerHTML = rows || '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);">No data</td></tr>';
+  document.getElementById('stmt-kpis').innerHTML = [
+    { val: inr(totalRev), lbl: 'Total Revenue' },
+    { val: inr(totalComm), lbl: 'Commission Earned (' + comm + '%)' },
+    { val: inr(totalCost), lbl: 'Total Cost Basis' },
+    { val: inr(totalRev - totalCost), lbl: 'Gross Margin' },
+  ].map(function(k){
+    return '<div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:12px;padding:18px;color:#fff;text-align:center;">' +
+      '<div style="font-size:22px;font-weight:900;">' + k.val + '</div>' +
+      '<div style="font-size:10.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;">' + k.lbl + '</div></div>';
+  }).join('');
+}
+
+// ─── CSV EXPORT ────────────────────────────────────────────────────────────
+function exportCSV(type) {
+  if (!_currentReseller) return;
+  var rid  = _currentReseller.id;
+  var data = [], headers = [], rows = [];
+  if (type==='batches') {
+    data = _RE.getBatchesByReseller(rid);
+    headers = ['Batch Code','Reseller Code','Product','Park','Total Qty','Allocated','Issued','Redeemed','Balance','Purchase Rate','Face Value','Valid From','Valid To','Payment','Status'];
+    rows = data.map(function(b){ return [b.batchCode,b.resellerCode,b.productName,b.parkKey,b.quantity,b.allocated,b.issued,b.redeemed,b.balance,b.purchaseRate,b.faceValue,b.validFrom,b.validTo,b.paymentStatus,b.status]; });
+  } else if (type==='allocations') {
+    data = _RE.getAllocationsByReseller(rid);
+    headers = ['Allocation Code','Reseller Code','Batch Code','Employee Code','Employee Name','Product','Qty','Issued','Redeemed','Recalled','Balance','Status','Date'];
+    rows = data.map(function(a){ return [a.allocationCode,a.resellerCode,a.batchCode,a.employeeCode,a.employeeName,a.productName,a.quantity,a.issued,a.redeemed,a.recalled,a.balance,a.status,new Date(a.allocatedAt).toISOString()]; });
+  } else if (type==='tickets') {
+    data = _RE.loadTickets().filter(function(t){ return t.resellerId===rid; });
+    headers = ['Ticket Code','Reseller Code','Batch Code','Employee Code','Alloc Code','Customer','Mobile','Product','Visit Date','Sale Price','Status','Issued At'];
+    rows = data.map(function(t){ return [t.ticketCode,t.resellerCode,t.batchCode,t.employeeCode,t.allocationCode||'',t.customerName,t.customerMobile,t.productName,t.visitDate,t.salePrice,t.status,new Date(t.issuedAt).toISOString()]; });
+  } else if (type==='employees') {
+    data = _RE.getEmployeesByReseller(rid);
+    headers = ['Employee Code','Name','Reseller Code','Role','Channel','Status','Email','Mobile'];
+    rows = data.map(function(e){ return [e.employeeCode,e.name,e.resellerCode,e.role,e.channel,e.status,e.email,e.mobile]; });
+  }
+  var csv = headers.join(',') + '\n' + rows.map(function(r){ return r.map(function(c){ return '"'+(c||'').toString().replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type:'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wow_reseller_' + type + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('Exported to CSV');
+}
+
+function exportAll() { exportCSV(_currentTab==='batches'?'batches':_currentTab==='allocations'?'allocations':_currentTab==='tickets'?'tickets':_currentTab==='salespersons'?'employees':'tickets'); }
+
+// ─── DROPDOWN POPULATORS ───────────────────────────────────────────────────
+function populateDropdowns() {
+  if (!_currentReseller) return;
+  var rid   = _currentReseller.id;
+  var emps  = _RE.getEmployeesByReseller(rid);
+  var bats  = _RE.getBatchesByReseller(rid);
+
+  ['alloc-emp','tkt-emp'].forEach(function(id){
+    var el = document.getElementById(id); if (!el) return;
+    el.innerHTML = '<option value="">All Employees</option>';
+    emps.forEach(function(e){ el.innerHTML += '<option value="' + e.id + '">' + e.employeeCode + ' — ' + e.name + '</option>'; });
+  });
+
+  ['alloc-bat','tkt-bat'].forEach(function(id){
+    var el = document.getElementById(id); if (!el) return;
+    el.innerHTML = '<option value="">All Batches</option>';
+    bats.forEach(function(b){ el.innerHTML += '<option value="' + b.id + '">' + b.batchCode + '</option>'; });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
-<script src="../js/wow-auth-guard.js" data-portal="reseller"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
