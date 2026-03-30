@@ -63,10 +63,11 @@ const NAV_ITEMS = [
   {
     label: 'Partners',
     children: [
-      { label: '✈️ Travel Agents',    href: 'partner/onboarding.html', desc: 'Commission & onboarding' },
-      { label: '🏪 Resellers',        href: 'partner/onboarding.html', desc: 'Kiosk & retail partners' },
-      { label: '🏢 Corporate Sales',  href: 'groups/corporate.html',   desc: 'Bulk & B2B bookings' },
-      { label: '🔑 Partner Portal',   href: 'partner/login.html',      desc: 'Sign in to your account' },
+      { label: '✈️ Travel Agent Onboarding', href: 'partner/onboarding.html',  desc: 'Apply as a travel agent partner' },
+      { label: '🏪 Reseller Onboarding',      href: 'reseller/onboarding.html', desc: 'Apply as a reseller partner' },
+      { label: '🏢 Corporate Sales',          href: 'groups/corporate.html',    desc: 'Bulk & B2B bookings' },
+      { label: '🤝 Travel Agent Login',       href: 'partner/login.html',       desc: 'Sign in to partner portal' },
+      { label: '🏬 Reseller Login',           href: 'reseller/login.html',      desc: 'Sign in to reseller ERP' },
     ]
   },
 ];
@@ -300,7 +301,7 @@ function buildFooter() {
         <a href="${BASE}groups/birthdays.html">Birthday Events</a>
         <a href="${BASE}sales/quote-builder.html">Get a Quote</a>
         <a href="${BASE}partner/onboarding.html">Travel Agent Onboarding</a>
-        <a href="${BASE}partner/login.html">Partner Portal Login</a>
+        <a href="${BASE}partner/login.html">Travel Agent / Partner Login</a>
         <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
           <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resellers</div>
           <a href="${BASE}reseller/onboarding.html">Reseller Onboarding</a>
@@ -316,17 +317,10 @@ function buildFooter() {
         <a href="${BASE}contact.html">Contact Us</a>
         <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
           <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">My Account</div>
-          <a href="${BASE}portal/login.html">\ud83d\udc64 Individual Sign In</a>
-          <a href="${BASE}portal/login.html?type=business">\ud83c\udfe2 Business Sign In</a>
-          <a href="${BASE}portal/register.html">Create Account</a>
+          <a href="${BASE}portal/login.html">👤 Sign In / Register</a>
+          <a href="${BASE}portal/login.html?type=business">🏢 Business Sign In</a>
           <a href="${BASE}portal/my-bookings.html">My Bookings</a>
           <a href="${BASE}portal/loyalty.html" data-module="loyalty_program">My Rewards</a>
-          <a href="${BASE}portal/wow-passport.html">My WOW Passport</a>
-        </div>
-        <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
-          <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Passport Holder</div>
-          <a href="${BASE}passport/login.html">Passport Holder Login</a>
-          <a href="${BASE}portal/wow-passport.html">View My Passport</a>
         </div>
       </div>
       <!-- STAFF & PARTNER PORTALS COL -->
@@ -343,7 +337,7 @@ function buildFooter() {
           <a href="${BASE}reseller/index.html">&#128722; Reseller ERP</a>
           <a href="${BASE}ta/index.html">&#9992;&#65039; Travel Agent Portal</a>
           <a href="${BASE}partner/onboarding.html">Reseller / TA Onboarding</a>
-          <a href="${BASE}groups/corporate.html">&#127970; Corporate Portal</a>
+
         </div>
       </div>
     </div>
@@ -358,6 +352,19 @@ function buildFooter() {
     </div>
   </div>
 </footer>`;
+}
+
+/* ─── Read customer session (CUSTOMER role only) ────────────── */
+function getCustomerSession() {
+  try {
+    const raw = sessionStorage.getItem('wow_auth_session') ||
+                localStorage.getItem('wow_auth_session') ||
+                sessionStorage.getItem('wow_portal_session') ||
+                localStorage.getItem('wow_portal_session');
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    return (s && s.role === 'CUSTOMER') ? s : null;
+  } catch(e) { return null; }
 }
 
 /* ─── Shell init ───────────────────────────────────────────── */
@@ -440,6 +447,21 @@ function initShell() {
   /* Apply module gates to freshly-built DOM */
   if (window.WOWModules) {
     window.WOWModules._applyDOMGates(window.WOWModules.getState());
+  }
+
+  /* ── Session-aware nav: swap Sign-In → My Account if logged in ── */
+  const sess = getCustomerSession();
+  const signinBtn = document.getElementById('nav-signin-btn');
+  if (signinBtn && sess) {
+    // Logged-in: replace Sign In with a greeting / My Account link
+    const firstName = (sess.name || 'Account').split(' ')[0];
+    signinBtn.href = BASE + 'portal/dashboard.html';
+    signinBtn.setAttribute('aria-label', 'My Account — ' + (sess.name || ''));
+    signinBtn.innerHTML = `
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:4px;"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Hi, ${firstName}`;
+    signinBtn.style.background = 'rgba(201,168,76,.15)';
+    signinBtn.style.borderColor = 'rgba(201,168,76,.5)';
+    signinBtn.style.color = '#F0D080';
   }
 }
 
