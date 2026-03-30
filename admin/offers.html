@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="../js/wow-auth.js"></script>
-  <script src="../js/wow-offer-engine.js"></script>
+  <script src="../js/wow-offer-engine-v4.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--ink:#0a0f28;--blue:#1a56db;--green:#16a34a;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;--border:#e2e8f0;--text:#374151;--muted:#6b7280;--surface:#f0f4ff;}
@@ -641,7 +641,8 @@ let _filterStatus = 'all';
 let _offers      = [];
 
 function init() {
-  _offers = WOWOfferEngine.loadOffers();
+  // Use loadRawOffers so admin panel sees v3-style fields (type, parks, categories, value, etc.)
+  _offers = WOWOfferEngine.loadRawOffers ? WOWOfferEngine.loadRawOffers() : WOWOfferEngine.loadOffers();
   renderOfferGrid();
   renderStats();
   loadBuffetForm();
@@ -657,9 +658,14 @@ function renderOfferGrid() {
   const typeFilter = document.getElementById('type-filter')?.value || '';
 
   let filtered = _offers.filter(o => {
-    if (_filterStatus !== 'all' && o.status !== _filterStatus) return false;
-    if (parkFilter && o.parks.indexOf(parkFilter) === -1) return false;
-    if (typeFilter && o.type !== typeFilter) return false;
+    // Normalise status for filtering: treat 'active' same as 'live'
+    const effStatus = (o.status === 'active') ? 'live' : o.status;
+    if (_filterStatus !== 'all' && effStatus !== _filterStatus) return false;
+    // v4 native offers may not have .parks; use conditionGroups if needed
+    const offerParks = o.parks || (o._v3raw && o._v3raw.parks) || [];
+    if (parkFilter && offerParks.indexOf(parkFilter) === -1) return false;
+    const offerType = o.type || (o._v3raw && o._v3raw.type) || 'percent';
+    if (typeFilter && offerType !== typeFilter) return false;
     return true;
   });
 
@@ -668,27 +674,43 @@ function renderOfferGrid() {
     return;
   }
 
-  const statusColors = { live:'#22c55e', draft:'#1a56db', scheduled:'#f59e0b', expired:'#9ca3af' };
-  const statusBadge  = { live:'badge-green', draft:'badge-blue', scheduled:'badge-amber', expired:'badge-gray' };
+  const statusColors = { live:'#22c55e', active:'#22c55e', draft:'#1a56db', scheduled:'#f59e0b', expired:'#9ca3af', paused:'#f97316', archived:'#9ca3af' };
+  const statusBadge  = { live:'badge-green', active:'badge-green', draft:'badge-blue', scheduled:'badge-amber', expired:'badge-gray', paused:'badge-amber', archived:'badge-gray' };
   const typelabels   = { percent:'% Discount', flat:'Flat ₹', bogo:'Buy 1 Get 1', b2g1:'Buy 2 Get 1', buy4_discount:'Buy 4 Discount', flash_sale:'Flash Sale' };
   const typeEmoji    = { percent:'%', flat:'₹', bogo:'🎁', b2g1:'🎁🎁', buy4_discount:'4+', flash_sale:'⚡' };
 
   grid.innerHTML = filtered.map(o => {
-    const color = statusColors[o.status] || '#9ca3af';
-    const badge = statusBadge[o.status] || 'badge-gray';
-    const parks = (o.parks || []).map(p => p.replace('_DAY','').replace('_',' ')).join(', ');
-    const cats  = (o.categories || []).join(', ');
-    const valTxt = o.type === 'percent' ? o.value + '% off'
-      : o.type === 'flat' ? '₹' + o.value + ' off'
-      : o.type === 'bogo' ? 'Buy ' + (o.buyQty||1) + ' Get ' + (o.getFreeQty||1) + ' Free'
-      : o.type === 'b2g1' ? 'Buy ' + (o.buyQty||2) + ' Get ' + (o.getFreeQty||1) + ' Free'
-      : o.type === 'buy4_discount' ? 'Buy 4+: ' + o.value + (o.discountMode === 'flat' ? ' ₹' : '% ') + 'off'
-      : o.value + '% Flash';
+    // Support both v3 fields and v4 native offers
+    const effStatus = o.status || 'draft';
+    const color = statusColors[effStatus] || '#9ca3af';
+    const badge = statusBadge[effStatus] || 'badge-gray';
+    const offerParks = o.parks || [];
+    const parks = offerParks.map(p => p.replace('_DAY','').replace('_',' ')).join(', ') || '(all parks)';
+    const offerCats  = o.categories || [];
+    const cats  = offerCats.join(', ') || '(all categories)';
+    // For v4 native offers, derive a display type from first action
+    let offerType = o.type;
+    let offerValue = o.value;
+    if (!offerType && o.actions && o.actions.length) {
+      const a = o.actions[0];
+      if (a.type === 'percent' || a.type === 'slab_percent') { offerType = 'percent'; offerValue = a.value; }
+      else if (a.type === 'flat' || a.type === 'slab_flat') { offerType = 'flat'; offerValue = a.value; }
+      else if (a.type === 'free_tickets') { offerType = 'bogo'; }
+      else if (a.type === 'fnb_credit')  { offerType = 'flat'; offerValue = a.value; }
+      else offerType = 'percent';
+    }
+    const valTxt = offerType === 'percent' ? (offerValue||0) + '% off'
+      : offerType === 'flat' ? '₹' + (offerValue||0) + ' off'
+      : offerType === 'bogo' ? 'Buy ' + (o.buyQty||1) + ' Get ' + (o.getFreeQty||1) + ' Free'
+      : offerType === 'b2g1' ? 'Buy ' + (o.buyQty||2) + ' Get ' + (o.getFreeQty||1) + ' Free'
+      : offerType === 'buy4_discount' ? 'Buy 4+: ' + (offerValue||0) + (o.discountMode === 'flat' ? ' ₹' : '% ') + 'off'
+      : (offerValue||0) + '% Flash';
 
-    const dateTxt = o.startDate || o.endDate
-      ? (o.startDate || '∞') + ' → ' + (o.endDate || '∞')
-      : 'Ongoing';
-    const autoTxt = o.promoCode ? 'Code: ' + o.promoCode : 'Auto-apply';
+    // Date display: v3 fields or v4 schedule
+    const sd = o.startDate || (o.schedule && o.schedule.startDate) || null;
+    const ed = o.endDate   || (o.schedule && o.schedule.endDate)   || null;
+    const dateTxt = sd || ed ? (sd || '∞') + ' → ' + (ed || '∞') : 'Ongoing';
+    const autoTxt = o.promoCode ? 'Code: ' + o.promoCode : (o.autoApply ? 'Auto-apply' : 'Manual');
 
     return `<div class="offer-card" style="border-top:4px solid ${color};">
       <div class="offer-card-header">
@@ -713,7 +735,7 @@ function renderOfferGrid() {
           <button class="btn-sm btn-amber" onclick="editOffer('${o.id}')">✏️ Edit</button>
           <button class="btn-sm btn-ghost" onclick="cloneOffer('${o.id}')">📋 Clone</button>
           <button class="btn-sm btn-purple" onclick="openAnalytics('${o.id}')">📊</button>
-          ${o.status === 'live'
+          ${(o.status === 'live' || o.status === 'active')
             ? `<button class="btn-sm btn-red" onclick="toggleStatus('${o.id}','draft')">⏸ Pause</button>`
             : `<button class="btn-sm btn-green" onclick="toggleStatus('${o.id}','live')">▶ Activate</button>`
           }
@@ -728,7 +750,8 @@ function renderOfferGrid() {
 //  Stats
 // ────────────────────────────────────────────────────────────
 function renderStats() {
-  const live = _offers.filter(o => o.status === 'live').length;
+  // Support both v3 'live' and v4 'active' status strings
+  const live = _offers.filter(o => o.status === 'live' || o.status === 'active').length;
   document.getElementById('stat-live').textContent = live;
   document.getElementById('stat-max-tix').textContent = WOWOfferEngine.getMaxTickets();
 }
@@ -809,28 +832,64 @@ function editOffer(id) {
   document.getElementById('f-value').value    = offer.value || '';
   document.getElementById('f-buy-qty').value  = offer.buyQty  || 1;
   document.getElementById('f-get-qty').value  = offer.getFreeQty || 1;
-  document.getElementById('f-start').value    = offer.startDate || '';
-  document.getElementById('f-end').value      = offer.endDate   || '';
+  document.getElementById('f-start').value    = offer.startDate || (offer.schedule && offer.schedule.startDate) || '';
+  document.getElementById('f-end').value      = offer.endDate   || (offer.schedule && offer.schedule.endDate)   || '';
   document.getElementById('f-min-tix').value  = offer.minTickets  || 1;
   document.getElementById('f-min-cart').value = offer.minCartValue || 0;
-  document.getElementById('f-max-uses').value = offer.maxUses !== null && offer.maxUses !== undefined ? offer.maxUses : '';
+  const _maxUses = offer.maxUses !== null && offer.maxUses !== undefined ? offer.maxUses
+    : (offer.usageLimits && offer.usageLimits.global !== null && offer.usageLimits.global !== undefined ? offer.usageLimits.global : '');
+  document.getElementById('f-max-uses').value = _maxUses;
   document.getElementById('f-auto-apply').checked = !!offer.autoApply;
   document.getElementById('f-flash-toggle').checked = !!offer.flashSale;
 
   if (offer.discountMode) document.getElementById('f-discount-mode').value = offer.discountMode;
 
-  // Type
+  // Type — derive from v3 .type or v4 first action
+  let editType = offer.type;
+  if (!editType && offer.actions && offer.actions.length) {
+    const a = offer.actions[0];
+    if (a.type === 'percent' || a.type === 'slab_percent') editType = 'percent';
+    else if (a.type === 'flat' || a.type === 'slab_flat') editType = 'flat';
+    else if (a.type === 'free_tickets') editType = 'bogo';
+    else if (a.type === 'fnb_credit')   editType = 'flat';
+    else editType = 'percent';
+  }
+  editType = editType || 'percent';
+  document.getElementById('f-value').value = offer.value || (offer.actions && offer.actions[0] ? offer.actions[0].value || '' : '');
   document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
-  const tc = document.querySelector('.type-card[data-type="' + offer.type + '"]');
-  if (tc) { tc.classList.add('selected'); selectType(offer.type, tc, false); }
+  const tc = document.querySelector('.type-card[data-type="' + editType + '"]');
+  if (tc) { tc.classList.add('selected'); selectType(editType, tc, false); }
 
-  // Parks
+  // Parks — support both v3 .parks array and v4 conditionGroups
   const parksEl = document.getElementById('f-parks');
-  Array.from(parksEl.options).forEach(o => { o.selected = offer.parks.indexOf(o.value) !== -1; });
+  let offerParks = offer.parks || [];
+  if (!offerParks.length && offer.conditionGroups) {
+    // Extract parks from v4 conditionGroups PARK condition
+    offer.conditionGroups.forEach(function(g) {
+      (g.conditions || []).forEach(function(c) {
+        if (c.type === 'park' && Array.isArray(c.value)) {
+          offerParks = offerParks.concat(c.value);
+        }
+      });
+    });
+  }
+  if (!offerParks.length) offerParks = ['WATER_DAY','AMUSEMENT_DAY','COMBO_DAY']; // default all parks
+  Array.from(parksEl.options).forEach(o => { o.selected = offerParks.indexOf(o.value) !== -1; });
 
-  // Categories
+  // Categories — support both v3 .categories array and v4 conditionGroups
   const catsEl = document.getElementById('f-categories');
-  Array.from(catsEl.options).forEach(o => { o.selected = offer.categories.indexOf(o.value) !== -1; });
+  let offerCats = offer.categories || [];
+  if (!offerCats.length && offer.conditionGroups) {
+    offer.conditionGroups.forEach(function(g) {
+      (g.conditions || []).forEach(function(c) {
+        if (c.type === 'category' && Array.isArray(c.value)) {
+          offerCats = offerCats.concat(c.value);
+        }
+      });
+    });
+  }
+  if (!offerCats.length) offerCats = ['adult','child']; // default
+  Array.from(catsEl.options).forEach(o => { o.selected = offerCats.indexOf(o.value) !== -1; });
 
   // Family rule
   if (offer.autoApplyRule) {
@@ -856,6 +915,10 @@ function editOffer(id) {
   document.getElementById('create-modal').classList.add('show');
 }
 
+function _reloadOffers() {
+  _offers = WOWOfferEngine.loadRawOffers ? WOWOfferEngine.loadRawOffers() : WOWOfferEngine.loadOffers();
+}
+
 function cloneOffer(id) {
   const offer = _offers.find(o => o.id === id);
   if (!offer) return;
@@ -865,7 +928,8 @@ function cloneOffer(id) {
     status: 'draft',
     usedCount: 0
   });
-  _offers = WOWOfferEngine.adminSaveOffer(clone);
+  WOWOfferEngine.adminSaveOffer(clone);
+  _reloadOffers();
   renderOfferGrid();
   renderStats();
   showToast('Offer cloned as Draft.');
@@ -873,7 +937,8 @@ function cloneOffer(id) {
 
 function deleteOffer(id) {
   if (!confirm('Delete this offer? This cannot be undone.')) return;
-  _offers = WOWOfferEngine.adminDeleteOffer(id);
+  WOWOfferEngine.adminDeleteOffer(id);
+  _reloadOffers();
   renderOfferGrid();
   renderStats();
   showToast('Offer deleted.');
@@ -883,7 +948,8 @@ function toggleStatus(id, newStatus) {
   const offer = _offers.find(o => o.id === id);
   if (!offer) return;
   offer.status = newStatus;
-  _offers = WOWOfferEngine.adminSaveOffer(offer);
+  WOWOfferEngine.adminSaveOffer(offer);
+  _reloadOffers();
   renderOfferGrid();
   renderStats();
   showToast('Offer status updated to: ' + newStatus);
@@ -1031,7 +1097,8 @@ function saveOfferForm(status) {
     usedCount:   _editId ? (_offers.find(o => o.id === _editId)?.usedCount || 0) : 0
   };
 
-  _offers = WOWOfferEngine.adminSaveOffer(offer);
+  WOWOfferEngine.adminSaveOffer(offer);
+  _reloadOffers();
   closeModal('create-modal');
   renderOfferGrid();
   renderStats();
