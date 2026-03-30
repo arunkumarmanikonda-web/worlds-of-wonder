@@ -100,12 +100,14 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;c
 .input-suffix:hover{text-decoration:underline;}
 .field-note{font-size:11px;color:var(--muted);}
 
-/* OTP row */
-.otp-row{display:flex;gap:8px;}
+/* OTP row — fixed width so boxes don't expand */
+.otp-row{display:flex;gap:8px;justify-content:flex-start;}
 .otp-input{
-  flex:1;text-align:center;font-size:20px;font-weight:800;
+  width:52px;min-width:52px;max-width:52px;
+  flex:0 0 52px;
+  text-align:center;font-size:22px;font-weight:800;
   background:#f8faff;border:1.5px solid var(--border);
-  color:var(--text);padding:12px 4px;border-radius:9px;
+  color:var(--text);padding:10px 0;border-radius:9px;
   font-family:'Courier New',monospace;transition:all .2s;
 }
 .otp-input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(0,51,204,.08);}
@@ -284,7 +286,11 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;c
               <label>Mobile Number</label>
               <div class="input-wrap">
                 <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
-                <input type="tel" id="mobile-input" class="has-icon" placeholder="+91 98765 43210" maxlength="13"/>
+                <input type="tel" id="mobile-input" class="has-icon" placeholder="10-digit mobile number"
+                  maxlength="10"
+                  pattern="[6-9][0-9]{9}"
+                  oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"
+                />
               </div>
             </div>
             <button class="btn-main" onclick="sendOTP()">
@@ -576,9 +582,9 @@ function setMethod(m) {
 // ── OTP FLOW ─────────────────────────────────────────────────────────
 let otpTimerInterval = null;
 function sendOTP() {
-  const mobile = document.getElementById('mobile-input').value.trim();
-  if (mobile.length < 10) {
-    showMsg('ind-msg','error','Please enter a valid 10-digit mobile number.');
+  const mobile = document.getElementById('mobile-input').value.replace(/\D/g,'').trim();
+  if (mobile.length !== 10 || !/^[6-9]/.test(mobile)) {
+    showMsg('ind-msg','error','Please enter a valid 10-digit Indian mobile number (starts with 6–9).');
     return;
   }
   document.getElementById('step-mobile-1').style.display = 'none';
@@ -629,7 +635,10 @@ function emailLogin(e) {
     showMsg('ind-msg','error','Please enter both email and password.');
     return;
   }
-  showMsg('ind-msg','success','Signing in... Redirecting to dashboard.');
+  showMsg('ind-msg','success','✅ Signing in… Redirecting to your dashboard.');
+  if (typeof WOWAuth !== 'undefined') {
+    WOWAuth.setSession({id:'DEMO-CUST',name:email.split('@')[0]||'Customer',email:email,role:'CUSTOMER',loginAt:Date.now()});
+  }
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
 }
 
@@ -647,7 +656,7 @@ function bizLogin() {
     showMsg('biz-msg','error','Please enter your company email and password.');
     return;
   }
-  showMsg('biz-msg','success','Signing in... Redirecting to business dashboard.');
+  showMsg('biz-msg','success','✅ Signing in… Redirecting to your dashboard.');
   setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
 }
 
@@ -727,8 +736,12 @@ window.addEventListener('DOMContentLoaded', () => {
   if (params.get('error') === 'access_denied') showMsg('ind-msg','error','Session expired or access denied.');
   if (typeof WOWAuth !== 'undefined') {
     const session = WOWAuth.getSession();
-    if (session && (session.role === 'SUPER_ADMIN' || session.role === 'CUSTOMER')) {
+    // Only redirect CUSTOMER role — Super Admin should go to admin dashboard, not here
+    if (session && session.role === 'CUSTOMER') {
       window.location.href = params.get('redirect') || 'dashboard.html'; return;
+    }
+    if (session && session.role === 'SUPER_ADMIN') {
+      window.location.href = params.get('redirect') || '../admin/index.html'; return;
     }
     // SA bypass button at extreme top-right
     const saBtn = document.createElement('div');
@@ -738,19 +751,26 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Patch OTP verify to also write WOWAuth session
-const _origVerifyOTP = typeof verifyOTP !== 'undefined' ? verifyOTP : null;
+// Patch OTP verify — always redirect to CUSTOMER dashboard
 function verifyOTP() {
   const otp = ['otp1','otp2','otp3','otp4'].map(function(id){ var el=document.getElementById(id); return el?el.value:''; }).join('');
   if (otp === '1234') {
     if (typeof WOWAuth !== 'undefined') {
       WOWAuth.setSession({id:'DEMO-CUST',name:'Demo Customer',email:'customer@wow.in',role:'CUSTOMER',pin:'1234',loginAt:Date.now()});
     }
-    showMsg('ind-msg','success','Verified! Redirecting to your dashboard...');
+    showMsg('ind-msg','success','✅ Verified! Redirecting to your dashboard…');
     var params = new URLSearchParams(window.location.search);
-    setTimeout(function(){ window.location.href = params.get('redirect') || 'dashboard.html'; }, 1000);
+    // Always redirect CUSTOMER to their dashboard, never to admin
+    var dest = params.get('redirect');
+    if (!dest || dest.includes('admin')) dest = 'dashboard.html';
+    setTimeout(function(){ window.location.href = dest; }, 1000);
   } else {
-    showMsg('ind-msg','error','Incorrect OTP. Please try again. (Demo OTP: 1234)');
+    showMsg('ind-msg','error','✗ Incorrect OTP. Demo OTP is: 1 2 3 4');
+    // Shake OTP boxes on error
+    document.querySelectorAll('.otp-input').forEach(function(el){
+      el.style.borderColor='#ef4444';
+      setTimeout(function(){ el.style.borderColor=''; },1500);
+    });
   }
 }
 </script>
