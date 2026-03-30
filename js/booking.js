@@ -212,7 +212,7 @@ function show(id)    { const e = el(id); if (e) e.classList.remove('hidden'); }
 function hide(id)    { const e = el(id); if (e) e.classList.add('hidden'); }
 
 // ------------------------------------------------------------
-//  BUILD CART OBJECT (for offer engine)
+//  BUILD CART OBJECT (for offer engine v4)
 // ------------------------------------------------------------
 function buildCart(parkKey) {
   const breakdown = {};
@@ -226,8 +226,11 @@ function buildCart(parkKey) {
       subtotal += line;
     }
   });
-  return { parkKey, qty: totalTickets(), total: subtotal, breakdown };
+  return { parkKey, qty: totalTickets(), subtotal, total: subtotal, breakdown };
 }
+
+// v4 evaluation result cache
+var _lastEvalResult = null;
 
 // ------------------------------------------------------------
 //  PRICING ENGINE
@@ -264,16 +267,22 @@ function computeOrder(parkKey) {
   let offerDisc = _appliedOffer ? _appliedOffer.discountAmount : 0;
 
   const afterGroupDisc = subtotal - groupDisc;
+  // F&B credit from v4 engine
+  let fnbCredit = 0;
+  if (_lastEvalResult) fnbCredit = _lastEvalResult.totalFnbCredit || 0;
+  // F&B credit reduces buffet price (capped at buffet cost)
+  const fnbDiscount = Math.min(fnbCredit, buffetPrice);
+
   // Offer applied after group disc
   const afterOfferDisc = Math.max(0, afterGroupDisc - offerDisc);
-  const finalTotal     = afterOfferDisc + buffetPrice;
+  const finalTotal     = afterOfferDisc + buffetPrice - fnbDiscount;
 
   const gstAmt  = Number((finalTotal - finalTotal / (1 + GST_RATE)).toFixed(2));
   const taxable = finalTotal - gstAmt;
 
   return {
-    parkKey, lines, subtotal, groupDisc, offerDisc, afterGroupDisc,
-    afterOfferDisc, buffetPrice, finalTotal, gstAmt, taxable, total
+    parkKey, lines, subtotal, groupDisc, offerDisc, fnbCredit, fnbDiscount,
+    afterGroupDisc, afterOfferDisc, buffetPrice, finalTotal, gstAmt, taxable, total
   };
 }
 
@@ -296,32 +305,117 @@ function showFlashBanner(parkKey) {
 }
 
 // ------------------------------------------------------------
-//  AUTO-APPLY OFFERS
+//  AUTO-APPLY OFFERS (v4 engine integration)
 // ------------------------------------------------------------
 function refreshOffers(parkKey) {
   if (!window.WOWOfferEngine) return;
-  const visitDate = el('visit-date')?.value || '';
-  const cart = buildCart(parkKey);
-  const best = window.WOWOfferEngine.computeBestOffer(cart, visitDate, _promoCode);
-  _appliedOffer = best;
+  const eng       = window.WOWOfferEngine;
+  const visitDate = el('visit-date') ? el('visit-date').value : '';
+  const cart      = buildCart(parkKey);
 
-  const offerRow  = el('sum-offer-row');
-  const offerLbl  = el('sum-offer-label');
-  const offerVal  = el('sum-offer-val');
+  // v4 evaluation — full resolution with stacking, conflict, A/B
+  const evalResult = eng.evaluateCart(cart, {
+    visitDateStr: visitDate || null,
+    promoCode   : _promoCode || null,
+    channel     : 'web',
+    segment     : 'all',
+  });
+  _lastEvalResult = evalResult;
+
+  // Aggregate totals from v4 result
+  const totalDiscount = evalResult.totalTicketDiscount || 0;
+  const totalFnb      = evalResult.totalFnbCredit      || 0;
+  const appliedOffers = evalResult.applied             || [];
+
+  // Set _appliedOffer as v3-compat shim for computeOrder()
+  if (appliedOffers.length > 0) {
+    const first = appliedOffers[0];
+    _appliedOffer = {
+      offerId      : first.offerId,
+      offerName    : first.offerName,
+      discountAmount: totalDiscount,
+      freeTickets  : first.freeTickets || 0,
+      freeCategory : first.freeCategory || null,
+      description  : (first.messaging && first.messaging.appliedMsg)
+        ? first.messaging.appliedMsg.replace('{savings}', inr(totalDiscount))
+        : first.offerName,
+      fnbCredit    : totalFnb,
+    };
+  } else {
+    _appliedOffer = null;
+  }
+
+  // ── Offer Summary Row ──
+  const offerRow   = el('sum-offer-row');
+  const offerLbl   = el('sum-offer-label');
+  const offerVal   = el('sum-offer-val');
   const offerBadge = el('applied-offer-badge');
 
-  if (best) {
+  if (appliedOffers.length > 0) {
     if (offerRow) offerRow.classList.remove('hidden');
-    if (offerLbl) offerLbl.textContent = best.offerName;
-    if (offerVal) offerVal.textContent = '−' + inr(best.discountAmount);
+    if (offerLbl) offerLbl.textContent = appliedOffers.map(function(a){return a.offerName;}).join(' + ');
+    if (offerVal) offerVal.textContent = '−' + inr(totalDiscount);
     if (offerBadge) {
-      offerBadge.textContent = '🎉 ' + best.description;
+      var badge = '';
+      appliedOffers.forEach(function(a) {
+        var savBadge = (a.messaging && a.messaging.savingsBadge) ? a.messaging.savingsBadge : a.offerName;
+        badge += '<span style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:5px;">🎉 ' + savBadge + '</span>';
+      });
+      if (totalDiscount > 0) badge += '<span style="font-size:12px;color:#059669;font-weight:600;"> You save ' + inr(totalDiscount) + '!</span>';
+      offerBadge.innerHTML = badge;
       offerBadge.classList.remove('hidden');
     }
   } else {
     if (offerRow) offerRow.classList.add('hidden');
     if (offerBadge) offerBadge.classList.add('hidden');
   }
+
+  // ── Explainability Ribbon ──
+  _renderExplainabilityRibbon(evalResult);
+
+  // ── F&B Credit Badge ──
+  if (totalFnb > 0) {
+    const fnbEl = el('fnb-credit-badge');
+    if (fnbEl) {
+      fnbEl.innerHTML = '🍽 <strong>F&B Credit ' + inr(totalFnb) + '</strong> unlocked! Applies to your Buffet add-on.';
+      fnbEl.classList.remove('hidden');
+    }
+  } else {
+    const fnbEl = el('fnb-credit-badge');
+    if (fnbEl) fnbEl.classList.add('hidden');
+  }
+}
+
+function _renderExplainabilityRibbon(evalResult) {
+  const ribbon = el('offer-explain-ribbon');
+  if (!ribbon) return;
+  if (!evalResult || !evalResult.considered || !evalResult.considered.length) {
+    ribbon.classList.add('hidden'); return;
+  }
+
+  // Show qualified + rejected breakdown
+  const qualified = evalResult.qualified || [];
+  const rejected  = (evalResult.considered || []).filter(function(c){return c.rejected;});
+  const applied   = evalResult.applied   || [];
+
+  if (!applied.length) {
+    ribbon.innerHTML = '<div style="font-size:10.5px;color:#6b7280;">No offers applicable to current cart. ' +
+      (rejected.length ? rejected.slice(0,2).map(function(r){return '<span style="margin-left:6px;">'+r.name+': '+r.reason+'</span>';}).join('') : '') + '</div>';
+    ribbon.classList.remove('hidden');
+    return;
+  }
+
+  var html = '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+    '<span style="font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;">Offers evaluated:</span>' +
+    applied.map(function(a){
+      return '<span style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);color:#4ade80;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;">✓ '+a.offerName+'</span>';
+    }).join('') +
+    (rejected.slice(0,3).map(function(r){
+      return '<span style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);color:#f87171;font-size:10px;padding:2px 8px;border-radius:12px;">'+r.name+'</span>';
+    }).join('')) +
+  '</div>';
+  ribbon.innerHTML = html;
+  ribbon.classList.remove('hidden');
 }
 
 // ------------------------------------------------------------
@@ -486,7 +580,7 @@ function showMaxTicketAlert(maxTix) {
 }
 
 // ------------------------------------------------------------
-//  PROMO CODE
+//  PROMO CODE (v4 engine integration)
 // ------------------------------------------------------------
 function applyPromoCode() {
   const inp = el('promo-code-input');
@@ -496,23 +590,43 @@ function applyPromoCode() {
 
   if (!window.WOWOfferEngine) { alert('Offer engine not loaded.'); return; }
 
-  const visitDate = el('visit-date')?.value || '';
+  const eng       = window.WOWOfferEngine;
+  const visitDate = el('visit-date') ? el('visit-date').value : '';
   const cart      = buildCart(_parkKey);
-  const result    = window.WOWOfferEngine.applyPromoCode(code, cart, visitDate);
 
-  if (result.error) {
-    const errEl = el('promo-err');
-    if (errEl) { errEl.textContent = result.error; errEl.classList.remove('hidden'); }
+  // v4 promo validation
+  const res = eng.validatePromoCode(code, cart, { visitDateStr: visitDate || null, channel: 'web' });
+
+  const errEl     = el('promo-err');
+  const successEl = el('promo-success');
+
+  if (!res.valid) {
+    if (errEl) { errEl.textContent = '❌ ' + res.error; errEl.classList.remove('hidden'); }
+    if (successEl) successEl.classList.add('hidden');
     _promoCode = '';
   } else {
-    _promoCode    = code;
-    _appliedOffer = result;
-    const errEl   = el('promo-err');
+    _promoCode = code;
     if (errEl) errEl.classList.add('hidden');
-    const successEl = el('promo-success');
-    if (successEl) { successEl.textContent = '✅ Promo applied: ' + result.description; successEl.classList.remove('hidden'); }
+    const discount = res.applied ? res.applied.totalDiscount : 0;
+    const savingText = discount > 0 ? ' — saving ' + inr(discount) + '!' : '';
+    if (successEl) {
+      successEl.innerHTML = '✅ <strong>' + code + '</strong> applied' + savingText;
+      successEl.classList.remove('hidden');
+    }
     refreshSummary(_parkKey);
   }
+}
+
+function clearPromoCode() {
+  _promoCode = '';
+  _appliedOffer = null;
+  const inp = el('promo-code-input');
+  if (inp) inp.value = '';
+  const errEl     = el('promo-err');
+  const successEl = el('promo-success');
+  if (errEl)     errEl.classList.add('hidden');
+  if (successEl) successEl.classList.add('hidden');
+  refreshSummary(_parkKey);
 }
 
 // ------------------------------------------------------------
@@ -569,6 +683,17 @@ function refreshSummary(parkKey) {
       buffetRow.classList.remove('hidden');
     } else {
       buffetRow.classList.add('hidden');
+    }
+  }
+
+  // F&B Credit row
+  const fnbRow = el('sum-fnb-credit-row');
+  if (fnbRow) {
+    if (order.fnbDiscount > 0) {
+      txt('sum-fnb-credit-val', '−' + inr(order.fnbDiscount));
+      fnbRow.classList.remove('hidden');
+    } else {
+      fnbRow.classList.add('hidden');
     }
   }
 
@@ -674,7 +799,16 @@ function validateAndCheckout() {
   sessionStorage.setItem('wow_booking', JSON.stringify(bookingData));
   sessionStorage.setItem('wow_tx_id', 'WOW' + Date.now().toString(36).toUpperCase());
 
-  showSuccessModal({ name, mobile, date, order, park, proofNeeded });
+  // ── Redirect to payment page ───────────────────────────────
+  // Determine the relative path depth to find book/payment.html
+  var _pathname = window.location.pathname;
+  var _payUrl;
+  if (_pathname.indexOf('/book/') !== -1) {
+    _payUrl = 'payment.html';          // already inside /book/
+  } else {
+    _payUrl = 'book/payment.html';     // root or other level
+  }
+  window.location.href = _payUrl;
 }
 
 // ------------------------------------------------------------
@@ -702,7 +836,13 @@ function showSuccessModal({ name, mobile, date, order, park, proofNeeded }) {
       breakdown.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#059669;"><span>Group discount</span><strong>−${inr(order.groupDisc)}</strong></div>`;
     }
     if (order.offerDisc > 0 && _appliedOffer) {
-      breakdown.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#7c3aed;"><span>🎉 ${_appliedOffer.offerName}</span><strong>−${inr(order.offerDisc)}</strong></div>`;
+      const offerNames = _lastEvalResult && _lastEvalResult.applied
+        ? _lastEvalResult.applied.map(a => a.offerName).join(' + ')
+        : (_appliedOffer ? _appliedOffer.offerName : 'Offer');
+      breakdown.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#7c3aed;"><span>🎉 ${offerNames}</span><strong>−${inr(order.offerDisc)}</strong></div>`;
+    }
+    if (order.fnbDiscount > 0) {
+      breakdown.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#f97316;"><span>🍽 F&B Credit</span><strong>−${inr(order.fnbDiscount)}</strong></div>`;
     }
     if (_buffetQty > 0) {
       breakdown.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#0055B3;"><span>🍽 Buffet Meal × ${_buffetQty}</span><strong>${inr(order.buffetPrice)}</strong></div>`;
@@ -815,8 +955,25 @@ function initBookingForm(parkKey) {
 // ------------------------------------------------------------
 //  PUBLIC API
 // ------------------------------------------------------------
+// Commit evaluation on successful checkout (increment usage counts)
+function _commitOnCheckout() {
+  if (!window.WOWOfferEngine || !_lastEvalResult) return;
+  try {
+    window.WOWOfferEngine.commitEvaluation(_lastEvalResult, {
+      channel     : 'web',
+      visitDateStr: el('visit-date') ? el('visit-date').value : null,
+    });
+  } catch(_) {}
+}
+
+// NOTE: showSuccessModal is now only called from payment.html confirmation page
+// after payment is processed. Offer usage is committed via commitOnCheckout().
+// Expose _commitOnCheckout so payment.html can call it.
+window._wowCommitOfferUsage = _commitOnCheckout;
+
 window.WOWBooking = {
   initBookingForm, computeOrder, inr,
   TICKET_CATEGORIES, PARKS, CATEGORIES_ORDER,
-  changeBuffet, applyPromoCode
+  changeBuffet, applyPromoCode, clearPromoCode,
+  validateAndCheckout,
 };
