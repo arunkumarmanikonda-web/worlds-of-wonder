@@ -1,7 +1,7 @@
 # Worlds of Wonder — EALCPL Digital Platform
 ### Complete Static Website · 100+ Pages · Full ERP Stack
 
-**Status: Production-Ready Static Site** | Last Updated: 30 March 2026 (Sprint 11 COMPLETE + Sprint 12 Bug-Fix + Sprint 13 — Reseller Identity Engine fully implemented)
+**Status: Production-Ready Static Site** | Last Updated: 30 March 2026 (Sprint 11 COMPLETE + Sprint 12 Bug-Fix + Sprint 13 — Reseller Identity Engine + Sprint 14 Passport UX Fixes + Sprint 15 Universal T&C Gate)
 
 ---
 
@@ -13,6 +13,137 @@ Worlds of Wonder (WOW), Noida — India's premier dual-park theme park destinati
 - **Parks**: Water Park (20+ rides) + Amusement Park (30+ rides)
 - **Ticketing**: ₹1,299 (Water Park) · ₹1,199 (Amusement Park) · ₹1,999 (Combo) · ₹4,999 (Annual Passport)
 - **GST**: 18% (CGST 9% + SGST 9%) on all B2C ticket sales
+
+---
+
+## ✅ Sprint 15 — Universal Terms & Conditions Gate (30 Mar 2026)
+
+### Feature: T&C Acceptance Checkbox on ALL Booking Pages
+
+**Requirement:** Every booking flow — ticket, combo, group, and passport — must show an exclusive "Accept Terms & Conditions" checkbox. The checkout/pay button must be blocked until the user explicitly accepts. The post-payment confirmation page must also display a "Terms Accepted" acknowledgement.
+
+### Implementation
+
+#### Shared Engine (`js/wow-terms.js`)
+A single shared Terms & Conditions engine, `WOWTerms`, handles all pages. It provides:
+- `WOWTerms.renderConsentBlock(selector, { context })` — renders a styled checkbox block into any container. Context values: `'ticket'`, `'passport'`, `'group'` — each shows appropriate label text.
+- `WOWTerms.validate()` — returns `true` if agreed; if not, shakes and highlights the block red and scrolls it into view.
+- `WOWTerms.openModal()` / `closeModal()` / `agreeAndClose()` — controls the full-screen T&C modal with 8 sections.
+- Auto-ticks the checkbox when the user clicks "I Have Read & Agree" inside the modal.
+- Read-progress bar tracks how much of the T&C the user has scrolled through.
+
+#### Pages Updated
+
+| Page | Context | Placement | Gate |
+|------|---------|-----------|------|
+| `book/water-park.html` | `ticket` | Step 4 section before mobile CTA | `checkout-btn` + `checkout-btn-mobile` — `stopImmediatePropagation` if not agreed |
+| `book/amusement-park.html` | `ticket` | Step 4 section before mobile CTA | Same gate as water-park |
+| `book/combo.html` ✨ **NEW** | `ticket` | Step 4 section before mobile CTA | `checkout-btn` + `checkout-btn-mobile` gated |
+| `book/group.html` ✨ **NEW** | `group` | Payment step (step 4) before promo code | `processPayment()` returns early if not agreed |
+| `book/passport.html` ✨ **NEW** | `passport` | Payment step (step 4) before payment sidebar | `processPayment()` returns early if not agreed |
+| `book/confirmation.html` ✨ **NEW** | — | Post-checkout acknowledgement block after "What to Do" steps | Read-only green banner — confirms T&C were accepted at checkout; "View Terms" button opens modal |
+
+#### T&C Sections Covered
+1. 🎟 Ticket Validity & Usage
+2. 💰 Payments, Refunds & Cancellations
+3. 🏃 Park Rules & Safety
+4. 📸 Photography & Media
+5. 🪪 Annual Passport Terms
+6. 👥 Group Bookings
+7. ⚖️ Liability & Governing Law
+8. 📞 Contact & Support
+
+#### UX Design
+- T&C section has a **numbered step header** (step 4) matching the booking card design on ticket pages
+- Checkbox turns **green** when checked, **red with shake animation** if user tries to proceed without accepting
+- Sidebar CTA shows a micro-copy "By paying you agree to our [Terms & Conditions]" link
+- Confirmation page shows a **green "Terms & Conditions Accepted" banner** with a "View full T&C" clickable link
+
+---
+
+## 🐛 Sprint 14 Bug Fix Log — Passport Booking & Portal Login (30 Mar 2026)
+
+### Bug 4 — Passport Tier Selection Not Visible (Colors Issue)
+**Root Cause:** Plan cards used `background:#1a2235` (near-black) for a dark-themed page, but the text and feature list colours were low-contrast against dark backgrounds. The selected state used `background:rgba(0,85,179,.1)` which was nearly invisible. The tier-specific accent colours (silver/gold/platinum) were not applied distinctly.
+
+**Fix** (`book/passport.html`): Fully rebuilt passport booking page with a **light-themed, high-contrast card design**. Each tier has its own distinct colour system:
+- **Silver** — Slate grey palette (`#64748B`, `#F1F5F9` background when selected, `#94A3B8` border)
+- **Gold** — Amber/Gold palette (`#B8860B`, `#FFFBEB` background when selected, `#F59E0B` border)
+- **Platinum** — Purple/Violet palette (`#6D28D9`, `#F5F3FF` background when selected, `#8B5CF6` border)
+Selected state is immediately obvious with clear background colour change and a checkmark badge.
+
+---
+
+### Bug 5 — Image Upload Never Works (KYC Step)
+**Root Cause:** The old KYC upload used `onclick="this.nextElementSibling.click()"` on the upload area div, which tried to trigger the hidden `<input type="file">` that was the *sibling* not the *child*. This failed because the click handler was on the wrong element, and the `onchange` handler only updated the parent's icon/text but didn't validate file type or size.
+
+**Fix:** Rebuilt KYC upload with:
+- `<input type="file">` placed **inside** the upload area using `position:absolute;inset:0;opacity:0;` — the entire clickable zone is the file input itself
+- Real file type validation (JPEG/PNG/PDF for IDs, only images for photos)
+- File size validation (5 MB for IDs, 2 MB for photos)
+- Passport photo uploads show a **live preview** with the actual image thumbnail
+- Upload area changes to green `uploaded` state with filename displayed
+- `resetPhoto()` function to re-upload a photo
+
+---
+
+### Bug 6 — Post-Payment Confirmation Looked Bad
+**Root Cause:** Step 5 success screen was a minimal centered div with a single `<div>` table. No passport card visual, no breakdown, no WhatsApp share, no "next steps" guidance.
+
+**Fix:** Rebuilt Step 5 success screen with:
+- Animated green success banner
+- Passport card with gradient (matches WOW branding)
+- Passport ID, plan name, validity dates, quantity, order ID
+- Full itemised order breakdown
+- "What Happens Next" 4-step process guide (KYC verification → activation → entry → physical card)
+- CTA buttons: View Dashboard, WhatsApp Share, Back to Home
+
+---
+
+### Bug 7 — After Confirmation, Landed on Customer Login Portal
+**Root Cause:** Step 5 action button `href="../portal/passport.html"` led to a page that didn't exist. The user was then left on the login page. Also, the confirmation page was incorrectly redirecting to the admin portal.
+
+**Fix:** Step 5 now links directly to `../portal/dashboard.html` (customer dashboard). The login page's `verifyOTP()` redirect logic also fixed (see Bug 9).
+
+---
+
+### Bug 8 — Mobile Number Input Accepted More Than 10 Digits
+**Root Cause:** Mobile input had `maxlength="13"` (allowing "+91XXXXXXXXXX") but no enforcement of 10-digit-only Indian numbers.
+
+**Fix** (`portal/login.html`):
+- `maxlength="10"` on the input
+- `oninput` strips all non-digits and caps at 10 characters
+- `pattern="[6-9][0-9]{9}"` enforces Indian mobile format
+- `sendOTP()` validates length === 10 AND starts with 6–9 before accepting
+- Placeholder updated to "10-digit mobile number" (no +91 prefix — that's shown as a separate prefix label)
+- Holder forms in passport booking also updated to the same 10-digit enforcement
+
+---
+
+### Bug 9 — OTP Input Boxes Spread Across Full Width
+**Root Cause:** `.otp-input { flex:1; }` caused each OTP box to grow and fill available width, making 4 boxes span the entire form card.
+
+**Fix** (`portal/login.html`):
+```css
+.otp-input {
+  width:52px; min-width:52px; max-width:52px;
+  flex: 0 0 52px;  /* no grow, no shrink, fixed 52px */
+}
+.otp-row { justify-content: flex-start; }
+```
+OTP boxes are now fixed 52×~42px squares, left-aligned, with clear separation.
+
+---
+
+### Bug 10 — Post-Login Redirect Landed on Admin Login Page
+**Root Cause:** `portal/login.html` had a DOMContentLoaded check: if a WOWAuth session existed with role `SUPER_ADMIN` OR `CUSTOMER`, it redirected to `params.get('redirect') || 'dashboard.html'`. If someone tested the admin bypass first (which sets `role:'SUPER_ADMIN'`), then opened the customer portal login, the session check fired and sent them to `'dashboard.html'` — but the admin pages also redirect to their own login. More critically, `verifyOTP()` had no guard against sending a CUSTOMER to the admin redirect parameter.
+
+**Fixes:**
+- DOMContentLoaded session check now handles `CUSTOMER` and `SUPER_ADMIN` separately:
+  - CUSTOMER → `dashboard.html`
+  - SUPER_ADMIN → `../admin/index.html`
+- `verifyOTP()` ignores any `redirect` param that contains `admin` and always sends CUSTOMER to `dashboard.html`
+- `emailLogin()` also sets a CUSTOMER WOWAuth session before redirecting
 
 ---
 
