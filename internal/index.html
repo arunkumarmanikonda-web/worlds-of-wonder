@@ -351,18 +351,18 @@ html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;c
       <i class="fas fa-arrow-right pc-arrow"></i>
     </div>
 
-    <div class="portal-card" onclick="openModal('corporate')">
+    <a class="portal-card" href="../admin/b2b-approvals.html" style="text-decoration:none">
       <div class="pc-icon indigo"><i class="fas fa-building"></i></div>
-      <div class="pc-role">Corporate / B2B</div>
-      <div class="pc-title">Corporate Client Portal</div>
-      <div class="pc-desc">Group bookings, event planning, invoice management, GST billing, employee welfare programs.</div>
+      <div class="pc-role">Admin — B2B &amp; Corporate</div>
+      <div class="pc-title">B2B &amp; Corporate Approvals</div>
+      <div class="pc-desc">Review and approve corporate, school, birthday and bulk group enquiries. GST invoicing, event confirmations.</div>
       <div class="pc-modules">
-        <span class="pc-mod">Group Booking</span>
+        <span class="pc-mod">Group Approvals</span>
         <span class="pc-mod">Events</span>
-        <span class="pc-mod">Invoices</span>
+        <span class="pc-mod">GST Invoice</span>
       </div>
       <i class="fas fa-arrow-right pc-arrow"></i>
-    </div>
+    </a>
 
   </div>
 
@@ -721,16 +721,7 @@ const PORTALS = {
     email: 'ta@wow.in',
     password: 'ta123',
   },
-  corporate: {
-    title: 'Corporate Client Portal',
-    icon: '<i class="fas fa-building"></i>',
-    iconClass: 'indigo',
-    sub: 'Corporate accounts are created after business KYC.',
-    note: 'Email corporate@worldsofwonder.in to get started.',
-    dest: '../groups/corporate.html',
-    email: 'corp@wow.in',
-    password: 'corp123',
-  },
+
 };
 
 let currentPortal = '';
