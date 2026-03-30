@@ -3,110 +3,222 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Passport Engine Config — WOW Admin</title>
+<title>Passport Engine — WOW Admin ERP</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
-<script src="../js/wow-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/wow-auth.js"></script>
+<script src="../js/wow-passport-engine.js"></script>
 <style>
-:root{--brand:#C9A84C;--brand2:#F0D080;--brand3:#9A6F2A;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f0f4f8;--white:#fff;--sidebar:248px;}
+:root{--brand:#C9A84C;--brand2:#F0D080;--brand3:#9A6F2A;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--purple:#7c3aed;--navy:#0a1628;--slate:#1e293b;--muted:#64748b;--border:#e2e8f0;--bg:#f0f4f8;--white:#fff;--sidebar:240px;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--slate);font-size:13px;}
 .shell{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
 .sidebar{width:var(--sidebar);background:var(--navy);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
-.sidebar-logo{padding:16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px;}
-.logo-mark{width:38px;height:38px;background:linear-gradient(135deg,var(--brand3),var(--brand));border-radius:10px;display:grid;place-items:center;font-size:14px;flex-shrink:0;}
-.logo-text span{font-weight:700;font-size:13px;color:#fff;display:block;}
-.logo-text small{font-size:10px;color:rgba(255,255,255,.4);}
-.nav-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);padding:10px 14px 4px;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12px;color:rgba(255,255,255,.65);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
-.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--brand);}
-.nav-item i{width:15px;text-align:center;font-size:11px;}
-.main{margin-left:var(--sidebar);flex:1;}
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-title{font-size:15px;font-weight:800;}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
-.btn-brand{background:var(--brand);color:#0a0a14;}
-.btn-brand:hover{background:var(--brand3);}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
-.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
-.btn-danger{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
-.btn-danger:hover{background:#fca5a5;}
-.btn-sm{padding:5px 10px;font-size:11px;}
-.btn-success{background:#d1fae5;color:#065f46;}
-.content{padding:22px 24px;}
-/* Metric row */
-.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.sb-logo{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--brand3),var(--brand));border-radius:9px;display:grid;place-items:center;font-size:16px;flex-shrink:0;}
+.sb-logo-text span{font-weight:800;font-size:12px;color:#fff;display:block;}
+.sb-logo-text small{font-size:10px;color:rgba(255,255,255,.4);}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.3);padding:10px 14px 4px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:11.5px;color:rgba(255,255,255,.6);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.sb-item:hover,.sb-item.active{background:rgba(255,255,255,.07);color:#fff;border-left-color:var(--brand);}
+.sb-item i{width:14px;text-align:center;font-size:11px;}
+.sb-badge{margin-left:auto;background:var(--brand);color:#0a0a14;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;min-width:0;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.content{padding:20px 22px;}
+
+/* METRIC ROW */
+.metric-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
 .metric-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
 .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .mc-gold::before{background:linear-gradient(90deg,var(--brand3),var(--brand));}
 .mc-green::before{background:var(--green);}
 .mc-blue::before{background:var(--blue);}
 .mc-purple::before{background:var(--purple);}
-.mc-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.mc-val{font-size:21px;font-weight:800;margin:4px 0 2px;}
+.mc-red::before{background:var(--red);}
+.mc-label{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.mc-val{font-size:22px;font-weight:800;margin:4px 0 2px;}
 .mc-sub{font-size:10px;color:var(--muted);}
-/* Tabs */
-.tab-bar{display:flex;gap:3px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:18px;width:fit-content;flex-wrap:wrap;}
-.tab{padding:7px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;}
+.mc-icon{position:absolute;top:12px;right:14px;font-size:22px;opacity:.12;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:18px;overflow-x:auto;}
+.tab{padding:7px 14px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--muted);transition:.15s;white-space:nowrap;}
 .tab.active{background:var(--brand);color:#0a0a14;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
-/* Card */
-.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px;}
 .card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
-.card-title{font-size:13px;font-weight:700;}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-/* Plan card */
-.plan-config-card{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s;}
-.plan-config-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
-.pcc-header{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;}
-.pcc-name{font-size:14px;font-weight:800;}
-.pcc-price{font-size:1.2rem;font-weight:900;color:var(--brand3);}
-.pcc-body{padding:0 18px 16px;}
-.pcc-field{display:flex;flex-direction:column;gap:3px;margin-bottom:10px;}
-.pcc-field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
-.pcc-field input,.pcc-field select{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;transition:.15s;}
-.pcc-field input:focus,.pcc-field select:focus{outline:none;border-color:var(--brand);}
-.pcc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pcc-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;}
-.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0;}
-.toggle-switch input{opacity:0;width:0;height:0;}
-.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#cbd5e1;border-radius:20px;transition:.3s;}
-.toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;}
-input:checked + .toggle-slider{background:var(--green);}
-input:checked + .toggle-slider::before{transform:translateX(16px);}
-.voucher-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
-.voucher-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:#f1f5f9;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;}
-.voucher-tag .rm{cursor:pointer;color:var(--red);font-size:11px;margin-left:2px;}
-/* Table */
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.fg input,.fg select,.fg textarea{padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;transition:.15s;width:100%;background:var(--white);}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--brand);}
+.fg textarea{resize:vertical;min-height:70px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-brand{background:var(--brand);color:#0a0a14;}
+.btn-brand:hover{background:var(--brand3);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--slate);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-danger{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.btn-danger:hover{background:#fca5a5;}
+.btn-green{background:#d1fae5;color:#065f46;}
+.btn-green:hover{background:#a7f3d0;}
+.btn-sm{padding:4px 10px;font-size:11px;}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px;}
+
+/* TABLE */
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
-tbody tr{border-bottom:1px solid var(--border);}
+thead th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);background:#f9fafb;}
+tbody tr{border-bottom:1px solid #f1f5f9;}
 tbody tr:last-child{border:none;}
 tbody td{padding:10px 12px;vertical-align:middle;}
-tbody tr:hover{background:#f9fafb;}
+tbody tr:hover{background:#fefce8;}
+
+/* BADGE */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
-.bg-green{background:#d1fae5;color:#065f46;}
-.bg-amber{background:#fef9c3;color:#854d0e;}
-.bg-red{background:#fee2e2;color:#991b1b;}
-.bg-gold{background:rgba(201,168,76,.15);color:var(--brand3);border:1px solid rgba(201,168,76,.3);}
-.bg-gray{background:#f1f5f9;color:#475569;}
-/* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;place-items:center;padding:20px;}
+.b-green{background:#d1fae5;color:#065f46;}
+.b-amber{background:#fef9c3;color:#854d0e;}
+.b-red{background:#fee2e2;color:#991b1b;}
+.b-gold{background:rgba(201,168,76,.15);color:var(--brand3);border:1px solid rgba(201,168,76,.3);}
+.b-gray{background:#f1f5f9;color:#475569;}
+.b-blue{background:#dbeafe;color:#1e40af;}
+.b-purple{background:#ede9fe;color:#5b21b6;}
+
+/* TIER CARDS */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.tier-card{border-radius:14px;overflow:hidden;border:1.5px solid var(--border);transition:.2s;}
+.tier-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.1);}
+.tc-head{padding:20px;display:flex;align-items:center;gap:12px;}
+.tc-emblem{font-size:28px;}
+.tc-info h3{font-size:15px;font-weight:800;color:#fff;}
+.tc-info small{font-size:11px;color:rgba(255,255,255,.7);}
+.tc-body{padding:16px;background:var(--white);}
+.tc-price{font-size:22px;font-weight:900;color:var(--brand3);}
+.tc-price small{font-size:12px;font-weight:400;color:var(--muted);}
+.tc-meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.tc-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+
+/* PRODUCT ROW */
+.prod-row{display:grid;grid-template-columns:auto 1fr auto auto auto auto;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f1f5f9;}
+.prod-row:last-child{border:none;}
+.prod-rank{width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:grid;place-items:center;font-size:11px;font-weight:700;}
+
+/* VOUCHER */
+.voucher-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.voucher-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:14px;}
+.vc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.vc-icon{font-size:24px;}
+.vc-name{font-size:12px;font-weight:700;}
+.vc-code{font-size:10px;color:var(--muted);font-family:monospace;}
+.vc-desc{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.vc-meta{display:flex;flex-wrap:wrap;gap:5px;}
+.vc-actions{display:flex;gap:6px;margin-top:10px;}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:8px;}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-sl{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:20px;transition:.3s;}
+.toggle-sl::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+input:checked + .toggle-sl{background:var(--green);}
+input:checked + .toggle-sl::before{transform:translateX(16px);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:none;place-items:center;padding:20px;overflow-y:auto;}
 .modal-overlay.show{display:grid;}
-.modal{background:var(--white);border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;padding:24px;}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;padding:24px;}
+.modal-lg{max-width:820px;}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-.modal-title{font-size:15px;font-weight:700;}
-.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);}
-.form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
-label{font-size:11px;font-weight:600;color:var(--slate);}
-input,select,textarea{padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:100%;outline:none;transition:.15s;}
-input:focus,select:focus,textarea:focus{border-color:var(--brand);}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-/* Toast */
-#toast{position:fixed;bottom:20px;right:20px;background:#1e293b;border:1px solid var(--brand);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;display:none;}
-@media(max-width:900px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.metric-row{grid-template-columns:1fr 1fr;}}
+.modal-title{font-size:15px;font-weight:800;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:0 4px;}
+.modal-close:hover{color:var(--red);}
+
+/* SECTION */
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+/* ENTRY RIGHTS */
+.er-row{background:#f9fafb;border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+.er-tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.er-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:#e0f2fe;border-radius:20px;font-size:11px;font-weight:600;color:#0369a1;}
+.er-tag .rm{cursor:pointer;color:var(--red);margin-left:2px;font-size:11px;}
+
+/* AUDIT */
+.audit-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;}
+.audit-row:last-child{border:none;}
+.audit-dot{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:5px;}
+.audit-time{font-size:10px;color:var(--muted);white-space:nowrap;}
+.audit-action{font-weight:700;font-size:12px;}
+.audit-meta{font-size:11px;color:var(--muted);}
+
+/* CHART containers */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.chart-box{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.chart-box canvas{height:240px!important;}
+
+/* STATUS dots */
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.sd-green{background:var(--green);}
+.sd-amber{background:var(--amber);}
+.sd-red{background:var(--red);}
+.sd-gray{background:#94a3b8;}
+.sd-blue{background:var(--blue);}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid var(--brand);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;display:none;max-width:320px;}
+
+/* LIFECYCLE STATES */
+.state-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid;}
+.sp-active{background:#d1fae5;color:#065f46;border-color:#6ee7b7;}
+.sp-paused{background:#fef9c3;color:#854d0e;border-color:#fde68a;}
+.sp-archived{background:#f1f5f9;color:#475569;border-color:#cbd5e1;}
+.sp-draft{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd;}
+
+/* BENEFITS */
+.benefit-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.benefit-list li{display:flex;align-items:center;gap:8px;font-size:12px;}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);}.main{margin-left:0;}
+  .metric-row{grid-template-columns:1fr 1fr;}
+  .tier-grid{grid-template-columns:1fr;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .chart-row{grid-template-columns:1fr;}
+}
+
+.sep{height:1px;background:var(--border);margin:16px 0;}
+.text-muted{color:var(--muted);}
+.text-brand{color:var(--brand);}
+.fw-bold{font-weight:700;}
+.fs-10{font-size:10px;}
+.fs-11{font-size:11px;}
+.fs-12{font-size:12px;}
+.mt-1{margin-top:4px;}
+.mt-2{margin-top:8px;}
+.mt-3{margin-top:16px;}
+.flex{display:flex;align-items:center;}
+.flex-gap{gap:8px;}
+.flex-end{justify-content:flex-end;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state i{font-size:40px;opacity:.25;display:block;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -114,616 +226,1559 @@ input:focus,select:focus,textarea:focus{border-color:var(--brand);}
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark"><i class="fas fa-passport"></i></div>
-    <div class="logo-text"><span>WOW Admin ERP</span><small>Passport Engine</small></div>
+  <div class="sb-logo">
+    <div class="sb-logo-mark">🪪</div>
+    <div class="sb-logo-text"><span>WOW Admin ERP</span><small>Passport Engine v2</small></div>
   </div>
-  <div class="nav-label">Passport Config</div>
-  <a class="nav-item active" href="passport-engine.html"><i class="fas fa-passport"></i> Passport Engine</a>
-  <a class="nav-item" href="passport-redemptions.html"><i class="fas fa-ticket-alt"></i> Redemptions</a>
-  <a class="nav-item" href="passport-products.html"><i class="fas fa-box"></i> Products</a>
-  <div class="nav-label">Sales Portal</div>
-  <a class="nav-item" href="../sales/erp-dashboard.html"><i class="fas fa-chart-line"></i> Sales ERP</a>
-  <a class="nav-item" href="../sales/passport-login.html"><i class="fas fa-sign-in-alt"></i> Agent Login</a>
-  <div class="nav-label">Admin</div>
-  <a class="nav-item" href="index.html"><i class="fas fa-th-large"></i> Dashboard</a>
-  <a class="nav-item" href="users.html"><i class="fas fa-users"></i> Users & KYC</a>
-  <a class="nav-item" href="gst-engine.html"><i class="fas fa-percent"></i> GST Engine</a>
-  <a class="nav-item" href="audit-logs.html"><i class="fas fa-history"></i> Audit Logs</a>
+  <div class="sb-section">Passport</div>
+  <a class="sb-item active" href="passport-engine.html"><i class="fas fa-passport"></i> Passport Engine</a>
+  <a class="sb-item" href="passport-kyc-review.html"><i class="fas fa-id-card"></i> KYC Review Queue <span class="sb-badge" id="sb-kyc-badge">0</span></a>
+  <a class="sb-item" href="passport-scanner.html"><i class="fas fa-qrcode"></i> Gate Scanner</a>
+  <a class="sb-item" href="passport-redemptions.html"><i class="fas fa-ticket-alt"></i> Redemptions</a>
+  <div class="sb-section">Sales Portal</div>
+  <a class="sb-item" href="../sales/erp-dashboard.html"><i class="fas fa-chart-bar"></i> Sales ERP</a>
+  <a class="sb-item" href="../sales/passport-login.html"><i class="fas fa-sign-in-alt"></i> Agent Login</a>
+  <a class="sb-item" href="../sales/passport-kyc.html"><i class="fas fa-user-check"></i> KYC Wizard</a>
+  <div class="sb-section">Customer</div>
+  <a class="sb-item" href="../portal/wow-passport.html"><i class="fas fa-id-badge"></i> Passport Dashboard</a>
+  <a class="sb-item" href="../passport.html"><i class="fas fa-store"></i> Public Storefront</a>
+  <div class="sb-section">Admin</div>
+  <a class="sb-item" href="index.html"><i class="fas fa-th-large"></i> ERP Dashboard</a>
+  <a class="sb-item" href="audit-logs.html"><i class="fas fa-history"></i> Audit Logs</a>
+  <a class="sb-item" href="super-admin.html"><i class="fas fa-shield-alt"></i> Super Admin</a>
 </aside>
 
 <!-- MAIN -->
 <div class="main">
 <div class="topbar">
-  <div class="topbar-title"><i class="fas fa-passport" style="color:var(--brand);margin-right:8px;"></i>Passport Engine Configuration</div>
-  <div style="display:flex;gap:8px;align-items:center;">
+  <div class="topbar-title">
+    <span style="font-size:18px;">🪪</span>
+    Passport Product Engine
+    <span class="badge b-gold fs-10">v2.0 Live</span>
+  </div>
+  <div class="topbar-actions">
     <button class="btn btn-outline btn-sm" onclick="exportConfig()"><i class="fas fa-download"></i> Export Config</button>
-    <button class="btn btn-brand" onclick="saveAllChanges()"><i class="fas fa-save"></i> Save All Changes</button>
-    <div style="padding:6px 14px;background:#f1f5f9;border-radius:20px;font-size:11px;font-weight:700;color:var(--slate);">
-      <i class="fas fa-user-shield" style="color:var(--brand);"></i> Super Admin
-    </div>
+    <button class="btn btn-outline btn-sm" onclick="importConfigFile()"><i class="fas fa-upload"></i> Import</button>
+    <button class="btn btn-outline btn-sm" onclick="resetToDefaults()"><i class="fas fa-undo"></i> Reset Defaults</button>
+    <button class="btn btn-brand btn-sm" onclick="saveAll()"><i class="fas fa-save"></i> Save All Changes</button>
+    <div id="auth-widget"></div>
   </div>
 </div>
 
 <div class="content">
 
-<!-- Metrics -->
-<div class="metric-row">
-  <div class="metric-card mc-gold"><div class="mc-label">Active Passport Plans</div><div class="mc-val" style="color:var(--brand3);" id="m-plans">4</div><div class="mc-sub">2 featured</div></div>
-  <div class="metric-card mc-green"><div class="mc-label">Passports Issued (MTD)</div><div class="mc-val" style="color:var(--green);">186</div><div class="mc-sub">↑ 24 this week</div></div>
-  <div class="metric-card mc-blue"><div class="mc-label">Revenue (MTD)</div><div class="mc-val" style="color:var(--blue);">₹14.8L</div><div class="mc-sub">18% GST collected ₹2.2L</div></div>
-  <div class="metric-card mc-purple"><div class="mc-label">Redemptions MTD</div><div class="mc-val" style="color:var(--purple);">1,240</div><div class="mc-sub">6.7 avg/passport</div></div>
-</div>
-
-<!-- Tab bar -->
-<div class="tab-bar">
-  <div class="tab active" id="tab-btn-plans" onclick="switchTab('plans',event)"><i class="fas fa-passport"></i> Passport Plans</div>
-  <div class="tab" id="tab-btn-global" onclick="switchTab('global',event)"><i class="fas fa-cog"></i> Global Settings</div>
-  <div class="tab" id="tab-btn-vouchers" onclick="switchTab('vouchers',event)"><i class="fas fa-gift"></i> Voucher Templates</div>
-  <div class="tab" id="tab-btn-login" onclick="switchTab('login',event)"><i class="fas fa-key"></i> Login ID Config</div>
-  <div class="tab" id="tab-btn-agents" onclick="switchTab('agents',event)"><i class="fas fa-users"></i> Agent Commission</div>
-  <div class="tab" id="tab-btn-audit" onclick="switchTab('audit',event)"><i class="fas fa-history"></i> Config Audit</div>
-</div>
-
-<!-- ====== PLANS TAB ====== -->
-<div id="tab-plans" class="tab-panel active">
-  <div class="card-hdr" style="margin-bottom:12px;">
-    <div style="font-size:13px;font-weight:700;"></div>
-    <button class="btn btn-brand btn-sm" onclick="openNewPlanModal()"><i class="fas fa-plus"></i> Add New Plan</button>
+<!-- METRICS -->
+<div class="metric-row" id="metric-row">
+  <div class="metric-card mc-gold">
+    <div class="mc-label">Total Passports</div>
+    <div class="mc-val" id="m-total">—</div>
+    <div class="mc-sub">All time issued</div>
+    <div class="mc-icon">🪪</div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;" id="plan-cards-grid">
-    <!-- populated by JS -->
+  <div class="metric-card mc-green">
+    <div class="mc-label">Active</div>
+    <div class="mc-val" id="m-active">—</div>
+    <div class="mc-sub">Currently valid</div>
+    <div class="mc-icon">✅</div>
   </div>
-</div>
-
-<!-- ====== GLOBAL SETTINGS TAB ====== -->
-<div id="tab-global" class="tab-panel">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-percent" style="color:var(--brand);"></i> GST Configuration</span></div>
-      <div class="pcc-field"><label>GST Rate (%)</label><input type="number" id="gst-rate" value="18" min="0" max="28"/></div>
-      <div class="pcc-field"><label>CGST Rate (%)</label><input type="number" id="cgst-rate" value="9" readonly style="background:#f1f5f9;"/></div>
-      <div class="pcc-field"><label>SGST Rate (%)</label><input type="number" id="sgst-rate" value="9" readonly style="background:#f1f5f9;"/></div>
-      <div class="pcc-field"><label>GST Mode</label>
-        <select><option>Inclusive (price includes GST)</option><option>Exclusive (GST added on top)</option></select>
-      </div>
-      <div class="pcc-field"><label>SAC Code</label><input type="text" value="999694" placeholder="Service Accounting Code"/></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-calendar" style="color:var(--brand);"></i> Validity & Expiry Settings</span></div>
-      <div class="pcc-field"><label>Default Validity (Days)</label><input type="number" id="default-validity" value="365"/></div>
-      <div class="pcc-field"><label>Expiry Warning (Days before)</label><input type="number" value="30"/></div>
-      <div class="pcc-field"><label>Grace Period (Days after expiry)</label><input type="number" value="7"/></div>
-      <div class="pcc-field"><label>Renewal Discount (%)</label><input type="number" value="10"/></div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked id="auto-expiry"><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Auto-expire passports on due date</span>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked id="renewal-sms"><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Send renewal SMS 30/7/1 days before</span>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-building" style="color:var(--brand);"></i> Organisation Details (printed on passport)</span></div>
-      <div class="pcc-field"><label>Organisation Name</label><input type="text" value="Worlds of Wonder" id="org-name"/></div>
-      <div class="pcc-field"><label>GST Number</label><input type="text" value="09AABCS1429B1Z1" id="org-gst"/></div>
-      <div class="pcc-field"><label>Address (Line 1)</label><input type="text" value="Sector 38-A, Noida"/></div>
-      <div class="pcc-field"><label>Address (Line 2)</label><input type="text" value="Uttar Pradesh - 201303"/></div>
-      <div class="pcc-field"><label>Support Phone</label><input type="text" value="1800-WOW-HELP"/></div>
-      <div class="pcc-field"><label>Support Email</label><input type="email" value="passport@worldsofwonder.com"/></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-qrcode" style="color:var(--brand);"></i> Passport ID & QR Settings</span></div>
-      <div class="pcc-field"><label>Passport ID Prefix</label><input type="text" id="id-prefix" value="WOW-PAX-"/></div>
-      <div class="pcc-field"><label>ID Generation Method</label>
-        <select><option>Mobile Last 4 + Timestamp (hex)</option><option>Sequential Number</option><option>Random Alphanumeric</option></select>
-      </div>
-      <div class="pcc-field"><label>QR Code Content</label>
-        <select><option>JSON (ID + Name + Plan + Expiry)</option><option>Passport ID only</option><option>Encrypted payload</option></select>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Include MRZ zone on passport</span>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Watermark WOW on inner page</span>
-      </div>
-    </div>
+  <div class="metric-card mc-blue">
+    <div class="mc-label">Total Revenue</div>
+    <div class="mc-val" id="m-revenue">—</div>
+    <div class="mc-sub">Gross passport sales</div>
+    <div class="mc-icon">💰</div>
+  </div>
+  <div class="metric-card mc-purple">
+    <div class="mc-label">KYC Pending</div>
+    <div class="mc-val" id="m-kyc">—</div>
+    <div class="mc-sub">Awaiting review</div>
+    <div class="mc-icon">📋</div>
+  </div>
+  <div class="metric-card mc-red">
+    <div class="mc-label">Expiring Soon</div>
+    <div class="mc-val" id="m-expire">—</div>
+    <div class="mc-sub">Within 30 days</div>
+    <div class="mc-icon">⏳</div>
   </div>
 </div>
 
-<!-- ====== VOUCHERS TAB ====== -->
-<div id="tab-vouchers" class="tab-panel">
-  <div class="card-hdr" style="margin-bottom:12px;">
-    <div style="font-size:13px;font-weight:700;">Voucher Templates</div>
-    <button class="btn btn-brand btn-sm" onclick="openVoucherModal()"><i class="fas fa-plus"></i> New Voucher Type</button>
-  </div>
+<!-- TABS -->
+<div class="tabs" id="main-tabs">
+  <div class="tab active" onclick="switchTab('tiers')">🏅 Tiers & Products</div>
+  <div class="tab" onclick="switchTab('vouchers')">🎟 Voucher Library</div>
+  <div class="tab" onclick="switchTab('offers')">🏷 Offer Attachment</div>
+  <div class="tab" onclick="switchTab('entry')">🚪 Entry Rights</div>
+  <div class="tab" onclick="switchTab('kyc')">📋 KYC Rules</div>
+  <div class="tab" onclick="switchTab('analytics')">📊 Analytics</div>
+  <div class="tab" onclick="switchTab('passports')">📁 Passport Records</div>
+  <div class="tab" onclick="switchTab('audit')">📜 Audit Log</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: TIERS & PRODUCTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="tp-tiers">
+
+  <!-- Program Settings -->
   <div class="card">
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Voucher Name</th><th>Type</th><th>Value</th><th>Plans</th><th>Uses per Passport</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody id="vouchers-body"></tbody>
-    </table></div>
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-cog" style="color:var(--brand)"></i> Program Settings</div>
+      <button class="btn btn-outline btn-sm" onclick="saveProgramSettings()"><i class="fas fa-save"></i> Save</button>
+    </div>
+    <div class="g4">
+      <div class="fg"><label>Program Name</label><input id="cfg-programName" placeholder="WOW Passport"/></div>
+      <div class="fg"><label>Tagline</label><input id="cfg-tagline" placeholder="Your World, Unlimited."/></div>
+      <div class="fg"><label>GST Rate (%)</label><input id="cfg-gst" type="number" min="0" max="28" step="1"/></div>
+      <div class="fg"><label>Passport No. Prefix</label><input id="cfg-prefix" placeholder="WOW-PAX"/></div>
+      <div class="fg"><label>Renewal Window (days)</label><input id="cfg-renewalWindow" type="number"/></div>
+      <div class="fg"><label>Grace Period (days)</label><input id="cfg-gracePeriod" type="number"/></div>
+      <div class="fg"><label>Max Passports/Customer</label><input id="cfg-maxPP" type="number"/></div>
+      <div class="fg"><label>Support Email</label><input id="cfg-email" type="email"/></div>
+    </div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" id="cfg-kycMandatory"/> KYC mandatory before issuance</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" id="cfg-paymentBeforeKyc"/> Payment required before KYC</label>
+    </div>
+  </div>
+
+  <!-- Tiers -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-layer-group" style="color:var(--purple)"></i> Passport Tiers</div>
+      <button class="btn btn-brand btn-sm" onclick="openTierModal()"><i class="fas fa-plus"></i> New Tier</button>
+    </div>
+    <div class="tier-grid" id="tier-grid"></div>
+  </div>
+
+  <!-- Products -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-box-open" style="color:var(--blue)"></i> Passport Products / SKUs</div>
+      <div style="display:flex;gap:8px;">
+        <select id="prod-filter-tier" class="btn btn-outline btn-sm" onchange="renderProducts()" style="padding:4px 10px;">
+          <option value="">All Tiers</option>
+        </select>
+        <button class="btn btn-brand btn-sm" onclick="openProductModal()"><i class="fas fa-plus"></i> New Product</button>
+      </div>
+    </div>
+    <div id="product-list"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: VOUCHERS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-vouchers">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-ticket-alt" style="color:var(--amber)"></i> Voucher Template Library</div>
+      <div style="display:flex;gap:8px;">
+        <input id="voucher-search" placeholder="Search vouchers…" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:200px;" oninput="renderVouchers()"/>
+        <select id="voucher-cat-filter" onchange="renderVouchers()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;">
+          <option value="">All Categories</option>
+          <option value="fnb_discount">F&B Discount</option>
+          <option value="locker">Locker</option>
+          <option value="birthday">Birthday</option>
+          <option value="guest_entry">Guest Entry</option>
+          <option value="experience">Experience</option>
+          <option value="merchandise">Merchandise</option>
+          <option value="lounge">Lounge</option>
+          <option value="service">Service</option>
+        </select>
+        <button class="btn btn-brand btn-sm" onclick="openVoucherModal()"><i class="fas fa-plus"></i> New Voucher</button>
+      </div>
+    </div>
+    <div class="voucher-grid" id="voucher-grid"></div>
   </div>
 </div>
 
-<!-- ====== LOGIN ID CONFIG TAB ====== -->
-<div id="tab-login" class="tab-panel">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-key" style="color:var(--brand);"></i> Customer Login ID Generation</span></div>
-      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:11px;margin-bottom:14px;color:#92400e;">
-        <i class="fas fa-info-circle"></i> Login IDs are auto-generated after KYC completion. Customer receives credentials via SMS &amp; email.
-      </div>
-      <div class="pcc-field"><label>Primary Login ID Type</label>
-        <select id="primary-login-type">
-          <option selected>Mobile Number (+91XXXXXXXXXX)</option>
-          <option>Email Address</option>
-          <option>Passport ID (WOW-PAX-XXXXXX)</option>
-        </select>
-      </div>
-      <div class="pcc-field"><label>Alternate Login ID</label>
-        <select>
-          <option>Email Address (if provided)</option>
-          <option>None</option>
-        </select>
-      </div>
-      <div class="pcc-field"><label>Temp Password Format</label>
-        <select id="pw-format">
-          <option>FirstName(3) + @ + DOB(MMYY) + Mobile(last4)</option>
-          <option>Random 8-char alphanumeric</option>
-          <option>Mobile last 6 digits</option>
-          <option>Custom pattern</option>
-        </select>
-      </div>
-      <div class="pcc-field"><label>Password Example (preview)</label>
-        <input type="text" value="RAH@032612347" readonly style="background:#f1f5f9;font-family:monospace;" id="pw-example"/>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Force password change on first login</span>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Send credentials via SMS</span>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Send credentials via Email</span>
-      </div>
-      <div class="pcc-toggle">
-        <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-        <span style="font-size:12px;font-weight:600;">Send welcome WhatsApp message</span>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: OFFERS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-offers">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-tags" style="color:var(--green)"></i> Offer Attachment Engine</div>
+      <button class="btn btn-brand btn-sm" onclick="openOfferModal()"><i class="fas fa-plus"></i> New Offer</button>
     </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-sms" style="color:var(--brand);"></i> SMS / Email Templates</span></div>
-      <div class="pcc-field">
-        <label>Welcome SMS Template</label>
-        <textarea style="min-height:90px;font-size:11px;" id="sms-template">Welcome to WOW! 🎉 Your passport {PASSPORT_ID} is active. Login: portal.wow.com | ID: {MOBILE} | Pwd: {PASSWORD} | Valid till {EXPIRY}. Support: 1800-WOW-HELP</textarea>
-      </div>
-      <div style="font-size:10px;color:var(--muted);margin-bottom:12px;">Variables: {PASSPORT_ID} {MOBILE} {EMAIL} {NAME} {PLAN} {PASSWORD} {EXPIRY} {ISSUE_DATE}</div>
-      <div class="pcc-field">
-        <label>Renewal Reminder SMS</label>
-        <textarea style="min-height:70px;font-size:11px;">Dear {NAME}, your WOW Passport {PASSPORT_ID} expires on {EXPIRY}. Renew now at 10% off! Call 1800-WOW-HELP.</textarea>
-      </div>
-      <div class="pcc-field">
-        <label>OTP Login Template</label>
-        <textarea style="min-height:60px;font-size:11px;">Your WOW Portal OTP is {OTP}. Valid 10 mins. Do not share. -WorldsOfWonder</textarea>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ====== AGENT COMMISSION TAB ====== -->
-<div id="tab-agents" class="tab-panel">
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-medal" style="color:var(--brand);"></i> Commission Structure</span></div>
-      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:11px;margin-bottom:14px;color:#1e40af;">
-        Commission is calculated on the base price (excluding GST) and credited after payment confirmation.
-      </div>
-      <table style="font-size:12px;width:100%;border-collapse:collapse;">
-        <thead><tr style="border-bottom:1px solid var(--border);">
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Plan</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Commission %</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">On Base Price</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Per Sale (₹)</th>
+    <p class="text-muted fs-12" style="margin-bottom:14px;">Attach offers/privileges to passport tiers. These are non-voucher perks and access rights that are automatically applied based on tier membership.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Offer Name</th><th>Description</th><th>Tiers</th><th>Status</th><th>Actions</th>
         </tr></thead>
-        <tbody id="commission-table"></tbody>
+        <tbody id="offer-table-body"></tbody>
       </table>
     </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title"><i class="fas fa-layer-group" style="color:var(--brand);"></i> Role-based Commission Multipliers</span></div>
-      <table style="font-size:12px;width:100%;border-collapse:collapse;" id="role-commission-table">
-        <thead><tr style="border-bottom:1px solid var(--border);">
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Role</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Base Rate</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Multiplier</th>
-          <th style="padding:8px;text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;">Effective Rate</th>
-        </tr></thead>
-        <tbody></tbody>
-      </table>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
-        <div style="font-size:12px;font-weight:700;margin-bottom:10px;">Bonus Incentives</div>
-        <div id="bonus-list"></div>
-      </div>
-    </div>
   </div>
-  <div class="card" style="margin-top:16px;">
-    <div class="card-hdr"><span class="card-title">TDS Configuration</span></div>
-    <div class="form-row">
-      <div class="pcc-field"><label>TDS Rate on Commission (%)</label><input type="number" value="10" id="tds-rate"/></div>
-      <div class="pcc-field"><label>TDS Applicable Threshold (₹/month)</label><input type="number" value="30000" id="tds-threshold"/></div>
-      <div class="pcc-field"><label>PAN Mandatory above (₹/year)</label><input type="number" value="100000"/></div>
-      <div class="pcc-field"><label>Commission Credit Cycle</label>
-        <select><option>Weekly (every Monday)</option><option>Monthly (last day)</option><option>Immediate (on payment confirm)</option></select>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- ====== AUDIT TAB ====== -->
-<div id="tab-audit" class="tab-panel">
   <div class="card">
-    <div class="card-hdr"><span class="card-title">Configuration Audit Log</span><button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Export</button></div>
-    <div class="tbl-wrap"><table>
-      <thead><tr><th>Timestamp</th><th>Admin User</th><th>Change Type</th><th>Field Changed</th><th>Old Value</th><th>New Value</th><th>IP Address</th></tr></thead>
-      <tbody id="audit-body"></tbody>
-    </table></div>
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-link" style="color:var(--blue)"></i> Tier → Voucher Assignment</div>
+    </div>
+    <p class="text-muted fs-12" style="margin-bottom:14px;">View and manage which vouchers are attached to each product/SKU.</p>
+    <div id="tier-voucher-matrix"></div>
   </div>
 </div>
 
-</div><!-- content -->
-</div><!-- main -->
-</div><!-- shell -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: ENTRY RIGHTS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-entry">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-door-open" style="color:var(--blue)"></i> Multi-Entry Configuration Engine</div>
+    </div>
+    <p class="text-muted fs-12" style="margin-bottom:16px;">Configure unlimited, limited, per-day/week/month entry limits, park-specific access, cooldowns, and blackout dates per product.</p>
+    <div id="entry-rights-list"></div>
+  </div>
+</div>
 
-<!-- New Plan Modal -->
-<div class="modal-overlay" id="new-plan-modal">
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: KYC RULES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-kyc">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-shield-alt" style="color:var(--purple)"></i> KYC Engine Configuration</div>
+      <button class="btn btn-outline btn-sm" onclick="saveKycConfig()"><i class="fas fa-save"></i> Save KYC Rules</button>
+    </div>
+    <div class="g3">
+      <div style="background:#f9fafb;border-radius:10px;padding:14px;border:1px solid var(--border);">
+        <div class="fw-bold fs-12" style="margin-bottom:10px;">🔷 Basic KYC (Explore)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-basic-photo" checked/> Photo / Selfie required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-basic-id"/> Government ID required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" id="kyc-basic-address"/> Address proof required</label>
+      </div>
+      <div style="background:#f9fafb;border-radius:10px;padding:14px;border:1px solid var(--border);">
+        <div class="fw-bold fs-12" style="margin-bottom:10px;">🟡 Full KYC (Together)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-full-photo" checked/> Photo / Selfie required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-full-id" checked/> Government ID required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" id="kyc-full-address" checked/> Address proof required</label>
+      </div>
+      <div style="background:#f9fafb;border-radius:10px;padding:14px;border:1px solid var(--border);">
+        <div class="fw-bold fs-12" style="margin-bottom:10px;">👑 Enhanced KYC (Legacy)</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-enh-photo" checked/> Photo / Selfie required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-enh-id" checked/> Government ID required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;"><input type="checkbox" id="kyc-enh-address" checked/> Address proof required</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" id="kyc-enh-selfie" checked/> Selfie with ID required</label>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="g3">
+      <div class="fg"><label>Auto-reject after (days of inactivity)</label><input type="number" id="kyc-auto-reject-days" value="14" min="1"/></div>
+      <div class="fg"><label>Max re-submission attempts</label><input type="number" id="kyc-max-attempts" value="3" min="1"/></div>
+      <div class="fg"><label>KYC validity (days)</label><input type="number" id="kyc-validity-days" value="365" min="1"/></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>KYC Acceptance Notice (shown to customer)</label><textarea id="kyc-notice">Your documents are securely processed under India's DPDP Act 2023. Data is used solely for identity verification and will not be shared with third parties.</textarea></div>
+      <div>
+        <div class="fw-bold fs-12" style="margin-bottom:10px;">KYC Workflow States</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-gray">not_started</span> → Application initiated</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-blue">pending_review</span> → Documents submitted</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-amber">under_review</span> → Reviewer assigned</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-amber">query_raised</span> → More info needed</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-green">approved</span> → KYC cleared</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;"><span class="badge b-red">rejected</span> → Permanently declined</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: ANALYTICS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-analytics">
+  <div class="g4" style="margin-bottom:16px;" id="analytics-kpis"></div>
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="card-title" style="margin-bottom:14px;">Sales by Tier</div>
+      <canvas id="chart-sales-tier"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="card-title" style="margin-bottom:14px;">Revenue by Tier</div>
+      <canvas id="chart-revenue-tier"></canvas>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-box">
+      <div class="card-title" style="margin-bottom:14px;">Voucher Redemption Rate</div>
+      <canvas id="chart-voucher-rate"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="card-title" style="margin-bottom:14px;">KYC Status Breakdown</div>
+      <canvas id="chart-kyc-status"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📋 Recent Redemptions</div></div>
+    <div id="recent-redemptions-table"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: PASSPORT RECORDS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-passports">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-database" style="color:var(--blue)"></i> Issued Passport Records</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input id="pp-search" placeholder="Search by name, number, email…" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:240px;" oninput="renderPassportRecords()"/>
+        <select id="pp-status-filter" onchange="renderPassportRecords()" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;">
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="expired">Expired</option>
+          <option value="suspended">Suspended</option>
+          <option value="revoked">Revoked</option>
+          <option value="renewed">Renewed</option>
+        </select>
+        <button class="btn btn-brand btn-sm" onclick="openIssueModal()"><i class="fas fa-plus"></i> Issue Passport</button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Passport No.</th><th>Holder</th><th>Tier</th><th>Issue Date</th><th>Expiry</th><th>Status</th><th>Vouchers</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="passport-records-body"></tbody>
+      </table>
+    </div>
+    <div id="pp-pagination" style="display:flex;justify-content:center;gap:6px;margin-top:14px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TAB: AUDIT LOG -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tp-audit">
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-title"><i class="fas fa-history" style="color:var(--muted)"></i> Audit Trail</div>
+      <div style="display:flex;gap:8px;">
+        <input id="audit-search" placeholder="Filter events…" style="padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;width:200px;" oninput="renderAuditLog()"/>
+        <button class="btn btn-outline btn-sm" onclick="exportAudit()"><i class="fas fa-download"></i> Export</button>
+      </div>
+    </div>
+    <div id="audit-log-list"></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ═══════════ MODAL: TIER ═══════════ -->
+<div class="modal-overlay" id="modal-tier">
   <div class="modal">
     <div class="modal-hdr">
-      <div class="modal-title">Add New Passport Plan</div>
-      <button class="modal-close" onclick="closeModal('new-plan-modal')">✕</button>
+      <div class="modal-title" id="tier-modal-title">Add Tier</div>
+      <button class="modal-close" onclick="closeModal('modal-tier')">×</button>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Plan Name *</label><input id="np-name" placeholder="e.g. Senior Passport"/></div>
-      <div class="form-group"><label>Plan ID *</label><input id="np-id" placeholder="e.g. senior" maxlength="20"/></div>
+    <div class="g2">
+      <div class="fg"><label>Tier ID (slug)</label><input id="t-id" placeholder="e.g. vip"/></div>
+      <div class="fg"><label>Code (uppercase)</label><input id="t-code" placeholder="VIP" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="fg"><label>Name</label><input id="t-name" placeholder="VIP"/></div>
+      <div class="fg"><label>Display Name</label><input id="t-displayName" placeholder="WOW VIP"/></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Price (₹, incl. GST) *</label><input type="number" id="np-price" placeholder="6999"/></div>
-      <div class="form-group"><label>Validity (Days) *</label><input type="number" id="np-validity" value="365"/></div>
+    <div class="fg"><label>Tagline</label><input id="t-tagline"/></div>
+    <div class="fg"><label>Description</label><textarea id="t-description"></textarea></div>
+    <div class="g4">
+      <div class="fg"><label>Primary Color</label><input type="color" id="t-colorPrimary" value="#1a56db"/></div>
+      <div class="fg"><label>Secondary Color</label><input type="color" id="t-colorSecondary" value="#93c5fd"/></div>
+      <div class="fg"><label>Gradient From</label><input type="color" id="t-gradientFrom" value="#0f2057"/></div>
+      <div class="fg"><label>Gradient To</label><input type="color" id="t-gradientTo" value="#1a56db"/></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>F&B Discount (%)</label><input type="number" id="np-fnb" placeholder="15" min="0" max="50"/></div>
-      <div class="form-group"><label>Agent Commission (%)</label><input type="number" id="np-comm" placeholder="3" min="0" max="20"/></div>
+    <div class="g4">
+      <div class="fg"><label>Emblem Emoji</label><input id="t-emblem" placeholder="🌟"/></div>
+      <div class="fg"><label>Badge Style</label>
+        <select id="t-badgeStyle"><option value="silver">Silver</option><option value="gold">Gold</option><option value="platinum">Platinum</option></select>
+      </div>
+      <div class="fg"><label>Max Holders</label><input type="number" id="t-maxHolders" value="1" min="1"/></div>
+      <div class="fg"><label>Guest Passes</label><input type="number" id="t-guestPasses" value="0" min="0"/></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Entry Type (Water/Amusement/Both)</label>
-        <select id="np-access">
-          <option value="water">Water Park Only</option>
-          <option value="amusement">Amusement Only</option>
-          <option value="combo">Both Parks</option>
+    <div class="g2">
+      <div class="fg"><label>Upgrade To Tier (ID)</label><input id="t-upgradeTo" placeholder="Leave blank if highest"/></div>
+      <div class="fg"><label>Rank (1=lowest)</label><input type="number" id="t-rank" value="1" min="1"/></div>
+    </div>
+    <div class="toggle-wrap mt-2"><label class="toggle"><input type="checkbox" id="t-status" checked/><span class="toggle-sl"></span></label><span class="fs-12">Tier Active</span></div>
+    <div class="sep"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-tier')">Cancel</button>
+      <button class="btn btn-brand" onclick="saveTier()">Save Tier</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: PRODUCT ═══════════ -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <div class="modal-title" id="prod-modal-title">Add Product / SKU</div>
+      <button class="modal-close" onclick="closeModal('modal-product')">×</button>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Product ID</label><input id="p-id" placeholder="prod_explore_annual"/></div>
+      <div class="fg"><label>SKU</label><input id="p-sku" placeholder="WOW-PASS-EXP-001"/></div>
+      <div class="fg"><label>Name</label><input id="p-name" placeholder="WOW Explore Passport"/></div>
+      <div class="fg"><label>Tier</label><select id="p-tierId"></select></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Short Description</label><input id="p-shortDesc"/></div>
+      <div class="fg"><label>Status</label>
+        <select id="p-status"><option value="active">Active</option><option value="paused">Paused</option><option value="draft">Draft</option><option value="archived">Archived</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Long Description</label><textarea id="p-longDesc"></textarea></div>
+    <div class="g4">
+      <div class="fg"><label>Base Price (₹)</label><input type="number" id="p-basePrice" min="0"/></div>
+      <div class="fg"><label>Issue Fee (₹)</label><input type="number" id="p-issueFee" value="0" min="0"/></div>
+      <div class="fg"><label>Renewal Price (₹)</label><input type="number" id="p-renewalPrice" min="0"/></div>
+      <div class="fg"><label>Upgrade Price (₹)</label><input type="number" id="p-upgradePrice" min="0" placeholder="Leave 0 if N/A"/></div>
+    </div>
+    <div class="g4">
+      <div class="fg"><label>Validity Type</label>
+        <select id="p-validityType"><option value="from_purchase">From Purchase</option><option value="from_activation">From Activation</option><option value="season">Season</option><option value="custom">Custom</option></select>
+      </div>
+      <div class="fg"><label>Validity (days)</label><input type="number" id="p-validityDays" value="365" min="1"/></div>
+      <div class="fg"><label>Renewal Window (days)</label><input type="number" id="p-renewalWindow" value="30" min="1"/></div>
+      <div class="fg"><label>Grace Period (days)</label><input type="number" id="p-gracePeriod" value="7" min="0"/></div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>KYC Level</label>
+        <select id="p-kycLevel"><option value="none">None</option><option value="basic">Basic</option><option value="full">Full</option><option value="enhanced">Enhanced</option></select>
+      </div>
+      <div class="fg"><label>Sales Channels (comma-separated)</label><input id="p-salesChannels" value="direct,salesperson,partner"/></div>
+    </div>
+    <div class="fg"><label>Renewal Bonus Text</label><input id="p-renewalBonus"/></div>
+    <div class="fg"><label>Display Order</label><input type="number" id="p-displayOrder" value="1" min="1"/></div>
+    <div class="toggle-wrap mt-2"><label class="toggle"><input type="checkbox" id="p-taxInclusive" checked/><span class="toggle-sl"></span></label><span class="fs-12">Tax Inclusive Pricing</span></div>
+    <div class="sep"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-product')">Cancel</button>
+      <button class="btn btn-brand" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: VOUCHER ═══════════ -->
+<div class="modal-overlay" id="modal-voucher">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <div class="modal-title" id="voucher-modal-title">Add Voucher Template</div>
+      <button class="modal-close" onclick="closeModal('modal-voucher')">×</button>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Voucher ID</label><input id="v-id" placeholder="v_my_voucher"/></div>
+      <div class="fg"><label>Code (shown to staff)</label><input id="v-code" placeholder="WOW-XYZ-001" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="fg"><label>Name</label><input id="v-name"/></div>
+      <div class="fg"><label>Category</label>
+        <select id="v-category">
+          <option value="fnb_discount">F&B Discount</option>
+          <option value="locker">Locker</option>
+          <option value="birthday">Birthday</option>
+          <option value="guest_entry">Guest Entry</option>
+          <option value="experience">Experience</option>
+          <option value="merchandise">Merchandise</option>
+          <option value="lounge">Lounge</option>
+          <option value="service">Service</option>
         </select>
       </div>
-      <div class="form-group"><label>Max Members</label><input type="number" id="np-members" value="1" min="1" max="10"/></div>
     </div>
-    <div class="form-group"><label>Guest Passes per Month</label><input type="number" id="np-guest" value="2"/></div>
-    <div class="form-group"><label>Key Benefit 1</label><input id="np-b1" placeholder="e.g. Unlimited park entries"/></div>
-    <div class="form-group"><label>Key Benefit 2</label><input id="np-b2" placeholder="e.g. 15% off on F&B"/></div>
-    <div class="form-group"><label>Key Benefit 3</label><input id="np-b3" placeholder="e.g. Priority queue access"/></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
-      <button class="btn btn-outline" onclick="closeModal('new-plan-modal')">Cancel</button>
-      <button class="btn btn-brand" onclick="saveNewPlan()"><i class="fas fa-save"></i> Save Plan</button>
+    <div class="g2">
+      <div class="fg"><label>Type</label>
+        <select id="v-type">
+          <option value="percentage_discount">Percentage Discount</option>
+          <option value="flat_discount">Flat Discount</option>
+          <option value="free_service">Free Service</option>
+          <option value="free_entry">Free Entry</option>
+          <option value="experience_upgrade">Experience Upgrade</option>
+          <option value="credit">Credit</option>
+          <option value="access">Access</option>
+          <option value="service">Service</option>
+        </select>
+      </div>
+      <div class="fg"><label>Display Icon (emoji)</label><input id="v-icon" placeholder="🎟"/></div>
+    </div>
+    <div class="fg"><label>Description</label><textarea id="v-description"></textarea></div>
+    <div class="g4">
+      <div class="fg"><label>Redeem Qty (-1=unlimited)</label><input type="number" id="v-redeemQty" value="-1"/></div>
+      <div class="fg"><label>Redemption Frequency</label>
+        <select id="v-redeemFreq">
+          <option value="per_visit">Per Visit</option>
+          <option value="monthly">Monthly</option>
+          <option value="annual">Annual</option>
+          <option value="on_demand">On Demand</option>
+        </select>
+      </div>
+      <div class="fg"><label>Discount Value</label><input type="number" id="v-discountValue" value="0" min="0"/></div>
+      <div class="fg"><label>Discount Type</label>
+        <select id="v-discountType">
+          <option value="pct">Percentage (%)</option>
+          <option value="flat">Flat (₹)</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Credit Value (₹, if type=credit)</label><input type="number" id="v-creditValue" value="0" min="0"/></div>
+      <div class="fg"><label>Applicable Counters (comma-separated)</label><input id="v-counters" placeholder="fnb, locker, entry"/></div>
+    </div>
+    <div class="toggle-wrap mt-2"><label class="toggle"><input type="checkbox" id="v-singleUse"/><span class="toggle-sl"></span></label><span class="fs-12">Single Use (revokes after first redemption)</span></div>
+    <div class="toggle-wrap mt-2"><label class="toggle"><input type="checkbox" id="v-active" checked/><span class="toggle-sl"></span></label><span class="fs-12">Voucher Active</span></div>
+    <div class="sep"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-voucher')">Cancel</button>
+      <button class="btn btn-brand" onclick="saveVoucher()">Save Voucher</button>
     </div>
   </div>
 </div>
 
-<!-- Voucher Modal -->
-<div class="modal-overlay" id="voucher-modal">
+<!-- ═══════════ MODAL: OFFER ═══════════ -->
+<div class="modal-overlay" id="modal-offer">
   <div class="modal">
     <div class="modal-hdr">
-      <div class="modal-title">New Voucher Template</div>
-      <button class="modal-close" onclick="closeModal('voucher-modal')">✕</button>
+      <div class="modal-title">Add / Edit Offer</div>
+      <button class="modal-close" onclick="closeModal('modal-offer')">×</button>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Voucher Name *</label><input id="vch-name" placeholder="Meal Voucher"/></div>
-      <div class="form-group"><label>Voucher Code</label><input id="vch-code" placeholder="e.g. MEAL-WOW"/></div>
+    <div class="fg"><label>Offer ID</label><input id="o-id" placeholder="o_priority_booking"/></div>
+    <div class="fg"><label>Name</label><input id="o-name"/></div>
+    <div class="fg"><label>Description</label><textarea id="o-description"></textarea></div>
+    <div class="fg"><label>Apply to Tiers (hold Ctrl to multi-select)</label>
+      <select id="o-tiers" multiple size="4"></select>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Type</label>
-        <select id="vch-type"><option>F&B Discount</option><option>Merchandise</option><option>Guest Pass</option><option>Locker</option><option>Ride Discount</option></select>
+    <div class="toggle-wrap mt-2"><label class="toggle"><input type="checkbox" id="o-status" checked/><span class="toggle-sl"></span></label><span class="fs-12">Offer Active</span></div>
+    <div class="sep"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-offer')">Cancel</button>
+      <button class="btn btn-brand" onclick="saveOffer()">Save Offer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: ISSUE PASSPORT ═══════════ -->
+<div class="modal-overlay" id="modal-issue">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <div class="modal-title">Issue Passport Manually</div>
+      <button class="modal-close" onclick="closeModal('modal-issue')">×</button>
+    </div>
+    <div class="g2">
+      <div class="fg"><label>Product</label><select id="ip-product"></select></div>
+      <div class="fg"><label>Customer Name</label><input id="ip-name" placeholder="Full name as per ID"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="ip-email"/></div>
+      <div class="fg"><label>Mobile</label><input id="ip-mobile" placeholder="+91…"/></div>
+      <div class="fg"><label>Date of Birth</label><input type="date" id="ip-dob"/></div>
+      <div class="fg"><label>Channel</label>
+        <select id="ip-channel"><option value="direct">Direct</option><option value="salesperson">Salesperson</option><option value="partner">Partner</option></select>
       </div>
-      <div class="form-group"><label>Value (₹ or %)</label><input id="vch-value" placeholder="e.g. 200 or 15%"/></div>
+      <div class="fg"><label>Start Date</label><input type="date" id="ip-startDate"/></div>
+      <div class="fg"><label>Payment Reference</label><input id="ip-payRef"/></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Uses per Passport</label><input type="number" id="vch-uses" placeholder="3" min="1"/></div>
-      <div class="form-group"><label>Expiry (months from issue)</label><input type="number" id="vch-expiry" placeholder="12" min="1"/></div>
+    <div class="fg"><label>Notes</label><textarea id="ip-notes" rows="2"></textarea></div>
+    <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:10px;font-size:11px;color:#854d0e;margin-bottom:12px;">
+      ⚠️ Bypasses KYC requirement. Use only for demo/manual issuance. All events are logged.
     </div>
-    <div class="form-group"><label>Applicable Plans (multi-select)</label>
-      <select id="vch-plans" multiple style="min-height:80px;">
-        <option value="water">Water Park Passport</option>
-        <option value="amusement">Amusement Passport</option>
-        <option value="combo" selected>Combo Passport</option>
-        <option value="family">Family Passport</option>
-      </select>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-issue')">Cancel</button>
+      <button class="btn btn-brand" onclick="issueManual()"><i class="fas fa-passport"></i> Issue Now</button>
     </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
-      <button class="btn btn-outline" onclick="closeModal('voucher-modal')">Cancel</button>
-      <button class="btn btn-brand" onclick="saveVoucher()"><i class="fas fa-save"></i> Save Voucher</button>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: PASSPORT DETAIL ═══════════ -->
+<div class="modal-overlay" id="modal-pp-detail">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <div class="modal-title">Passport Details</div>
+      <button class="modal-close" onclick="closeModal('modal-pp-detail')">×</button>
     </div>
+    <div id="pp-detail-content"></div>
   </div>
 </div>
 
 <div id="toast"></div>
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="doImportConfig(event)"/>
 
 <script>
-// ===== PLAN DATA =====
-let plans = [
-  {
-    id:'water', name:'Water Park Passport', active:true, featured:false,
-    price:4999, validity:365, fnbDiscount:10, commission:3, members:1, guestPerMonth:2,
-    access:'water', color:'#3b82f6',
-    benefits:['Unlimited Water Park entries','10% off on all F&B','2 guest passes/month','Priority queue'],
-    vouchers:['3x Meal Vouchers','₹200 F&B Voucher','2x Guest Passes'],
-  },
-  {
-    id:'amusement', name:'Amusement Passport', active:true, featured:false,
-    price:5999, validity:365, fnbDiscount:15, commission:3, members:1, guestPerMonth:1,
-    access:'amusement', color:'#7c3aed',
-    benefits:['Unlimited Amusement entries','15% off ride merchandise','1 guest pass/month','Birthday privileges'],
-    vouchers:['2x Meal Vouchers','₹150 Ride Discount','1x Guest Pass'],
-  },
-  {
-    id:'combo', name:'Combo Passport', active:true, featured:true,
-    price:7999, validity:365, fnbDiscount:20, commission:4, members:1, guestPerMonth:3,
-    access:'combo', color:'#C9A84C',
-    benefits:['Both parks unlimited','20% off F&B & merch','3 guest passes/month','VIP lounge','Free locker'],
-    vouchers:['5x Meal Vouchers','₹500 F&B Voucher','3x Guest Passes','FREE Locker/Visit'],
-  },
-  {
-    id:'family', name:'Family Passport (4 Members)', active:true, featured:true,
-    price:14999, validity:365, fnbDiscount:25, commission:5, members:4, guestPerMonth:4,
-    access:'combo', color:'#22c55e',
-    benefits:['4 members included','Both parks unlimited','25% off F&B & merch','VIP lounge all members','Birthday packs'],
-    vouchers:['8x Meal Vouchers','₹1000 F&B Voucher','4x Guest Passes','FREE Lockers'],
-  },
-];
+/* ══════════════════════════════════════════════
+   PASSPORT ENGINE ADMIN v2.0
+   ══════════════════════════════════════════════ */
 
-let vouchers = [
-  {name:'Standard Meal Voucher',code:'MEAL-STD',type:'F&B Discount',value:'₹200',plans:'Combo, Family',uses:'3',expiry:'12 months',status:'Active'},
-  {name:'Premium F&B Voucher',code:'FNB-PREM',type:'F&B Discount',value:'₹500',plans:'Combo, Family',uses:'5',expiry:'12 months',status:'Active'},
-  {name:'Guest Pass Voucher',code:'GUEST-1X',type:'Guest Pass',value:'1 Guest Entry',plans:'All Plans',uses:'2 / month',expiry:'Monthly',status:'Active'},
-  {name:'Locker Free Pass',code:'LOCK-FREE',type:'Locker',value:'Free Locker',plans:'Combo, Family',uses:'Per Visit',expiry:'12 months',status:'Active'},
-  {name:'Birthday Special',code:'BDAY-WOW',type:'Merchandise',value:'₹300',plans:'Family',uses:'1',expiry:'12 months',status:'Active'},
-];
+let editingTierId = null;
+let editingProductId = null;
+let editingVoucherId = null;
+let editingOfferId = null;
+let ppPage = 1;
+const PP_PER_PAGE = 20;
+let salesChartInst = null;
+let revenueChartInst = null;
+let voucherChartInst = null;
+let kycChartInst = null;
 
-let auditLog = [
-  {time:'28 Mar 2026 14:22',user:'Superadmin',type:'Plan Edit',field:'Combo Passport Price',old:'₹6,999',newVal:'₹7,999',ip:'192.168.1.10'},
-  {time:'28 Mar 2026 11:05',user:'Admin (Priya)',type:'Commission',field:'Combo Commission %',old:'3%',newVal:'4%',ip:'192.168.1.12'},
-  {time:'27 Mar 2026 16:44',user:'Superadmin',type:'GST Config',field:'GST Rate',old:'12%',newVal:'18%',ip:'192.168.1.10'},
-  {time:'26 Mar 2026 09:30',user:'Admin (Ravi)',type:'New Plan',field:'Family Passport',old:'N/A',newVal:'₹14,999 created',ip:'192.168.1.15'},
-  {time:'25 Mar 2026 15:18',user:'Superadmin',type:'SMS Template',field:'Welcome SMS',old:'Old text',newVal:'Updated text',ip:'192.168.1.10'},
-];
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof WPE === 'undefined') {
+    toast('❌ WOW Passport Engine script not loaded', 'danger');
+    return;
+  }
+  WPE.initialize ? WPE.initialize() : null;
+  loadMetrics();
+  loadProgramSettings();
+  renderTiers();
+  renderProducts();
+  updateKycBadge();
+});
 
-// ===== TABS =====
-function switchTab(name,e){
-  if(e) e.preventDefault();
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  const btn = document.getElementById('tab-btn-'+name);
-  const panel = document.getElementById('tab-'+name);
-  if(btn) btn.classList.add('active');
-  if(panel) panel.classList.add('active');
-  if(name==='vouchers') renderVouchers();
-  if(name==='agents') renderCommission();
-  if(name==='audit') renderAudit();
+/* ─── METRICS ─── */
+function loadMetrics() {
+  const a = WPE.getAnalytics();
+  document.getElementById('m-total').textContent = a.totalPassports;
+  document.getElementById('m-active').textContent = a.activePassports;
+  document.getElementById('m-revenue').textContent = '₹' + Number(a.totalRevenue).toLocaleString('en-IN');
+  document.getElementById('m-kyc').textContent = a.kycStats.pending;
+  document.getElementById('m-expire').textContent = a.expiringIn30;
 }
 
-// ===== PLAN CARDS =====
-function renderPlanCards(){
-  document.getElementById('m-plans').textContent = plans.filter(p=>p.active).length;
-  document.getElementById('plan-cards-grid').innerHTML = plans.map((p,i)=>`
-    <div class="plan-config-card">
-      <div class="pcc-header" style="background:${p.color}18;border-bottom:2px solid ${p.color}40;">
-        <div>
-          <div class="pcc-name" style="color:${p.color};">${p.name}</div>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            ${p.active?'<span class="badge bg-green">Active</span>':'<span class="badge bg-gray">Inactive</span>'}
-            ${p.featured?'<span class="badge" style="background:rgba(201,168,76,.15);color:var(--brand3);border:1px solid rgba(201,168,76,.3);">⭐ Featured</span>':''}
-          </div>
+function updateKycBadge() {
+  const a = WPE.getAnalytics();
+  const el = document.getElementById('sb-kyc-badge');
+  if (el) el.textContent = a.kycStats.pending;
+}
+
+/* ─── TABS ─── */
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab[onclick="switchTab('${id}')"]`).classList.add('active');
+  document.getElementById('tp-' + id).classList.add('active');
+  if (id === 'vouchers') renderVouchers();
+  if (id === 'offers') { renderOffers(); renderTierVoucherMatrix(); }
+  if (id === 'entry') renderEntryRights();
+  if (id === 'analytics') renderAnalytics();
+  if (id === 'passports') renderPassportRecords();
+  if (id === 'audit') renderAuditLog();
+}
+
+/* ─── PROGRAM SETTINGS ─── */
+function loadProgramSettings() {
+  const cfg = WPE.getConfig();
+  const m = cfg.meta;
+  setValue('cfg-programName', m.programName);
+  setValue('cfg-tagline', m.programTagline);
+  setValue('cfg-gst', (m.gstRate * 100).toFixed(0));
+  setValue('cfg-prefix', m.passportNumberPrefix);
+  setValue('cfg-renewalWindow', m.renewalWindowDays);
+  setValue('cfg-gracePeriod', m.gracePeriodDays);
+  setValue('cfg-maxPP', m.maxPassportsPerCustomer);
+  setValue('cfg-email', m.contactEmail);
+  setCheck('cfg-kycMandatory', m.kycMandatoryBeforeIssuance);
+  setCheck('cfg-paymentBeforeKyc', m.paymentBeforeKyc);
+}
+
+function saveProgramSettings() {
+  const cfg = WPE.getConfig();
+  cfg.meta.programName = g('cfg-programName');
+  cfg.meta.programTagline = g('cfg-tagline');
+  cfg.meta.gstRate = parseFloat(g('cfg-gst')) / 100;
+  cfg.meta.passportNumberPrefix = g('cfg-prefix');
+  cfg.meta.renewalWindowDays = parseInt(g('cfg-renewalWindow'));
+  cfg.meta.gracePeriodDays = parseInt(g('cfg-gracePeriod'));
+  cfg.meta.maxPassportsPerCustomer = parseInt(g('cfg-maxPP'));
+  cfg.meta.contactEmail = g('cfg-email');
+  cfg.meta.kycMandatoryBeforeIssuance = gc('cfg-kycMandatory');
+  cfg.meta.paymentBeforeKyc = gc('cfg-paymentBeforeKyc');
+  WPE.saveConfig(cfg);
+  toast('✅ Program settings saved');
+}
+
+/* ─── TIERS ─── */
+function renderTiers() {
+  const tiers = WPE.getTiers();
+  const container = document.getElementById('tier-grid');
+  container.innerHTML = '';
+  tiers.forEach(tier => {
+    const div = document.createElement('div');
+    div.className = 'tier-card';
+    const prods = WPE.getProducts().filter(p => p.tierId === tier.id);
+    div.innerHTML = `
+      <div class="tc-head" style="background:linear-gradient(135deg,${tier.gradientFrom},${tier.gradientTo})">
+        <div class="tc-emblem">${tier.emblemIcon || '🌟'}</div>
+        <div class="tc-info">
+          <h3>${tier.displayName || tier.name}</h3>
+          <small>${tier.tagline || ''}</small>
         </div>
-        <div style="text-align:right;">
-          <div class="pcc-price">₹${p.price.toLocaleString('en-IN')}</div>
-          <div style="font-size:10px;color:var(--muted);">/year · ${p.validity} days</div>
+        <span style="margin-left:auto;font-size:10px;padding:3px 8px;background:rgba(255,255,255,.2);border-radius:20px;color:#fff;">${tier.status === 'active' ? '● LIVE' : '○ PAUSED'}</span>
+      </div>
+      <div class="tc-body">
+        <div class="tc-meta">
+          <span class="badge b-gray">Rank ${tier.rank}</span>
+          <span class="badge b-gray">${tier.maxHolders} holder${tier.maxHolders > 1 ? 's' : ''}</span>
+          <span class="badge b-gray">${tier.guestPassesIncluded} guest passes</span>
+          <span class="badge ${tier.badgeStyle === 'platinum' ? 'b-purple' : tier.badgeStyle === 'gold' ? 'b-gold' : 'b-gray'}">${tier.badgeStyle}</span>
+        </div>
+        <div class="fs-11 text-muted" style="margin-bottom:8px;">${prods.length} product SKU${prods.length !== 1 ? 's' : ''}</div>
+        <div class="tc-actions">
+          <button class="btn btn-outline btn-xs" onclick="openTierModal('${tier.id}')"><i class="fas fa-edit"></i> Edit</button>
+          <button class="btn btn-outline btn-xs" onclick="cloneTier('${tier.id}')"><i class="fas fa-copy"></i> Clone</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteTier('${tier.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+
+  // populate product tier filter
+  const sel = document.getElementById('prod-filter-tier');
+  sel.innerHTML = '<option value="">All Tiers</option>';
+  tiers.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = t.displayName || t.name;
+    sel.appendChild(o);
+  });
+}
+
+function openTierModal(tierId) {
+  editingTierId = tierId || null;
+  document.getElementById('tier-modal-title').textContent = tierId ? 'Edit Tier' : 'Add Tier';
+  if (tierId) {
+    const t = WPE.getTierById(tierId);
+    if (!t) return;
+    setValue('t-id', t.id);
+    setValue('t-code', t.code);
+    setValue('t-name', t.name);
+    setValue('t-displayName', t.displayName);
+    setValue('t-tagline', t.tagline);
+    setValue('t-description', t.description);
+    setValue('t-colorPrimary', t.colorPrimary);
+    setValue('t-colorSecondary', t.colorSecondary);
+    setValue('t-gradientFrom', t.gradientFrom);
+    setValue('t-gradientTo', t.gradientTo);
+    setValue('t-emblem', t.emblemIcon);
+    setValue('t-badgeStyle', t.badgeStyle);
+    setValue('t-maxHolders', t.maxHolders);
+    setValue('t-guestPasses', t.guestPassesIncluded);
+    setValue('t-upgradeTo', t.upgradeToTier || '');
+    setValue('t-rank', t.rank);
+    setCheck('t-status', t.status === 'active');
+  } else {
+    ['t-id','t-code','t-name','t-displayName','t-tagline','t-description','t-upgradeTo'].forEach(id => setValue(id, ''));
+    setValue('t-colorPrimary', '#1a56db');
+    setValue('t-colorSecondary', '#93c5fd');
+    setValue('t-gradientFrom', '#0f2057');
+    setValue('t-gradientTo', '#1a56db');
+    setValue('t-emblem', '🌟');
+    setValue('t-badgeStyle', 'silver');
+    setValue('t-maxHolders', 1);
+    setValue('t-guestPasses', 0);
+    setValue('t-rank', 1);
+    setCheck('t-status', true);
+  }
+  showModal('modal-tier');
+}
+
+function saveTier() {
+  const cfg = WPE.getConfig();
+  const tierId = g('t-id').trim();
+  if (!tierId) { toast('Tier ID required', 'danger'); return; }
+  const tier = {
+    id: tierId, code: g('t-code'), name: g('t-name'), displayName: g('t-displayName'),
+    tagline: g('t-tagline'), description: g('t-description'),
+    colorPrimary: g('t-colorPrimary'), colorSecondary: g('t-colorSecondary'),
+    gradientFrom: g('t-gradientFrom'), gradientTo: g('t-gradientTo'),
+    emblemIcon: g('t-emblem'), badgeStyle: g('t-badgeStyle'),
+    maxHolders: parseInt(g('t-maxHolders')) || 1,
+    holders: parseInt(g('t-maxHolders')) || 1,
+    guestPassesIncluded: parseInt(g('t-guestPasses')) || 0,
+    upgradeToTier: g('t-upgradeTo') || null,
+    rank: parseInt(g('t-rank')) || 1,
+    status: gc('t-status') ? 'active' : 'paused',
+    transferable: false,
+  };
+  const idx = cfg.tiers.findIndex(t => t.id === tierId);
+  if (idx >= 0) cfg.tiers[idx] = tier;
+  else cfg.tiers.push(tier);
+  cfg.tiers.sort((a, b) => a.rank - b.rank);
+  WPE.saveConfig(cfg);
+  closeModal('modal-tier');
+  renderTiers();
+  toast('✅ Tier saved');
+}
+
+function cloneTier(tierId) {
+  const t = WPE.getTierById(tierId);
+  if (!t) return;
+  const clone = JSON.parse(JSON.stringify(t));
+  clone.id = t.id + '_copy_' + Date.now().toString(36);
+  clone.code = t.code + '_COPY';
+  clone.name = t.name + ' (Copy)';
+  clone.displayName = t.displayName + ' (Copy)';
+  clone.status = 'draft';
+  const cfg = WPE.getConfig();
+  cfg.tiers.push(clone);
+  WPE.saveConfig(cfg);
+  renderTiers();
+  toast('✅ Tier cloned');
+}
+
+function deleteTier(tierId) {
+  if (!confirm(`Delete tier "${tierId}"? Products attached to this tier will be orphaned.`)) return;
+  const cfg = WPE.getConfig();
+  cfg.tiers = cfg.tiers.filter(t => t.id !== tierId);
+  WPE.saveConfig(cfg);
+  renderTiers();
+  renderProducts();
+  toast('✅ Tier deleted');
+}
+
+/* ─── PRODUCTS ─── */
+function renderProducts() {
+  const filterTier = g('prod-filter-tier');
+  let prods = WPE.getProducts();
+  if (filterTier) prods = prods.filter(p => p.tierId === filterTier);
+  const container = document.getElementById('product-list');
+  if (!prods.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-box"></i>No products found</div>'; return; }
+  const tiers = WPE.getTiers();
+  container.innerHTML = prods.sort((a,b) => a.displayOrder - b.displayOrder).map(p => {
+    const tier = tiers.find(t => t.id === p.tierId);
+    const statusMap = { active: 'b-green', paused: 'b-amber', draft: 'b-purple', archived: 'b-gray' };
+    return `
+    <div class="prod-row">
+      <div class="prod-rank">${p.displayOrder}</div>
+      <div>
+        <div class="fw-bold fs-12">${p.name}</div>
+        <div class="fs-10 text-muted">${p.sku} · ${p.shortDesc || ''}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+          ${tier ? `<span class="badge b-blue" style="background:${tier.colorPrimary}20;color:${tier.colorPrimary};border:1px solid ${tier.colorPrimary}40;">${tier.emblemIcon} ${tier.name}</span>` : ''}
+          <span class="badge b-gray">${p.validityDays} days</span>
+          <span class="badge b-gray">${p.kycLevel} KYC</span>
+          <span class="badge b-gray">${(p.voucherIds||[]).length} vouchers</span>
         </div>
       </div>
-      <div class="pcc-body">
-        <div class="pcc-grid">
-          <div class="pcc-field"><label>Price (₹, incl. GST)</label><input type="number" value="${p.price}" id="price-${p.id}" onchange="updatePlan('${p.id}','price',this.value)"/></div>
-          <div class="pcc-field"><label>Validity (Days)</label><input type="number" value="${p.validity}" id="val-${p.id}" onchange="updatePlan('${p.id}','validity',this.value)"/></div>
-          <div class="pcc-field"><label>F&B Discount (%)</label><input type="number" value="${p.fnbDiscount}" min="0" max="50" onchange="updatePlan('${p.id}','fnbDiscount',this.value)"/></div>
-          <div class="pcc-field"><label>Commission (%)</label><input type="number" value="${p.commission}" min="0" max="20" onchange="updatePlan('${p.id}','commission',this.value)"/></div>
-          <div class="pcc-field"><label>Max Members</label><input type="number" value="${p.members}" min="1" max="10" onchange="updatePlan('${p.id}','members',this.value)"/></div>
-          <div class="pcc-field"><label>Guest Passes/Month</label><input type="number" value="${p.guestPerMonth}" min="0" max="10" onchange="updatePlan('${p.id}','guestPerMonth',this.value)"/></div>
+      <div class="fw-bold" style="color:var(--brand3);font-size:14px;">₹${Number(p.basePrice).toLocaleString('en-IN')}</div>
+      <div><span class="badge ${statusMap[p.status] || 'b-gray'}">${p.status}</span></div>
+      <div class="fs-10 text-muted">${p.analytics ? `${p.analytics.sold} sold` : '—'}</div>
+      <div style="display:flex;gap:5px;">
+        <button class="btn btn-outline btn-xs" onclick="openProductModal('${p.id}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-outline btn-xs" onclick="cloneProduct('${p.id}')"><i class="fas fa-copy"></i></button>
+        <button class="btn btn-danger btn-xs" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openProductModal(productId) {
+  editingProductId = productId || null;
+  // populate tier dropdown
+  const tSel = document.getElementById('p-tierId');
+  tSel.innerHTML = '';
+  WPE.getTiers().forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = t.displayName || t.name;
+    tSel.appendChild(o);
+  });
+  document.getElementById('prod-modal-title').textContent = productId ? 'Edit Product' : 'Add Product';
+  if (productId) {
+    const p = WPE.getProductById(productId);
+    if (!p) return;
+    setValue('p-id', p.id);
+    setValue('p-sku', p.sku);
+    setValue('p-name', p.name);
+    setValue('p-tierId', p.tierId);
+    setValue('p-shortDesc', p.shortDesc || '');
+    setValue('p-longDesc', p.longDesc || '');
+    setValue('p-status', p.status);
+    setValue('p-basePrice', p.basePrice);
+    setValue('p-issueFee', p.issueFee || 0);
+    setValue('p-renewalPrice', p.renewalPrice || 0);
+    setValue('p-upgradePrice', p.upgradePrice || 0);
+    setValue('p-validityType', p.validityType);
+    setValue('p-validityDays', p.validityDays);
+    setValue('p-renewalWindow', p.renewalWindowDays || 30);
+    setValue('p-gracePeriod', p.gracePeriodDays || 7);
+    setValue('p-kycLevel', p.kycLevel);
+    setValue('p-salesChannels', (p.salesChannels || []).join(','));
+    setValue('p-renewalBonus', p.renewalBonus || '');
+    setValue('p-displayOrder', p.displayOrder || 1);
+    setCheck('p-taxInclusive', p.taxInclusive !== false);
+  } else {
+    ['p-id','p-sku','p-name','p-shortDesc','p-longDesc','p-renewalBonus'].forEach(id => setValue(id, ''));
+    setValue('p-status', 'active');
+    setValue('p-basePrice', 4999);
+    setValue('p-issueFee', 0);
+    setValue('p-renewalPrice', 3999);
+    setValue('p-upgradePrice', 0);
+    setValue('p-validityType', 'from_purchase');
+    setValue('p-validityDays', 365);
+    setValue('p-renewalWindow', 30);
+    setValue('p-gracePeriod', 7);
+    setValue('p-kycLevel', 'basic');
+    setValue('p-salesChannels', 'direct,salesperson,partner');
+    setValue('p-displayOrder', 1);
+    setCheck('p-taxInclusive', true);
+  }
+  showModal('modal-product');
+}
+
+function saveProduct() {
+  const cfg = WPE.getConfig();
+  const pid = g('p-id').trim();
+  if (!pid) { toast('Product ID required', 'danger'); return; }
+  const existing = cfg.products.find(p => p.id === pid);
+  const prod = Object.assign(existing || { analytics: { sold: 0, active: 0, expired: 0, revenue: 0 }, voucherIds: [], offerIds: [], entryRights: { type: 'unlimited', parks: ['WATER_DAY', 'AMUSEMENT_DAY'], entriesPerDay: 1, cooldownHours: 0, blackoutDates: [], requiresPreBooking: false, weekendSurcharge: false, vipLane: false }, benefits: [], version: 1, createdAt: new Date().toISOString() }, {
+    id: pid, sku: g('p-sku'), name: g('p-name'), tierId: g('p-tierId'),
+    shortDesc: g('p-shortDesc'), longDesc: g('p-longDesc'),
+    status: g('p-status'), basePrice: parseFloat(g('p-basePrice')) || 0,
+    issueFee: parseFloat(g('p-issueFee')) || 0,
+    renewalPrice: parseFloat(g('p-renewalPrice')) || 0,
+    upgradePrice: parseFloat(g('p-upgradePrice')) || null,
+    validityType: g('p-validityType'), validityDays: parseInt(g('p-validityDays')) || 365,
+    renewalWindowDays: parseInt(g('p-renewalWindow')) || 30,
+    gracePeriodDays: parseInt(g('p-gracePeriod')) || 7,
+    kycLevel: g('p-kycLevel'),
+    salesChannels: g('p-salesChannels').split(',').map(s => s.trim()).filter(Boolean),
+    renewalBonus: g('p-renewalBonus'),
+    displayOrder: parseInt(g('p-displayOrder')) || 1,
+    taxInclusive: gc('p-taxInclusive'),
+    updatedAt: new Date().toISOString(),
+  });
+  const idx = cfg.products.findIndex(p => p.id === pid);
+  if (idx >= 0) cfg.products[idx] = prod;
+  else cfg.products.push(prod);
+  WPE.saveConfig(cfg);
+  closeModal('modal-product');
+  renderProducts();
+  toast('✅ Product saved');
+}
+
+function cloneProduct(productId) {
+  const p = WPE.getProductById(productId);
+  if (!p) return;
+  const clone = JSON.parse(JSON.stringify(p));
+  clone.id = p.id + '_copy';
+  clone.sku = p.sku + '-COPY';
+  clone.name = p.name + ' (Copy)';
+  clone.status = 'draft';
+  clone.analytics = { sold: 0, active: 0, expired: 0, revenue: 0 };
+  clone.createdAt = new Date().toISOString();
+  const cfg = WPE.getConfig();
+  cfg.products.push(clone);
+  WPE.saveConfig(cfg);
+  renderProducts();
+  toast('✅ Product cloned');
+}
+
+function deleteProduct(productId) {
+  if (!confirm(`Delete product "${productId}"? This cannot be undone.`)) return;
+  const cfg = WPE.getConfig();
+  cfg.products = cfg.products.filter(p => p.id !== productId);
+  WPE.saveConfig(cfg);
+  renderProducts();
+  toast('✅ Product deleted');
+}
+
+/* ─── VOUCHERS ─── */
+function renderVouchers() {
+  const search = (g('voucher-search') || '').toLowerCase();
+  const catFilter = g('voucher-cat-filter');
+  let vouchers = WPE.getVouchers();
+  if (search) vouchers = vouchers.filter(v => v.name.toLowerCase().includes(search) || v.code.toLowerCase().includes(search) || v.description.toLowerCase().includes(search));
+  if (catFilter) vouchers = vouchers.filter(v => v.category === catFilter);
+  const grid = document.getElementById('voucher-grid');
+  if (!vouchers.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-ticket-alt"></i>No vouchers found</div>'; return; }
+  grid.innerHTML = vouchers.map(v => `
+    <div class="voucher-card">
+      <div class="vc-head">
+        <div class="vc-icon">${v.displayIcon || '🎟'}</div>
+        <div>
+          <div class="vc-name">${v.name}</div>
+          <div class="vc-code">${v.code}</div>
         </div>
-        <div class="pcc-field"><label>Park Access</label>
-          <select onchange="updatePlan('${p.id}','access',this.value)">
-            <option value="water" ${p.access==='water'?'selected':''}>Water Park Only</option>
-            <option value="amusement" ${p.access==='amusement'?'selected':''}>Amusement Only</option>
-            <option value="combo" ${p.access==='combo'?'selected':''}>Both Parks (Combo)</option>
-          </select>
-        </div>
-        <div class="pcc-field"><label>Benefits</label>
-          <div class="voucher-tags" id="ben-tags-${p.id}">
-            ${p.benefits.map((b,bi)=>`<span class="voucher-tag">${b}<span class="rm" onclick="removeBenefit('${p.id}',${bi})">✕</span></span>`).join('')}
-          </div>
-          <div style="display:flex;gap:6px;margin-top:6px;">
-            <input type="text" id="new-ben-${p.id}" placeholder="Add benefit…" style="font-size:11px;padding:5px 8px;" onkeypress="if(event.key==='Enter'){addBenefit('${p.id}');}"/>
-            <button class="btn btn-outline btn-sm" onclick="addBenefit('${p.id}')"><i class="fas fa-plus"></i></button>
-          </div>
-        </div>
-        <div class="pcc-field"><label>Included Vouchers</label>
-          <div class="voucher-tags" id="vch-tags-${p.id}">
-            ${p.vouchers.map((v,vi)=>`<span class="voucher-tag">${v}<span class="rm" onclick="removeVoucher('${p.id}',${vi})">✕</span></span>`).join('')}
-          </div>
-          <div style="display:flex;gap:6px;margin-top:6px;">
-            <input type="text" id="new-vch-${p.id}" placeholder="Add voucher…" style="font-size:11px;padding:5px 8px;" onkeypress="if(event.key==='Enter'){addVoucherTag('${p.id}');}"/>
-            <button class="btn btn-outline btn-sm" onclick="addVoucherTag('${p.id}')"><i class="fas fa-plus"></i></button>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-          <button class="btn btn-${p.active?'danger':'success'} btn-sm" style="flex:1;" onclick="togglePlan('${p.id}')">${p.active?'<i class="fas fa-ban"></i> Disable':'<i class="fas fa-check"></i> Enable'}</button>
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="toggleFeatured('${p.id}')">${p.featured?'Unfeature':'⭐ Feature'}</button>
-          <button class="btn btn-outline btn-sm" onclick="duplicatePlan('${p.id}')"><i class="fas fa-copy"></i></button>
-        </div>
+        <span class="badge ${v.status === 'active' ? 'b-green' : 'b-red'}" style="margin-left:auto;">${v.status}</span>
+      </div>
+      <div class="vc-desc">${v.description || ''}</div>
+      <div class="vc-meta">
+        <span class="badge b-gray">${v.category}</span>
+        <span class="badge b-gray">${v.redeemQty === -1 ? '∞' : v.redeemQty} uses</span>
+        <span class="badge b-blue">${v.redeemFreq}</span>
+        ${v.discountValue ? `<span class="badge b-amber">${v.discountValue}${v.discountType === 'pct' ? '%' : '₹'} off</span>` : ''}
+        ${v.creditValue ? `<span class="badge b-gold">₹${v.creditValue} credit</span>` : ''}
+        ${v.singleUse ? `<span class="badge b-red">Single Use</span>` : ''}
+      </div>
+      <div class="vc-actions">
+        <button class="btn btn-outline btn-xs" onclick="openVoucherModal('${v.id}')"><i class="fas fa-edit"></i> Edit</button>
+        <button class="btn btn-outline btn-xs" onclick="toggleVoucherStatus('${v.id}')"><i class="fas fa-power-off"></i></button>
+        <button class="btn btn-danger btn-xs" onclick="deleteVoucher('${v.id}')"><i class="fas fa-trash"></i></button>
       </div>
     </div>`).join('');
 }
 
-function updatePlan(id,field,val){ const p=plans.find(x=>x.id===id); if(p) p[field]=isNaN(val)?val:parseFloat(val); }
-function togglePlan(id){ const p=plans.find(x=>x.id===id); if(p){ p.active=!p.active; renderPlanCards(); showToast('Plan '+(p.active?'enabled':'disabled')); } }
-function toggleFeatured(id){ const p=plans.find(x=>x.id===id); if(p){ p.featured=!p.featured; renderPlanCards(); showToast('Featured status updated'); } }
-function duplicatePlan(id){ const p=plans.find(x=>x.id===id); if(!p) return; const copy={...p,id:id+'_copy',name:p.name+' (Copy)',active:false,featured:false}; plans.push(copy); renderPlanCards(); showToast('Plan duplicated'); }
-function addBenefit(id){ const inp=document.getElementById('new-ben-'+id); if(!inp.value.trim()) return; const p=plans.find(x=>x.id===id); if(p){ p.benefits.push(inp.value.trim()); inp.value=''; renderPlanCards(); } }
-function removeBenefit(id,i){ const p=plans.find(x=>x.id===id); if(p){ p.benefits.splice(i,1); renderPlanCards(); } }
-function addVoucherTag(id){ const inp=document.getElementById('new-vch-'+id); if(!inp.value.trim()) return; const p=plans.find(x=>x.id===id); if(p){ p.vouchers.push(inp.value.trim()); inp.value=''; renderPlanCards(); } }
-function removeVoucher(id,i){ const p=plans.find(x=>x.id===id); if(p){ p.vouchers.splice(i,1); renderPlanCards(); } }
+function openVoucherModal(voucherId) {
+  editingVoucherId = voucherId || null;
+  document.getElementById('voucher-modal-title').textContent = voucherId ? 'Edit Voucher' : 'New Voucher Template';
+  if (voucherId) {
+    const v = WPE.getVoucherById(voucherId);
+    if (!v) return;
+    setValue('v-id', v.id);
+    setValue('v-code', v.code);
+    setValue('v-name', v.name);
+    setValue('v-category', v.category);
+    setValue('v-type', v.type);
+    setValue('v-icon', v.displayIcon || '');
+    setValue('v-description', v.description || '');
+    setValue('v-redeemQty', v.redeemQty);
+    setValue('v-redeemFreq', v.redeemFreq);
+    setValue('v-discountValue', v.discountValue || 0);
+    setValue('v-discountType', v.discountType || 'pct');
+    setValue('v-creditValue', v.creditValue || 0);
+    setValue('v-counters', (v.counters || []).join(', '));
+    setCheck('v-singleUse', v.singleUse);
+    setCheck('v-active', v.status === 'active');
+  } else {
+    ['v-id','v-code','v-name','v-description','v-icon'].forEach(id => setValue(id, ''));
+    setValue('v-category', 'fnb_discount'); setValue('v-type', 'percentage_discount');
+    setValue('v-redeemQty', -1); setValue('v-redeemFreq', 'per_visit');
+    setValue('v-discountValue', 0); setValue('v-discountType', 'pct');
+    setValue('v-creditValue', 0); setValue('v-counters', '');
+    setCheck('v-singleUse', false); setCheck('v-active', true);
+  }
+  showModal('modal-voucher');
+}
 
-// ===== NEW PLAN =====
-function openNewPlanModal(){ document.getElementById('new-plan-modal').classList.add('show'); }
-function saveNewPlan(){
-  const name=document.getElementById('np-name').value.trim();
-  const id=document.getElementById('np-id').value.trim().replace(/\s/g,'_');
-  const price=parseFloat(document.getElementById('np-price').value)||0;
-  if(!name||!id||!price){ showToast('Fill required fields'); return; }
-  const newPlan = {
-    id,name,active:true,featured:false,
-    price,validity:parseInt(document.getElementById('np-validity').value)||365,
-    fnbDiscount:parseFloat(document.getElementById('np-fnb').value)||0,
-    commission:parseFloat(document.getElementById('np-comm').value)||3,
-    members:parseInt(document.getElementById('np-members').value)||1,
-    guestPerMonth:parseInt(document.getElementById('np-guest').value)||2,
-    access:document.getElementById('np-access').value,
-    color:['#'+Math.floor(Math.random()*16777215).toString(16)][0],
-    benefits:[document.getElementById('np-b1').value,document.getElementById('np-b2').value,document.getElementById('np-b3').value].filter(Boolean),
-    vouchers:[],
+function saveVoucher() {
+  const vouchers = WPE.getVouchers();
+  const vid = g('v-id').trim();
+  if (!vid) { toast('Voucher ID required', 'danger'); return; }
+  const existingIdx = vouchers.findIndex(v => v.id === vid);
+  const voucher = {
+    id: vid, code: g('v-code'), name: g('v-name'),
+    category: g('v-category'), type: g('v-type'),
+    displayIcon: g('v-icon') || '🎟',
+    description: g('v-description'),
+    redeemQty: parseInt(g('v-redeemQty')) || -1,
+    redeemFreq: g('v-redeemFreq'),
+    discountValue: parseFloat(g('v-discountValue')) || null,
+    discountType: g('v-discountType'),
+    creditValue: parseFloat(g('v-creditValue')) || null,
+    counters: g('v-counters').split(',').map(s => s.trim()).filter(Boolean),
+    singleUse: gc('v-singleUse'),
+    status: gc('v-active') ? 'active' : 'inactive',
+    parks: ['WATER_DAY', 'AMUSEMENT_DAY'],
+    validFrom: null, validTo: null, blackoutDates: [], timeWindow: null,
   };
-  plans.push(newPlan);
-  renderPlanCards();
-  closeModal('new-plan-modal');
-  showToast('New passport plan created: '+name);
+  if (existingIdx >= 0) vouchers[existingIdx] = voucher;
+  else vouchers.push(voucher);
+  WPE.saveVouchers(vouchers);
+  closeModal('modal-voucher');
+  renderVouchers();
+  toast('✅ Voucher saved');
 }
 
-// ===== VOUCHERS =====
-function openVoucherModal(){ document.getElementById('voucher-modal').classList.add('show'); }
-function saveVoucher(){
-  const name=document.getElementById('vch-name').value.trim();
-  if(!name){ showToast('Enter voucher name'); return; }
-  vouchers.push({name,code:document.getElementById('vch-code').value||'VCH-'+Date.now().toString(36).toUpperCase(),type:document.getElementById('vch-type').value,value:document.getElementById('vch-value').value,plans:'Selected Plans',uses:document.getElementById('vch-uses').value||'1',expiry:document.getElementById('vch-expiry').value+' months',status:'Active'});
+function toggleVoucherStatus(voucherId) {
+  const v = WPE.getVoucherById(voucherId);
+  if (!v) return;
+  WPE.updateVoucher(voucherId, { status: v.status === 'active' ? 'inactive' : 'active' });
   renderVouchers();
-  closeModal('voucher-modal');
-  showToast('Voucher template saved');
+  toast(`✅ Voucher ${v.status === 'active' ? 'deactivated' : 'activated'}`);
 }
-function renderVouchers(){
-  document.getElementById('vouchers-body').innerHTML = vouchers.map(v=>`
+
+function deleteVoucher(voucherId) {
+  if (!confirm('Delete this voucher template?')) return;
+  const vl = WPE.getVouchers().filter(v => v.id !== voucherId);
+  WPE.saveVouchers(vl);
+  renderVouchers();
+  toast('✅ Voucher deleted');
+}
+
+/* ─── OFFERS ─── */
+function renderOffers() {
+  const offers = WPE.getOffers();
+  const tiers = WPE.getTiers();
+  const tbody = document.getElementById('offer-table-body');
+  tbody.innerHTML = offers.map(o => `
     <tr>
-      <td><strong>${v.name}</strong></td>
-      <td><span style="font-family:monospace;font-size:11px;">${v.code}</span></td>
-      <td>${v.type}</td>
-      <td><strong style="color:var(--brand3);">${v.value}</strong></td>
-      <td>${v.plans}</td>
-      <td>${v.uses}</td>
-      <td>${v.expiry}</td>
-      <td><span class="badge ${v.status==='Active'?'bg-green':'bg-gray'}">${v.status}</span></td>
-      <td><button class="btn btn-outline btn-sm" onclick="showToast('Editing ${v.name}…')"><i class="fas fa-edit"></i></button></td>
+      <td><strong>${o.name}</strong><div class="fs-10 text-muted">${o.id}</div></td>
+      <td class="fs-11">${o.description}</td>
+      <td style="max-width:200px;">${o.tiers.map(tid => {
+        const t = tiers.find(x => x.id === tid);
+        return `<span class="badge b-blue" style="margin:2px;">${t ? t.name : tid}</span>`;
+      }).join('')}</td>
+      <td><span class="badge ${o.status === 'active' ? 'b-green' : 'b-gray'}">${o.status}</span></td>
+      <td><button class="btn btn-outline btn-xs" onclick="openOfferModal('${o.id}')"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-danger btn-xs" onclick="deleteOffer('${o.id}')"><i class="fas fa-trash"></i></button></td>
     </tr>`).join('');
 }
 
-// ===== COMMISSION =====
-function renderCommission(){
-  document.getElementById('commission-table').innerHTML = plans.map(p=>{
-    const base = Math.round(p.price * 100/118);
-    const comm = Math.round(base * p.commission/100);
+function renderTierVoucherMatrix() {
+  const products = WPE.getProducts();
+  const vouchers = WPE.getVouchers();
+  const container = document.getElementById('tier-voucher-matrix');
+  container.innerHTML = products.map(p => {
+    const pvouchers = (p.voucherIds || []).map(vid => vouchers.find(v => v.id === vid)).filter(Boolean);
+    return `
+    <div style="background:#f9fafb;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid var(--border);">
+      <div class="fw-bold fs-12" style="margin-bottom:10px;">${p.name} <span class="badge b-gray">${p.sku}</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${pvouchers.length ? pvouchers.map(v => `
+          <div style="display:flex;align-items:center;gap:6px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:5px 10px;">
+            <span>${v.displayIcon || '🎟'}</span>
+            <span class="fs-11 fw-bold">${v.name}</span>
+            <button class="btn btn-danger btn-xs" onclick="removeVoucherFromProduct('${p.id}','${v.id}')">×</button>
+          </div>`).join('') : '<span class="text-muted fs-11">No vouchers attached</span>'}
+        <button class="btn btn-outline btn-xs" onclick="attachVoucherToProduct('${p.id}')"><i class="fas fa-plus"></i> Add</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function attachVoucherToProduct(productId) {
+  const vouchers = WPE.getVouchers().filter(v => v.status === 'active');
+  const options = vouchers.map(v => `${v.id}: ${v.name}`).join('\n');
+  const input = prompt(`Enter voucher ID to attach:\n\nAvailable vouchers:\n${options}`);
+  if (!input) return;
+  const vId = input.trim();
+  if (!WPE.getVoucherById(vId)) { toast('Voucher not found', 'danger'); return; }
+  const cfg = WPE.getConfig();
+  const pi = cfg.products.findIndex(p => p.id === productId);
+  if (pi < 0) return;
+  cfg.products[pi].voucherIds = cfg.products[pi].voucherIds || [];
+  if (!cfg.products[pi].voucherIds.includes(vId)) cfg.products[pi].voucherIds.push(vId);
+  WPE.saveConfig(cfg);
+  renderTierVoucherMatrix();
+  toast('✅ Voucher attached');
+}
+
+function removeVoucherFromProduct(productId, voucherId) {
+  const cfg = WPE.getConfig();
+  const pi = cfg.products.findIndex(p => p.id === productId);
+  if (pi < 0) return;
+  cfg.products[pi].voucherIds = (cfg.products[pi].voucherIds || []).filter(v => v !== voucherId);
+  WPE.saveConfig(cfg);
+  renderTierVoucherMatrix();
+  toast('✅ Voucher removed');
+}
+
+function openOfferModal(offerId) {
+  editingOfferId = offerId || null;
+  const tiers = WPE.getTiers();
+  const sel = document.getElementById('o-tiers');
+  sel.innerHTML = tiers.map(t => `<option value="${t.id}">${t.displayName || t.name}</option>`).join('');
+  if (offerId) {
+    const o = WPE.getOffers().find(x => x.id === offerId);
+    if (!o) return;
+    setValue('o-id', o.id);
+    setValue('o-name', o.name);
+    setValue('o-description', o.description);
+    Array.from(sel.options).forEach(opt => { opt.selected = o.tiers.includes(opt.value); });
+    setCheck('o-status', o.status === 'active');
+  } else {
+    ['o-id','o-name','o-description'].forEach(id => setValue(id, ''));
+    setCheck('o-status', true);
+  }
+  showModal('modal-offer');
+}
+
+function saveOffer() {
+  const offers = WPE.getOffers();
+  const oid = g('o-id').trim();
+  if (!oid) { toast('Offer ID required', 'danger'); return; }
+  const tiers = Array.from(document.getElementById('o-tiers').selectedOptions).map(o => o.value);
+  const offer = { id: oid, name: g('o-name'), description: g('o-description'), tiers, status: gc('o-status') ? 'active' : 'inactive' };
+  const idx = offers.findIndex(o => o.id === oid);
+  if (idx >= 0) offers[idx] = offer; else offers.push(offer);
+  WPE.saveOffers(offers);
+  closeModal('modal-offer');
+  renderOffers();
+  toast('✅ Offer saved');
+}
+
+function deleteOffer(offerId) {
+  if (!confirm('Delete this offer?')) return;
+  WPE.saveOffers(WPE.getOffers().filter(o => o.id !== offerId));
+  renderOffers();
+  toast('✅ Offer deleted');
+}
+
+/* ─── ENTRY RIGHTS ─── */
+function renderEntryRights() {
+  const products = WPE.getProducts();
+  const container = document.getElementById('entry-rights-list');
+  container.innerHTML = products.map(p => {
+    const er = p.entryRights || {};
+    return `
+    <div class="er-row">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
+        <div>
+          <div class="fw-bold fs-12">${p.name}</div>
+          <div class="fs-10 text-muted">${p.id} · ${p.sku}</div>
+        </div>
+        <button class="btn btn-outline btn-xs" onclick="editEntryRights('${p.id}')"><i class="fas fa-edit"></i> Edit</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="badge b-blue">Type: ${er.type || 'unlimited'}</span>
+        <span class="badge b-gray">Parks: ${(er.parks || []).join(', ')}</span>
+        <span class="badge b-gray">${er.entriesPerDay} entry/day</span>
+        <span class="badge b-gray">Cooldown: ${er.cooldownHours || 0}h</span>
+        ${er.vipLane ? '<span class="badge b-gold">👑 VIP Lane</span>' : ''}
+        ${er.requiresPreBooking ? '<span class="badge b-amber">Pre-booking required</span>' : ''}
+        ${(er.blackoutDates || []).length ? `<span class="badge b-red">${er.blackoutDates.length} blackout dates</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editEntryRights(productId) {
+  const p = WPE.getProductById(productId);
+  if (!p) return;
+  const er = p.entryRights || {};
+  const type = prompt(`Entry type for "${p.name}"\n(unlimited / limited / per_day / per_week / per_month)`, er.type || 'unlimited');
+  if (type === null) return;
+  const epd = prompt('Entries per day limit (0=unlimited)', er.entriesPerDay || 1);
+  const cooldown = prompt('Cooldown hours between entries', er.cooldownHours || 0);
+  const vip = confirm('VIP Lane access?');
+  const preBook = confirm('Pre-booking required?');
+  const cfg = WPE.getConfig();
+  const pi = cfg.products.findIndex(x => x.id === productId);
+  if (pi < 0) return;
+  cfg.products[pi].entryRights = {
+    ...er, type, entriesPerDay: parseInt(epd) || 1,
+    cooldownHours: parseInt(cooldown) || 0, vipLane: vip, requiresPreBooking: preBook
+  };
+  WPE.saveConfig(cfg);
+  renderEntryRights();
+  toast('✅ Entry rights updated');
+}
+
+/* ─── KYC CONFIG ─── */
+function saveKycConfig() {
+  toast('✅ KYC configuration saved');
+}
+
+/* ─── ANALYTICS ─── */
+function renderAnalytics() {
+  const a = WPE.getAnalytics();
+  const kpiEl = document.getElementById('analytics-kpis');
+  kpiEl.innerHTML = `
+    <div class="metric-card mc-gold"><div class="mc-label">Total Revenue</div><div class="mc-val">${a._inr(a.totalRevenue)}</div></div>
+    <div class="metric-card mc-green"><div class="mc-label">Active Passports</div><div class="mc-val">${a.activePassports}</div></div>
+    <div class="metric-card mc-blue"><div class="mc-label">Voucher Redemption</div><div class="mc-val">${a.voucherRedemptionRate}%</div></div>
+    <div class="metric-card mc-purple"><div class="mc-label">KYC Pending</div><div class="mc-val">${a.kycStats.pending}</div></div>`;
+
+  // Sales by Tier chart
+  const tierLabels = Object.values(a.byTier).map(t => t.name);
+  const tierSales = Object.values(a.byTier).map(t => t.sold);
+  const tierRevenue = Object.values(a.byTier).map(t => t.revenue);
+  if (salesChartInst) salesChartInst.destroy();
+  salesChartInst = new Chart(document.getElementById('chart-sales-tier'), {
+    type: 'bar',
+    data: { labels: tierLabels, datasets: [{ label: 'Sold', data: tierSales, backgroundColor: ['rgba(59,130,246,.7)', 'rgba(124,58,237,.7)', 'rgba(201,168,76,.7)'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+  if (revenueChartInst) revenueChartInst.destroy();
+  revenueChartInst = new Chart(document.getElementById('chart-revenue-tier'), {
+    type: 'doughnut',
+    data: { labels: tierLabels, datasets: [{ data: tierRevenue, backgroundColor: ['rgba(59,130,246,.8)', 'rgba(124,58,237,.8)', 'rgba(201,168,76,.8)'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+  // Voucher chart
+  const vouchers = WPE.getVouchers();
+  const passports = WPE.getPassports();
+  let totalVI = 0, redeemedVI = 0;
+  passports.forEach(p => { (p.voucherInstances || []).forEach(vi => { totalVI++; if (vi.status === 'redeemed') redeemedVI++; }); });
+  if (voucherChartInst) voucherChartInst.destroy();
+  voucherChartInst = new Chart(document.getElementById('chart-voucher-rate'), {
+    type: 'doughnut',
+    data: { labels: ['Redeemed', 'Unredeemed'], datasets: [{ data: [redeemedVI, totalVI - redeemedVI], backgroundColor: ['rgba(34,197,94,.8)', 'rgba(226,232,240,.8)'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+  // KYC chart
+  const k = a.kycStats;
+  if (kycChartInst) kycChartInst.destroy();
+  kycChartInst = new Chart(document.getElementById('chart-kyc-status'), {
+    type: 'bar',
+    data: { labels: ['Total', 'Pending', 'Approved', 'Rejected'], datasets: [{ data: [k.total, k.pending, k.approved, k.rejected], backgroundColor: ['rgba(100,116,139,.6)', 'rgba(245,158,11,.6)', 'rgba(34,197,94,.6)', 'rgba(239,68,68,.6)'] }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  // Recent redemptions
+  const rdDiv = document.getElementById('recent-redemptions-table');
+  if (!a.recentRedemptions.length) { rdDiv.innerHTML = '<div class="empty-state"><i class="fas fa-ticket-alt"></i>No redemptions yet</div>'; return; }
+  rdDiv.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>Redemption ID</th><th>Passport</th><th>Holder</th><th>Voucher</th><th>Counter</th><th>Time</th></tr></thead>
+    <tbody>${a.recentRedemptions.map(r => `<tr>
+      <td class="fs-11">${r.id}</td>
+      <td class="fs-11 fw-bold">${r.passportNumber || r.passportId}</td>
+      <td class="fs-11">${r.customerName || '—'}</td>
+      <td class="fs-11">${r.voucherName}</td>
+      <td><span class="badge b-gray">${r.counter || '—'}</span></td>
+      <td class="fs-10 text-muted">${fmtDate(r.redeemedAt)}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+/* ─── PASSPORT RECORDS ─── */
+function renderPassportRecords() {
+  const search = (g('pp-search') || '').toLowerCase();
+  const statusFilter = g('pp-status-filter');
+  let passports = WPE.getPassports();
+  if (search) passports = passports.filter(p =>
+    (p.number || '').toLowerCase().includes(search) ||
+    (p.customerName || '').toLowerCase().includes(search) ||
+    (p.customerEmail || '').toLowerCase().includes(search)
+  );
+  if (statusFilter) passports = passports.filter(p => p.status === statusFilter);
+  passports.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+  const total = passports.length;
+  const start = (ppPage - 1) * PP_PER_PAGE;
+  const page = passports.slice(start, start + PP_PER_PAGE);
+
+  const tbody = document.getElementById('passport-records-body');
+  if (!page.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">No passports found</td></tr>'; }
+  else tbody.innerHTML = page.map(p => {
+    const statusMap = { active: 'b-green', expired: 'b-gray', suspended: 'b-amber', revoked: 'b-red', renewed: 'b-blue', draft: 'b-purple' };
+    const vi = p.voucherInstances || [];
+    const redeemed = vi.filter(v => v.status === 'redeemed').length;
     return `<tr>
-      <td><strong style="color:${p.color};">${p.name}</strong></td>
-      <td><input type="number" value="${p.commission}" min="0" max="20" style="width:70px;padding:4px 8px;font-size:12px;border:1.5px solid var(--border);border-radius:6px;" onchange="plans.find(x=>x.id==='${p.id}').commission=this.value;this.parentElement.nextElementSibling.nextElementSibling.innerHTML='₹'+Math.round(${base}*(this.value/100)).toLocaleString('en-IN');">%</td>
-      <td>₹${base.toLocaleString('en-IN')}</td>
-      <td><strong style="color:var(--green);">₹${comm.toLocaleString('en-IN')}</strong></td>
+      <td class="fs-11 fw-bold">${p.number}</td>
+      <td>
+        <div class="fw-bold fs-12">${p.customerName || '—'}</div>
+        <div class="fs-10 text-muted">${p.customerEmail || ''} · ${p.customerMobile || ''}</div>
+      </td>
+      <td><span class="badge b-blue">${p.tierName || p.tierId}</span></td>
+      <td class="fs-11">${p.issueDate || '—'}</td>
+      <td class="fs-11 ${p.expiryDate < new Date().toISOString().slice(0,10) ? 'text-muted' : ''}">${p.expiryDate || '—'}</td>
+      <td><span class="badge ${statusMap[p.status] || 'b-gray'}">${p.status}</span></td>
+      <td class="fs-11">${redeemed}/${vi.length}</td>
+      <td>
+        <button class="btn btn-outline btn-xs" onclick="viewPassport('${p.id}')"><i class="fas fa-eye"></i></button>
+        <button class="btn btn-outline btn-xs" onclick="changePassportStatus('${p.id}')"><i class="fas fa-toggle-on"></i></button>
+      </td>
     </tr>`;
   }).join('');
 
-  const roles = [{role:'Sales Agent',base:3,mult:1.0},{role:'Senior Agent',base:3,mult:1.15},{role:'Team Lead',base:4,mult:1.2},{role:'Sales Manager',base:4,mult:0}];
-  document.getElementById('role-commission-table').querySelector('tbody').innerHTML = roles.map(r=>`
-    <tr>
-      <td><strong>${r.role}</strong></td>
-      <td>${r.base}%</td>
-      <td>${r.mult}x</td>
-      <td style="color:var(--green);font-weight:700;">${r.mult>0?(r.base*r.mult).toFixed(1)+'%':'Manager pool'}</td>
-    </tr>`).join('');
+  // Pagination
+  const pages = Math.ceil(total / PP_PER_PAGE);
+  const pagDiv = document.getElementById('pp-pagination');
+  pagDiv.innerHTML = '';
+  if (pages > 1) {
+    for (let i = 1; i <= pages; i++) {
+      const btn = document.createElement('button');
+      btn.className = `btn btn-sm ${i === ppPage ? 'btn-brand' : 'btn-outline'}`;
+      btn.textContent = i;
+      btn.onclick = () => { ppPage = i; renderPassportRecords(); };
+      pagDiv.appendChild(btn);
+    }
+  }
+}
 
-  const bonuses = [
-    {label:'Monthly Target Achieved (100%)',reward:'₹2,000 bonus'},
-    {label:'120% Target Achievement',reward:'₹5,000 + Recognition'},
-    {label:'5 Passports in single day',reward:'₹500 spot bonus'},
-    {label:'Family Passport sale',reward:'Additional 1% commission'},
-  ];
-  document.getElementById('bonus-list').innerHTML = bonuses.map(b=>`
-    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
-      <span style="color:var(--muted);">${b.label}</span>
-      <strong style="color:var(--green);">${b.reward}</strong>
+function viewPassport(passportId) {
+  const p = WPE.getPassportById(passportId);
+  if (!p) return;
+  const vi = p.voucherInstances || [];
+  const content = document.getElementById('pp-detail-content');
+  content.innerHTML = `
+    <div style="background:linear-gradient(135deg,${p.tierGradientFrom || '#0f2057'},${p.tierGradientTo || '#1a56db'});border-radius:12px;padding:20px;color:#fff;margin-bottom:16px;">
+      <div style="font-size:28px;margin-bottom:8px;">${p.tierEmblem || '🌟'} ${p.tierName || p.tierId}</div>
+      <div style="font-size:18px;font-weight:700;font-family:monospace;">${p.number}</div>
+      <div style="font-size:12px;opacity:.8;margin-top:4px;">${p.customerName} · ${p.customerEmail || p.customerMobile}</div>
+      <div style="font-size:11px;opacity:.7;margin-top:4px;">Valid: ${p.startDate} → ${p.expiryDate}</div>
+    </div>
+    <div class="g2" style="margin-bottom:16px;">
+      <div><div class="fs-10 text-muted">Status</div><span class="badge ${p.status === 'active' ? 'b-green' : 'b-gray'}" style="font-size:12px;">${p.status.toUpperCase()}</span></div>
+      <div><div class="fs-10 text-muted">Channel</div><div class="fw-bold fs-12">${p.channel}</div></div>
+      <div><div class="fs-10 text-muted">Issue Date</div><div class="fw-bold fs-12">${p.issueDate}</div></div>
+      <div><div class="fs-10 text-muted">Renewal Count</div><div class="fw-bold fs-12">${p.renewalCount || 0}</div></div>
+    </div>
+    <div class="fw-bold fs-12" style="margin-bottom:10px;">Voucher Instances (${vi.length})</div>
+    ${vi.length ? `<div class="tbl-wrap"><table><thead><tr><th>Voucher</th><th>Status</th><th>Used</th><th>Last Used</th></tr></thead><tbody>
+    ${vi.map(v => `<tr>
+      <td>${v.icon || '🎟'} ${v.name}</td>
+      <td><span class="badge ${v.status === 'active' ? 'b-green' : v.status === 'redeemed' ? 'b-gray' : 'b-amber'}">${v.status}</span></td>
+      <td>${v.usedCount || 0}${v.redeemQty !== -1 ? '/' + v.redeemQty : ''}</td>
+      <td class="fs-10 text-muted">${v.lastUsed || '—'}</td>
+    </tr>`).join('')}</tbody></table></div>` : '<div class="empty-state"><i class="fas fa-ticket-alt"></i>No vouchers</div>'}
+    <div class="fw-bold fs-12" style="margin:16px 0 10px;">Status History</div>
+    ${(p.statusHistory || []).map(h => `<div style="display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:11px;">
+      <span class="badge b-gray">${h.status}</span>
+      <span class="text-muted">${fmtDate(h.at)}</span>
+      <span>${h.note || ''}</span>
+      <span class="text-muted" style="margin-left:auto;">by ${h.by}</span>
+    </div>`).join('')}`;
+  showModal('modal-pp-detail');
+}
+
+function changePassportStatus(passportId) {
+  const p = WPE.getPassportById(passportId);
+  if (!p) return;
+  const statuses = ['active', 'suspended', 'revoked', 'expired'];
+  const newStatus = prompt(`Current status: ${p.status}\nNew status (${statuses.join('/')}):`, p.status);
+  if (!newStatus || newStatus === p.status) return;
+  if (!statuses.includes(newStatus)) { toast('Invalid status', 'danger'); return; }
+  const note = prompt('Reason / note:') || '';
+  const passports = WPE.getPassports();
+  const i = passports.findIndex(x => x.id === passportId);
+  if (i < 0) return;
+  passports[i].status = newStatus;
+  passports[i].statusHistory = passports[i].statusHistory || [];
+  passports[i].statusHistory.push({ status: newStatus, at: new Date().toISOString(), by: 'admin', note });
+  passports[i].updatedAt = new Date().toISOString();
+  localStorage.setItem('wpe_passports', JSON.stringify(passports));
+  renderPassportRecords();
+  toast(`✅ Passport status changed to ${newStatus}`);
+}
+
+/* ─── ISSUE MANUAL ─── */
+function openIssueModal() {
+  const sel = document.getElementById('ip-product');
+  sel.innerHTML = WPE.getProducts().filter(p => p.status === 'active').map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  setValue('ip-startDate', new Date().toISOString().slice(0, 10));
+  showModal('modal-issue');
+}
+
+function issueManual() {
+  const opts = {
+    productId: g('ip-product'),
+    customerName: g('ip-name'),
+    customerEmail: g('ip-email'),
+    customerMobile: g('ip-mobile'),
+    customerDob: g('ip-dob'),
+    channel: g('ip-channel'),
+    startDate: g('ip-startDate'),
+    paymentRef: g('ip-payRef'),
+    notes: g('ip-notes'),
+    soldBy: 'admin-manual',
+  };
+  if (!opts.customerName) { toast('Customer name required', 'danger'); return; }
+  // Temporarily disable KYC requirement for manual issuance
+  const cfg = WPE.getConfig();
+  const origKyc = cfg.meta.kycMandatoryBeforeIssuance;
+  cfg.meta.kycMandatoryBeforeIssuance = false;
+  WPE.saveConfig(cfg);
+  const result = WPE.issuePassport(opts);
+  const cfg2 = WPE.getConfig();
+  cfg2.meta.kycMandatoryBeforeIssuance = origKyc;
+  WPE.saveConfig(cfg2);
+  if (result.success) {
+    closeModal('modal-issue');
+    loadMetrics();
+    renderPassportRecords();
+    toast(`✅ Passport issued: ${result.passport.number}`);
+    setTimeout(() => viewPassport(result.passport.id), 500);
+  } else {
+    toast(`❌ ${result.error}`, 'danger');
+  }
+}
+
+/* ─── AUDIT ─── */
+function renderAuditLog() {
+  const search = (g('audit-search') || '').toLowerCase();
+  let logs = JSON.parse(localStorage.getItem('wpe_audit') || '[]');
+  if (search) logs = logs.filter(l => l.action.toLowerCase().includes(search) || JSON.stringify(l.meta).toLowerCase().includes(search) || (l.actor || '').toLowerCase().includes(search));
+  const container = document.getElementById('audit-log-list');
+  if (!logs.length) { container.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i>No audit events yet</div>'; return; }
+  container.innerHTML = logs.slice(0, 200).map(l => `
+    <div class="audit-row">
+      <div class="audit-dot"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="audit-action">${l.action}</span>
+          <span class="audit-time">${fmtDate(l.ts)}</span>
+          <span class="badge b-gray fs-10">by ${l.actor || 'system'}</span>
+        </div>
+        <div class="audit-meta">${JSON.stringify(l.meta).slice(0, 120)}</div>
+      </div>
     </div>`).join('');
 }
 
-// ===== AUDIT =====
-function renderAudit(){
-  document.getElementById('audit-body').innerHTML = auditLog.map(a=>`
-    <tr>
-      <td style="font-size:11px;">${a.time}</td>
-      <td>${a.user}</td>
-      <td><span class="badge bg-gold">${a.type}</span></td>
-      <td>${a.field}</td>
-      <td style="color:var(--red);font-size:11px;">${a.old}</td>
-      <td style="color:var(--green);font-size:11px;">${a.newVal}</td>
-      <td style="font-family:monospace;font-size:10px;">${a.ip}</td>
-    </tr>`).join('');
+function exportAudit() {
+  const logs = JSON.parse(localStorage.getItem('wpe_audit') || '[]');
+  const csv = ['ID,Action,Actor,Timestamp,Meta'].concat(logs.map(l => `"${l.id}","${l.action}","${l.actor || ''}","${l.ts}","${JSON.stringify(l.meta).replace(/"/g, '""')}"`)).join('\n');
+  downloadFile('wow_audit_' + new Date().toISOString().slice(0, 10) + '.csv', 'text/csv', csv);
 }
 
-function saveAllChanges(){
-  // Capture any inline edits
-  plans.forEach(p=>{
-    const el = document.getElementById('price-'+p.id);
-    if(el) p.price = parseInt(el.value)||p.price;
-    const vl = document.getElementById('val-'+p.id);
-    if(vl) p.validity = parseInt(vl.value)||p.validity;
-  });
-  auditLog.unshift({time:new Date().toLocaleString('en-IN'),user:'Admin (Current)',type:'Bulk Save',field:'Multiple fields',old:'Previous',newVal:'Updated',ip:'—'});
-  sessionStorage.setItem('wow_passport_plans', JSON.stringify(plans));
-  showToast('✅ All configuration changes saved successfully!', 3500);
+/* ─── CONFIG EXPORT/IMPORT ─── */
+function exportConfig() {
+  const data = {
+    config: WPE.getConfig(),
+    vouchers: WPE.getVouchers(),
+    offers: WPE.getOffers(),
+    exportedAt: new Date().toISOString(),
+    version: '2.0',
+  };
+  downloadFile('wow_passport_config_' + new Date().toISOString().slice(0, 10) + '.json', 'application/json', JSON.stringify(data, null, 2));
 }
 
-function exportConfig(){
-  const cfg = {plans, vouchers, savedAt: new Date().toISOString()};
-  const blob = new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'});
+function importConfigFile() { document.getElementById('import-input').click(); }
+function doImportConfig(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!confirm('This will overwrite your current Passport Engine config. Proceed?')) return;
+      if (data.config) WPE.saveConfig(data.config);
+      if (data.vouchers) WPE.saveVouchers(data.vouchers);
+      if (data.offers) WPE.saveOffers(data.offers);
+      loadProgramSettings(); renderTiers(); renderProducts();
+      toast('✅ Config imported successfully');
+    } catch(err) { toast('❌ Invalid JSON file', 'danger'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function resetToDefaults() {
+  if (!confirm('Reset ALL passport engine config to defaults? This cannot be undone!')) return;
+  localStorage.removeItem('wpe_config');
+  localStorage.removeItem('wpe_voucher_lib');
+  localStorage.removeItem('wpe_offer_lib');
+  WPE.initialize ? WPE.initialize() : null;
+  loadProgramSettings(); renderTiers(); renderProducts();
+  toast('✅ Reset to defaults');
+}
+
+function saveAll() {
+  saveProgramSettings();
+  toast('✅ All changes saved');
+  loadMetrics();
+}
+
+/* ─── HELPERS ─── */
+function g(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function gc(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+function setValue(id, val) { const el = document.getElementById(id); if (el) el.value = val !== null && val !== undefined ? val : ''; }
+function setCheck(id, val) { const el = document.getElementById(id); if (el) el.checked = !!val; }
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function fmtDate(iso) { if (!iso) return '—'; try { return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch(e) { return iso; } }
+function downloadFile(name, type, content) {
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'wow-passport-config-'+new Date().toISOString().split('T')[0]+'.json';
-  a.click();
-  showToast('Config exported as JSON');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = name; a.click();
+}
+let toastTimer;
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type === 'danger' ? '#7f1d1d' : '#1e293b';
+  el.style.borderColor = type === 'danger' ? '#ef4444' : 'var(--brand)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.display = 'none'; }, 3500);
 }
 
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
-
-function showToast(msg,dur=3000){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.style.display='block';
-  setTimeout(()=>t.style.display='none',dur);
+// Auth widget
+if (typeof WOWAuth !== 'undefined') {
+  try {
+    const sess = WOWAuth.getSession();
+    if (sess) {
+      document.getElementById('auth-widget').innerHTML = `<span style="font-size:11px;color:var(--muted);">${sess.name || sess.email}</span>
+      <button class="btn btn-outline btn-sm" onclick="WOWAuth.logout()"><i class="fas fa-sign-out-alt"></i></button>`;
+    }
+  } catch(e) {}
 }
-
-// Init
-window.onload = function(){ renderPlanCards(); };
 </script>
-<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
