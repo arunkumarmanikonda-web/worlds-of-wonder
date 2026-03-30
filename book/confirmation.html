@@ -203,6 +203,22 @@
     .conf-share-btn.whatsapp { background: #25D366; color: #fff; }
     .conf-share-btn.email    { background: #0055B3; color: #fff; }
 
+    /* ── Terms Accepted Acknowledgement ── */
+    .conf-terms-ack {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #F0FDF4; border: 1.5px solid #86EFAC;
+      border-radius: 14px; padding: 16px 18px; margin-top: 24px;
+    }
+    .conf-terms-ack-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .conf-terms-ack-title { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; color: #15803D; margin-bottom: 4px; }
+    .conf-terms-ack-text { font-size: 12.5px; color: #374151; line-height: 1.6; }
+    .conf-terms-view-btn {
+      background: none; border: none; color: #0055B3; font-weight: 700;
+      font-size: 12.5px; font-family: inherit; padding: 0; cursor: pointer;
+      text-decoration: underline; display: inline;
+    }
+    .conf-terms-view-btn:hover { color: #003D82; }
+
     /* ── Toast ── */
     .conf-toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -436,7 +452,24 @@
         <div class="conf-step-num">5</div>
         <div class="conf-step-text">
           <h4>Need Help? Call Us</h4>
-          <p>Helpline: <a href="tel:08069090000" style="color:#0055B3;font-weight:700;">080-6909-0000</a> | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95e6e0e5e5fae7e1d5e2fae7f9f1e6faf3e2fafbf1f0e7bbfcfb">[email&#160;protected]</a> | 9 AM to 7 PM daily.</p>
+          <p>Helpline: <a href="tel:08069090000" style="color:#0055B3;font-weight:700;">080-6909-0000</a> | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="54272124243b262014233b263830273b32233b3a3031267a3d3a">[email&#160;protected]</a> | 9 AM to 7 PM daily.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TERMS ACCEPTED ACKNOWLEDGEMENT ── -->
+    <div class="conf-terms-ack conf-anim conf-anim-d2" id="terms-ack-block">
+      <div class="conf-terms-ack-icon">✅</div>
+      <div class="conf-terms-ack-body">
+        <div class="conf-terms-ack-title">Terms &amp; Conditions Accepted</div>
+        <div class="conf-terms-ack-text">
+          By completing your booking you have read and agreed to the
+          <button id="conf-terms-link" onclick="WOWTerms.openModal();return false;" class="conf-terms-view-btn">
+            Worlds of Wonder Terms &amp; Conditions
+          </button>,
+          including park rules, the no-refund policy, and safety guidelines.
+          <br>A copy of our full T&amp;C is always available at
+          <a href="../terms.html" target="_blank" style="color:#0055B3;font-weight:600;">worldsofwonder.in/terms</a>.
         </div>
       </div>
     </div>
@@ -1117,5 +1150,7 @@ function showToast(msg, dur = 2800) {
   setTimeout(() => t.classList.remove('show'), dur);
 }
 </script>
+<!-- T&C modal engine — for "View Terms" link on confirmation page -->
+<script src="../js/wow-terms.js"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
