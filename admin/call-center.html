@@ -1,852 +1,1756 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Call Centre CRM — WOW Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-<script src="../js/wow-auth.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Call Center CRM — Worlds of Wonder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/crm-engine.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f172a;--navy2:#1e293b;--navy3:#334155;
+  --gold:#C9A84C;--gold2:#e8c96b;--gold3:rgba(201,168,76,.15);
+  --red:#ef4444;--green:#10b981;--blue:#3b82f6;--purple:#8b5cf6;
+  --orange:#f97316;--cyan:#06b6d4;--yellow:#f59e0b;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);
+  --sidebar-w:244px;--topbar-h:56px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--text);font-size:13px}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:inherit;outline:none}
+select{
+  background:#1e293b;
+  color:#f1f5f9;
+  border:1px solid rgba(255,255,255,.1);
+  -webkit-appearance:auto;
+  appearance:auto;
+  color-scheme:dark;
+}
+select option{
+  background:#1e293b;
+  color:#f1f5f9;
+  padding:6px 10px;
+}
+select optgroup{
+  background:#0f172a;
+  color:#C9A84C;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+select optgroup option{
+  background:#1e293b;
+  color:#f1f5f9;
+  font-size:12.5px;
+  font-weight:400;
+  text-transform:none;
+  letter-spacing:0;
+  padding-left:6px;
+}
+select option:disabled{color:#64748b;background:#1e293b;}
+select option:checked,
+select option:focus{
+  background:#2d3d55;
+  color:#f1f5f9;
+}
+select:focus{
+  outline:none;
+  border-color:#C9A84C;
+  box-shadow:0 0 0 2px rgba(201,168,76,.15);
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--navy3);border-radius:3px}
 
-/* ── Header ── */
-.cc-header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid #334155;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.cc-header .logo-row{display:flex;align-items:center;gap:12px}
-.cc-header img{height:44px;filter:none!important}
-.cc-header h1{font-size:1.1rem;font-weight:700;color:#f1f5f9}
-.cc-header h1 span{color:#f59e0b;font-size:.75rem;display:block;font-weight:400}
-.header-right{display:flex;align-items:center;gap:12px}
-.agent-chip{background:#1e40af;color:#bfdbfe;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600}
-.btn-sm{padding:7px 16px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
-.btn-red{background:#dc2626;color:#fff}
-.btn-gold{background:#f59e0b;color:#000}
-.btn-blue{background:#2563eb;color:#fff}
-.btn-green{background:#16a34a;color:#fff}
-.btn-outline{background:transparent;border:1px solid #475569;color:#cbd5e1}
-.btn-sm:hover{transform:translateY(-1px);opacity:.9}
+/* ─── LAYOUT ────────────────────────────────────────────────── */
+#login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 20%,rgba(201,168,76,.09),transparent 60%),var(--navy);z-index:9999}
+#app{display:flex;height:100vh;overflow:hidden;display:none}
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:100}
+#main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#080e1a}
+#topbar{height:var(--topbar-h);min-height:var(--topbar-h);background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:90;flex-shrink:0}
+#content{flex:1;overflow-y:auto;overflow-x:hidden}
 
-/* ── Layout ── */
-.cc-body{display:grid;grid-template-columns:300px 1fr 320px;height:calc(100vh - 73px)}
+/* ─── SIDEBAR ───────────────────────────────────────────────── */
+.sb-brand{padding:15px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-brand-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),#a07828);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-brand-title{font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;line-height:1.2}
+.sb-brand-sub{font-size:10px;color:var(--text3)}
 
-/* ── LEFT: Ticket Queue ── */
-.queue-panel{background:#1e293b;border-right:1px solid #334155;display:flex;flex-direction:column;overflow:hidden}
-.queue-header{padding:16px;border-bottom:1px solid #334155}
-.queue-header h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin-bottom:10px}
-.queue-tabs{display:flex;gap:4px;background:#0f172a;padding:4px;border-radius:8px}
-.q-tab{flex:1;padding:6px;border:none;background:transparent;color:#94a3b8;font-size:.75rem;font-weight:600;border-radius:6px;cursor:pointer;transition:all .2s}
-.q-tab.active{background:#2563eb;color:#fff}
-.queue-search{margin:10px 16px 0;position:relative}
-.queue-search input{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 8px 8px 34px;color:#e2e8f0;font-size:.82rem}
-.queue-search input::placeholder{color:#64748b}
-.queue-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#64748b;font-size:.8rem}
-.queue-list{flex:1;overflow-y:auto;padding:8px}
-.ticket-card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
-.ticket-card:hover,.ticket-card.active{border-color:#2563eb;background:#172554}
-.ticket-card .tc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.tc-id{font-size:.72rem;color:#64748b;font-weight:600}
-.tc-badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px}
-.badge-open{background:#1e3a5f;color:#60a5fa}
-.badge-escalated{background:#4a1d1d;color:#f87171}
-.badge-pending{background:#3b2f00;color:#fbbf24}
-.badge-resolved{background:#14532d;color:#4ade80}
-.badge-waiting{background:#312e81;color:#a5b4fc}
-.tc-name{font-size:.88rem;font-weight:600;color:#f1f5f9;margin-bottom:3px}
-.tc-issue{font-size:.78rem;color:#94a3b8;margin-bottom:6px;line-height:1.4}
-.tc-meta{display:flex;gap:8px;font-size:.72rem;color:#64748b}
-.priority-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
-.p-high{background:#ef4444}.p-medium{background:#f59e0b}.p-low{background:#22c55e}
+.sb-user{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07828);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;flex-shrink:0}
+.sb-un{font-size:12px;font-weight:600;color:var(--text)}
+.sb-ur{font-size:10px;color:var(--text3);margin-top:1px}
 
-/* ── CENTRE: Ticket Detail ── */
-.detail-panel{display:flex;flex-direction:column;overflow:hidden}
-.detail-header{background:#1e293b;border-bottom:1px solid #334155;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
-.detail-header h2{font-size:1rem;font-weight:700;color:#f1f5f9}
-.action-bar{display:flex;gap:8px;flex-wrap:wrap}
-.detail-body{flex:1;overflow-y:auto;padding:20px;display:grid;grid-template-rows:auto auto 1fr;gap:16px}
+.sb-nav{padding:6px 0;flex:1}
+.sb-sec{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:10px 16px 3px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;color:var(--text2);font-size:12.5px;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all .13s;user-select:none}
+.sb-item:hover{background:var(--surface);color:var(--text)}
+.sb-item.active{background:var(--gold3);color:var(--gold);border-left-color:var(--gold);font-weight:600}
+.sb-item i{width:15px;text-align:center;font-size:12px;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
+.sb-badge.red{background:var(--red);color:#fff}
+.sb-badge.orange{background:var(--orange);color:#fff}
+.sb-badge.blue{background:var(--blue);color:#fff}
 
-/* Customer info card */
-.cust-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start}
-.cust-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#fff}
-.cust-info h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin-bottom:4px}
-.cust-info .cust-meta{font-size:.78rem;color:#94a3b8;display:flex;flex-wrap:wrap;gap:12px}
-.cust-info .cust-meta span{display:flex;align-items:center;gap:4px}
-.cust-stats{display:flex;gap:16px}
-.cstat{text-align:center}
-.cstat .val{font-size:1.1rem;font-weight:700;color:#f59e0b}
-.cstat .lbl{font-size:.68rem;color:#64748b;white-space:nowrap}
+.sb-bottom{padding:11px 16px;border-top:1px solid var(--border)}
+.sb-logout{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;cursor:pointer;padding:5px 0;transition:color .13s}
+.sb-logout:hover{color:var(--red)}
 
-/* Issue section */
-.issue-section{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px}
-.issue-section h4{font-size:.88rem;font-weight:700;color:#f1f5f9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.issue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
-.ig-item label{font-size:.72rem;color:#64748b;display:block;margin-bottom:4px}
-.ig-item select,.ig-item input{width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#e2e8f0;font-size:.82rem}
-.ig-item.full{grid-column:1/-1}
-.ig-item textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#e2e8f0;font-size:.82rem;resize:vertical;min-height:80px}
+/* ─── TOPBAR ─────────────────────────────────────────────────── */
+.tb-title{font-size:15px;font-weight:700;color:var(--text);flex:1}
+.tb-sub{font-size:11px;color:var(--text3)}
+.tb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;transition:all .13s;cursor:pointer;white-space:nowrap}
+.tb-btn.primary{background:linear-gradient(135deg,var(--gold),#a07828);color:#000;border:none}
+.tb-btn.primary:hover{filter:brightness(1.1)}
+.tb-btn.ghost{background:var(--surface);border:1px solid var(--border2);color:var(--text2)}
+.tb-btn.ghost:hover{background:var(--surface2);color:var(--text)}
+.alert-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:11.5px;font-weight:700;animation:blink 2.5s ease infinite}
+.alert-chip.red{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red)}
+.alert-chip.orange{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);color:var(--orange)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.65}}
 
-/* Escalation flow */
-.escalation-flow{display:flex;align-items:center;gap:0;margin-top:12px;flex-wrap:wrap;gap:6px}
-.esc-step{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;font-size:.75rem;text-align:center;flex:1;min-width:90px}
-.esc-step .es-role{font-weight:700;color:#f59e0b;margin-bottom:2px}
-.esc-step .es-time{color:#64748b}
-.esc-step.active{border-color:#2563eb;background:#172554}
-.esc-arrow{color:#475569;font-size:.9rem;flex-shrink:0}
+/* ─── PAGE VIEWS ─────────────────────────────────────────────── */
+.view{display:none;min-height:100%}
+.view.active{display:block}
 
-/* Conversation */
-.conversation{flex:1;display:flex;flex-direction:column;min-height:300px}
-.convo-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#0f172a;border-radius:8px;margin-bottom:12px;min-height:200px}
-.msg{max-width:78%;display:flex;flex-direction:column;gap:3px}
-.msg.agent{align-self:flex-end;align-items:flex-end}
-.msg.customer{align-self:flex-start;align-items:flex-start}
-.msg .bubble{padding:10px 14px;border-radius:12px;font-size:.83rem;line-height:1.5}
-.msg.agent .bubble{background:#1d4ed8;color:#fff;border-bottom-right-radius:4px}
-.msg.customer .bubble{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px;border:1px solid #334155}
-.msg .msg-meta{font-size:.68rem;color:#64748b}
-.reply-box{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden}
-.reply-tabs{display:flex;border-bottom:1px solid #334155}
-.r-tab{padding:8px 16px;font-size:.78rem;font-weight:600;color:#64748b;border:none;background:transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
-.r-tab.active{background:#172554;color:#60a5fa;border-bottom:2px solid #2563eb}
-.reply-input{padding:12px}
-.reply-input textarea{width:100%;background:#0f172a;border:none;color:#e2e8f0;font-size:.85rem;resize:none;outline:none;min-height:70px;font-family:inherit}
-.reply-actions{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #334155}
-.reply-tools{display:flex;gap:8px}
-.tool-btn{background:transparent;border:none;color:#64748b;cursor:pointer;font-size:.9rem;padding:4px;transition:color .2s}
-.tool-btn:hover{color:#f59e0b}
+/* ─── LOGIN ──────────────────────────────────────────────────── */
+.login-card{background:var(--navy2);border:1px solid var(--border2);border-radius:20px;padding:38px;width:430px;max-width:95vw}
+.login-hero{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.login-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--gold),#a07828);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.login-title{font-size:21px;font-weight:800;color:var(--text)}
+.login-sub{font-size:12.5px;color:var(--text3);margin-bottom:22px}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.lu-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:11px;cursor:pointer;transition:all .13s}
+.lu-card:hover{background:var(--surface2);border-color:var(--border2)}
+.lu-card.sel{border-color:var(--gold);background:var(--gold3)}
+.lu-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07828);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;margin-bottom:5px}
+.lu-name{font-size:11.5px;font-weight:700;color:var(--text)}
+.lu-role{font-size:10px;color:var(--text3);margin-top:1px}
+.lu-pin{font-size:10px;color:var(--gold);margin-top:3px;letter-spacing:1.5px;font-weight:600}
+.login-pin{width:100%;padding:11px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:16px;letter-spacing:5px;text-align:center;margin-top:4px}
+.login-pin:focus{border-color:var(--gold)}
+.login-err{font-size:12px;color:var(--red);min-height:18px;margin-top:6px}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#a07828);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer;margin-top:14px;transition:filter .13s}
+.login-btn:hover{filter:brightness(1.1)}
+.login-note{font-size:11px;color:var(--text3);text-align:center;margin-top:10px}
 
-/* ── RIGHT: Activity & Stats ── */
-.right-panel{background:#1e293b;border-left:1px solid #334155;display:flex;flex-direction:column;overflow:hidden}
-.rp-section{padding:16px;border-bottom:1px solid #334155}
-.rp-section h4{font-size:.85rem;font-weight:700;color:#f1f5f9;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.stat-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.stat-box{background:#0f172a;border-radius:8px;padding:12px;text-align:center}
-.stat-box .sv{font-size:1.4rem;font-weight:700;color:#f59e0b}
-.stat-box .sl{font-size:.7rem;color:#64748b;margin-top:2px}
-.activity-list{flex:1;overflow-y:auto;padding:0 16px 16px}
-.act-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #1e293b}
-.act-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
-.act-icon.call{background:#172554;color:#60a5fa}
-.act-icon.email{background:#1c3a1c;color:#4ade80}
-.act-icon.whatsapp{background:#14532d;color:#4ade80}
-.act-icon.escalation{background:#4a1d1d;color:#f87171}
-.act-icon.resolved{background:#14532d;color:#4ade80}
-.act-icon.note{background:#3b2f00;color:#fbbf24}
-.act-text{flex:1}
-.act-text .at-main{font-size:.8rem;color:#e2e8f0;margin-bottom:2px}
-.act-text .at-time{font-size:.7rem;color:#64748b}
+/* ─── DASHBOARD ──────────────────────────────────────────────── */
+.dash-hero{background:linear-gradient(135deg,var(--navy2),#111827);border-bottom:1px solid var(--border);padding:18px 24px}
+.dash-greeting{font-size:20px;font-weight:800;color:var(--text)}
+.dash-greeting em{color:var(--gold);font-style:normal}
+.dash-date{font-size:12px;color:var(--text3);margin-top:3px}
 
-/* Refund widget */
-.refund-widget{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:14px}
-.refund-widget h5{font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.rw-row{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:6px}
-.rw-row .label{color:#94a3b8}
-.rw-row .value{color:#f1f5f9;font-weight:600}
-.refund-input{width:100%;margin:10px 0;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:8px 10px;color:#e2e8f0;font-size:.82rem}
-.refund-btns{display:flex;gap:8px}
+.sla-banner{display:flex;align-items:center;gap:10px;padding:10px 24px;background:rgba(239,68,68,.08);border-bottom:1px solid rgba(239,68,68,.18);font-size:12.5px;color:#fca5a5}
+.sla-banner i{font-size:14px}
+.sla-banner a{color:var(--red);font-weight:700;text-decoration:underline;margin-left:8px}
+.sla-banner.hidden{display:none}
 
-/* Agents panel */
-.agents-grid{display:flex;flex-direction:column;gap:8px}
-.agent-row{background:#0f172a;border-radius:8px;padding:10px;display:flex;align-items:center;gap:10px}
-.agent-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.status-online{background:#22c55e}
-.status-busy{background:#f59e0b}
-.status-offline{background:#64748b}
-.agent-info{flex:1}
-.agent-info .an{font-size:.82rem;font-weight:600;color:#f1f5f9}
-.agent-info .am{font-size:.72rem;color:#64748b}
-.agent-load{font-size:.78rem;color:#f59e0b;font-weight:700}
+.stats-row{display:grid;grid-template-columns:repeat(8,1fr);gap:12px;padding:18px 24px 0}
+@media(max-width:1300px){.stats-row{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-c{background:var(--navy2);border:1px solid var(--border);border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.stat-c.hi{border-color:rgba(201,168,76,.3);background:var(--gold3)}
+.stat-c.danger{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
+.stat-c.warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)}
+.stat-c.ok{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05)}
+.stat-icon{font-size:18px}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1}
+.stat-lbl{font-size:10.5px;color:var(--text3);font-weight:500}
 
-/* Modal overlay */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal-box{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px;max-width:480px;width:90%;position:relative}
-.modal-box h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin-bottom:16px}
-.modal-close{position:absolute;top:12px;right:16px;background:transparent;border:none;color:#64748b;font-size:1.2rem;cursor:pointer}
-.form-field{margin-bottom:14px}
-.form-field label{display:block;font-size:.78rem;color:#94a3b8;margin-bottom:5px;font-weight:600}
-.form-field input,.form-field select,.form-field textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:.85rem;font-family:inherit}
-.form-field textarea{resize:vertical;min-height:80px}
+.dash-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px 24px}
+@media(max-width:1100px){.dash-panels{grid-template-columns:1fr}}
+.d-panel{background:var(--navy2);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.d-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.d-panel-title{font-size:13px;font-weight:700;color:var(--text)}
+.d-panel-link{font-size:11.5px;color:var(--gold);cursor:pointer;font-weight:600}
+.d-panel-link:hover{text-decoration:underline}
 
-/* Tabs */
-.tab-bar{display:flex;border-bottom:1px solid #334155;background:#0f172a}
-.tab-item{padding:12px 20px;font-size:.82rem;font-weight:600;color:#64748b;border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
-.tab-item.active{color:#60a5fa;border-bottom-color:#2563eb}
+.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;padding:0 24px 24px}
+@media(max-width:1100px){.charts-row{grid-template-columns:1fr}}
+.chart-c{background:var(--navy2);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.chart-hdr{padding:12px 16px;border-bottom:1px solid var(--border);font-size:12.5px;font-weight:700;color:var(--text)}
+.chart-body{padding:14px;height:220px;position:relative}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+/* ─── QUEUE TABLE ────────────────────────────────────────────── */
+.q-toolbar{display:flex;align-items:center;gap:9px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--navy2);flex-wrap:wrap}
+.q-search{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 11px;flex:1;min-width:180px}
+.q-search input{background:transparent;border:none;color:var(--text);font-size:12.5px;width:100%}
+.q-search input::placeholder{color:var(--text3)}
+.q-sel{
+  padding:7px 10px;
+  background:#1e293b;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;
+  color:#f1f5f9;
+  font-size:12px;
+  cursor:pointer;
+  -webkit-appearance:auto;
+  appearance:auto;
+  color-scheme:dark;
+}
+.q-sel:focus{border-color:var(--gold);outline:none;}
+.q-sel option{background:#1e293b;color:#f1f5f9;}
+.q-sel option[value=""]{color:#94a3b8;background:#1e293b;}
+.q-icon-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text3);cursor:pointer;font-size:13px;transition:all .13s}
+.q-icon-btn:hover{background:var(--surface2);color:var(--text)}
 
-/* Notification toast */
-.toast{position:fixed;bottom:24px;right:24px;background:#1e3a5f;border:1px solid #2563eb;border-radius:10px;padding:12px 18px;color:#bfdbfe;font-size:.85rem;font-weight:600;z-index:300;opacity:0;transform:translateY(20px);transition:all .4s;display:flex;align-items:center;gap:10px}
-.toast.show{opacity:1;transform:translateY(0)}
+.q-table-wrap{overflow-x:auto}
+table.q-table{width:100%;border-collapse:collapse}
+table.q-table th{padding:9px 13px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:rgba(15,23,42,.6);position:sticky;top:0;z-index:5;white-space:nowrap}
+table.q-table td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.q-table tr.data-row{cursor:pointer;transition:background .1s}
+table.q-table tr.data-row:hover td{background:var(--surface)}
+table.q-table tr.breach td{background:rgba(239,68,68,.04)}
+table.q-table tr.breach td:first-child{border-left:3px solid var(--red)}
+table.q-table tr.esc-row td:first-child{border-left:3px solid var(--orange)}
 
-/* Responsive */
-@media(max-width:1200px){.cc-body{grid-template-columns:260px 1fr 280px}}
-@media(max-width:900px){.cc-body{grid-template-columns:240px 1fr};.right-panel{display:none}}
-@media(max-width:640px){.cc-body{grid-template-columns:1fr};.queue-panel{display:none}}
+.case-id-cell{font-size:11.5px;font-weight:700;color:var(--gold)}
+.caller-name{font-size:12.5px;font-weight:600;color:var(--text)}
+.caller-sub{font-size:10.5px;color:var(--text3);margin-top:1px}
+.s-pill{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.p-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.age-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.age-tag.urgent{animation:blink 2s infinite}
+.owner-chip{display:flex;align-items:center;gap:6px}
+.ow-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07828);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#000;flex-shrink:0}
+.q-empty{text-align:center;padding:52px 24px;color:var(--text3)}
+.q-empty-icon{font-size:44px;margin-bottom:10px}
+.q-empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:5px}
+
+.q-pagination{padding:11px 20px;display:flex;align-items:center;gap:9px;border-top:1px solid var(--border)}
+
+/* ─── CALL CAPTURE ───────────────────────────────────────────── */
+.cap-wrap{max-width:880px;margin:0 auto;padding:22px}
+.cap-form{background:var(--navy2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.cap-header{background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(139,92,246,.06));padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.cap-hdr-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),#a07828);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.cap-hdr-title{font-size:16px;font-weight:800;color:var(--text)}
+.cap-hdr-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.cap-body{padding:22px}
+.cap-sec{margin-bottom:22px}
+.cap-sec-title{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:13px;display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.f-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+@media(max-width:680px){.f-grid,.f-grid3{grid-template-columns:1fr}}
+.f-field{display:flex;flex-direction:column;gap:5px}
+.f-label{font-size:11.5px;font-weight:600;color:var(--text2)}
+.f-label .req{color:var(--red);font-size:10px;margin-left:2px}
+.f-inp{padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;transition:border-color .13s;width:100%}
+.f-inp:focus{border-color:var(--gold)}
+.f-inp::placeholder{color:var(--text3)}
+.f-inp.err{border-color:var(--red)}
+.f-sel{
+  padding:9px 12px;
+  background:#1e293b;
+  border:1.5px solid rgba(255,255,255,.1);
+  border-radius:8px;
+  color:#f1f5f9;
+  font-size:13px;
+  width:100%;
+  cursor:pointer;
+  -webkit-appearance:auto;
+  appearance:auto;
+  color-scheme:dark;
+}
+.f-sel:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 2px rgba(201,168,76,.12);}
+.f-sel option{background:#1e293b;color:#f1f5f9;}
+.f-sel optgroup{background:#0f172a;color:#C9A84C;}
+.f-sel optgroup option{background:#1e293b;color:#f1f5f9;}
+.f-sel option:disabled,
+.f-sel option[value=""]{color:#94a3b8;background:#1e293b;}
+.f-ta{padding:9px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;resize:vertical;min-height:80px;width:100%;line-height:1.55}
+.f-ta:focus{border-color:var(--gold)}
+.f-hint{font-size:10.5px;color:var(--text3)}
+
+/* caller type cards */
+.ct-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.ct-card{padding:10px 8px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .13s;user-select:none}
+.ct-card:hover{background:var(--surface2);border-color:var(--border2)}
+.ct-card.sel{border-color:var(--gold);background:var(--gold3)}
+.ct-card-icon{font-size:19px;margin-bottom:4px}
+.ct-card-lbl{font-size:10.5px;font-weight:600;color:var(--text2)}
+.ct-card.sel .ct-card-lbl{color:var(--gold)}
+
+/* issue category */
+.ic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:7px}
+.ic-item{padding:8px 11px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text2);transition:all .13s}
+.ic-item:hover{border-color:var(--border2);color:var(--text)}
+.ic-item.sel{border-color:var(--gold);background:var(--gold3);color:var(--gold);font-weight:700}
+
+/* priority buttons */
+.pri-row{display:flex;gap:7px;flex-wrap:wrap}
+.pri-btn{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);transition:all .13s;user-select:none}
+.pri-btn.sel-LOW{border-color:#6b7280;background:rgba(107,114,128,.12);color:#9ca3af}
+.pri-btn.sel-NORMAL{border-color:var(--blue);background:rgba(59,130,246,.1);color:var(--blue)}
+.pri-btn.sel-HIGH{border-color:var(--yellow);background:rgba(245,158,11,.1);color:var(--yellow)}
+.pri-btn.sel-URGENT{border-color:var(--orange);background:rgba(249,115,22,.1);color:var(--orange)}
+.pri-btn.sel-CRITICAL{border-color:var(--red);background:rgba(239,68,68,.1);color:var(--red)}
+
+/* package checkboxes */
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}
+.pkg-item{display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;transition:all .13s;user-select:none}
+.pkg-item:hover{border-color:var(--border2)}
+.pkg-item.sel{border-color:var(--gold);background:var(--gold3);color:var(--gold)}
+
+/* booking lookup */
+.bkl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px;margin-top:10px}
+.bkl-row{display:flex;gap:8px}
+.bkl-inp{flex:1;padding:8px 11px;background:var(--navy);border:1.5px solid var(--border);border-radius:7px;color:var(--text);font-size:13px}
+.bkl-inp:focus{border-color:var(--gold);outline:none}
+.bkl-btn{padding:8px 15px;background:var(--gold);color:#000;font-size:12.5px;font-weight:700;border:none;border-radius:7px;cursor:pointer}
+.bkl-btn:hover{filter:brightness(1.08)}
+.bkl-results{margin-top:10px}
+.bkl-item{padding:10px 12px;background:var(--navy2);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:6px;transition:all .13s;display:flex;align-items:center;gap:10px}
+.bkl-item:hover,.bkl-item.sel{border-color:var(--gold);background:var(--gold3)}
+.bkl-bid{font-size:11.5px;font-weight:700;color:var(--gold)}
+.bkl-name{font-size:12.5px;font-weight:600;color:var(--text)}
+.bkl-meta{font-size:10.5px;color:var(--text3);margin-top:1px}
+.pay-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.pay-PAID{background:rgba(16,185,129,.15);color:var(--green)}
+.pay-PENDING{background:rgba(245,158,11,.15);color:var(--yellow)}
+.pay-FAILED{background:rgba(239,68,68,.15);color:var(--red)}
+.pay-USED,.pay-REFUNDED{background:rgba(100,116,139,.15);color:var(--text3)}
+.bkl-loading,.bkl-none{font-size:12px;color:var(--text3);padding:10px;text-align:center}
+
+/* selected booking card */
+.sel-bkg-card{background:var(--gold3);border:1px solid rgba(201,168,76,.25);border-radius:11px;padding:14px;margin-top:12px}
+.sel-bkg-hdr{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:13px;font-weight:700;color:var(--gold)}
+.bkg-fields{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.bkg-f-label{font-size:10px;color:var(--text3);margin-bottom:2px;font-weight:600}
+.bkg-f-val{font-size:12.5px;font-weight:600;color:var(--text)}
+
+.cap-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid var(--border);background:rgba(15,23,42,.4);flex-wrap:wrap;gap:11px}
+.cap-footer-note{font-size:11.5px;color:var(--text3);display:flex;align-items:center;gap:5px}
+.cap-actions{display:flex;gap:10px;align-items:center}
+.cap-submit{padding:10px 26px;background:linear-gradient(135deg,var(--gold),#a07828);border:none;border-radius:9px;color:#000;font-size:13.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:filter .13s}
+.cap-submit:hover{filter:brightness(1.1)}
+.cap-submit:disabled{opacity:.45;cursor:not-allowed}
+.cap-draft{padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:9px;color:var(--text2);font-size:12.5px;font-weight:600;cursor:pointer}
+.cap-draft:hover{background:var(--surface2)}
+
+/* ─── CASE DETAIL ────────────────────────────────────────────── */
+.detail-layout{display:grid;grid-template-columns:1fr 320px;height:100%;overflow:hidden}
+@media(max-width:1050px){.detail-layout{grid-template-columns:1fr}}
+.detail-main{overflow-y:auto;padding:22px}
+.detail-side{overflow-y:auto;border-left:1px solid var(--border);background:var(--navy2)}
+
+.detail-header{background:var(--navy2);border:1px solid var(--border);border-radius:13px;padding:18px;margin-bottom:14px}
+.detail-id-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+.back-btn{display:inline-flex;align-items:center;gap:5px;color:var(--text3);font-size:12px;cursor:pointer;padding:4px 10px;border-radius:7px;border:1px solid var(--border);transition:all .13s}
+.back-btn:hover{color:var(--text);background:var(--surface)}
+.case-big-id{font-size:15px;font-weight:800;color:var(--gold)}
+.case-summary-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:11px}
+
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:11px}
+.meta-item{background:var(--surface);border-radius:8px;padding:9px 11px}
+.meta-lbl{font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.meta-val{font-size:12.5px;font-weight:600;color:var(--text)}
+.meta-val.gold{color:var(--gold)}
+
+/* timeline */
+.tl-list{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:11px;position:relative}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:14px;top:30px;bottom:-8px;width:1px;background:var(--border)}
+.tl-ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;position:relative;z-index:1}
+.tl-body{flex:1;padding-bottom:16px}
+.tl-event{font-size:12.5px;font-weight:600;color:var(--text)}
+.tl-meta{font-size:11px;color:var(--text3);margin-top:2px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tl-note-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;margin-top:7px;font-size:12px;color:var(--text2);line-height:1.5;white-space:pre-wrap}
+.tl-note-box.internal{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2);color:#c4b5fd}
+.tl-note-box.internal::before{content:'🔒 Internal';display:block;font-size:10px;font-weight:700;color:#a78bfa;margin-bottom:4px}
+
+/* case side panel */
+.csp{padding:14px;border-bottom:1px solid var(--border)}
+.csp-title{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:11px}
+.act-btn{width:100%;display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .13s;border:1px solid var(--border);margin-bottom:7px}
+.act-btn:last-child{margin-bottom:0}
+.act-btn.primary{background:linear-gradient(135deg,var(--gold),#a07828);color:#000;border:none}
+.act-btn.primary:hover{filter:brightness(1.1)}
+.act-btn.ghost{background:var(--surface);color:var(--text2)}
+.act-btn.ghost:hover{background:var(--surface2);color:var(--text)}
+.act-btn.ok{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.25);color:var(--green)}
+.act-btn.warn{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);color:var(--yellow)}
+.act-btn.danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+.act-btn.esc{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25);color:var(--orange)}
+.act-btn:disabled{opacity:.38;cursor:not-allowed}
+.side-sel{
+  width:100%;
+  padding:7px 10px;
+  background:#1e293b;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;
+  color:#f1f5f9;
+  font-size:12px;
+  margin-bottom:7px;
+  -webkit-appearance:auto;
+  appearance:auto;
+  color-scheme:dark;
+}
+.side-sel:focus{border-color:var(--gold);outline:none;}
+.side-sel option{background:#1e293b;color:#f1f5f9;}
+.side-sel option[value=""]{color:#94a3b8;background:#1e293b;}
+.side-sel optgroup{background:#0f172a;color:#C9A84C;}
+.side-sel optgroup option{background:#1e293b;color:#f1f5f9;}
+.side-ta{width:100%;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;resize:none;min-height:56px;margin-bottom:7px;line-height:1.5}
+.side-ta:focus{border-color:var(--gold);outline:none}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:11.5px}
+.info-row-lbl{color:var(--text3);font-weight:500}
+.info-row-val{color:var(--text);font-weight:600}
+
+/* ─── LEADS KANBAN ───────────────────────────────────────────── */
+.kanban-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.kanban-col{background:var(--navy2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.kanban-col-hdr{padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.kanban-col-title{font-size:12.5px;font-weight:700}
+.kanban-count{background:var(--surface);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;color:var(--text2)}
+.kanban-cards{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:70px}
+.kanban-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:all .13s}
+.kanban-card:hover{border-color:var(--gold);background:var(--gold3)}
+.kc-id{font-size:10.5px;font-weight:700;color:var(--gold)}
+.kc-name{font-size:12px;font-weight:700;color:var(--text);margin-top:2px}
+.kc-org{font-size:10.5px;color:var(--text3)}
+.kc-meta{font-size:10.5px;color:var(--text2);margin-top:4px}
+.kanban-empty{font-size:11px;color:var(--text3);text-align:center;padding:12px}
+
+/* ─── REPORTS ────────────────────────────────────────────────── */
+.rpt-filter-bar{display:flex;gap:11px;flex-wrap:wrap;background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:18px}
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.rpt-card{background:var(--navy2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.rpt-card-hdr{padding:12px 14px;border-bottom:1px solid var(--border);font-size:12.5px;font-weight:700;color:var(--text)}
+.rpt-rows{padding:6px}
+.rpt-row{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px}
+.rpt-row:hover{background:var(--surface)}
+.rpt-lbl{flex:1;font-size:12px;color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpt-bar-wrap{width:70px;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;flex-shrink:0}
+.rpt-bar{height:100%;border-radius:3px;background:var(--gold);transition:width .5s}
+.rpt-val{font-size:12px;font-weight:700;color:var(--text);min-width:18px;text-align:right;flex-shrink:0}
+
+/* ─── AGENT CARDS ────────────────────────────────────────────── */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.agent-card{background:var(--navy2);border:1px solid var(--border);border-radius:13px;padding:17px}
+.agent-card-hdr{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.agent-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07828);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#000}
+.agent-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.agent-stat{background:var(--surface);border-radius:8px;padding:9px;text-align:center}
+.agent-stat.ok{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.18)}
+.agent-stat.warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18)}
+.agent-stat.danger{background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.18)}
+.agent-stat-val{font-size:22px;font-weight:800;color:var(--text);line-height:1}
+.agent-stat-lbl{font-size:9.5px;color:var(--text3);margin-top:3px}
+.sla-bar{margin-top:11px;padding:9px 11px;background:var(--surface);border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+
+/* ─── ADMIN TABLES ───────────────────────────────────────────── */
+.admin-table{width:100%;border-collapse:collapse;background:var(--navy2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-table th{padding:10px 13px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:rgba(15,23,42,.5)}
+.admin-table td{padding:11px 13px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text2)}
+.admin-table tr:last-child td{border-bottom:none}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+
+/* ─── MISC ───────────────────────────────────────────────────── */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:9px;font-size:10.5px;font-weight:600;background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.tag.gold{background:var(--gold3);border-color:rgba(201,168,76,.3);color:var(--gold)}
+.tag.green{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.25);color:var(--green)}
+.tag.red{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+.tag.orange{background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25);color:var(--orange)}
+.tag.blue{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.25);color:var(--blue)}
+.spinner{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.note-section{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:13px;margin-top:14px}
+.note-input{width:100%;padding:9px 11px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12.5px;resize:vertical;min-height:72px;line-height:1.5;margin-top:8px}
+.note-input:focus{border-color:var(--gold);outline:none}
+.grp-det-card{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.grp-det-title{font-size:12.5px;font-weight:700;color:var(--gold);margin-bottom:11px}
+.grp-meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="cc-header">
-  <div class="logo-row">
-    <img src="../images/logo.png" alt="WOW">
-    <h1>Call Centre CRM <span>⚡ Live Dashboard · Agent Portal</span></h1>
+<!-- ════════════ LOGIN ════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-hero">
+      <div class="login-icon">📞</div>
+      <div>
+        <div style="font-size:10.5px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px">Worlds of Wonder</div>
+        <div class="login-title">Call Center CRM</div>
+      </div>
+    </div>
+    <div class="login-sub">Enterprise call capture, routing &amp; resolution platform — v1.0</div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:9px">Select your profile:</div>
+    <div class="login-grid" id="login-grid"></div>
+    <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:5px">Enter PIN</div>
+    <input class="login-pin" type="password" id="login-pin" maxlength="4" placeholder="• • • •" autocomplete="off" oninput="onPinInput(this)"/>
+    <div class="login-err" id="login-err"></div>
+    <button class="login-btn" onclick="doLogin()">Sign In <i class="fas fa-arrow-right" style="margin-left:7px"></i></button>
+    <div class="login-note">🔐 Demo environment — data illustrative only</div>
   </div>
-  <div class="header-right">
-    <span class="agent-chip"><i class="fas fa-headset"></i> Priya Mehta — Agent L1</span>
-    <button class="btn-sm btn-gold" onclick="openModal('scheduleModal')"><i class="fas fa-calendar-plus"></i> Schedule CB</button>
-    <button class="btn-sm btn-outline" onclick="window.location='index.html'"><i class="fas fa-th"></i> Admin</button>
+</div>
+
+<!-- ════════════ APP SHELL ════════════ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-icon">📞</div>
+      <div>
+        <div class="sb-brand-title">Call Center CRM</div>
+        <div class="sb-brand-sub">WOW Operations</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-av" id="sb-av">??</div>
+      <div>
+        <div class="sb-un" id="sb-un">Loading…</div>
+        <div class="sb-ur" id="sb-ur">—</div>
+      </div>
+    </div>
+    <nav class="sb-nav" id="sb-nav">
+      <div class="sb-sec">Overview</div>
+      <div class="sb-item active" data-view="dashboard" onclick="nav('dashboard')"><i class="fas fa-th-large"></i>Dashboard <span class="sb-badge orange" id="sb-fu" style="display:none">0</span></div>
+
+      <div class="sb-sec" id="ns-capture">Live Call</div>
+      <div class="sb-item" id="ni-capture" data-view="capture" onclick="nav('capture')"><i class="fas fa-headset"></i>New Call Capture</div>
+
+      <div class="sb-sec">Case Queue</div>
+      <div class="sb-item" data-view="queue" onclick="nav('queue')"><i class="fas fa-list-ul"></i>All Cases <span class="sb-badge blue" id="sb-open">0</span></div>
+      <div class="sb-item" data-view="mine" onclick="filteredQueue('mine')"><i class="fas fa-user-check"></i>My Cases</div>
+      <div class="sb-item" data-view="escalated" onclick="filteredQueue('escalated')"><i class="fas fa-fire"></i>Escalated <span class="sb-badge red" id="sb-esc">0</span></div>
+      <div class="sb-item" data-view="followup" onclick="filteredQueue('followup')"><i class="fas fa-clock"></i>Follow-ups Due <span class="sb-badge orange" id="sb-fu2">0</span></div>
+      <div class="sb-item" data-view="sla" onclick="filteredQueue('sla')"><i class="fas fa-exclamation-triangle"></i>SLA Breaches <span class="sb-badge red" id="sb-sla">0</span></div>
+
+      <div class="sb-sec">Business</div>
+      <div class="sb-item" data-view="leads" onclick="nav('leads')"><i class="fas fa-briefcase"></i>Lead Pipeline</div>
+
+      <div class="sb-sec">Analytics</div>
+      <div class="sb-item" data-view="reports" onclick="nav('reports')"><i class="fas fa-chart-bar"></i>Reports</div>
+      <div class="sb-item" data-view="productivity" onclick="nav('productivity')"><i class="fas fa-user-chart"></i>Agent Productivity</div>
+      <a class="sb-item" href="crm-analytics.html" style="text-decoration:none"><i class="fas fa-chart-line" style="color:#3b82f6"></i>Full Analytics Dashboard <i class="fas fa-external-link-alt" style="margin-left:auto;font-size:9px;opacity:.5"></i></a>
+
+      <div class="sb-sec" id="ns-admin" style="display:none">Admin</div>
+      <div class="sb-item" id="ni-users" data-view="admin-users" onclick="nav('admin-users')" style="display:none"><i class="fas fa-users-cog"></i>Manage Users</div>
+      <div class="sb-item" id="ni-esc" data-view="admin-esc" onclick="nav('admin-esc')" style="display:none"><i class="fas fa-project-diagram"></i>Escalation Rules</div>
+    </nav>
+    <div class="sb-bottom">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:7px">CRM Engine v1.0.0</div>
+      <div class="sb-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
+    </div>
   </div>
-</header>
 
-<!-- Body -->
-<div class="cc-body">
-
-  <!-- LEFT: Ticket Queue -->
-  <aside class="queue-panel">
-    <div class="queue-header">
-      <h3><i class="fas fa-ticket-alt" style="color:#f59e0b"></i> Ticket Queue <span style="background:#dc2626;color:#fff;border-radius:10px;padding:1px 7px;font-size:.7rem;margin-left:6px">12</span></h3>
-      <div class="queue-tabs">
-        <button class="q-tab active" onclick="filterQueue('all',this)">All</button>
-        <button class="q-tab" onclick="filterQueue('open',this)">Open</button>
-        <button class="q-tab" onclick="filterQueue('escalated',this)">Esclr</button>
-        <button class="q-tab" onclick="filterQueue('resolved',this)">Done</button>
+  <!-- MAIN -->
+  <div id="main-area">
+    <div id="topbar">
+      <div style="flex:1">
+        <div class="tb-title" id="tb-title">Dashboard</div>
+        <div class="tb-sub" id="tb-sub">Worlds of Wonder Call Center CRM</div>
       </div>
-    </div>
-    <div class="queue-search">
-      <i class="fas fa-search"></i>
-      <input type="text" placeholder="Search name, ticket ID…" oninput="searchQueue(this.value)">
-    </div>
-    <div class="queue-list" id="queueList"></div>
-  </aside>
-
-  <!-- CENTRE: Ticket Detail -->
-  <main class="detail-panel">
-    <div class="detail-header">
-      <h2 id="detailTitle"><i class="fas fa-ticket-alt" style="color:#f59e0b"></i> #TKT-2025-001841 · Refund Request — Annual Passport</h2>
-      <div class="action-bar">
-        <button class="btn-sm btn-outline" onclick="openModal('escalateModal')"><i class="fas fa-arrow-up"></i> Escalate</button>
-        <button class="btn-sm btn-gold" onclick="openModal('refundModal')"><i class="fas fa-rupee-sign"></i> Process Refund</button>
-        <button class="btn-sm btn-green" onclick="resolveTicket()"><i class="fas fa-check"></i> Mark Resolved</button>
-      </div>
+      <div id="tb-chips" style="display:flex;gap:8px;align-items:center"></div>
+      <button class="tb-btn primary" id="tb-new-btn" onclick="nav('capture')"><i class="fas fa-plus"></i> New Call</button>
     </div>
 
-    <!-- Tab bar -->
-    <div class="tab-bar">
-      <button class="tab-item active" onclick="switchTab('conversation',this)"><i class="fas fa-comments"></i> Conversation</button>
-      <button class="tab-item" onclick="switchTab('details',this)"><i class="fas fa-info-circle"></i> Details</button>
-      <button class="tab-item" onclick="switchTab('history',this)"><i class="fas fa-history"></i> History</button>
-      <button class="tab-item" onclick="switchTab('escalation',this)"><i class="fas fa-sitemap"></i> Escalation</button>
-    </div>
-
-    <div class="detail-body" id="mainContent">
-      <!-- Conversation Tab -->
-      <div id="tab-conversation">
-        <!-- Customer card -->
-        <div class="cust-card">
-          <div class="cust-avatar">RS</div>
-          <div class="cust-info">
-            <h3>Rahul Kumar Sharma</h3>
-            <div class="cust-meta">
-              <span><i class="fas fa-phone"></i> +91 98765 43210</span>
-              <span><i class="fas fa-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="01736069746d2f726960736c6041666c60686d2f626e6c">[email&#160;protected]</a></span>
-              <span><i class="fab fa-whatsapp" style="color:#25D366"></i> Opted In</span>
-              <span><i class="fas fa-passport" style="color:#f59e0b"></i> Explore Tier · WOW-2025-004817</span>
-            </div>
+    <div id="content">
+      <!-- DASHBOARD -->
+      <div id="view-dashboard" class="view active">
+        <div class="dash-hero">
+          <div class="dash-greeting">Good <em id="d-greeting">day</em>, <em id="d-name">Agent</em> 👋</div>
+          <div class="dash-date" id="d-date"></div>
+        </div>
+        <div class="sla-banner hidden" id="sla-banner">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span id="sla-banner-msg"></span>
+          <a href="#" onclick="filteredQueue('sla');return false">View Now →</a>
+        </div>
+        <div class="stats-row" id="stats-row"></div>
+        <div class="dash-panels">
+          <div class="d-panel">
+            <div class="d-panel-hdr"><div class="d-panel-title">⚡ Recent Cases</div><div class="d-panel-link" onclick="nav('queue')">View All →</div></div>
+            <div id="recent-list" style="max-height:320px;overflow-y:auto"></div>
           </div>
-          <div class="cust-stats">
-            <div class="cstat"><div class="val">₹18,450</div><div class="lbl">Total Spend</div></div>
-            <div class="cstat"><div class="val">7</div><div class="lbl">Visits</div></div>
-            <div class="cstat"><div class="val">2</div><div class="lbl">Tickets Open</div></div>
+          <div class="d-panel">
+            <div class="d-panel-hdr"><div class="d-panel-title">🔔 Active Alerts</div><div class="d-panel-link" onclick="filteredQueue('sla')">SLA View →</div></div>
+            <div id="alerts-list" style="max-height:320px;overflow-y:auto"></div>
           </div>
         </div>
-
-        <!-- Issue details -->
-        <div class="issue-section">
-          <h4><i class="fas fa-exclamation-circle" style="color:#ef4444"></i> Issue Details</h4>
-          <div class="issue-grid">
-            <div class="ig-item">
-              <label>Category</label>
-              <select>
-                <option selected>Refund Request</option>
-                <option>Entry Issue</option>
-                <option>Payment Failed</option>
-                <option>Passport Query</option>
-                <option>Complaint</option>
-                <option>General Enquiry</option>
-                <option>Lost &amp; Found</option>
-                <option>F&amp;B Complaint</option>
-                <option>Safety Concern</option>
-              </select>
-            </div>
-            <div class="ig-item">
-              <label>Priority</label>
-              <select>
-                <option>Low</option>
-                <option selected>Medium</option>
-                <option>High</option>
-                <option>Critical</option>
-              </select>
-            </div>
-            <div class="ig-item">
-              <label>Assigned To</label>
-              <select>
-                <option selected>Priya Mehta (Me)</option>
-                <option>Arun Singh</option>
-                <option>Deepika Rao</option>
-                <option>Vikram Joshi</option>
-                <option>L2 — Supervisor</option>
-              </select>
-            </div>
-            <div class="ig-item full">
-              <label>Issue Summary</label>
-              <textarea>Customer purchased Explore passport on 15 Mar 2025 but was unable to enter water park due to wave pool maintenance closure. Requesting full refund or extension of validity. Booking ID: WOW-BP-2025-004817.</textarea>
-            </div>
-          </div>
-          <!-- Escalation flow -->
-          <div style="margin-bottom:8px;font-size:.78rem;color:#94a3b8;font-weight:600">ESCALATION PATH</div>
-          <div class="escalation-flow">
-            <div class="esc-step active"><div class="es-role">L1 Agent</div><div class="es-time">0–15 min</div></div>
-            <span class="esc-arrow">→</span>
-            <div class="esc-step"><div class="es-role">L2 Supervisor</div><div class="es-time">15–60 min</div></div>
-            <span class="esc-arrow">→</span>
-            <div class="esc-step"><div class="es-role">Manager</div><div class="es-time">1–4 hrs</div></div>
-            <span class="esc-arrow">→</span>
-            <div class="esc-step"><div class="es-role">Finance Head</div><div class="es-time">Refund &gt;₹5K</div></div>
-            <span class="esc-arrow">→</span>
-            <div class="esc-step"><div class="es-role">Super Admin</div><div class="es-time">Final Auth</div></div>
-          </div>
-        </div>
-
-        <!-- Conversation -->
-        <div class="conversation">
-          <div class="convo-messages" id="convoMessages">
-            <div class="msg customer">
-              <div class="bubble">Hello, I visited WOW on 22 March with my family but the wave pool was closed for maintenance. I have the Explore passport which I paid ₹4,999 for. I want a refund or at least an extension.</div>
-              <div class="msg-meta">Rahul Sharma · 28 Mar 10:23 AM · WhatsApp</div>
-            </div>
-            <div class="msg agent">
-              <div class="bubble">Namaste Rahul ji! 🙏 Aapki problem sunke dukh hua. Let me check your passport details right away. Wave pool maintenance pe humein sincerely sorry — ek kaam karte hain, aapki visit extend karte hain + ₹500 voucher dete hain compensation ke liye?</div>
-              <div class="msg-meta">Priya Mehta (Agent) · 28 Mar 10:31 AM · WhatsApp</div>
-            </div>
-            <div class="msg customer">
-              <div class="bubble">Voucher nahi chahiye. Full refund chahiye. Koi response nahi tha staff ka wahan pe bhi.</div>
-              <div class="msg-meta">Rahul Sharma · 28 Mar 10:35 AM · WhatsApp</div>
-            </div>
-            <div class="msg agent">
-              <div class="bubble">Bilkul samajhte hain Rahul ji. Refund request raise kar rahi hoon — ₹4,999 original payment mode pe 5-7 working days mein. Plus I'm flagging the staff response issue to our operations team. Koi aur madad chahiye?</div>
-              <div class="msg-meta">Priya Mehta (Agent) · 28 Mar 10:38 AM · WhatsApp</div>
-            </div>
-          </div>
-          <!-- Reply box -->
-          <div class="reply-box">
-            <div class="reply-tabs">
-              <button class="r-tab active" onclick="switchReply('whatsapp',this)"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</button>
-              <button class="r-tab" onclick="switchReply('email',this)"><i class="fas fa-envelope" style="color:#60a5fa"></i> Email</button>
-              <button class="r-tab" onclick="switchReply('sms',this)"><i class="fas fa-sms" style="color:#a78bfa"></i> SMS</button>
-              <button class="r-tab" onclick="switchReply('call',this)"><i class="fas fa-phone" style="color:#4ade80"></i> Call Log</button>
-              <button class="r-tab" onclick="switchReply('note',this)"><i class="fas fa-sticky-note" style="color:#fbbf24"></i> Note</button>
-            </div>
-            <div class="reply-input">
-              <textarea id="replyText" placeholder="Type reply in Hinglish… use /template for quick responses"></textarea>
-            </div>
-            <div class="reply-actions">
-              <div class="reply-tools">
-                <button class="tool-btn" title="Template" onclick="insertTemplate()"><i class="fas fa-bolt"></i></button>
-                <button class="tool-btn" title="Attachment"><i class="fas fa-paperclip"></i></button>
-                <button class="tool-btn" title="Emoji"><i class="far fa-smile"></i></button>
-                <button class="tool-btn" title="Booking link"><i class="fas fa-link"></i></button>
-                <select style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.75rem;padding:4px">
-                  <option>Language: Hinglish</option>
-                  <option>Hindi</option>
-                  <option>English</option>
-                </select>
-              </div>
-              <button class="btn-sm btn-blue" onclick="sendReply()"><i class="fas fa-paper-plane"></i> Send Reply</button>
-            </div>
-          </div>
+        <div class="charts-row">
+          <div class="chart-c"><div class="chart-hdr">📊 By Status</div><div class="chart-body"><canvas id="ch-status"></canvas></div></div>
+          <div class="chart-c"><div class="chart-hdr">🎯 By Segment</div><div class="chart-body"><canvas id="ch-seg"></canvas></div></div>
+          <div class="chart-c"><div class="chart-hdr">⚡ By Priority</div><div class="chart-body"><canvas id="ch-pri"></canvas></div></div>
         </div>
       </div>
 
-      <!-- Details Tab (hidden by default) -->
-      <div id="tab-details" style="display:none">
-        <div class="issue-section">
-          <h4><i class="fas fa-receipt" style="color:#f59e0b"></i> Booking & Transaction History</h4>
-          <table style="width:100%;border-collapse:collapse;font-size:.82rem">
-            <thead><tr style="border-bottom:1px solid #334155">
-              <th style="text-align:left;padding:8px;color:#64748b">Booking ID</th>
-              <th style="text-align:left;padding:8px;color:#64748b">Product</th>
-              <th style="text-align:left;padding:8px;color:#64748b">Amount</th>
-              <th style="text-align:left;padding:8px;color:#64748b">Date</th>
-              <th style="text-align:left;padding:8px;color:#64748b">Status</th>
-            </tr></thead>
-            <tbody id="bookingHistory">
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:8px;color:#60a5fa">WOW-BP-2025-004817</td>
-                <td style="padding:8px;color:#e2e8f0">Explore Passport (1 yr)</td>
-                <td style="padding:8px;color:#4ade80">₹4,999</td>
-                <td style="padding:8px;color:#94a3b8">01 Apr 2025</td>
-                <td style="padding:8px"><span class="tc-badge badge-open">Active</span></td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:8px;color:#60a5fa">WOW-TK-2025-002133</td>
-                <td style="padding:8px;color:#e2e8f0">Combo Ticket ×2</td>
-                <td style="padding:8px;color:#4ade80">₹3,998</td>
-                <td style="padding:8px;color:#94a3b8">15 Jan 2025</td>
-                <td style="padding:8px"><span class="tc-badge badge-resolved">Used</span></td>
-              </tr>
-              <tr>
-                <td style="padding:8px;color:#60a5fa">WOW-TK-2024-008841</td>
-                <td style="padding:8px;color:#e2e8f0">Water Park ×3</td>
-                <td style="padding:8px;color:#4ade80">₹3,897</td>
-                <td style="padding:8px;color:#94a3b8">10 Aug 2024</td>
-                <td style="padding:8px"><span class="tc-badge badge-resolved">Used</span></td>
-              </tr>
-            </tbody>
+      <!-- QUEUE -->
+      <div id="view-queue" class="view">
+        <div class="q-toolbar">
+          <div class="q-search"><i class="fas fa-search" style="color:var(--text3);font-size:12px"></i><input type="text" id="qs-search" placeholder="Case ID, name, mobile, booking, org…" oninput="qDebounce()"/></div>
+          <select class="q-sel" id="qs-status" onchange="renderQ()"><option value="">All Statuses</option><option>NEW</option><option>ASSIGNED</option><option>IN_PROGRESS</option><option>ESCALATED</option><option>AWAITING_INTERNAL</option><option>AWAITING_CUSTOMER</option><option>RESOLVED</option><option>CLOSED</option><option>REOPENED</option></select>
+          <select class="q-sel" id="qs-pri" onchange="renderQ()"><option value="">All Priorities</option><option value="CRITICAL">🔴 Critical</option><option value="URGENT">🟠 Urgent</option><option value="HIGH">🟡 High</option><option value="NORMAL">⚪ Normal</option><option value="LOW">🔵 Low</option></select>
+          <select class="q-sel" id="qs-seg" onchange="renderQ()"><option value="">All Segments</option><option value="INDIVIDUAL">Individual</option><option value="CORPORATE">Corporate</option><option value="SCHOOL">School</option><option value="COLLEGE">College</option><option value="BIRTHDAY">Birthday</option><option value="TRAVEL_AGENT">Travel Agent</option><option value="BULK">Bulk</option><option value="EVENT">Event</option></select>
+          <select class="q-sel" id="qs-dept" onchange="renderQ()"><option value="">All Departments</option><option value="CALL_CENTER">Call Center</option><option value="FINANCE">Finance</option><option value="OPERATIONS">Operations</option><option value="SALES">Sales</option><option value="GROUP_SALES">Group Sales</option><option value="CORPORATE_SALES">Corporate Sales</option><option value="INSTITUTIONAL_SALES">Institutional Sales</option><option value="DIGITAL_MARKETING">Digital Marketing</option></select>
+          <div class="q-icon-btn" onclick="renderQ(true)" title="Refresh"><i class="fas fa-sync-alt"></i></div>
+        </div>
+        <div class="q-table-wrap">
+          <table class="q-table">
+            <thead><tr><th>Case ID</th><th>Caller</th><th>Issue</th><th>Status</th><th>Priority</th><th>Owner</th><th>Age</th><th>SLA</th><th>Last Activity</th></tr></thead>
+            <tbody id="q-tbody"><tr><td colspan="9" class="q-empty"><div class="spinner"></div></td></tr></tbody>
           </table>
         </div>
-        <div class="issue-section" style="margin-top:16px">
-          <h4><i class="fas fa-clipboard-list" style="color:#a78bfa"></i> Internal Notes</h4>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="background:#0f172a;border-radius:8px;padding:12px;font-size:.82rem">
-              <div style="color:#fbbf24;font-weight:600;margin-bottom:4px">📌 Priya Mehta · 28 Mar 10:40 AM</div>
-              <div style="color:#e2e8f0">Wave pool was under scheduled maintenance on 22 Mar 2025. Maintenance log confirms closure 9 AM – 4 PM. Customer complaint is valid. Recommend full refund OR 3-month extension of passport validity.</div>
-            </div>
-            <div style="background:#0f172a;border-radius:8px;padding:12px;font-size:.82rem">
-              <div style="color:#fbbf24;font-weight:600;margin-bottom:4px">📌 System · 27 Mar 6:00 PM</div>
-              <div style="color:#e2e8f0">Auto-flag: Customer loyalty score 87/100. High-value customer. Priority handling recommended.</div>
-            </div>
+        <div id="q-pages" class="q-pagination"></div>
+      </div>
+
+      <!-- CAPTURE -->
+      <div id="view-capture" class="view">
+        <div class="cap-wrap"><div class="cap-form" id="cap-form"></div></div>
+      </div>
+
+      <!-- CASE DETAIL -->
+      <div id="view-case" class="view">
+        <div class="detail-layout" id="detail-layout">
+          <div style="display:flex;align-items:center;justify-content:center;height:200px;grid-column:1/-1"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div id="view-leads" class="view">
+        <div style="padding:22px">
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:5px">📊 Business Lead Pipeline</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:18px">Commercial &amp; group inquiries by lead stage</div>
+          <div class="kanban-wrap" id="kanban"></div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div id="view-reports" class="view">
+        <div style="padding:22px">
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:5px">📈 CRM Reports</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:18px">Case analytics and resolution intelligence</div>
+          <div class="rpt-filter-bar">
+            <div class="f-field"><label class="f-label">From</label><input type="date" class="f-inp" id="rpt-from" style="width:145px"/></div>
+            <div class="f-field"><label class="f-label">To</label><input type="date" class="f-inp" id="rpt-to" style="width:145px"/></div>
+            <div class="f-field"><label class="f-label">Segment</label><select class="f-sel" id="rpt-seg" style="width:150px"><option value="">All</option><option value="INDIVIDUAL">Individual</option><option value="CORPORATE">Corporate</option><option value="SCHOOL">School</option><option value="BIRTHDAY">Birthday</option><option value="TRAVEL_AGENT">Travel Agent</option></select></div>
+            <div class="f-field"><label class="f-label">Department</label><select class="f-sel" id="rpt-dept" style="width:175px"><option value="">All</option><option value="CALL_CENTER">Call Center</option><option value="FINANCE">Finance</option><option value="OPERATIONS">Operations</option><option value="SALES">Sales</option></select></div>
+            <div class="f-field" style="align-self:flex-end"><button class="tb-btn primary" onclick="genReport()"><i class="fas fa-chart-bar"></i> Generate</button></div>
           </div>
+          <div class="rpt-grid" id="rpt-out"></div>
         </div>
       </div>
 
-      <!-- History Tab (hidden) -->
-      <div id="tab-history" style="display:none">
-        <div class="issue-section">
-          <h4><i class="fas fa-history" style="color:#60a5fa"></i> All Tickets — Rahul Sharma</h4>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="background:#0f172a;border-radius:8px;padding:12px;font-size:.82rem;border-left:3px solid #2563eb">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="color:#60a5fa;font-weight:600">#TKT-2025-001841</span>
-                <span class="tc-badge badge-open">Open</span>
-              </div>
-              <div style="color:#e2e8f0;margin-bottom:3px">Refund Request — Annual Passport (wave pool closed)</div>
-              <div style="color:#64748b">28 Mar 2025 · Assigned: Priya Mehta</div>
-            </div>
-            <div style="background:#0f172a;border-radius:8px;padding:12px;font-size:.82rem;border-left:3px solid #22c55e">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="color:#60a5fa;font-weight:600">#TKT-2025-000422</span>
-                <span class="tc-badge badge-resolved">Resolved</span>
-              </div>
-              <div style="color:#e2e8f0;margin-bottom:3px">Payment Failed — Combo Ticket (UPI timeout)</div>
-              <div style="color:#64748b">12 Jan 2025 · Resolved by Arun Singh · 45 min MTTR</div>
-            </div>
-          </div>
+      <!-- AGENT PRODUCTIVITY -->
+      <div id="view-productivity" class="view">
+        <div style="padding:22px">
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:5px">👥 Agent Productivity</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:18px">Per-agent call center performance metrics</div>
+          <div class="agent-grid" id="agent-grid"></div>
         </div>
       </div>
 
-      <!-- Escalation Tab (hidden) -->
-      <div id="tab-escalation" style="display:none">
-        <div class="issue-section">
-          <h4><i class="fas fa-sitemap" style="color:#f87171"></i> Authority & Escalation Matrix</h4>
-          <table style="width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:16px">
-            <thead><tr style="background:#0f172a">
-              <th style="padding:10px;text-align:left;color:#64748b">Issue Type</th>
-              <th style="padding:10px;text-align:center;color:#64748b">L1 Agent</th>
-              <th style="padding:10px;text-align:center;color:#64748b">L2 Supervisor</th>
-              <th style="padding:10px;text-align:center;color:#64748b">Manager</th>
-              <th style="padding:10px;text-align:center;color:#64748b">Finance/Head</th>
-              <th style="padding:10px;text-align:center;color:#64748b">Super Admin</th>
-            </tr></thead>
-            <tbody>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Refund ≤ ₹1,000</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Auto</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Refund ₹1,001–₹5,000</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Request</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Approve</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Refund &gt; ₹5,000</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Request</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Recommend</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Review</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Approve</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Passport Cancellation</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Request</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Process</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Safety Complaint</td>
-                <td style="padding:10px;text-align:center;color:#f87171">Escalate</td>
-                <td style="padding:10px;text-align:center;color:#f87171">Escalate</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Handle</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Override</td>
-              </tr>
-              <tr style="border-bottom:1px solid #1e293b">
-                <td style="padding:10px;color:#e2e8f0">Media / PR Issue</td>
-                <td style="padding:10px;text-align:center;color:#f87171">Alert</td>
-                <td style="padding:10px;text-align:center;color:#f87171">Alert</td>
-                <td style="padding:10px;text-align:center;color:#f87171">Alert</td>
-                <td style="padding:10px;text-align:center;color:#64748b">—</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Manage</td>
-              </tr>
-              <tr>
-                <td style="padding:10px;color:#e2e8f0">Bulk B2B Dispute</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Log</td>
-                <td style="padding:10px;text-align:center;color:#fbbf24">Assign</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Negotiate</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Approve</td>
-                <td style="padding:10px;text-align:center;color:#4ade80">✓ Override</td>
-              </tr>
-            </tbody>
-          </table>
-          <div style="background:#0f172a;border-radius:10px;padding:14px">
-            <div style="font-size:.82rem;font-weight:700;color:#f59e0b;margin-bottom:10px">⚡ SLA Targets</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-              <div style="text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#4ade80">15 min</div><div style="font-size:.72rem;color:#64748b">First Response</div></div>
-              <div style="text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#60a5fa">2 hrs</div><div style="font-size:.72rem;color:#64748b">L1 Resolution</div></div>
-              <div style="text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#fbbf24">24 hrs</div><div style="font-size:.72rem;color:#64748b">Escalated Cases</div></div>
-              <div style="text-align:center"><div style="font-size:1.2rem;font-weight:700;color:#f87171">5-7 days</div><div style="font-size:.72rem;color:#64748b">Refund Processing</div></div>
-            </div>
-          </div>
+      <!-- ADMIN: USERS -->
+      <div id="view-admin-users" class="view">
+        <div style="padding:22px">
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:5px">🛠 CRM User Management</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:18px">Users, roles and assignment permissions</div>
+          <div id="user-tbl-wrap"></div>
         </div>
       </div>
-    </div>
-  </main>
 
-  <!-- RIGHT: Activity & Stats -->
-  <aside class="right-panel">
-    <!-- Live stats -->
-    <div class="rp-section">
-      <h4><i class="fas fa-chart-bar" style="color:#f59e0b"></i> Today's Stats</h4>
-      <div class="stat-grid-4">
-        <div class="stat-box"><div class="sv" id="statOpen">47</div><div class="sl">Open Tickets</div></div>
-        <div class="stat-box"><div class="sv" style="color:#f87171" id="statEsc">8</div><div class="sl">Escalated</div></div>
-        <div class="stat-box"><div class="sv" style="color:#4ade80" id="statRes">134</div><div class="sl">Resolved</div></div>
-        <div class="stat-box"><div class="sv" style="color:#a78bfa" id="statCsat">4.2★</div><div class="sl">CSAT Score</div></div>
-      </div>
-    </div>
-
-    <!-- Refund widget -->
-    <div class="rp-section">
-      <h4><i class="fas fa-rupee-sign" style="color:#f87171"></i> Pending Refunds</h4>
-      <div class="refund-widget">
-        <h5><i class="fas fa-exclamation-triangle"></i> Active Refund — TKT-001841</h5>
-        <div class="rw-row"><span class="label">Customer</span><span class="value">Rahul Sharma</span></div>
-        <div class="rw-row"><span class="label">Amount</span><span class="value">₹4,999</span></div>
-        <div class="rw-row"><span class="label">Mode</span><span class="value">Original (UPI)</span></div>
-        <div class="rw-row"><span class="label">Auth Required</span><span class="value" style="color:#f87171">L2 Supervisor</span></div>
-        <input class="refund-input" type="text" placeholder="Refund note / reason…" value="Wave pool closed on visit date — maintenance. Full refund approved.">
-        <div class="refund-btns">
-          <button class="btn-sm btn-red" style="flex:1" onclick="showToast('Refund of ₹4,999 raised — awaiting L2 approval','error')"><i class="fas fa-undo"></i> Raise Refund</button>
-          <button class="btn-sm btn-outline" style="flex:1" onclick="showToast('Partial credit ₹500 applied to WOW Wallet','success')"><i class="fas fa-wallet"></i> Add Credit</button>
+      <!-- ADMIN: ESCALATION -->
+      <div id="view-admin-esc" class="view">
+        <div style="padding:22px">
+          <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:5px">⚡ Escalation Matrix</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:18px">SLA thresholds and automatic escalation rules</div>
+          <div id="esc-rules-wrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:13px"></div>
         </div>
       </div>
-    </div>
-
-    <!-- Quick actions -->
-    <div class="rp-section">
-      <h4><i class="fas fa-bolt" style="color:#fbbf24"></i> Quick Actions</h4>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="showToast('WhatsApp message sent to Rahul Sharma','success')"><i class="fab fa-whatsapp" style="color:#25D366;width:20px"></i> Send WhatsApp Update</button>
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="showToast('Confirmation email sent!','success')"><i class="fas fa-envelope" style="color:#60a5fa;width:20px"></i> Send Email Confirmation</button>
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="showToast('SMS sent via MSG91','success')"><i class="fas fa-sms" style="color:#a78bfa;width:20px"></i> Send SMS</button>
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="openModal('scheduleModal')"><i class="fas fa-phone" style="color:#4ade80;width:20px"></i> Schedule Callback</button>
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="showToast('Passport validity extended by 30 days','success')"><i class="fas fa-passport" style="color:#f59e0b;width:20px"></i> Extend Passport Validity</button>
-        <button class="btn-sm btn-outline" style="width:100%;text-align:left" onclick="showToast('₹500 compensation voucher issued','success')"><i class="fas fa-ticket-alt" style="color:#fbbf24;width:20px"></i> Issue Comp. Voucher</button>
-      </div>
-    </div>
-
-    <!-- Online Agents -->
-    <div class="rp-section" style="flex:1;overflow-y:auto">
-      <h4><i class="fas fa-users" style="color:#4ade80"></i> Agent Status</h4>
-      <div class="agents-grid" id="agentsGrid"></div>
-    </div>
-  </aside>
-</div>
-
-<!-- Activity Feed (hidden in right panel overflow, shown as section) -->
-
-<!-- Modals -->
-<!-- Escalate Modal -->
-<div class="modal-overlay" id="escalateModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('escalateModal')"><i class="fas fa-times"></i></button>
-    <h3><i class="fas fa-arrow-up" style="color:#f87171"></i> Escalate Ticket</h3>
-    <div class="form-field"><label>Escalate To</label>
-      <select>
-        <option>L2 — Team Supervisor</option>
-        <option>Operations Manager</option>
-        <option>Finance Head (refund &gt;₹5K)</option>
-        <option>GM — Guest Relations</option>
-        <option>Super Admin</option>
-      </select>
-    </div>
-    <div class="form-field"><label>Urgency</label>
-      <select><option>Standard (next business hour)</option><option>High (within 2 hrs)</option><option>Critical (immediate)</option></select>
-    </div>
-    <div class="form-field"><label>Escalation Reason</label>
-      <textarea placeholder="Why are you escalating? What steps taken so far?"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-sm btn-outline" onclick="closeModal('escalateModal')">Cancel</button>
-      <button class="btn-sm btn-red" onclick="handleEscalate()"><i class="fas fa-arrow-up"></i> Escalate Now</button>
     </div>
   </div>
 </div>
 
-<!-- Refund Modal -->
-<div class="modal-overlay" id="refundModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('refundModal')"><i class="fas fa-times"></i></button>
-    <h3><i class="fas fa-rupee-sign" style="color:#f87171"></i> Process Refund</h3>
-    <div class="form-field"><label>Booking ID</label><input type="text" value="WOW-BP-2025-004817" readonly></div>
-    <div class="form-field"><label>Refund Amount (₹)</label><input type="number" value="4999"></div>
-    <div class="form-field"><label>Refund Mode</label>
-      <select><option>Original Payment Method (UPI)</option><option>WOW Wallet Credit</option><option>Bank Transfer (NEFT)</option><option>Razorpay Instant</option></select>
-    </div>
-    <div class="form-field"><label>Reason</label>
-      <select><option>Facility Unavailable</option><option>Double Charge</option><option>Cancellation (T&C)</option><option>Customer Request</option><option>System Error</option></select>
-    </div>
-    <div class="form-field"><label>Internal Note</label>
-      <textarea placeholder="Add internal note for audit trail…"></textarea>
-    </div>
-    <div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:14px;font-size:.78rem;color:#fbbf24">
-      ⚠️ Refund of ₹4,999 requires L2 Supervisor approval. Request will be sent automatically.
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-sm btn-outline" onclick="closeModal('refundModal')">Cancel</button>
-      <button class="btn-sm btn-red" onclick="handleRefund()"><i class="fas fa-undo"></i> Submit Refund Request</button>
-    </div>
-  </div>
-</div>
+<!-- ════════════ MODAL OVERLAY ════════════ -->
+<div id="modal-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9900;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)" onclick="closeModalBg(event)"></div>
 
-<!-- Schedule Callback Modal -->
-<div class="modal-overlay" id="scheduleModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('scheduleModal')"><i class="fas fa-times"></i></button>
-    <h3><i class="fas fa-phone" style="color:#4ade80"></i> Schedule Callback</h3>
-    <div class="form-field"><label>Customer Mobile</label><input type="tel" value="+91 98765 43210"></div>
-    <div class="form-field"><label>Callback Date & Time</label><input type="datetime-local"></div>
-    <div class="form-field"><label>Assigned Agent</label>
-      <select><option>Priya Mehta (Me)</option><option>Arun Singh</option><option>Deepika Rao</option></select>
-    </div>
-    <div class="form-field"><label>Notes</label><textarea placeholder="What to discuss…"></textarea></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn-sm btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
-      <button class="btn-sm btn-green" onclick="handleSchedule()"><i class="fas fa-calendar-check"></i> Schedule</button>
-    </div>
-  </div>
-</div>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════════ */
+const E = WOWCRM;
+let _selLoginId = null;
+let _qFilter = {};
+let _qPage = 1;
+const _qPS = 25;
+let _qTimer = null;
+let _charts = {};
+let _curCaseId = null;
+let _capData = {};
+let _selBkg = null;
+let _allUsers = [];
+let _mobileLookupTimer = null;
 
-<!-- Toast -->
-<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ── Ticket data ──
-const TICKETS = [
-  {id:'TKT-2025-001841',name:'Rahul Sharma',issue:'Refund Request — Passport',status:'open',priority:'medium',time:'10:23 AM',channel:'whatsapp'},
-  {id:'TKT-2025-001838',name:'Anjali Gupta',issue:'Payment Failed — Combo Tickets',status:'escalated',priority:'high',time:'09:45 AM',channel:'email'},
-  {id:'TKT-2025-001835',name:'Vijay Malhotra',issue:'Entry Denied — QR Not Scanning',status:'pending',priority:'high',time:'09:12 AM',channel:'call'},
-  {id:'TKT-2025-001830',name:'Meena Krishnan',issue:'Passport Tier Query — Legacy',status:'open',priority:'low',time:'08:55 AM',channel:'whatsapp'},
-  {id:'TKT-2025-001827',name:'Sanjay Verma',issue:'F&B Complaint — Food Quality',status:'escalated',priority:'medium',time:'08:30 AM',channel:'email'},
-  {id:'TKT-2025-001821',name:'Pooja Sharma',issue:'Birthday Package — Cancellation',status:'pending',priority:'medium',time:'Yesterday',channel:'call'},
-  {id:'TKT-2025-001815',name:'Arjun Kapoor',issue:'Season Pass — Transfer Request',status:'open',priority:'low',time:'Yesterday',channel:'whatsapp'},
-  {id:'TKT-2025-001809',name:'Sunita Devi',issue:'Lost Locker Key',status:'resolved',priority:'low',time:'Yesterday',channel:'call'},
-  {id:'TKT-2025-001804',name:'Rakesh Agarwal',issue:'Corporate Booking — Invoice',status:'resolved',priority:'medium',time:'27 Mar',channel:'email'},
-  {id:'TKT-2025-001798',name:'Kavita Singh',issue:'Kids Height Waiver Request',status:'open',priority:'low',time:'27 Mar',channel:'whatsapp'},
-  {id:'TKT-2025-001791',name:'Mohit Bajaj',issue:'GST Invoice — B2B',status:'waiting',priority:'medium',time:'27 Mar',channel:'email'},
-  {id:'TKT-2025-001785',name:'Priti Saxena',issue:'WhatsApp OTP Not Received',status:'open',priority:'high',time:'26 Mar',channel:'call'},
-];
-
-const AGENTS = [
-  {name:'Priya Mehta',role:'L1 Agent',status:'online',load:3},
-  {name:'Arun Singh',role:'L1 Agent',status:'busy',load:5},
-  {name:'Deepika Rao',role:'L2 Supervisor',status:'online',load:2},
-  {name:'Vikram Joshi',role:'L1 Agent',status:'busy',load:4},
-  {name:'Neha Pandey',role:'L1 Agent',status:'offline',load:0},
-  {name:'Ravi Kumar',role:'L2 Supervisor',status:'online',load:1},
-];
-
-let currentFilter = 'all';
-let activeTicket = 0;
-
-function renderQueue(tickets){
-  const list = document.getElementById('queueList');
-  list.innerHTML = tickets.map((t,i)=>`
-    <div class="ticket-card ${i===activeTicket?'active':''}" onclick="selectTicket(${i})">
-      <div class="tc-top">
-        <span class="tc-id">#${t.id}</span>
-        <span class="tc-badge badge-${t.status}">${t.status.toUpperCase()}</span>
-      </div>
-      <div class="tc-name"><span class="priority-dot p-${t.priority}"></span>${t.name}</div>
-      <div class="tc-issue">${t.issue}</div>
-      <div class="tc-meta">
-        <span><i class="fas fa-clock"></i> ${t.time}</span>
-        <span><i class="fas fa-${channelIcon(t.channel)}"></i> ${t.channel}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-function channelIcon(ch){
-  return {whatsapp:'comment',email:'envelope',call:'phone',sms:'sms'}[ch]||'comment';
-}
-
-function filterQueue(f,el){
-  currentFilter = f;
-  document.querySelectorAll('.q-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  const filtered = f==='all'?TICKETS:TICKETS.filter(t=>t.status===f);
-  renderQueue(filtered);
-}
-
-function searchQueue(q){
-  const filtered = TICKETS.filter(t=>
-    t.name.toLowerCase().includes(q.toLowerCase())||
-    t.id.toLowerCase().includes(q.toLowerCase())||
-    t.issue.toLowerCase().includes(q.toLowerCase())
-  );
-  renderQueue(filtered);
-}
-
-function selectTicket(i){
-  activeTicket = i;
-  const t = TICKETS[i];
-  document.getElementById('detailTitle').innerHTML = `<i class="fas fa-ticket-alt" style="color:#f59e0b"></i> #${t.id} · ${t.issue}`;
-  renderQueue(TICKETS);
-  showToast(`Loading ticket #${t.id}…`,'info');
-}
-
-function renderAgents(){
-  document.getElementById('agentsGrid').innerHTML = AGENTS.map(a=>`
-    <div class="agent-row">
-      <div class="agent-status status-${a.status}"></div>
-      <div class="agent-info">
-        <div class="an">${a.name}</div>
-        <div class="am">${a.role} · ${a.status}</div>
-      </div>
-      <div class="agent-load">${a.load} tickets</div>
-    </div>
-  `).join('');
-}
-
-function switchTab(tab,el){
-  ['conversation','details','history','escalation'].forEach(t=>{
-    const el = document.getElementById('tab-'+t);
-    if(el) el.style.display = t===tab?'':'none';
-  });
-  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function switchReply(mode,el){
-  document.querySelectorAll('.r-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  const placeholder = {
-    whatsapp:'Type WhatsApp message in Hinglish…',
-    email:'Type email reply…',
-    sms:'Type SMS (max 160 chars)…',
-    call:'Log call outcome…',
-    note:'Add internal note (not visible to customer)…'
-  }[mode];
-  document.getElementById('replyText').placeholder = placeholder;
-}
-
-function sendReply(){
-  const txt = document.getElementById('replyText').value.trim();
-  if(!txt){showToast('Please type a message first','error');return;}
-  const msgs = document.getElementById('convoMessages');
-  msgs.innerHTML += `
-    <div class="msg agent">
-      <div class="bubble">${txt}</div>
-      <div class="msg-meta">Priya Mehta (Agent) · Just now · WhatsApp</div>
-    </div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-  document.getElementById('replyText').value = '';
-  showToast('Reply sent via WhatsApp','success');
-}
-
-function insertTemplate(){
-  const templates = [
-    'Namaste {{name}} ji! 🙏 Aapki booking confirm ho gayi hai WOW ke liye. Ticket ID: {{id}}. Koi sawaal ho toh humein WhatsApp karen!',
-    'Hi {{name}}! Your refund of ₹{{amount}} has been processed. 5-7 working days mein aapke account mein aa jayega. Sorry for the inconvenience! 🙏',
-    'Wah re wah {{name}} ji! 🎉 Aapka WOW Passport ready hai! Kal se unlimited entry — pool mein doob jaiye aur rides pe aasman chhuiye! 🌊🎢',
-  ];
-  document.getElementById('replyText').value = templates[Math.floor(Math.random()*templates.length)];
-}
-
-function resolveTicket(){
-  showToast('Ticket #TKT-2025-001841 marked as Resolved!','success');
-  TICKETS[activeTicket].status = 'resolved';
-  renderQueue(TICKETS);
-}
-
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
-
-function handleEscalate(){
-  closeModal('escalateModal');
-  showToast('Ticket escalated to L2 Supervisor — alert sent','error');
-  TICKETS[activeTicket].status = 'escalated';
-  renderQueue(TICKETS);
-}
-
-function handleRefund(){
-  closeModal('refundModal');
-  showToast('Refund of ₹4,999 submitted — awaiting L2 approval','info');
-}
-
-function handleSchedule(){
-  closeModal('scheduleModal');
-  showToast('Callback scheduled! Customer will be notified via SMS.','success');
-}
-
-function showToast(msg,type='success'){
-  const t = document.getElementById('toast');
-  const icons = {success:'check-circle',error:'exclamation-circle',info:'info-circle'};
-  const colors = {success:'#1e3a5f',error:'#4a1d1d',info:'#1e293b'};
-  t.style.background = colors[type]||colors.info;
-  t.innerHTML = `<i class="fas fa-${icons[type]||icons.info}"></i><span>${msg}</span>`;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-// Live stat counter simulation
-function updateStats(){
-  const open = parseInt(document.getElementById('statOpen').textContent);
-  document.getElementById('statOpen').textContent = open + (Math.random()>0.7?1:0);
-}
-
-// Init
-renderQueue(TICKETS);
-renderAgents();
-setInterval(updateStats,8000);
-
-// Close modals on backdrop click
-document.querySelectorAll('.modal-overlay').forEach(m=>{
-  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')});
+/* ══════════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  if (E.isLoggedIn()) { await boot(); }
+  else { renderLogin(); }
 });
+
+async function boot() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const u = E.currentUser();
+  _allUsers = await E.getAllUsers();
+  document.getElementById('sb-av').textContent = u.avatar || u.name.slice(0,2).toUpperCase();
+  document.getElementById('sb-un').textContent = u.name;
+  document.getElementById('sb-ur').textContent = E.ROLE_HIERARCHY[u.role]?.label || u.role;
+  applyRoleNav(u);
+  await loadDash();
+  setTimeout(() => E.runEscalationCheck().catch(()=>{}), 4000);
+}
+
+function applyRoleNav(u) {
+  const canCapture = ['CRM_AGENT','CRM_SUPERVISOR','SUPER_ADMIN','MANAGEMENT'].includes(u.role);
+  if (!canCapture) {
+    document.getElementById('ni-capture')?.remove();
+    document.getElementById('ns-capture')?.remove();
+    document.getElementById('tb-new-btn')?.remove();
+  }
+  if (E.isSuperAdmin()) {
+    document.getElementById('ns-admin').style.display='';
+    document.getElementById('ni-users').style.display='';
+    document.getElementById('ni-esc').style.display='';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════════════════════ */
+function renderLogin() {
+  document.getElementById('login-grid').innerHTML = E.DEMO_LOGIN_USERS.map(u => `
+    <div class="lu-card" id="lc-${u.id}" onclick="selUser('${u.id}')">
+      <div class="lu-av">${u.avatar}</div>
+      <div class="lu-name">${u.name}</div>
+      <div class="lu-role">${E.ROLE_HIERARCHY[u.role]?.label||u.role}</div>
+      <div class="lu-pin">PIN: ${u.pin}</div>
+    </div>`).join('');
+}
+
+function selUser(id) {
+  _selLoginId = id;
+  document.querySelectorAll('.lu-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('lc-'+id)?.classList.add('sel');
+  document.getElementById('login-pin').value='';
+  document.getElementById('login-pin').focus();
+  document.getElementById('login-err').textContent='';
+}
+
+function onPinInput(el) { if (el.value.length===4) doLogin(); }
+
+async function doLogin() {
+  const pin = document.getElementById('login-pin').value;
+  const err = document.getElementById('login-err');
+  if (!_selLoginId) { err.textContent='Select a profile first.'; return; }
+  if (!pin || pin.length<4) { err.textContent='Enter your 4-digit PIN.'; return; }
+  const u = E.DEMO_LOGIN_USERS.find(x=>x.id===_selLoginId);
+  if (!u) { err.textContent='User not found.'; return; }
+  if (u.pin!==pin) { err.textContent='✗ Incorrect PIN. Try again.'; return; }
+  E.loginDemo(_selLoginId);
+  await boot();
+}
+
+function doLogout() { E.clearSession(); location.reload(); }
+
+/* ══════════════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════════════ */
+const VIEW_META = {
+  dashboard:    ['Dashboard','Your operational overview'],
+  capture:      ['New Call Capture','Live call intake form'],
+  queue:        ['Case Queue','All active and historical cases'],
+  'case':       ['Case Detail','Full timeline and workflow'],
+  leads:        ['Lead Pipeline','Business & group inquiry tracking'],
+  reports:      ['Reports','Case analytics and metrics'],
+  productivity: ['Agent Productivity','Per-agent performance'],
+  'admin-users':['User Management','CRM users and roles'],
+  'admin-esc':  ['Escalation Matrix','SLA and escalation rules'],
+};
+
+function nav(viewId) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  const el = document.getElementById('view-'+viewId);
+  if (el) el.classList.add('active');
+  const si = document.querySelector(`.sb-item[data-view="${viewId}"]`);
+  if (si) si.classList.add('active');
+  const meta = VIEW_META[viewId]||[viewId,''];
+  document.getElementById('tb-title').textContent = meta[0];
+  document.getElementById('tb-sub').textContent = meta[1];
+  if (viewId==='queue')        renderQ(true);
+  if (viewId==='capture')      buildCaptureForm();
+  if (viewId==='leads')        renderLeads();
+  if (viewId==='reports')      genReport();
+  if (viewId==='productivity') renderProductivity();
+  if (viewId==='admin-users')  renderUserMgmt();
+  if (viewId==='admin-esc')    renderEscRules();
+}
+
+function filteredQueue(f) {
+  _qFilter = {};
+  if (f==='mine')     _qFilter._mine=true;
+  if (f==='escalated')_qFilter._esc=true;
+  if (f==='followup') _qFilter._fu=true;
+  if (f==='sla')      _qFilter.sla_breach=true;
+  nav('queue');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════════════ */
+async function loadDash() {
+  const u = E.currentUser();
+  const h = new Date().getHours();
+  const gr = h<12?'morning':h<17?'afternoon':'evening';
+  document.getElementById('d-greeting').textContent = gr;
+  document.getElementById('d-name').textContent = u.name.split(' ')[0];
+  document.getElementById('d-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const stats = await E.getDashboardStats();
+  renderStats(stats);
+  renderTopbarAlerts(stats);
+  if (stats.slaBreach>0) {
+    document.getElementById('sla-banner').classList.remove('hidden');
+    document.getElementById('sla-banner-msg').textContent = `⚠️ ${stats.slaBreach} case${stats.slaBreach>1?'s':''} have breached SLA — immediate action required.`;
+  }
+  renderRecentList();
+  renderAlertsList();
+  buildCharts(stats);
+  // update badges
+  $set('sb-open', stats.openCases);
+  $set('sb-esc', stats.escalated);
+  $set('sb-fu',  stats.followUpDue);
+  $set('sb-fu2', stats.followUpDue);
+  $set('sb-sla', stats.slaBreach);
+  if (stats.followUpDue>0) document.getElementById('sb-fu').style.display='';
+}
+
+function $set(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function renderStats(s) {
+  const defs = [
+    {icon:'📋',val:s.totalCases,  lbl:'Total Cases',    cls:''},
+    {icon:'🔄',val:s.openCases,   lbl:'Open Cases',     cls:'warn'},
+    {icon:'🚨',val:s.escalated,   lbl:'Escalated',      cls:'danger'},
+    {icon:'⏰',val:s.slaBreach,   lbl:'SLA Breaches',   cls:'danger'},
+    {icon:'✅',val:s.closedToday, lbl:'Closed Today',   cls:'ok'},
+    {icon:'📅',val:s.followUpDue, lbl:'Follow-ups Due', cls:'hi'},
+    {icon:'👤',val:s.myCases,     lbl:'My Cases',       cls:''},
+    {icon:'📩',val:s.assignedToMe,lbl:'Assigned to Me', cls:''},
+  ];
+  document.getElementById('stats-row').innerHTML = defs.map(d=>`
+    <div class="stat-c ${d.cls}">
+      <div class="stat-icon">${d.icon}</div>
+      <div class="stat-val">${d.val}</div>
+      <div class="stat-lbl">${d.lbl}</div>
+    </div>`).join('');
+}
+
+function renderTopbarAlerts(s) {
+  const chips = document.getElementById('tb-chips');
+  chips.innerHTML='';
+  if (s.slaBreach>0) chips.innerHTML+=`<div class="alert-chip orange"><i class="fas fa-exclamation-triangle"></i> ${s.slaBreach} SLA Breach${s.slaBreach>1?'es':''}</div>`;
+  if (s.escalated>0) chips.innerHTML+=`<div class="alert-chip red"><i class="fas fa-fire"></i> ${s.escalated} Escalated</div>`;
+}
+
+async function renderRecentList() {
+  const cases = await E.getCases({});
+  const recent = [...cases].sort((a,b)=>new Date(b.last_activity_at||b.created_at)-new Date(a.last_activity_at||a.created_at)).slice(0,8);
+  const el = document.getElementById('recent-list');
+  if (!recent.length) { el.innerHTML='<div class="q-empty" style="padding:30px"><div class="q-empty-icon">📭</div><div>No cases yet</div></div>'; return; }
+  el.innerHTML = recent.map(c=>miniCaseRow(c)).join('');
+}
+
+async function renderAlertsList() {
+  const cases = await E.getCases({});
+  const today = new Date(); today.setHours(23,59,59,999);
+  const alerts=[];
+  cases.filter(c=>c.sla_breach).forEach(c=>alerts.push({type:'sla',c}));
+  cases.filter(c=>c.escalation_level>0&&c.status==='ESCALATED').forEach(c=>alerts.push({type:'esc',c}));
+  cases.filter(c=>c.follow_up_date&&new Date(c.follow_up_date)<=today&&!['CLOSED','CANCELLED'].includes(c.status)).forEach(c=>alerts.push({type:'fu',c}));
+  const el = document.getElementById('alerts-list');
+  if (!alerts.length) { el.innerHTML='<div class="q-empty" style="padding:30px"><div style="font-size:32px">🎉</div><div style="color:var(--green);font-weight:600;font-size:13px;margin-top:6px">All clear — no active alerts!</div></div>'; return; }
+  const cfg = {sla:{icon:'⏰',color:'var(--red)',label:'SLA Breach'},esc:{icon:'🚨',color:'var(--orange)',label:'Escalated'},fu:{icon:'📅',color:'var(--yellow)',label:'Follow-up Due'}};
+  el.innerHTML = alerts.slice(0,10).map(a=>{
+    const k=cfg[a.type];
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid var(--border);cursor:pointer" onclick="openCase('${a.c.id}')">
+      <div style="font-size:18px">${k.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:${k.color}">${k.label}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text)">${esc(a.c.caller_name||'—')} — ${esc(a.c.issue_summary||'')}</div>
+        <div style="font-size:10.5px;color:var(--text3)">${a.c.case_number} · ${E.timeAgo(a.c.last_activity_at)}</div>
+      </div>
+      <div style="font-size:12px;color:${k.color};font-weight:700">${E.getAgeBadge(a.c).label}</div>
+    </div>`;
+  }).join('');
+}
+
+function miniCaseRow(c) {
+  const sc=E.STATUS_CONFIG[c.status]||{};
+  const ab=E.getAgeBadge(c);
+  return `<div style="display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseenter="this.style.background='var(--surface)'" onmouseleave="this.style.background=''" onclick="openCase('${c.id}')">
+    <div style="flex:1">
+      <div style="font-size:11px;font-weight:700;color:var(--gold)">${c.case_number}</div>
+      <div style="font-size:12.5px;font-weight:600;color:var(--text)">${esc(c.caller_name||'—')}</div>
+      <div style="font-size:10.5px;color:var(--text3)">${esc(c.issue_summary||c.issue_category||'—')}</div>
+    </div>
+    <div style="text-align:right">
+      <div class="s-pill" style="color:${sc.color};background:${sc.bg}">${sc.icon||''} ${sc.label||c.status}</div>
+      <div style="font-size:10px;color:${ab.color};font-weight:600;margin-top:4px">${ab.label}</div>
+    </div>
+  </div>`;
+}
+
+function buildCharts(stats) {
+  const COLS=['#C9A84C','#3b82f6','#10b981','#ef4444','#8b5cf6','#f97316','#06b6d4','#f59e0b','#ec4899'];
+  const mk=(id,data)=>{
+    const ctx=document.getElementById(id)?.getContext('2d'); if(!ctx)return;
+    if(_charts[id])_charts[id].destroy();
+    const labels=Object.keys(data), vals=Object.values(data);
+    _charts[id]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:COLS.slice(0,vals.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:10},padding:7,boxWidth:9}}}}});
+  };
+  mk('ch-status', stats.byStatus||{});
+  mk('ch-seg',    stats.bySegment||{});
+  mk('ch-pri',    stats.byPriority||{});
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CASE QUEUE
+══════════════════════════════════════════════════════════════════ */
+async function renderQ(force=false) {
+  const tbody = document.getElementById('q-tbody');
+  tbody.innerHTML='<tr><td colspan="9" class="q-empty"><div class="spinner"></div></td></tr>';
+  const u = E.currentUser();
+  const search = document.getElementById('qs-search')?.value||'';
+  const status = document.getElementById('qs-status')?.value||'';
+  const pri    = document.getElementById('qs-pri')?.value||'';
+  const seg    = document.getElementById('qs-seg')?.value||'';
+  const dept   = document.getElementById('qs-dept')?.value||'';
+
+  const apiFilters = {};
+  if (status)  apiFilters.status=status;
+  if (pri)     apiFilters.priority=pri;
+  if (seg)     apiFilters.segment=seg;
+  if (dept)    apiFilters.department=dept;
+  if (search)  apiFilters.search=search;
+  if (_qFilter.sla_breach) apiFilters.sla_breach=true;
+  if (_qFilter._esc)       apiFilters.escalated=true;
+  if (_qFilter._mine)      apiFilters.created_by=u.id;
+
+  let cases = await E.getCases(apiFilters);
+
+  if (_qFilter._fu) {
+    const today=new Date(); today.setHours(23,59,59,999);
+    cases=cases.filter(c=>c.follow_up_date&&new Date(c.follow_up_date)<=today&&!['CLOSED','CANCELLED'].includes(c.status));
+  }
+
+  cases.sort((a,b)=>{
+    if(a.sla_breach&&!b.sla_breach)return -1; if(!a.sla_breach&&b.sla_breach)return 1;
+    if(a.escalation_level>b.escalation_level)return -1; if(a.escalation_level<b.escalation_level)return 1;
+    const po={CRITICAL:0,URGENT:1,HIGH:2,NORMAL:3,LOW:4};
+    return (po[a.priority]||3)-(po[b.priority]||3);
+  });
+
+  if (!cases.length) {
+    tbody.innerHTML='<tr><td colspan="9"><div class="q-empty"><div class="q-empty-icon">📭</div><div class="q-empty-title">No cases found</div><div>Adjust filters or log a new call</div></div></td></tr>';
+    document.getElementById('q-pages').innerHTML=''; return;
+  }
+
+  const start=(_qPage-1)*_qPS;
+  const page=cases.slice(start,start+_qPS);
+  tbody.innerHTML=page.map(c=>qRow(c)).join('');
+  renderQPages(cases.length);
+}
+
+function qRow(c) {
+  const sc=E.STATUS_CONFIG[c.status]||{};
+  const pc=E.PRIORITY_CONFIG[c.priority]||{};
+  const ab=E.getAgeBadge(c);
+  const rc = c.sla_breach?'breach':c.escalation_level>0?'esc-row':'';
+  const oa = (c.current_owner_name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  return `<tr class="data-row ${rc}" onclick="openCase('${c.id}')">
+    <td>
+      <div class="case-id-cell">${c.case_number}</div>
+      ${c.escalation_level>0?`<div style="font-size:9px;color:var(--orange);font-weight:700;margin-top:1px">🚨 L${c.escalation_level} ESC</div>`:''}
+      ${c.sla_breach?`<div style="font-size:9px;color:var(--red);font-weight:700;margin-top:1px">⏰ SLA</div>`:''}
+    </td>
+    <td>
+      <div class="caller-name">${esc(c.caller_name||'—')}</div>
+      <div class="caller-sub">${c.caller_mobile?E.maskMobile(c.caller_mobile):''} ${c.org_name?'· '+esc(c.org_name):''}</div>
+      ${c.caller_type?`<div style="margin-top:3px"><span class="tag" style="font-size:9.5px">${c.caller_type}</span></div>`:''}
+    </td>
+    <td style="max-width:190px">
+      <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.issue_summary||'—')}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">${(c.issue_category||'').replace(/_/g,' ')}</div>
+    </td>
+    <td><div class="s-pill" style="color:${sc.color};background:${sc.bg}">${sc.icon||''} ${sc.label||c.status}</div></td>
+    <td>
+      <div style="display:flex;align-items:center;gap:5px">
+        <div class="p-dot" style="background:${pc.color}"></div>
+        <span style="font-size:12px;font-weight:600;color:${pc.color}">${pc.label||c.priority}</span>
+      </div>
+    </td>
+    <td>
+      <div class="owner-chip">
+        <div class="ow-av">${oa}</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">${esc(c.current_owner_name||'Unassigned')}</div>
+          <div style="font-size:10px;color:var(--text3)">${c.current_owner_dept||''}</div>
+        </div>
+      </div>
+    </td>
+    <td><div class="age-tag${ab.urgent?' urgent':''}" style="background:${ab.urgent?'rgba(239,68,68,.1)':'rgba(16,185,129,.07)'};color:${ab.color}"><i class="fas fa-clock" style="font-size:9px"></i> ${ab.label}</div></td>
+    <td style="font-size:11px;color:${c.sla_breach?'var(--red)':'var(--green)'}">${c.sla_breach?'⛔ Breached':'✅ OK'}<br><span style="color:var(--text3);font-size:10px">SLA:${c.sla_hours||24}h</span></td>
+    <td style="font-size:11px;color:var(--text3)">${E.timeAgo(c.last_activity_at)}</td>
+  </tr>`;
+}
+
+function renderQPages(total) {
+  const el=document.getElementById('q-pages');
+  const tp=Math.ceil(total/_qPS);
+  if (tp<=1) { el.innerHTML=`<span style="font-size:12px;color:var(--text3)">${total} case${total!==1?'s':''}</span>`; return; }
+  el.innerHTML=`<span style="font-size:12px;color:var(--text3);flex:1">${total} cases · Page ${_qPage}/${tp}</span>
+    <button class="tb-btn ghost" onclick="qPage(${_qPage-1})" ${_qPage===1?'disabled':''}>← Prev</button>
+    ${Array.from({length:Math.min(tp,7)},(_,i)=>i+1).map(p=>`<button class="tb-btn ${p===_qPage?'primary':'ghost'}" onclick="qPage(${p})">${p}</button>`).join('')}
+    <button class="tb-btn ghost" onclick="qPage(${_qPage+1})" ${_qPage===tp?'disabled':''}>Next →</button>`;
+}
+function qPage(p){_qPage=p;renderQ();}
+function qDebounce(){clearTimeout(_qTimer);_qTimer=setTimeout(renderQ,350);}
+
+/* ══════════════════════════════════════════════════════════════════
+   CALL CAPTURE FORM
+══════════════════════════════════════════════════════════════════ */
+function buildCaptureForm() {
+  _capData={}; _selBkg=null;
+  document.getElementById('cap-form').innerHTML = capFormHTML();
+  selectPri('NORMAL');
+}
+
+function capFormHTML() {
+  return `
+  <div class="cap-header">
+    <div class="cap-hdr-icon">📞</div>
+    <div><div class="cap-hdr-title">New Call Capture</div><div class="cap-hdr-sub">Record this live call systematically — fill as much as possible while speaking</div></div>
+  </div>
+  <div class="cap-body">
+
+    <!-- STEP 1 -->
+    <div class="cap-sec">
+      <div class="cap-sec-title"><i class="fas fa-users"></i> Step 1 — Caller Classification</div>
+      <div class="f-grid mt8">
+        <div class="f-field">
+          <label class="f-label">Call Received At<span class="req"> *</span></label>
+          <input type="datetime-local" class="f-inp" id="cf-dt" value="${new Date().toISOString().slice(0,16)}"/>
+        </div>
+        <div class="f-field">
+          <label class="f-label">Duration (mins)</label>
+          <input type="number" class="f-inp" id="cf-dur" min="1" max="120" placeholder="e.g. 8"/>
+        </div>
+      </div>
+      <div class="f-field mt12">
+        <label class="f-label">Caller Type<span class="req"> *</span></label>
+        <div class="ct-grid mt8">
+          ${E.CALLER_TYPES.map(t=>`<div class="ct-card" id="ct-${t.id}" onclick="selCallerType('${t.id}')"><div class="ct-card-icon">${t.label.split(' ')[0]}</div><div class="ct-card-lbl">${t.label.replace(/^\S+\s*/,'')}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2A: INDIVIDUAL -->
+    <div class="cap-sec" id="s-ind" style="display:none">
+      <div class="cap-sec-title"><i class="fas fa-user"></i> Step 2A — Individual Customer</div>
+      <div class="f-grid">
+        <div class="f-field"><label class="f-label">Full Name<span class="req"> *</span></label><input type="text" class="f-inp" id="cf-name" placeholder="Rajesh Kumar"/></div>
+        <div class="f-field"><label class="f-label">Mobile Number<span class="req"> *</span></label><input type="tel" class="f-inp" id="cf-mob" maxlength="10" placeholder="10-digit mobile" oninput="onMobInput(this)"/><div class="f-hint">Auto-searches linked bookings</div></div>
+        <div class="f-field"><label class="f-label">Alternate Mobile</label><input type="tel" class="f-inp" id="cf-altmob" maxlength="10" placeholder="Optional"/></div>
+        <div class="f-field"><label class="f-label">Email</label><input type="email" class="f-inp" id="cf-email" placeholder="Optional"/></div>
+      </div>
+      <div class="f-field mt12">
+        <label class="f-label">Booking Lookup</label>
+        <div class="bkl-wrap">
+          <div style="font-size:11.5px;color:var(--text3);margin-bottom:8px">Mobile lookup triggers automatically above. Or search by Booking ID:</div>
+          <div class="bkl-row"><input class="bkl-inp" type="text" id="cf-bkg-search" placeholder="WOW-BKG-2026-001247"/><button class="bkl-btn" onclick="lookupById()"><i class="fas fa-search"></i> Find</button></div>
+          <div class="bkl-results" id="bkl-res"></div>
+        </div>
+        <div id="sel-bkg-card" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- STEP 2B: BUSINESS -->
+    <div class="cap-sec" id="s-biz" style="display:none">
+      <div class="cap-sec-title"><i class="fas fa-building"></i> Step 2B — Business / Organisation</div>
+      <div class="f-grid">
+        <div class="f-field"><label class="f-label">Contact Person Name<span class="req"> *</span></label><input type="text" class="f-inp" id="cf-bname" placeholder="Full name"/></div>
+        <div class="f-field"><label class="f-label">Designation</label><input type="text" class="f-inp" id="cf-bdes" placeholder="HR Manager, Principal…"/></div>
+        <div class="f-field"><label class="f-label">Organisation Name<span class="req"> *</span></label><input type="text" class="f-inp" id="cf-org" placeholder="Company / School / NGO name"/></div>
+        <div class="f-field"><label class="f-label">Mobile<span class="req"> *</span></label><input type="tel" class="f-inp" id="cf-bmob" maxlength="10" placeholder="10-digit"/></div>
+        <div class="f-field"><label class="f-label">Email</label><input type="email" class="f-inp" id="cf-bemail" placeholder="Official email"/></div>
+      </div>
+    </div>
+
+    <!-- STEP 2C: EVENT -->
+    <div class="cap-sec" id="s-evt" style="display:none">
+      <div class="cap-sec-title"><i class="fas fa-calendar-star"></i> Step 2C — Event Organiser</div>
+      <div class="f-grid">
+        <div class="f-field"><label class="f-label">Organiser Name<span class="req"> *</span></label><input type="text" class="f-inp" id="cf-ename" placeholder="Name of caller"/></div>
+        <div class="f-field"><label class="f-label">Mobile<span class="req"> *</span></label><input type="tel" class="f-inp" id="cf-emob" maxlength="10" placeholder="10-digit"/></div>
+        <div class="f-field"><label class="f-label">Email</label><input type="email" class="f-inp" id="cf-eemail" placeholder="Optional"/></div>
+      </div>
+    </div>
+
+    <!-- STEP 3: GROUP REQUIREMENTS -->
+    <div class="cap-sec" id="s-grp" style="display:none">
+      <div class="cap-sec-title"><i class="fas fa-users-cog"></i> Step 3 — Group &amp; Event Requirements</div>
+      <div class="f-grid">
+        <div class="f-field"><label class="f-label">Event / Visit Date</label><input type="date" class="f-inp" id="cf-evdate"/><div class="f-hint">Or use flexible range →</div></div>
+        <div class="f-field">
+          <label class="f-label">Flexible Date Range</label>
+          <div style="display:flex;gap:6px;align-items:center"><input type="date" class="f-inp" id="cf-dfrom" style="flex:1"/><span style="color:var(--text3);font-size:11px;flex-shrink:0">to</span><input type="date" class="f-inp" id="cf-dto" style="flex:1"/></div>
+        </div>
+        <div class="f-field"><label class="f-label">Group Size Min</label><input type="number" class="f-inp" id="cf-gmin" min="1" placeholder="e.g. 200"/></div>
+        <div class="f-field"><label class="f-label">Group Size Max</label><input type="number" class="f-inp" id="cf-gmax" min="1" placeholder="e.g. 300"/></div>
+      </div>
+      <div class="f-field mt12"><label class="f-label">Park / Venue Preference</label>
+        <select class="f-sel" id="cf-ppref"><option value="">Not specified</option><option value="Both">Both Parks (Combo)</option><option value="Water Park">Water Park Only</option><option value="Amusement Park">Amusement Park Only</option><option value="Lawn Only">Lawn / Venue Only</option></select>
+      </div>
+      <div class="f-field mt12"><label class="f-label">Package Requirements</label>
+        <div class="pkg-grid mt8">${E.PACKAGES.map(p=>`<div class="pkg-item" id="pk-${p.id}" onclick="togglePkg('${p.id}',this)"><span>${p.label}</span></div>`).join('')}</div>
+      </div>
+      <div class="f-grid mt12">
+        <div class="f-field"><label class="f-label">Food / Catering?</label><select class="f-sel" id="cf-food"><option value="">Not mentioned</option><option value="yes">Yes — required</option><option value="no">No</option></select></div>
+        <div class="f-field"><label class="f-label">Venue / Lawn Rental?</label><select class="f-sel" id="cf-venue"><option value="">Not mentioned</option><option value="yes">Yes — required</option><option value="no">No</option></select></div>
+      </div>
+      <div class="f-field mt12"><label class="f-label">Special Arrangements</label><textarea class="f-ta" id="cf-special" placeholder="Decoration, stage, AV, timing requirements, VIP access…"></textarea></div>
+    </div>
+
+    <!-- STEP 4: ISSUE CLASSIFICATION -->
+    <div class="cap-sec">
+      <div class="cap-sec-title"><i class="fas fa-tag"></i> Step 4 — Issue Classification</div>
+      <div class="f-field"><label class="f-label">Issue Category<span class="req"> *</span></label>
+        <div class="ic-grid mt8">${E.ISSUE_CATEGORIES.map(c=>`<div class="ic-item" id="ic-${c.id}" onclick="selIssue('${c.id}')">${c.label}</div>`).join('')}</div>
+      </div>
+      <div class="f-grid mt12">
+        <div class="f-field"><label class="f-label">Specific Sub-type</label><input type="text" class="f-inp" id="cf-sub" placeholder="Wrong date booked, duplicate payment…"/></div>
+        <div class="f-field"><label class="f-label">One-Line Summary<span class="req"> *</span></label><input type="text" class="f-inp" id="cf-sum" placeholder="Brief description of what customer wants"/></div>
+      </div>
+      <div class="f-field mt12"><label class="f-label">Detailed Call Notes<span class="req"> *</span></label><textarea class="f-ta" id="cf-notes" placeholder="Full notes from the call — what the customer said, what you promised, next steps…" style="min-height:96px"></textarea></div>
+      <div class="f-field mt12"><label class="f-label">Internal Note (team only)</label><textarea class="f-ta" id="cf-int" placeholder="Internal context, flags, observations not visible to customer…"></textarea></div>
+    </div>
+
+    <!-- STEP 5: PRIORITY, ASSIGNMENT, FOLLOW-UP -->
+    <div class="cap-sec">
+      <div class="cap-sec-title"><i class="fas fa-sliders-h"></i> Step 5 — Priority, Assignment &amp; Follow-up</div>
+      <div class="f-field"><label class="f-label">Priority<span class="req"> *</span></label>
+        <div class="pri-row mt8">${Object.entries(E.PRIORITY_CONFIG).map(([k,v])=>`<div class="pri-btn" id="pb-${k}" onclick="selectPri('${k}')">${v.icon} ${v.label}</div>`).join('')}</div>
+      </div>
+      <div class="f-grid mt16">
+        <div class="f-field"><label class="f-label">Assign To</label><select class="f-sel" id="cf-assign"><option value="">— Self / Unassigned —</option></select><div class="f-hint" id="cf-assign-hint">Suggested assignees load after issue category selection</div></div>
+        <div class="f-field"><label class="f-label">Follow-up Date</label><input type="datetime-local" class="f-inp" id="cf-fudate"/></div>
+      </div>
+      <div class="f-field mt12"><label class="f-label">Follow-up Notes</label><input type="text" class="f-inp" id="cf-funotes" placeholder="e.g. Call back to confirm rescheduling decision"/></div>
+      <div class="f-field mt12"><label class="f-label">Lead Stage (for business inquiries)</label>
+        <select class="f-sel" id="cf-lead"><option value="">— Not a lead —</option><option value="NEW_INQUIRY">New Inquiry</option><option value="QUALIFIED">Qualified</option><option value="PROPOSAL_PENDING">Proposal Pending</option><option value="FOLLOW_UP">Follow-up</option><option value="CONFIRMED">Confirmed</option><option value="LOST">Lost</option></select>
+      </div>
+    </div>
+  </div>
+  <div class="cap-footer">
+    <div class="cap-footer-note"><i class="fas fa-info-circle"></i> Fields marked <span style="color:var(--red);font-weight:700">*</span> are required</div>
+    <div class="cap-actions">
+      <button class="cap-draft" onclick="E.toast('Draft saved','info')">💾 Save Draft</button>
+      <button class="cap-submit" id="cap-submit" onclick="submitCapture()"><i class="fas fa-paper-plane"></i> Record &amp; Route Case</button>
+    </div>
+  </div>`;
+}
+
+/* ─── Form interactions ─── */
+function selCallerType(id) {
+  _capData.caller_type=id;
+  document.querySelectorAll('.ct-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('ct-'+id)?.classList.add('sel');
+  const t=E.CALLER_TYPES.find(x=>x.id===id);
+  if (!t) return;
+  document.getElementById('s-ind').style.display = t.form==='individual'?'':'none';
+  document.getElementById('s-biz').style.display = t.form==='business'?'':'none';
+  document.getElementById('s-evt').style.display = t.form==='event'?'':'none';
+  const grp=['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','BULK','EVENT','VENUE','TRAVEL_AGENT'].includes(id);
+  document.getElementById('s-grp').style.display = grp?'':'none';
+  const catMap={INDIVIDUAL:'BOOKING_SUPPORT',CORPORATE:'CORPORATE_LEAD',SCHOOL:'SCHOOL_INQUIRY',COLLEGE:'SCHOOL_INQUIRY',INSTITUTION:'EVENT_INQUIRY',BIRTHDAY:'BIRTHDAY_INQUIRY',TRAVEL_AGENT:'TRAVEL_AGENT_INQUIRY',BULK:'BULK_TICKET',EVENT:'EVENT_INQUIRY',VENUE:'VENUE_RENTAL'};
+  if (catMap[id]) selIssue(catMap[id]);
+}
+
+function selIssue(id) {
+  _capData.issue_category=id;
+  document.querySelectorAll('.ic-item').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('ic-'+id)?.classList.add('sel');
+  fillAssignDropdown(id);
+}
+
+async function fillAssignDropdown(catId) {
+  const sel=document.getElementById('cf-assign'); if(!sel) return;
+  sel.innerHTML='<option value="">— Self / Unassigned —</option>';
+  const users=await E.getAssignableUsers(catId);
+  const me=E.currentUser();
+  const byDept={};
+  users.filter(u=>u.id!==me.id).forEach(u=>{ if(!byDept[u.department])byDept[u.department]=[]; byDept[u.department].push(u); });
+  Object.entries(byDept).forEach(([dept,ul])=>{
+    const og=document.createElement('optgroup'); og.label=dept.replace(/_/g,' ');
+    ul.forEach(u=>{ const o=document.createElement('option'); o.value=JSON.stringify({id:u.id,name:u.name,dept:u.department}); o.textContent=`${u.name} (${(E.ROLE_HIERARCHY[u.role]?.label||u.role)})`; og.appendChild(o); });
+    sel.appendChild(og);
+  });
+  const hint=document.getElementById('cf-assign-hint');
+  if(hint) hint.textContent=`${users.length} suggested assignees for "${catId.replace(/_/g,' ')}"`;
+}
+
+function selectPri(p) {
+  _capData.priority=p;
+  document.querySelectorAll('.pri-btn').forEach(b=>{ const k=b.id.replace('pb-',''); b.className='pri-btn'+(_capData.priority===k?' sel-'+k:''); });
+}
+
+function togglePkg(id, el) {
+  el.classList.toggle('sel');
+  if (!_capData.pkgs) _capData.pkgs=[];
+  const i=_capData.pkgs.indexOf(id);
+  if(i>=0) _capData.pkgs.splice(i,1); else _capData.pkgs.push(id);
+}
+
+/* Booking lookup */
+function onMobInput(el) {
+  const v=el.value.replace(/\D/g,''); el.value=v;
+  clearTimeout(_mobileLookupTimer);
+  if(v.length===10) _mobileLookupTimer=setTimeout(()=>doMobileLookup(v),650);
+}
+
+async function doMobileLookup(mob) {
+  const res=document.getElementById('bkl-res'); if(!res) return;
+  res.innerHTML='<div class="bkl-loading"><div class="spinner"></div> Searching bookings…</div>';
+  const bkgs=await E.lookupBookingsByMobile(mob);
+  if(bkgs.length && !document.getElementById('cf-name')?.value) {
+    const el=document.getElementById('cf-name'); if(el) el.value=bkgs[0].customer_name||'';
+    const em=document.getElementById('cf-email'); if(em) em.value=bkgs[0].customer_email||'';
+  }
+  renderBklResults(res, bkgs);
+}
+
+async function lookupById() {
+  const v=document.getElementById('cf-bkg-search')?.value?.trim(); if(!v) return;
+  const res=document.getElementById('bkl-res');
+  res.innerHTML='<div class="bkl-loading"><div class="spinner"></div> Searching…</div>';
+  const b=await E.lookupBookingById(v);
+  renderBklResults(res, b?[b]:[]);
+}
+
+function renderBklResults(el, list) {
+  if(!list.length){el.innerHTML='<div class="bkl-none">No bookings found.</div>';return;}
+  el.innerHTML=list.map(b=>`
+    <div class="bkl-item" id="bi-${b.booking_id}" onclick='selBkg(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
+      <div style="flex:1">
+        <div class="bkl-bid">${b.booking_id}</div>
+        <div class="bkl-name">${b.customer_name||'—'}</div>
+        <div class="bkl-meta">Visit: ${b.visit_date||'—'} · ${(b.ticket_type||'').replace(/_/g,' ')} · ${b.ticket_count||0} tickets · ₹${(b.total_amount||0).toLocaleString('en-IN')}</div>
+      </div>
+      <span class="pay-pill pay-${b.payment_status||'PAID'}">${b.payment_status||'—'}</span>
+    </div>`).join('');
+}
+
+function selBkg(b) {
+  _selBkg=b;
+  document.querySelectorAll('.bkl-item').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('bi-'+b.booking_id)?.classList.add('sel');
+  const card=document.getElementById('sel-bkg-card'); if(!card) return;
+  card.style.display='';
+  card.innerHTML=`<div class="sel-bkg-card">
+    <div class="sel-bkg-hdr"><i class="fas fa-ticket-alt"></i> Selected Booking</div>
+    <div class="bkg-fields">
+      <div><div class="bkg-f-label">Booking ID</div><div class="bkg-f-val" style="color:var(--gold)">${b.booking_id}</div></div>
+      <div><div class="bkg-f-label">Customer</div><div class="bkg-f-val">${b.customer_name}</div></div>
+      <div><div class="bkg-f-label">Visit Date</div><div class="bkg-f-val">${b.visit_date}</div></div>
+      <div><div class="bkg-f-label">Type</div><div class="bkg-f-val">${(b.ticket_type||'').replace(/_/g,' ')}</div></div>
+      <div><div class="bkg-f-label">Tickets</div><div class="bkg-f-val">${b.ticket_count}</div></div>
+      <div><div class="bkg-f-label">Amount</div><div class="bkg-f-val">₹${(b.total_amount||0).toLocaleString('en-IN')}</div></div>
+      <div><div class="bkg-f-label">Payment</div><div class="bkg-f-val">${b.payment_status}</div></div>
+      <div><div class="bkg-f-label">Status</div><div class="bkg-f-val">${b.booking_status}</div></div>
+    </div>
+    <button onclick="_selBkg=null;document.getElementById('sel-bkg-card').style.display='none'" style="margin-top:9px;background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">✕ Deselect</button>
+  </div>`;
+  E.toast('Booking linked: '+b.booking_id,'success');
+}
+
+/* Submit */
+async function submitCapture() {
+  const btn=document.getElementById('cap-submit');
+  btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Recording…';
+  try {
+    const ct=_capData.caller_type;
+    if(!ct){E.toast('Select a caller type','error');return;}
+    const ic=_capData.issue_category;
+    if(!ic){E.toast('Select an issue category','error');return;}
+    const sum=(document.getElementById('cf-sum')?.value||'').trim();
+    const notes=(document.getElementById('cf-notes')?.value||'').trim();
+    if(!sum||!notes){E.toast('Enter issue summary and call notes','error');return;}
+
+    const t=E.CALLER_TYPES.find(x=>x.id===ct);
+    let callerName,mob,email,orgName,des;
+    if(t?.form==='individual'){
+      callerName=document.getElementById('cf-name')?.value||'';
+      mob=(document.getElementById('cf-mob')?.value||'').replace(/\D/g,'');
+      email=document.getElementById('cf-email')?.value||'';
+      if(!mob||mob.length!==10){E.toast('Enter valid 10-digit mobile','error');return;}
+    } else if(t?.form==='business'){
+      callerName=document.getElementById('cf-bname')?.value||'';
+      mob=(document.getElementById('cf-bmob')?.value||'').replace(/\D/g,'');
+      email=document.getElementById('cf-bemail')?.value||'';
+      orgName=document.getElementById('cf-org')?.value||'';
+      des=document.getElementById('cf-bdes')?.value||'';
+    } else if(t?.form==='event'){
+      callerName=document.getElementById('cf-ename')?.value||'';
+      mob=(document.getElementById('cf-emob')?.value||'').replace(/\D/g,'');
+      email=document.getElementById('cf-eemail')?.value||'';
+    }
+    if(!callerName){E.toast('Enter caller name','error');return;}
+
+    let aId,aName,aDept;
+    const av=document.getElementById('cf-assign')?.value;
+    if(av){try{const a=JSON.parse(av);aId=a.id;aName=a.name;aDept=a.dept;}catch(e){}}
+    if(!aId){const me=E.currentUser();aId=me.id;aName=me.name;aDept=me.department;}
+
+    const isGrp=['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','BULK','EVENT','VENUE','TRAVEL_AGENT'].includes(ct);
+    const catCfg=E.ISSUE_CATEGORIES.find(c=>c.id===ic);
+
+    const caseData={
+      caller_type:ct, caller_name:callerName, caller_mobile:mob||'',
+      caller_alt_mobile:document.getElementById('cf-altmob')?.value||'',
+      caller_email:email||'', org_name:orgName||'', contact_designation:des||'',
+      linked_booking_id:_selBkg?.booking_id||'',
+      call_date:document.getElementById('cf-dt')?.value||new Date().toISOString(),
+      call_duration_mins:parseInt(document.getElementById('cf-dur')?.value)||0,
+      issue_category:ic, issue_sub_type:document.getElementById('cf-sub')?.value||'',
+      issue_summary:sum, call_notes:notes,
+      internal_notes:document.getElementById('cf-int')?.value||'',
+      priority:_capData.priority||'NORMAL',
+      current_owner_id:aId, current_owner_name:aName, current_owner_dept:aDept,
+      department:aDept||catCfg?.dept||'CALL_CENTER', segment:catCfg?.segment||'GENERAL',
+      follow_up_date:document.getElementById('cf-fudate')?.value||'',
+      follow_up_notes:document.getElementById('cf-funotes')?.value||'',
+      lead_stage:document.getElementById('cf-lead')?.value||'',
+    };
+    if(isGrp){
+      caseData.event_date=document.getElementById('cf-evdate')?.value||'';
+      caseData.event_date_flexible_from=document.getElementById('cf-dfrom')?.value||'';
+      caseData.event_date_flexible_to=document.getElementById('cf-dto')?.value||'';
+      caseData.group_size_min=parseInt(document.getElementById('cf-gmin')?.value)||0;
+      caseData.group_size_max=parseInt(document.getElementById('cf-gmax')?.value)||0;
+      caseData.package_requirements=_capData.pkgs||[];
+      caseData.park_preference=document.getElementById('cf-ppref')?.value||'';
+      caseData.food_required=document.getElementById('cf-food')?.value==='yes';
+      caseData.venue_rental_required=document.getElementById('cf-venue')?.value==='yes';
+      caseData.special_arrangements=document.getElementById('cf-special')?.value||'';
+    }
+    const saved=await E.createCase(caseData);
+    E.toast(`✅ Case ${saved.id} recorded & routed to ${aName}`,'success');
+    setTimeout(()=>openCase(saved.id),750);
+  } catch(err){
+    console.error(err);
+    E.toast('Error: '+err.message,'error');
+  } finally {
+    btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane"></i> Record &amp; Route Case';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CASE DETAIL
+══════════════════════════════════════════════════════════════════ */
+async function openCase(id) {
+  _curCaseId=id;
+  nav('case');
+  document.getElementById('tb-title').textContent='Case Detail';
+  document.getElementById('tb-sub').textContent=id;
+  const layout=document.getElementById('detail-layout');
+  layout.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:200px;grid-column:1/-1"><div class="spinner"></div></div>';
+  const [c,tl]=await Promise.all([E.getCaseById(id),E.getCaseTimeline(id)]);
+  if(!c){layout.innerHTML='<div style="padding:40px;text-align:center;color:var(--text3)">Case not found.</div>';return;}
+  layout.innerHTML=detailHTML(c,tl);
+  await populateSidePanelDropdowns(c);
+}
+
+function detailHTML(c,tl) {
+  const sc=E.STATUS_CONFIG[c.status]||{};
+  const pc=E.PRIORITY_CONFIG[c.priority]||{};
+  return `
+  <div class="detail-main">
+    <div class="detail-header">
+      <div class="detail-id-row">
+        <div class="back-btn" onclick="nav('queue')"><i class="fas fa-arrow-left"></i> Back</div>
+        <div class="case-big-id">${c.case_number}</div>
+        <div class="s-pill" style="color:${sc.color};background:${sc.bg};font-size:12.5px;padding:5px 12px">${sc.icon||''} ${sc.label||c.status}</div>
+        ${c.escalation_level>0?`<span class="tag orange">🚨 Esc L${c.escalation_level}</span>`:''}
+        ${c.sla_breach?`<span class="tag red">⏰ SLA Breached</span>`:''}
+        <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><div class="p-dot" style="background:${pc.color};width:9px;height:9px;border-radius:50%"></div><span style="font-size:12px;font-weight:700;color:${pc.color}">${pc.icon} ${pc.label}</span></div>
+      </div>
+      <div class="case-summary-title">${esc(c.issue_summary||'—')}</div>
+      <div class="meta-grid">
+        ${metaItem('Caller',c.caller_name||'—')}
+        ${metaItem('Mobile',c.caller_mobile||'—')}
+        ${metaItem('Type',c.caller_type||'—')}
+        ${metaItem('Called',E.formatDate(c.call_date,true))}
+        ${metaItem('Created By',c.created_by_name||'—')}
+        ${metaItem('Owner',c.current_owner_name||'—',true)}
+        ${metaItem('Department',c.department||'—')}
+        ${metaItem('Issue Category',(c.issue_category||'—').replace(/_/g,' '))}
+        ${c.org_name?metaItem('Organisation',c.org_name):''}
+        ${c.linked_booking_id?metaItem('Booking ID',c.linked_booking_id,true):''}
+        ${c.caller_email?metaItem('Email',c.caller_email):''}
+        ${c.follow_up_date?metaItem('Follow-up',E.formatDate(c.follow_up_date,true),true):''}
+      </div>
+    </div>
+
+    ${grpDetailCard(c)}
+
+    <div style="background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:9px">📋 Call Notes</div>
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${esc(c.call_notes||'No notes recorded.')}</div>
+    </div>
+
+    ${c.resolution_notes?`<div style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:14px;margin-bottom:14px"><div style="font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:8px">✅ Resolution</div><div style="font-size:12.5px;color:var(--text2);line-height:1.6">${esc(c.resolution_notes)}</div>${c.closed_at?`<div style="font-size:10.5px;color:var(--text3);margin-top:7px">Closed ${E.formatDate(c.closed_at,true)}</div>`:''}</div>`:''}
+
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:13px;display:flex;align-items:center;gap:7px"><i class="fas fa-history" style="color:var(--gold)"></i> Case Timeline</div>
+      <div class="tl-list" id="tl-list">${tlHTML(tl)}</div>
+      <div class="note-section">
+        <div style="font-size:12px;font-weight:700;color:var(--text2)">Add Note / Update</div>
+        <textarea class="note-input" id="note-inp" placeholder="Add a note, update, or comment…"></textarea>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3);cursor:pointer"><input type="checkbox" id="note-internal" style="accent-color:var(--purple)"/> Internal only</label>
+          <button class="tb-btn primary" style="margin-left:auto" onclick="addNote()"><i class="fas fa-comment-alt"></i> Add Note</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-side">
+    <div class="csp">
+      <div class="csp-title">🔄 Change Status</div>
+      <div id="status-acts">${statusActsHTML(c)}</div>
+    </div>
+    <div class="csp">
+      <div class="csp-title">👤 Reassign</div>
+      <select class="side-sel" id="re-sel"></select>
+      <textarea class="side-ta" id="re-note" placeholder="Reason for reassignment…"></textarea>
+      <button class="act-btn ghost" onclick="doReassign()"><i class="fas fa-user-plus"></i> Reassign Case</button>
+    </div>
+    <div class="csp">
+      <div class="csp-title">🚨 Escalate</div>
+      <select class="side-sel" id="esc-sel"></select>
+      <textarea class="side-ta" id="esc-reason" placeholder="Escalation reason…"></textarea>
+      <button class="act-btn esc" onclick="doEscalate()"><i class="fas fa-level-up-alt"></i> Escalate</button>
+    </div>
+    <div class="csp">
+      <div class="csp-title">📅 Follow-up</div>
+      <input type="datetime-local" class="side-sel" id="fu-date" value="${c.follow_up_date?c.follow_up_date.slice(0,16):''}"/>
+      <textarea class="side-ta" id="fu-note" placeholder="Follow-up notes…">${c.follow_up_notes||''}</textarea>
+      <button class="act-btn ghost" onclick="saveFU()"><i class="fas fa-calendar-plus"></i> Save Follow-up</button>
+    </div>
+    ${c.lead_stage?`<div class="csp"><div class="csp-title">💼 Lead Stage</div><select class="side-sel" id="lead-stage-sel" onchange="updateLead(this.value)">
+      ${['NEW_INQUIRY','QUALIFIED','PROPOSAL_PENDING','FOLLOW_UP','CONFIRMED','LOST','CONVERTED'].map(s=>`<option value="${s}"${c.lead_stage===s?' selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+    </select></div>`:''}
+    <div class="csp">
+      <div class="csp-title">ℹ️ Case Info</div>
+      <div class="info-row"><span class="info-row-lbl">SLA</span><span class="info-row-val" style="color:${c.sla_breach?'var(--red)':'var(--green)'}">${c.sla_breach?'Breached':'On Track'} (${c.sla_hours||24}h)</span></div>
+      <div class="info-row"><span class="info-row-lbl">Age</span><span class="info-row-val">${E.getAgeBadge(c).label}</span></div>
+      <div class="info-row"><span class="info-row-lbl">Reopened</span><span class="info-row-val">${c.reopen_count||0}×</span></div>
+      <div class="info-row"><span class="info-row-lbl">Last Update</span><span class="info-row-val">${E.timeAgo(c.last_activity_at)}</span></div>
+      <div class="info-row"><span class="info-row-lbl">Segment</span><span class="info-row-val">${c.segment||'—'}</span></div>
+    </div>
+  </div>`;
+}
+
+function metaItem(lbl,val,gold=false){
+  return `<div class="meta-item"><div class="meta-lbl">${lbl}</div><div class="meta-val${gold?' gold':''}">${esc(val)}</div></div>`;
+}
+
+function grpDetailCard(c) {
+  const grp=['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','BULK','EVENT','VENUE','TRAVEL_AGENT'].includes(c.caller_type);
+  if (!grp) return '';
+  return `<div class="grp-det-card">
+    <div class="grp-det-title">👥 Group / Event Details</div>
+    <div class="grp-meta-grid">
+      ${c.event_date?metaItem('Event Date',E.formatDate(c.event_date)):''}
+      ${c.event_date_flexible_from?metaItem('Date Range',c.event_date_flexible_from+' → '+(c.event_date_flexible_to||'?')):''}
+      ${c.group_size_min?metaItem('Group Size',c.group_size_min+(c.group_size_max?' – '+c.group_size_max:'')+' pax'):''}
+      ${c.park_preference?metaItem('Park Pref',c.park_preference):''}
+      ${c.food_required!==undefined?metaItem('Food',c.food_required?'Required':'No'):''}
+      ${c.venue_rental_required!==undefined?metaItem('Venue',c.venue_rental_required?'Required':'No'):''}
+    </div>
+    ${c.package_requirements?.length?`<div style="margin-top:10px"><div style="font-size:10px;color:var(--text3);font-weight:700;margin-bottom:6px">PACKAGES REQUESTED</div><div style="display:flex;flex-wrap:wrap;gap:5px">${c.package_requirements.map(p=>{const pk=E.PACKAGES.find(x=>x.id===p);return `<span class="tag gold">${pk?.label||p}</span>`;}).join('')}</div></div>`:''}
+    ${c.lead_stage?`<div style="margin-top:10px;font-size:11.5px;color:var(--text3)">Lead Stage: <strong style="color:var(--gold)">${c.lead_stage.replace(/_/g,' ')}</strong></div>`:''}
+  </div>`;
+}
+
+function statusActsHTML(c) {
+  const allowed=E.getAllowedTransitions(c.status);
+  if (!allowed.length) return '<div style="font-size:12px;color:var(--text3)">No transitions available</div>';
+  const cfg={IN_PROGRESS:{cls:'ghost',icon:'🔄',lbl:'In Progress'},RESOLVED:{cls:'ok',icon:'✅',lbl:'Resolve'},CLOSED:{cls:'ok',icon:'🔒',lbl:'Close'},ESCALATED:{cls:'esc',icon:'🚨',lbl:'Escalate'},AWAITING_INTERNAL:{cls:'warn',icon:'🏢',lbl:'Awaiting Internal'},AWAITING_CUSTOMER:{cls:'warn',icon:'📞',lbl:'Awaiting Customer'},REOPENED:{cls:'danger',icon:'🔓',lbl:'Reopen'},CANCELLED:{cls:'danger',icon:'❌',lbl:'Cancel'},ASSIGNED:{cls:'ghost',icon:'👤',lbl:'Mark Assigned'}};
+  return allowed.map(s=>{const k=cfg[s]||{cls:'ghost',icon:'',lbl:s};return `<button class="act-btn ${k.cls}" onclick="chStatus('${s}')">${k.icon} ${k.lbl}</button>`;}).join('');
+}
+
+function tlHTML(tl) {
+  if(!tl.length) return '<div style="font-size:12px;color:var(--text3);padding:12px">No timeline entries yet.</div>';
+  const imap={CASE_CREATED:{i:'📋',bg:'rgba(201,168,76,.15)',c:'var(--gold)'},BOOKING_LINKED:{i:'🎟',bg:'rgba(59,130,246,.15)',c:'var(--blue)'},ASSIGNED:{i:'👤',bg:'rgba(139,92,246,.15)',c:'var(--purple)'},REASSIGNED:{i:'🔀',bg:'rgba(139,92,246,.15)',c:'var(--purple)'},STATUS_CHANGED:{i:'🔄',bg:'rgba(16,185,129,.15)',c:'var(--green)'},NOTE_ADDED:{i:'💬',bg:'rgba(100,116,139,.15)',c:'var(--text3)'},INTERNAL_NOTE:{i:'🔒',bg:'rgba(139,92,246,.15)',c:'var(--purple)'},ESCALATED:{i:'🚨',bg:'rgba(249,115,22,.15)',c:'var(--orange)'},SLA_BREACH:{i:'⏰',bg:'rgba(239,68,68,.15)',c:'var(--red)'},RESOLVED:{i:'✅',bg:'rgba(16,185,129,.2)',c:'var(--green)'},CLOSED:{i:'🔒',bg:'rgba(16,185,129,.2)',c:'var(--green)'},REOPENED:{i:'🔓',bg:'rgba(239,68,68,.15)',c:'var(--red)'},FOLLOW_UP_SET:{i:'📅',bg:'rgba(245,158,11,.15)',c:'var(--yellow)'},CUSTOMER_CALLED:{i:'📞',bg:'rgba(6,182,212,.15)',c:'var(--cyan)'},PRIORITY_CHANGED:{i:'⚡',bg:'rgba(245,158,11,.15)',c:'var(--yellow)'}};
+  return tl.map(t=>{
+    const cfg=imap[t.event_type]||{i:'📌',bg:'rgba(100,116,139,.1)',c:'var(--text3)'};
+    return `<div class="tl-item">
+      <div class="tl-ic" style="background:${cfg.bg}">${cfg.i}</div>
+      <div class="tl-body">
+        <div class="tl-event">${esc(t.event_description||t.event_type)}</div>
+        <div class="tl-meta">
+          <span style="color:${cfg.c};font-weight:600">${esc(t.performed_by_name||'System')}</span>
+          <span>·</span><span>${esc(t.performed_by_role||'')}</span>
+          <span>·</span><span>${E.formatDate(t.event_at,true)}</span>
+        </div>
+        ${t.note_content?`<div class="tl-note-box ${t.is_internal?'internal':''}">${esc(t.note_content)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function populateSidePanelDropdowns(c) {
+  const users=await E.getAllUsers();
+  const reSel=document.getElementById('re-sel');
+  const escSel=document.getElementById('esc-sel');
+  if(reSel) {
+    users.filter(u=>u.can_receive_assignments).forEach(u=>{
+      const o=document.createElement('option');
+      o.value=JSON.stringify({id:u.id,name:u.name,dept:u.department});
+      o.textContent=`${u.name} — ${(u.role||'').replace(/_/g,' ')}`;
+      reSel.appendChild(o);
+    });
+  }
+  if(escSel) {
+    users.filter(u=>['CRM_SUPERVISOR','SALES_MANAGER','MANAGEMENT','SUPER_ADMIN'].includes(u.role)).forEach(u=>{
+      const o=document.createElement('option');
+      o.value=JSON.stringify({id:u.id,name:u.name,dept:u.department});
+      o.textContent=`${u.name} — ${(u.role||'').replace(/_/g,' ')}`;
+      escSel.appendChild(o);
+    });
+  }
+}
+
+async function chStatus(s) {
+  if(!_curCaseId) return;
+  let res='';
+  if(['RESOLVED','CLOSED'].includes(s)) { res=window.prompt('Enter resolution notes (required):',''); if(res===null)return; }
+  try { await E.changeStatus(_curCaseId,s,'',res); E.toast('Status → '+s,'success'); await openCase(_curCaseId); }
+  catch(e){E.toast('Error: '+e.message,'error');}
+}
+
+async function doReassign() {
+  const v=document.getElementById('re-sel')?.value;
+  const note=document.getElementById('re-note')?.value||'';
+  if(!v){E.toast('Select a user','warning');return;}
+  const {id,name,dept}=JSON.parse(v);
+  await E.reassignCase(_curCaseId,id,name,dept,note);
+  E.toast('Reassigned to '+name,'success');
+  await openCase(_curCaseId);
+}
+
+async function doEscalate() {
+  const v=document.getElementById('esc-sel')?.value;
+  const reason=document.getElementById('esc-reason')?.value||'';
+  if(!v){E.toast('Select escalation target','warning');return;}
+  const {id,name}=JSON.parse(v);
+  await E.escalateCase(_curCaseId,id,name,reason);
+  E.toast('Escalated to '+name,'warning');
+  await openCase(_curCaseId);
+}
+
+async function saveFU() {
+  const d=document.getElementById('fu-date')?.value;
+  const n=document.getElementById('fu-note')?.value||'';
+  if(!d){E.toast('Select follow-up date','warning');return;}
+  await E.scheduleFollowUp(_curCaseId,d,n);
+  E.toast('Follow-up saved','success');
+}
+
+async function updateLead(s) {
+  await E.updateCase(_curCaseId,{lead_stage:s},{event_type:'STATUS_CHANGED',description:`Lead stage → ${s.replace(/_/g,' ')}`,is_internal:false});
+  E.toast('Lead stage updated','success');
+}
+
+async function addNote() {
+  const content=document.getElementById('note-inp')?.value?.trim();
+  if(!content){E.toast('Enter a note','warning');return;}
+  const internal=document.getElementById('note-internal')?.checked||false;
+  await E.addNote(_curCaseId,content,internal);
+  document.getElementById('note-inp').value='';
+  E.toast('Note added','success');
+  const tl=await E.getCaseTimeline(_curCaseId);
+  const el=document.getElementById('tl-list');
+  if(el) el.innerHTML=tlHTML(tl);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LEADS PIPELINE
+══════════════════════════════════════════════════════════════════ */
+const STAGES=[
+  {id:'NEW_INQUIRY',lbl:'🆕 New Inquiry',c:'var(--blue)'},
+  {id:'QUALIFIED',lbl:'✅ Qualified',c:'var(--green)'},
+  {id:'PROPOSAL_PENDING',lbl:'📄 Proposal',c:'var(--yellow)'},
+  {id:'FOLLOW_UP',lbl:'🔁 Follow-up',c:'var(--orange)'},
+  {id:'CONFIRMED',lbl:'🎯 Confirmed',c:'var(--purple)'},
+  {id:'LOST',lbl:'❌ Lost',c:'var(--red)'},
+  {id:'CONVERTED',lbl:'🏆 Converted',c:'var(--gold)'},
+];
+
+async function renderLeads() {
+  const cases=await E.getCases({});
+  const leads=cases.filter(c=>c.lead_stage&&c.caller_type!=='INDIVIDUAL');
+  const el=document.getElementById('kanban');
+  el.innerHTML=STAGES.map(st=>{
+    const sc=leads.filter(c=>c.lead_stage===st.id);
+    return `<div class="kanban-col">
+      <div class="kanban-col-hdr"><div class="kanban-col-title" style="color:${st.c}">${st.lbl}</div><div class="kanban-count">${sc.length}</div></div>
+      <div class="kanban-cards">
+        ${sc.length?sc.map(c=>`<div class="kanban-card" onclick="openCase('${c.id}')">
+          <div class="kc-id">${c.case_number}</div>
+          <div class="kc-name">${esc(c.caller_name||'—')}</div>
+          ${c.org_name?`<div class="kc-org">${esc(c.org_name)}</div>`:''}
+          <div class="kc-meta">${c.caller_type?.replace(/_/g,' ')||'—'}</div>
+          ${c.group_size_min?`<div class="kc-meta">👥 ${c.group_size_min}${c.group_size_max?' – '+c.group_size_max:''} pax</div>`:''}
+          ${c.event_date_flexible_from?`<div class="kc-meta">📅 ${c.event_date_flexible_from}</div>`:''}
+          <div class="kc-meta" style="color:var(--text3);font-size:10px">${esc(c.current_owner_name||'Unassigned')}</div>
+        </div>`).join(''):`<div class="kanban-empty">No leads</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   REPORTS
+══════════════════════════════════════════════════════════════════ */
+async function genReport() {
+  const d=await E.getReport({
+    dateFrom:document.getElementById('rpt-from')?.value,
+    dateTo:document.getElementById('rpt-to')?.value,
+    segment:document.getElementById('rpt-seg')?.value,
+    department:document.getElementById('rpt-dept')?.value,
+  });
+  const el=document.getElementById('rpt-out');
+  const mkCard=(title,items)=>{
+    const max=Math.max(...Object.values(items),1);
+    return `<div class="rpt-card"><div class="rpt-card-hdr">${title} <span style="font-size:11px;color:var(--text3);margin-left:6px">${Object.values(items).reduce((a,b)=>a+b,0)} total</span></div>
+    <div class="rpt-rows">${Object.entries(items).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="rpt-row"><div class="rpt-lbl">${k.replace(/_/g,' ')}</div><div class="rpt-bar-wrap"><div class="rpt-bar" style="width:${Math.round(v/max*100)}%"></div></div><div class="rpt-val">${v}</div></div>`).join('')}</div></div>`;
+  };
+  el.innerHTML=`
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:6px">
+      <div class="stat-c"><div class="stat-icon">📋</div><div class="stat-val">${d.total}</div><div class="stat-lbl">Total Cases</div></div>
+      <div class="stat-c warn"><div class="stat-icon">🔄</div><div class="stat-val">${d.open}</div><div class="stat-lbl">Open</div></div>
+      <div class="stat-c ok"><div class="stat-icon">✅</div><div class="stat-val">${d.closed}</div><div class="stat-lbl">Closed</div></div>
+      <div class="stat-c danger"><div class="stat-icon">⏰</div><div class="stat-val">${d.slaBreaches}</div><div class="stat-lbl">SLA Breaches</div></div>
+    </div>
+    ${mkCard('📊 By Status',d.byStatus)}
+    ${mkCard('🎯 By Segment',d.bySegment)}
+    ${mkCard('⚡ By Priority',d.byPriority)}
+    ${mkCard('🏢 By Department',d.byDept)}
+    ${mkCard('📋 By Issue Category',d.byIssueCategory)}
+    ${mkCard('👤 By Agent (Created)',d.byAgent)}
+    ${mkCard('📩 By Owner (Assigned)',d.byOwner)}`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   AGENT PRODUCTIVITY
+══════════════════════════════════════════════════════════════════ */
+async function renderProductivity() {
+  const agents=_allUsers.filter(u=>['CRM_AGENT','CRM_SUPERVISOR'].includes(u.role));
+  const el=document.getElementById('agent-grid');
+  el.innerHTML='<div style="color:var(--text3);font-size:12px;padding:12px">Loading…</div>';
+  const cards=await Promise.all(agents.map(async a=>{
+    const p=await E.getAgentProductivity(a.id);
+    const slaColor=p.avgSlaCompliance>=80?'var(--green)':p.avgSlaCompliance>=60?'var(--yellow)':'var(--red)';
+    return `<div class="agent-card">
+      <div class="agent-card-hdr">
+        <div class="agent-av">${a.avatar_initials||a.name.slice(0,2).toUpperCase()}</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--text)">${a.name}</div><div style="font-size:11px;color:var(--text3)">${E.ROLE_HIERARCHY[a.role]?.label||a.role}</div></div>
+      </div>
+      <div class="agent-mini-grid">
+        <div class="agent-stat"><div class="agent-stat-val">${p.total}</div><div class="agent-stat-lbl">Total Cases</div></div>
+        <div class="agent-stat ok"><div class="agent-stat-val" style="color:var(--green)">${p.resolved}</div><div class="agent-stat-lbl">Resolved</div></div>
+        <div class="agent-stat warn"><div class="agent-stat-val" style="color:var(--yellow)">${p.open}</div><div class="agent-stat-lbl">Open</div></div>
+        <div class="agent-stat danger"><div class="agent-stat-val" style="color:var(--orange)">${p.escalated}</div><div class="agent-stat-lbl">Escalated</div></div>
+      </div>
+      <div class="sla-bar">
+        <span style="font-size:12px;color:var(--text2)">SLA Compliance</span>
+        <span style="font-size:14px;font-weight:800;color:${slaColor}">${p.avgSlaCompliance}%</span>
+      </div>
+      <div style="margin-top:7px;font-size:11.5px;color:var(--text3)">Direct closures: <strong style="color:var(--text)">${p.directlyClosed}</strong></div>
+    </div>`;
+  }));
+  el.innerHTML=cards.join('')||'<div style="color:var(--text3);padding:12px">No agent data.</div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ADMIN
+══════════════════════════════════════════════════════════════════ */
+async function renderUserMgmt() {
+  const users=await E.getAllUsers();
+  document.getElementById('user-tbl-wrap').innerHTML=`
+    <table class="admin-table">
+      <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Email</th><th>Mobile</th><th>Status</th><th>Assignable</th></tr></thead>
+      <tbody>${users.map(u=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07828);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;flex-shrink:0">${u.avatar_initials||u.name.slice(0,2)}</div><div><div style="font-size:12.5px;font-weight:600;color:var(--text)">${esc(u.name)}</div><div style="font-size:10px;color:var(--text3)">${u.id}</div></div></div></td>
+        <td style="color:var(--text2)">${(E.ROLE_HIERARCHY[u.role]?.label||u.role).replace(/_/g,' ')}</td>
+        <td style="color:var(--text2)">${(u.department||'—').replace(/_/g,' ')}</td>
+        <td style="color:var(--text3)">${u.email||'—'}</td>
+        <td style="color:var(--text3)">${u.mobile||'—'}</td>
+        <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;${u.is_active?'background:rgba(16,185,129,.12);color:var(--green)':'background:rgba(100,116,139,.12);color:var(--text3)'}">${u.is_active?'Active':'Inactive'}</span></td>
+        <td style="color:${u.can_receive_assignments?'var(--green)':'var(--text3)'}">${u.can_receive_assignments?'✅ Yes':'— No'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+async function renderEscRules() {
+  try {
+    const r=await fetch('../tables/crm_escalation_rules?limit=50');
+    const d=await r.json();
+    const rules=d.data||[];
+    document.getElementById('esc-rules-wrap').innerHTML=rules.map(r=>`
+      <div style="background:var(--navy2);border:1px solid ${r.is_active?'rgba(201,168,76,.22)':'var(--border)'};border-radius:13px;padding:15px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${esc(r.rule_name)}</div>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;${r.is_active?'background:rgba(16,185,129,.12);color:var(--green)':'background:rgba(100,116,139,.12);color:var(--text3)'}">${r.is_active?'Active':'Off'}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--text3);line-height:2.1">
+          <div>📋 Category: <b style="color:var(--text2)">${(r.applies_to_category||'ALL').replace(/_/g,' ')}</b></div>
+          <div>🏢 Dept: <b style="color:var(--text2)">${r.applies_to_dept||'ALL'}</b></div>
+          <div>⚡ Priority: <b style="color:var(--text2)">${r.applies_to_priority||'ALL'}</b></div>
+          <div>⏰ No update after: <b style="color:var(--orange)">${r.no_update_hours}h</b></div>
+          <div>🔒 No closure after: <b style="color:var(--red)">${r.no_closure_hours}h</b></div>
+          <div>📩 Escalate to: <b style="color:var(--text2)">${(r.escalate_to_role||'—').replace(/_/g,' ')}</b></div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('esc-rules-wrap').innerHTML='<div style="color:var(--text3)">Unable to load rules.</div>';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════════════════ */
+function esc(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function closeModalBg(e){if(e.target===document.getElementById('modal-ov'))closeModal();}
+function closeModal(){const el=document.getElementById('modal-ov');if(el){el.style.display='none';el.innerHTML='';}}
 </script>
-<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
