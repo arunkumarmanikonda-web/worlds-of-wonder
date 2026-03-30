@@ -301,6 +301,16 @@
               </label>
             </div>
           </div>
+          <!-- ── TERMS & CONDITIONS ──────────────────────── -->
+          <div class="step-section" id="wtc-section" style="border:1.5px solid rgba(0,85,179,.3);">
+            <div class="step-title">
+              <span class="step-num">📜</span>
+              Terms &amp; Conditions
+            </div>
+            <p style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:16px;">Please read and accept before confirming your group booking.</p>
+            <div id="wtc-consent-container"></div>
+          </div>
+
           <div class="step-section">
             <div class="step-title"><span class="step-num">🏷️</span> Promo / Contract Code</div>
             <div style="display:flex;gap:10px;">
@@ -315,7 +325,7 @@
           <div id="orderLines2"></div>
           <div class="order-total"><span>Total</span><span style="color:#F5A800;" id="orderTotal2">—</span></div>
           <p style="font-size:11px;color:rgba(255,255,255,.3);margin-top:10px;">GST invoice will be emailed</p>
-          <button onclick="processPayment()" class="btn btn-primary btn-large" style="width:100%;margin-top:20px;" id="payBtn">Confirm Booking</button>
+          <button onclick="processPayment()" class="btn btn-primary btn-large" style="width:100%;margin-top:20px;" id="payBtn">Confirm Group Booking</button>
         </div>
       </div>
       <button onclick="prevStep()" class="btn btn-ghost" style="margin-top:16px;">← Back</button>
@@ -441,6 +451,8 @@
     }
 
     function processPayment() {
+      // Gate: T&C must be accepted
+      if (typeof WOWTerms !== 'undefined' && !WOWTerms.validate()) return;
       document.getElementById('payBtn').textContent = 'Processing...';
       document.getElementById('payBtn').disabled = true;
       setTimeout(() => {
@@ -461,6 +473,15 @@
     document.getElementById('visitDate').value = tomorrow.toISOString().split('T')[0];
 
     updateGroupPricing();
+  </script>
+  <script src="../js/wow-terms.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Render T&C consent block inside the group booking payment step
+    if (typeof WOWTerms !== 'undefined') {
+      WOWTerms.renderConsentBlock('#wtc-consent-container', { context: 'group' });
+    }
+  });
   </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
