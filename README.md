@@ -1,7 +1,7 @@
 # Worlds of Wonder — EALCPL Digital Platform
 ### Complete Static Website · 100+ Pages · Full ERP Stack
 
-**Status: Production-Ready Static Site** | Last Updated: 29 March 2026 (Sprint 8 COMPLETE — Super Admin Live Control Engine: Products/Sections toggle, inline content editing, booking page park/category blocking, Banner Manager, Operational Calendar, Category Availability & Price Overrides)
+**Status: Production-Ready Static Site** | Last Updated: 30 March 2026 (Sprint 11 COMPLETE + Sprint 12 Bug-Fix + Sprint 13 — Reseller Identity Engine fully implemented)
 
 ---
 
@@ -13,6 +13,130 @@ Worlds of Wonder (WOW), Noida — India's premier dual-park theme park destinati
 - **Parks**: Water Park (20+ rides) + Amusement Park (30+ rides)
 - **Ticketing**: ₹1,299 (Water Park) · ₹1,199 (Amusement Park) · ₹1,999 (Combo) · ₹4,999 (Annual Passport)
 - **GST**: 18% (CGST 9% + SGST 9%) on all B2C ticket sales
+
+---
+
+## 🐛 Sprint 12 Bug Fix Log (30 Mar 2026)
+
+### Bug 1 — Super Admin bypass button did not open the login modal
+**Root Cause:** `renderTopbarWidget(containerId)` returned early when the container element was not found (`if (!container) return`), which prevented `_injectBypassModal()` from being called. Pages that called `renderTopbarWidget('__dummy__')` to trigger modal injection therefore never got the modal injected.
+
+**Fix** (`js/wow-auth.js`): `renderTopbarWidget` now injects the bypass modal unconditionally before the container guard check. The auto-inject floating button IIFE already handled DOMContentLoaded timing correctly and continues to work as before.
+
+---
+
+### Bug 2 — Offers configured in the admin panel (status: Live) did not appear on the booking frontend
+**Root Cause:** `_computeStatus()` in the offer engine correctly handled `'paused'`, `'archived'`, `'draft'`, and `'expired'` but had no explicit branch for `'live'` (the v3 admin status string). While `'live'` fell through to the schedule check and ultimately returned `STATUS.ACTIVE`, a subtle interaction with the nested `else` block checking `STATUS.PAUSED`/`ARCHIVED`/`DRAFT` string constants could misidentify `'live'` in edge cases.
+
+Additionally, `editOffer()` in `admin/offers.html` accessed `offer.parks` and `offer.categories` directly — crashing when editing v4 native DEFAULT_OFFERS (which use `conditionGroups` instead).
+
+**Fixes:**
+- `js/wow-offer-engine-v4.js` — `_computeStatus` now has an explicit `'live'` branch that explicitly falls through to the schedule/usage checks, ensuring no unintended early returns.
+- `admin/offers.html` — `editOffer()` now extracts parks and categories from `conditionGroups` when `.parks`/`.categories` are absent (v4 native offers), and derives `type` and `value` from `actions[0]`.
+
+---
+
+### Bug 3 — Booking page was stuck after ticket selection; clicking Pay did not proceed
+**Root Cause (infinite recursion):** `booking.js` defined `showSuccessModal` twice as a regular function declaration. Due to JavaScript function hoisting, both declarations were hoisted before any code ran. The line `const _origShowSuccessModal = showSuccessModal` at line ~963 therefore captured the *second* (overriding) declaration, not the first — meaning `_origShowSuccessModal` and `showSuccessModal` pointed to the same function. Calling `showSuccessModal()` triggered infinite recursion → stack overflow → the booking page froze after ticket selection and any "Pay" click.
+
+**Root Cause (wrong flow):** Even without the recursion, `validateAndCheckout` showed a "Booking Confirmed!" modal *inline* on the booking page rather than redirecting to `book/payment.html`. The payment page had hardcoded dummy data and no connection to real booking data.
+
+**Fixes:**
+- `js/booking.js` — Removed the double declaration. `validateAndCheckout` now saves booking data to `sessionStorage` (`wow_booking`, `wow_tx_id`) and redirects to `payment.html`.
+- `book/payment.html` — Now reads `sessionStorage.wow_booking` on load and dynamically populates the order summary, guest details panel, and GST table. On successful payment simulation, the confirmation card shows real guest name, mobile, visit date, booking ID, and QR code. If no session data is found (direct access), a user-friendly "No booking found" message is shown.
+
+---
+
+---
+
+## 🏷️ Sprint 13 — Reseller Identity Code System (30 Mar 2026)
+
+### Overview
+Implemented a comprehensive, immutable Reseller Identity Architecture that flows through every core object in the platform. No batch, employee, ticket, QR record, or redemption log can exist without a traceable reseller code chain.
+
+### Identity Code Architecture
+
+#### §55 — Reseller Master Identity
+- **Code Pattern:** `RS-{YEAR}-{SEQ4}` (configurable by Super Admin)
+- **Immutability:** Code locked permanently at `activateReseller()` — `codeLockedAt` timestamp is set
+- **Custom Codes:** Admin can specify `customCode` (e.g. `MMT-DELHI`) before activation
+- **Registry Guard:** Global ID registry prevents duplicate codes across all resellers
+- **Embedded In:** All downstream objects (batches, allocations, tickets, QR payloads, redemption logs, analytics, exports)
+
+#### §56 — Bulk Batch Identity
+- **Code Pattern:** `{RCODE}-{SEASON}-B{BSEQ3}` (e.g. `TM-INDIA-FY26-B001`)
+- **Configurable:** Super Admin can change batch pattern and season string
+- **Carries:** Reseller code as prefix + season label + sequential batch number
+- **No Anonymous Batches:** Every batch must be assigned to an active reseller
+
+#### §57 — Customer Ticket Identity
+- **Code Pattern:** `{RCODE}-{ECODE_SHORT}-TKT-{TSEQ5}` (e.g. `TM-INDIA-SP001-TKT-00001`)
+- **Full Chain Embedded:** Reseller code, batch code, employee code, allocation code all stored in every ticket record
+- **QR Payload:** Base64 JWT-style payload containing the complete identity chain + nonce
+- **Redemption Trace:** Every redemption log records the full chain
+
+#### §58 — Employee/Salesperson Identity
+- **Code Pattern:** `{RCODE}-SP{SEQ3}` (e.g. `TM-INDIA-SP001`)
+- **Reseller Prefix Always Present:** Employee code inherits reseller prefix
+- **Immutable from Assignment:** Even removed/suspended employees retain their code
+- **Max Employees:** Configurable per reseller (default: 50)
+
+#### §59 — Sub-Allocation Identity
+- **Code Pattern:** `{ECODE}-A{ASEQ3}` (e.g. `TM-INDIA-SP001-A001`)
+- **Full Trace:** Captures reseller code, employee code, parent batch code, quantity, dates, remaining balance, and recalls
+- **Recall Support:** Admin can recall partial or full allocation back to batch pool
+
+#### §63 — QR & Redemption Trace
+- QR tokens are Base64-encoded JSON containing: ticketCode, resellerCode, batchCode, employeeCode, allocationId, productId, parkKey, visitDate, issuedAt, nonce
+- Redemption records carry the full identity chain
+- Audit trail entries always include: resellerId, resellerCode, employeeCode, batchCode, ticketCode
+
+#### §64 — Immutability Rules
+| Object | When Locked | Guard Mechanism |
+|--------|-------------|-----------------|
+| Reseller Code | On `activateReseller()` | `codeLockedAt` + `codeImmutableOnActivation` config flag |
+| Employee Code | On creation | Protected fields list in `updateEmployee()` |
+| Batch Code | On creation | Never in update path |
+| Ticket Code | On issuance | Never updated |
+| Allocation Code | On creation | Never updated |
+
+### Files Implemented
+
+| File | Description |
+|------|-------------|
+| `js/reseller-engine.js` | Core engine v1.0 — all identity code generators, CRUD, audit, reporting |
+| `admin/reseller-engine.html` | **Super Admin Console** — 10-tab ERP with full CRUD modals, identity chain visualizer, central reports with all filters (by reseller code / batch code / salesperson code / date / channel / status), audit trail, immutable coding rules config |
+| `reseller/index.html` | **Reseller ERP Dashboard** — Reseller-coded batch references, employee performance metrics, live balances, allocation management, ticket issuance, financial statements |
+| `reseller/salesperson.html` | **Salesperson Performance Portal** — Multi-filter reports (date range, batch, employee code, channel, status), leaderboard with redemption rates and utilization metrics, individual ticket log with redemption trace |
+
+### Central Report Filters (§62)
+The central report tab in `admin/reseller-engine.html` supports all these filters simultaneously:
+- Reseller code / name
+- Batch code
+- Salesperson code / name
+- Date range (from / to)
+- Ticket status (issued / redeemed / expired)
+- Delivery channel (counter / online / field / digital)
+- Quantities: issued, redeemed, expired, remaining
+
+### Key Metrics Available (§61)
+- Tickets sold (per SP, batch, reseller)
+- Redemption rate %
+- Utilization rate % (issued ÷ allocated)
+- Balance remaining
+- Revenue generated
+- Commission earned
+- Last sale date
+- Batch breakdown per salesperson
+
+### Demo Data
+`ResellerEngine.seedDemoData()` auto-seeds on first load with:
+- **3 Resellers**: TM-INDIA (Platinum), MMT-NCR (Gold), RS-2026-0003 (Silver)
+- **7 Salespersons** with unique SP codes linked to their resellers
+- **5 Batches** across different products and parks
+- **7 Sub-Allocations** across salespersons
+- **8+ Tickets** issued to sample customers (3 redeemed)
+- Full audit trail of all operations
 
 ---
 
@@ -65,7 +189,9 @@ faq.html                            # FAQ (searchable + filterable by category)
 │   ├── inventory.html              # ✅ UPGRADED: Full Capacity Management (live zone rings, ride slots, locker grid, F&B stock, daily allocation, stock movement log)
 │   ├── pricing.html                # Legacy pricing config
 │   ├── dynamic-pricing.html        # ✅ NEW: Dynamic Pricing Engine (peak/off-peak rules, surge calendar, price matrix, simulation, bulk overrides, scheduled changes, audit trail)
-│   ├── offers.html                 # Offers & campaign management
+│   ├── offers.html                 # Offers & campaign management (legacy)
+│   ├── offer-engine.html           # ✅ NEW: Offer Engine v4 Control Centre (offer CRUD, rule builder, scheduler, simulator, analytics, audit)
+│   ├── offer-analytics.html        # ✅ NEW: CFO-Grade Offer Analytics Dashboard (revenue impact, leakage analysis, coupon trends, AOV lift)
 │   ├── banners.html                # CMS banner management
 │   ├── cms.html                    # Content management system
 │   ├── crm.html                    # ✅ UPGRADED: Full CRM (lead pipeline Kanban, contact profiles, deal stages, activity feed, email/call log)
@@ -78,7 +204,9 @@ faq.html                            # FAQ (searchable + filterable by category)
 │   ├── invoices.html               # Invoice management
 │   ├── fnb-packages.html           # ✅ F&B Package Manager (CSV upload, quote builder, inventory)
 │   ├── ticketing-engine.html       # Ticket configuration & allocation engine
-│   ├── passport-engine.html        # ✅ FULLY REBUILT: Admin Passport Config (plan CRUD, pricing, GST, validity, vouchers, login-ID format, commission structure, SMS templates, audit log)
+│   ├── passport-engine.html        # ✅ SPRINT 11: Enterprise Passport Product Engine v2.0 (tier CRUD, product SKUs, voucher library, offer attachment, entry rights, KYC rules, analytics charts, passport records, audit log, import/export config)
+│   ├── passport-kyc-review.html    # ✅ SPRINT 11: KYC Review Console (application queue, completeness scoring, approve/reject/query, bulk actions, reviewer notes thread, status history, export CSV, demo seeder)
+│   ├── passport-scanner.html       # ✅ SPRINT 11: Gate & Voucher Scanner (park entry + voucher redemption modes, QR token parsing, camera simulation, manual override with audit, session log, demo seed)
 │   ├── passport-redemptions.html   # Passport voucher redemption log
 │   ├── passport-products.html      # Passport plan configuration
 │   ├── passport.html               # Passport admin view
@@ -165,7 +293,9 @@ faq.html                            # FAQ (searchable + filterable by category)
 │   ├── main.js                     # Public site JS
 │   ├── wow-modules.js              # Module feature flags
 │   ├── banner-engine.js            # Banner/offer engine
-│   ├── wow-offer-engine.js         # ✅ REBUILT v3.0: Full offer engine — BOGO, B2G1, Buy4Discount, Flash, Family auto-apply, buffet add-on, max ticket cap (all admin-configurable)
+│   ├── wow-offer-engine.js         # ✅ v3.0 (legacy — still present for reference)
+│   ├── wow-offer-engine-v4.js      # ✅ NEW Sprint 9: Enterprise Offer Engine v4.0 (see §Offer Engine below)
+│   ├── wow-passport-engine.js      # ✅ SPRINT 11: WOW Passport Engine v1.0 — full in-browser engine: config store, tier/product master, voucher library, QR tokenizer, redemption engine, KYC state machine, renewal engine, analytics, audit trail (17 public APIs)
 │   ├── wow-passport-api.js         # ✅ Shared Table API utility — CRUD helpers, ID generators, KYC/payment/passport/redemption methods, bulk issuance, MRZ/QR generation
 │   ├── wow-auth.js                 # ✅ AuthGate Engine v1.0 — roles, sessions, SA bypass modal, portal guard, topbar widget
 │   ├── wow-auth-guard.js           # ✅ Drop-in auth guard script for any portal page
@@ -401,6 +531,199 @@ WOWContent.applyBookingCatToggles(cfg) // Hide disabled ticket-category rows
 | `wow_category_availability` | Category global toggles + rules | CA.save() | booking.js (isCategoryAvailable) |
 | `wow_price_overrides` | Price overrides per cat/park | CA.save() | booking.js (pricing engine) |
 | `wow_cat_config` | Combined cat+price config | CA.save() | booking.js (unified read) |
+
+---
+
+## 🪪 Sprint 11 — Enterprise Passport Product Engine v2.0
+
+### Architecture Overview
+
+The WOW Passport Product Engine is a fully configurable, no-backend enterprise membership system built on top of `localStorage` and `js/wow-passport-engine.js`.
+
+```
+js/wow-passport-engine.js          ← Core engine (17 public APIs)
+  ├── Config Store (wpe_config)     ← Tier + Product master
+  ├── Voucher Library (wpe_voucher_lib)
+  ├── Offer Library (wpe_offer_lib)
+  ├── Passport Records (wpe_passports)
+  ├── KYC Records (wpe_kyc)
+  ├── Redemption Ledger (wpe_redemptions)
+  ├── Audit Trail (wpe_audit)
+  └── Customer Records (wpe_customers)
+```
+
+### Passport Product Engine — `js/wow-passport-engine.js`
+
+| Component | Description |
+|-----------|-------------|
+| **Config Engine** | `WPE.getConfig()` / `WPE.saveConfig()` — tier master, product SKUs, program meta |
+| **Voucher Library** | 15 default vouchers (F&B, locker, birthday, guest pass, merch, VIP lounge, concierge) |
+| **Offer Library** | 5 default tier-linked offers (priority booking, guest discount, family events, VIP events, renewal bonus) |
+| **QR Tokenizer** | `WPE.generateQRToken()` — tamper-proof base64 payload + 6-char checksum; `WPE.parseQRToken()` validates |
+| **Issuance Engine** | `WPE.issuePassport()` — product lookup, KYC gate, passport number gen, voucher instance build, audit |
+| **Redemption Engine** | `WPE.redeemVoucher()` — frequency/quantity guards, cooldown check, anti-replay, audit |
+| **Park Entry Engine** | `WPE.recordParkEntry()` — daily limit, blackout date, park coverage, VIP lane detection |
+| **KYC Engine** | `WPE.submitKYC()` / `WPE.updateKYCStatus()` — 6 states (not_started → pending → under_review → query_raised → approved → rejected) |
+| **Renewal Engine** | `WPE.initiateRenewal()` — linked new passport, increments renewal counter, updates old status to `renewed` |
+| **Analytics Engine** | `WPE.getAnalytics()` — by-tier breakdown, revenue, expiry forecast, breakage rate, KYC stats |
+| **Lifecycle States** | `active`, `paused`, `suspended`, `expired`, `renewed`, `revoked`, `archived` |
+| **Customer Engine** | `WPE.upsertCustomer()` / `WPE.findCustomer()` — deduplication by email/mobile |
+| **Audit Trail** | Every action logged with actor, timestamp, meta — capped at 500 entries |
+
+### Passport Tiers (Configurable, No Hard-Coding)
+
+| Tier | Code | Holders | F&B | Guest Passes | VIP Lane | Price |
+|------|------|:-------:|-----|:---:|:---:|-------|
+| **WOW Explore** | `EXPLORE` | 1 | 10% | 0 | ❌ | ₹4,999 |
+| **WOW Together** | `TOGETHER` | 4 | 15% | 2 | ❌ | ₹12,999 |
+| **WOW Legacy** | `LEGACY` | 6 | 25% | 4 | ✅ | ₹24,999 |
+
+All tiers are fully configurable via the admin UI — color gradients, emblem emoji, badge style, upgrade path, holder limits, guest passes.
+
+### Voucher Library (15 Default Templates)
+
+| Category | Voucher | Freq | Qty |
+|----------|---------|------|-----|
+| F&B Discount | 10%, 15%, 25% off | Per visit | Unlimited |
+| Locker | Monthly, Per Visit, Unlimited | Varies | 1 / ∞ |
+| Birthday | Upgrade (Explore), Party Pack (Together), VIP Suite (Legacy) | Annual | 1 |
+| Guest Entry | 2 passes / 4 passes | Annual | 2 or 4 |
+| Experience | Annual Photo Session | Annual | 1 |
+| Merchandise | ₹1,000 Credit | Annual | 1 |
+| Lounge | VIP Lounge Unlimited | Per visit | Unlimited |
+| Service | Concierge Priority Line | On-demand | Unlimited |
+
+### localStorage Keys (Sprint 11 Passport Engine)
+
+| Key | Purpose | Written by | Read by |
+|-----|---------|-----------|--------|
+| `wpe_config` | Tier + Product master + program meta | `WPE.saveConfig()` | All passport flows |
+| `wpe_voucher_lib` | Voucher template library | `WPE.saveVouchers()` | Issuance, Admin |
+| `wpe_offer_lib` | Linked offer library | `WPE.saveOffers()` | Admin, Storefront |
+| `wpe_passports` | Issued passport records | `WPE.issuePassport()` | Portal, Scanner |
+| `wpe_kyc` | KYC application records | `WPE.submitKYC()` | KYC Review Console |
+| `wpe_redemptions` | Redemption ledger | `WPE.redeemVoucher()` | Scanner, Analytics |
+| `wpe_audit` | Audit trail (last 500 events) | Internal `_audit()` | Admin, Audit Log |
+| `wpe_customers` | Customer records | `WPE.upsertCustomer()` | Portal, Sales |
+| `wpe_passport_seq` | Auto-increment sequence for passport numbers | `generatePassportNumber()` | Issuance |
+| `wow_scanner_settings` | Gate scanner staff/gate config | Scanner settings modal | Gate Scanner |
+
+### Passport Engine URLs
+
+| URL | Role | Description |
+|-----|------|-------------|
+| `/admin/passport-engine.html` | Super Admin / Passport Admin | No-code product admin: tier CRUD, product SKUs, voucher library, offer attachment, entry rights, KYC rules, analytics charts, passport records, audit log, config export/import |
+| `/admin/passport-kyc-review.html` | KYC Reviewer | Application queue with completeness scoring, approve/reject/query workflow, bulk approve, reviewer notes thread, status history, export CSV |
+| `/admin/passport-scanner.html` | Gate Staff | QR validation for park entry + voucher redemption; camera simulation; manual override with supervisor PIN; session log with export |
+| `/portal/wow-passport.html` | Customer | Digital passport dashboard: flippable card, MRZ, QR, voucher book, entry log, redemption history, renewal trigger |
+| `/sales/passport-kyc.html` | Sales Agent | 4-step KYC wizard: plan select → photo capture → details form → review → submit |
+| `/sales/erp-dashboard.html` | Sales Agent / Manager | Salesforce ERP with KYC queue, passport ledger, agent management, bulk issuance |
+| `/passport.html` | Public | Premium storefront with 3-tier comparison, benefit matrix, FAQ, purchase CTA |
+
+### WPE Public API Reference
+
+```javascript
+// ── CONFIG ───────────────────────────────────────────────────
+WPE.getConfig()                     // Full config object (tiers + products + meta)
+WPE.saveConfig(cfg)                 // Save + audit
+WPE.getDefaults()                   // { config: DEFAULT_CONFIG, vouchers: […], offers: […] }
+WPE.getTiers()                      // → Tier[]
+WPE.getTierById(id)                 // → Tier | null
+WPE.getProducts()                   // → Product[]
+WPE.getProductById(id)              // → Product | null
+
+// ── VOUCHERS ─────────────────────────────────────────────────
+WPE.getVouchers()                   // → Voucher[]
+WPE.getVoucherById(id)              // → Voucher | null
+WPE.addVoucher(v)                   // Create + audit
+WPE.updateVoucher(id, data)         // Update + audit
+WPE.saveVouchers(list)              // Full replace
+
+// ── OFFERS ───────────────────────────────────────────────────
+WPE.getOffers()                     // → Offer[]
+WPE.saveOffers(list)                // Full replace
+
+// ── PASSPORTS ────────────────────────────────────────────────
+WPE.issuePassport(opts)             // → { success, passport } — KYC gate enforced
+WPE.getPassports()                  // → Passport[]
+WPE.getPassportById(id)             // → Passport | null
+WPE.getPassportsByCustomer(cid)     // → Passport[]
+WPE.updatePassport(id, data)        // Partial update + audit
+WPE.suspendPassport(id, reason, by) // Status → suspended
+WPE.revokePassport(id, reason, by)  // Status → revoked
+WPE.reactivatePassport(id, note, by)// Status → active
+WPE.initiateRenewal(passportId, opts)// → { success, oldPassport, newPassport }
+
+// ── KYC ──────────────────────────────────────────────────────
+WPE.getKYCRecords()                 // → KYCRecord[]
+WPE.getKYCById(id)                  // → KYCRecord | null
+WPE.submitKYC(opts)                 // → { success, kycId, record }
+WPE.updateKYCStatus(id, status, note, by) // → { success, record }
+
+// ── QR / REDEMPTION ──────────────────────────────────────────
+WPE.generateQRToken(passportId, voucherInstanceId, counter) // → 'WOW-QR.xxx.chk'
+WPE.parseQRToken(token)             // → payload | null (validates checksum)
+WPE.validateQR(token, ctx)          // → { valid, passport, voucherInstance, reason }
+WPE.redeemVoucher(token, ctx, overrideReason) // → { success, redemptionId, passport, vi }
+WPE.validateParkEntry(passportId, park)// → { valid, passport, vipLane, reason }
+WPE.recordParkEntry(passportId, park, ctx) // → { success, entryRecord }
+
+// ── CUSTOMERS ────────────────────────────────────────────────
+WPE.upsertCustomer(data)            // Create or update by email/mobile
+WPE.findCustomer(query)             // Search by name/email/mobile
+
+// ── ANALYTICS ────────────────────────────────────────────────
+WPE.getAnalytics()                  // Full analytics object (byTier, revenue, KYC, redemptions)
+WPE.getRedemptions()                // → Redemption[]
+WPE.getAuditLog()                   // → AuditEvent[]
+```
+
+### KYC State Machine
+
+```
+not_started
+    ↓ [submit form]
+pending_review
+    ↓ [reviewer opens]         ↓ [reviewer raises query]
+under_review            query_raised
+    ↓ [approve]                ↓ [customer resubmits]
+  approved          ←──── pending_review (re-cycle)
+    ↓ [issue passport]
+  [Passport Issued]
+    
+  [Any state]
+    ↓ [reject]
+  rejected  (permanent — customer must re-apply)
+```
+
+### Passport Lifecycle
+
+```
+draft → pending → approved → issued → active ──┐
+                                    ↓            │ renew
+                              suspended          ↓
+                                    ↓         renewed
+                                revoked
+                                    │
+                               expired (auto on expiry date)
+                                    │
+                               archived (manual)
+```
+
+### QR Token Format
+
+```
+WOW-QR.<base64url-payload>.<6-char-checksum>
+
+Payload (JSON, base64url-encoded):
+{
+  p: "WOW-PAX-2025-000001",   // passport ID
+  v: "WOW-PAX-...-v_fnb-abc", // voucher instance ID
+  c: "fnb",                    // counter scope
+  ts: 1711800000000,           // issue timestamp (ms)
+  n: "x7k2q9m4"               // nonce (replay prevention)
+}
+```
 
 ---
 
@@ -672,7 +995,21 @@ All passport sales data is persisted via the RESTful Table API (`tables/{table}`
 
 ## 🚧 Not Yet Implemented (Future Roadmap)
 
-### Sprint 9 Candidates
+### Sprint 10 — COMPLETED ✅ (Offer Engine v4 Full Delivery)
+- [x] **A/B Testing Framework** — `admin/offer-engine.html` Panel: Create tests, assign variants by hash(userId+testId), weight-based traffic split (must sum 100%), start/pause/complete lifecycle, simulate 1000-user distribution. `WOWOfferEngine.ABEngine` API fully public.
+- [x] **Conflict Resolution Matrix** — Visual grid showing stack compatibility between all active offers (✓ Stackable, ✗ Exclusive blocks all, ? Best-only per family, ~ Mixed). Stack-family grouping and real-time risk overlay.
+- [x] **Priority Ranking & Drag-to-Reorder** — Drag handles to reorder evaluation sequence, direct numeric input per offer, distribution histogram, auto-reassign step-weights on drop.
+- [x] **Bulk Operations Panel** — Export JSON (all/active/draft), Import with merge/replace_all/add_new modes, Bulk Activate Drafts, Bulk Pause Active, Archive Expired, Reset Usage Counts, Factory Reset, Clear Audit/Exec logs.
+- [x] **Deep Drill Modal** — Per-offer: 90-day stats (uses, discount, avg), risk alerts, version history with rollback, quick edit + quick sim shortcuts.
+- [x] **Demand-Based Pricing Engine** — `WOWOfferEngine.DemandEngine` module: surge rules (booking_velocity trigger), off-peak incentive rules, configurable inventory thresholds (highDemand 80% / lowDemand 20%). `getSuggestedSurgePercent(parkKey)` API.
+- [x] **Maker-Checker Workflow API** — `WOWOfferEngine.MakerChecker` module: `submit(offerData, action, submittedBy)`, `approve(requestId, approvedBy, comments)`, `reject(requestId, rejectedBy, reason)`, `getPending()`, `getHistory(offerId)`. Approval auto-executes the action on the engine.
+- [x] **Booking.js v4 Integration** — `refreshOffers()` now uses `evaluateCart()` (full stacking + conflict resolution), explainability ribbon showing ✓ applied / rejected offers, stacked savings badge with multiple offer names, F&B credit badge, `fnbDiscount` row in order summary, `commitEvaluation()` called on checkout to persist usage counts + audit log.
+- [x] **Promo Code v4 UX** — Uses `validatePromoCode()` with v4 stacking engine; shows exact savings amount on success, clear error messaging, `clearPromoCode()` utility.
+- [x] **CFO Analytics — Time Heatmap** — Hour × Day heatmap (24h × 7 days), colour intensity = booking velocity, peak hour/day KPIs, hour-of-day bar chart, day-of-week bar chart.
+- [x] **CFO Analytics — A/B Test Results** — Live results panel: test summaries, variant assignment counts, discount-given per variant (bar chart), status tracking.
+- [x] **CFO Analytics — Approvals Queue** — Full Maker-Checker UI in analytics: pending list with Approve/Reject buttons, approval history table with status colours, KPI stats.
+
+### Sprint 9 Candidates (Pending)
 - [ ] **Banner Manager → public page integration** — banners.json / localStorage banners currently managed by admin but not yet read by public hero carousel (`js/banner-engine.js` hook needed)
 - [ ] **Operational Calendar → booking.js date-picker** — `wow_calendar_config` is published but the booking page date input needs to use `getDateStatus()` to grey-out closed days in the native `<input type="date">` (requires custom date-picker or Flatpickr integration)
 - [ ] **Price overrides → booking.js pricing engine** — `wow_cat_config.prices` is published; booking.js needs to merge these overrides into the base price table on init
@@ -692,6 +1029,84 @@ All passport sales data is persisted via the RESTful Table API (`tables/{table}`
 - [ ] Loyalty points live deduction on checkout
 - [ ] Push notifications via service worker
 - [ ] A/B testing for conversion optimisation
+
+---
+
+## 🏗 Offer Engine v4.0 — Architecture Reference
+
+### Overview
+`js/wow-offer-engine-v4.js` (62KB) is a self-contained IIFE that exposes `window.WOWOfferEngine` / `window.WOE4`. It persists all state in localStorage and is fully functional without any backend.
+
+### Core Engine Layers
+
+| Layer | Section | Description |
+|-------|---------|-------------|
+| Storage Helpers | §3 | JSON safe read/write for 7 localStorage keys |
+| Audit Log | §4 | 500-entry rolling audit log with action + user + meta |
+| Schedule Checker | §5 | IST-aware date/time/day/hour/blackout evaluation |
+| Usage & Budget | §6 | Global/per-user/per-day/budget cap enforcement |
+| Condition Evaluator | §7 | 22 condition types: park, category, qty, cart_value, promo, date_range, day_of_week, hour_range, segment, A/B variant, cross-category, demand_level, etc. AND/OR/NOT groups |
+| Action Executor | §8 | 12 action types: percent, flat, per_ticket, free_tickets, slab_percent, slab_flat, credit, fnb_credit, fee_waiver, price_override, percent_cap, hybrid |
+| Conflict Resolution | §9 | Exclusive/Best-Only/Stackable stacking modes; family-based best-selection |
+| Status Lifecycle | §10 | draft→scheduled→active→paused→expired→archived state machine |
+| Main Eval Engine | §11 | `evaluateCart(cart, opts)` — full evaluation with rule path + explainability |
+| Promo Validator | §12 | `validatePromoCode(code, cart, opts)` — v4 stacking-aware code validation |
+| Commit | §13 | `commitEvaluation(evalResult, opts)` — usage increment + exec log write |
+| Simulation | §14 | `simulate(cart, opts)` — dry-run without usage increment, persists history |
+| Admin CRUD | §15 | adminListOffers, adminGetOffer, adminSaveOffer, adminDeleteOffer, adminCloneOffer, adminActivateOffer, adminPauseOffer, adminRollback, adminGetVersionHistory |
+| A/B Testing | §16 | Deterministic hash-based assignment, 100-bucket split |
+| Analytics | §17 | summary(days), offerDetail(offerId, days) — daily trend, per-offer stats, AOV before/after |
+| Backward Compat | §18 | v3 API shim: computeBestOffer, applyPromoCode, isOfferActive, applyOffer, getFlashOffers, buffet helpers |
+| Demand Engine | §19 | Surge/discount rules by booking velocity + inventory threshold |
+| Maker-Checker | §20 | submit → pending → approve/reject → auto-execute workflow |
+
+### localStorage Keys
+
+| Key | Purpose | Writer | Reader |
+|-----|---------|--------|--------|
+| `wow_offers_v4` | Offer master array (JSON) | adminSaveOffer | loadOffers |
+| `wow_offer_audit` | 500-entry audit log | AuditLog.write | AuditLog.read |
+| `wow_exec_log` | 2000-entry execution log | _writeExecLog | readExecLog |
+| `wow_ab_assignments` | User→variant map | ABEngine.assignVariant | ABEngine.getVariant |
+| `wow_sim_history` | 100 simulation snapshots | simulate() | loadSimHistory |
+| `wow_usage_v4` | Per-user/per-day usage counters | _incrementUsage | _checkUsage |
+| `wow_budget_v4` | Per-offer budget spend | _incrementUsage | _checkUsage |
+| `wow_offer_versions` | Version snapshots per offer | adminSaveOffer | adminGetVersionHistory |
+| `wow_ab_tests` | A/B test config array | Admin UI | Admin UI |
+| `wow_demand_config` | Demand engine rules | DemandEngine.saveConfig | DemandEngine.loadConfig |
+| `wow_offer_pending_approvals` | Maker-checker queue | MakerChecker.submit | MakerChecker.getPending |
+
+### Admin UI Pages
+
+| Page | Description |
+|------|-------------|
+| `/admin/offer-engine.html` | Full Offer Engine Super Admin — Dashboard, Offer Library (CRUD/Clone/Pause/Archive/Rollback), Simulator Sandbox, Analytics, **A/B Testing**, **Conflict Matrix**, **Priority Ranking**, **Bulk Ops (Import/Export)**, Audit Log |
+| `/admin/offer-analytics.html` | CFO-Grade Analytics — Overview KPIs, Revenue Waterfall, AOV Lift, Leakage Analysis, Coupon Intelligence, **Time Heatmap**, **A/B Test Results**, **Approvals Queue (Maker-Checker)** |
+
+### Offer Condition Types
+`park` · `category` · `qty_total` · `qty_category` · `qty_mix` · `cart_value` · `promo_code` · `coupon_code` · `date_range` · `day_of_week` · `hour_range` · `visit_date` · `channel` · `segment` · `first_booking` · `booking_count` · `ab_variant` · `inventory` · `demand_level` · `cross_category` · `spend_threshold` · `presence`
+
+### Action Types
+`percent` · `flat` · `per_ticket` · `free_tickets` · `slab_percent` · `slab_flat` · `credit` · `fnb_credit` · `fee_waiver` · `price_override` · `percent_cap` · `hybrid`
+
+### Stacking Modes
+- **STACKABLE** — Combines with all other stackable offers (cumulative by priority)
+- **EXCLUSIVE** — Blocks all other offers; best exclusive wins alone
+- **BEST_ONLY** — Best offer within the same `stackFamily` group wins
+- **FAMILY_ONLY** — Only applies alongside other family-specific offers
+
+### Default Offer Library (v4)
+
+| ID | Name | Type | Status | Priority | Stack |
+|----|------|------|--------|----------|-------|
+| WOE4_SUMMER20 | Summer Splash 20% Off | Auto (percent) | Active | 80 | Stackable |
+| WOE4_FAMILY4 | Family of 4 Rs.1,000 Off | Auto (flat) | Active | 75 | Best-Only |
+| WOE4_BOGO_WATER | Buy 1 Get 1 Water Park | Code: BOGO1 | Active | 90 | Exclusive |
+| WOE4_BUY4 | Buy 4 Tickets 10% Off | Auto (percent) | Active | 70 | Stackable |
+| WOE4_WKND_FLASH | Weekend Flash 15% Off | Auto (Fri–Sun) | Active | 85 | Stackable |
+| WOE4_SLAB_TIER | Slab Qty Tiers 5/10/15% | Auto (slab_percent) | Active | 65 | Best-Only |
+| WOE4_PARTNER_CORP | Corporate 18% Off | Code: CORP2026 | Active | 95 | Exclusive |
+| WOE4_FNB_CREDIT | F&B Credit Rs.200 | Auto (fnb_credit) | Active | 60 | Stackable |
 
 ---
 
