@@ -6,8 +6,94 @@
 <title>Reseller ERP — Worlds of Wonder</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
-<script src="../js/wow-auth.js"></script>
 <script src="../js/reseller-engine.js"></script>
+<!-- NOTE: wow-auth.js is intentionally NOT loaded on the Reseller Portal.
+     The Reseller Portal uses its own separate session (wow_reseller_session)
+     and its own login page (reseller/login.html).
+     Super Admin bypass does NOT apply here. -->
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   RESELLER PORTAL AUTH GUARD
+   Reads wow_reseller_session (set by reseller/login.html).
+   Only role === 'RESELLER' is permitted.
+   Super Admin credentials are REJECTED — this is a partner portal,
+   completely separate from WOW internal staff systems.
+   ══════════════════════════════════════════════════════════════════ */
+(function resellerGuard() {
+  const RESELLER_SESSION_KEY = 'wow_reseller_session';
+  const LOGIN_URL = 'login.html';
+
+  function getResellerSession() {
+    try {
+      const raw = sessionStorage.getItem(RESELLER_SESSION_KEY);
+      if (!raw) return null;
+      const sess = JSON.parse(raw);
+      // Validate role strictly
+      if (!sess || sess.role !== 'RESELLER') return null;
+      // Check session age (8 hours = 480 min)
+      if (sess.loginAt && (Date.now() - sess.loginAt) > 480 * 60 * 1000) {
+        sessionStorage.removeItem(RESELLER_SESSION_KEY);
+        return null;
+      }
+      return sess;
+    } catch(e) { return null; }
+  }
+
+  const sess = getResellerSession();
+
+  if (!sess) {
+    // Not logged in → redirect to RESELLER login (not admin login)
+    const redirectTo = encodeURIComponent(window.location.pathname + window.location.search);
+    window.location.replace(LOGIN_URL + '?redirect=' + redirectTo);
+    return;
+  }
+
+  // ── Inject reseller info into the sidebar chip ──────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    var nameEl = document.querySelector('.reseller-chip .rname');
+    var codeEl = document.querySelector('.reseller-chip .rcode');
+    var tierEl = document.querySelector('.reseller-chip .rtier');
+    if (nameEl) nameEl.textContent = sess.name || 'Reseller';
+    if (codeEl) codeEl.textContent = sess.resellerCode || sess.id;
+    if (tierEl) {
+      tierEl.textContent = (sess.tier || 'Bronze').toUpperCase();
+      tierEl.className = 'rtier tier-' + (sess.tier || 'bronze').toLowerCase();
+    }
+
+    // Populate topbar auth widget with reseller name + logout
+    var authEl = document.getElementById('topbar-auth');
+    if (authEl) {
+      authEl.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);' +
+               'display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">' +
+            (sess.name ? sess.name[0].toUpperCase() : 'R') +
+          '</div>' +
+          '<div style="line-height:1.2;">' +
+            '<div style="font-size:12px;font-weight:700;color:var(--text);">' + (sess.name || 'Reseller') + '</div>' +
+            '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Reseller · ' + (sess.resellerCode || '') + '</div>' +
+          '</div>' +
+          '<button id="reseller-logout" style="background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);' +
+               'color:#dc2626;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;' +
+               'font-family:Inter,sans-serif;">' +
+            '<i class="fas fa-sign-out-alt"></i> Logout' +
+          '</button>' +
+        '</div>';
+    }
+
+    // Logout button handler
+    var logoutEl = document.getElementById('reseller-logout');
+    if (logoutEl) {
+      logoutEl.addEventListener('click', function() {
+        sessionStorage.removeItem('wow_reseller_session');
+        sessionStorage.removeItem('wow_reseller_logged_in');
+        window.location.href = LOGIN_URL;
+      });
+    }
+  });
+
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -168,6 +254,7 @@ tbody tr:hover{background:#f9fafb;}
       <div class="sb-lbl">Team</div>
       <a class="sb-item" onclick="showTab('salespersons')"><i class="fas fa-users"></i>Salespersons</a>
       <a class="sb-item" href="salesperson.html"><i class="fas fa-chart-line"></i>Performance Reports</a>
+      <a class="sb-item" href="salesperson-performance.html"><i class="fas fa-trophy"></i>Salesperson Analytics</a>
     </div>
     <div class="sb-section">
       <div class="sb-lbl">Finance</div>
@@ -918,7 +1005,7 @@ function renderSalespersons() {
       '<td style="font-weight:700;">' + utPct + '%</td>' +
       '<td style="font-size:11px;color:var(--muted);">' + (e.lastIssuance||'—') + '</td>' +
       '<td>' + statusBadge(e.status) + '</td>' +
-      '<td><a href="salesperson.html?emp=' + encodeURIComponent(e.employeeCode) + '" class="btn btn-outline btn-xs"><i class="fas fa-chart-line"></i> Report</a></td>' +
+      '<td><a href="salesperson-performance.html?emp=' + encodeURIComponent(e.employeeCode) + '" class="btn btn-outline btn-xs"><i class="fas fa-chart-line"></i> Analytics</a> <a href="salesperson.html?emp=' + encodeURIComponent(e.employeeCode) + '" class="btn btn-outline btn-xs" style="margin-left:4px"><i class="fas fa-file-alt"></i> Report</a></td>' +
     '</tr>';
   }).join('');
 }
