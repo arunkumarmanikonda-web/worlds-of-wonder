@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/booking-page.css" />
   <link rel="stylesheet" href="../css/forms.css" />
+  <link rel="stylesheet" href="../css/offer-widget.css" />
 </head>
 <body>
 <div id="app">
@@ -280,6 +281,21 @@
             </div>
           </div>
 
+          <!-- ── OFFER WIDGET ─────────────────────────── -->
+          <div class="ofw-widget" id="ofw-widget-container">
+            <div class="ofw-widget-header">
+              <span class="ofw-widget-header-icon">🏷️</span>
+              <div>
+                <div class="ofw-widget-header-title">Offers &amp; Discounts</div>
+                <div class="ofw-widget-header-sub">Best deal applied automatically</div>
+              </div>
+              <span class="ofw-widget-header-badge">Live</span>
+            </div>
+            <div id="ofw-widget-body">
+              <div class="ofw-loading"><div class="ofw-loading-spinner"></div> Loading offers…</div>
+            </div>
+          </div>
+
           <!-- What to carry -->
           <div class="bk-info-card" style="margin-top:16px;">
             <div class="bk-info-card-title">📋 What to carry to the park</div>
@@ -344,6 +360,8 @@
 <script src="../js/wow-content-control.js"></script>
 <script src="../js/wow-modules.js"></script>
 <script src="../js/wow-offer-engine-v4.js"></script>
+<script src="../js/wow-offer-cart.js"></script>
+<script src="../js/main.js"></script>
 <script src="../js/shell.js"></script>
 <script src="../js/booking.js"></script>
 <script src="../js/wow-terms.js"></script>
@@ -365,6 +383,41 @@ document.addEventListener('DOMContentLoaded', function () {
     WOWContent.apply();
   }
   WOWBooking.initBookingForm('WATER_DAY');
+
+  // ── Offer Cart Widget Integration ─────────────────────────────
+  if (typeof WOWOfferCart !== 'undefined') {
+    const ofwBody = document.getElementById('ofw-widget-body');
+    if (ofwBody) {
+      WOWOfferCart.mountWidget(ofwBody, {
+        parkKey: 'WATER_DAY',
+        onUpdate: function(result) {
+          // Sync savings back into order summary
+          const offerRow  = document.getElementById('sum-offer-row');
+          const offerLabel = document.getElementById('sum-offer-label');
+          const offerVal  = document.getElementById('sum-offer-val');
+          if (result && result.totalSavings > 0 && offerRow && offerVal) {
+            offerRow.classList.remove('hidden');
+            if (offerLabel) offerLabel.textContent = '🎯 ' + (result.bestOfferName || 'Offer Applied');
+            offerVal.textContent = '−₹' + result.totalSavings.toLocaleString('en-IN');
+          } else if (offerRow) {
+            offerRow.classList.add('hidden');
+          }
+        }
+      });
+      // Trigger evaluation whenever booking state changes
+      document.addEventListener('wow:cart:updated', function(e) {
+        WOWOfferCart.evaluate(e.detail || null);
+      });
+    }
+  }
+
+  // Pre-fill fields for logged-in customers coming from the portal
+  if (typeof window.__wowSessionPrefillLoaded === 'undefined') {
+    var s = document.createElement('script');
+    s.src = '../js/wow-session-prefill.js';
+    document.head.appendChild(s);
+    window.__wowSessionPrefillLoaded = true;
+  }
   // Render T&C consent block
   if (typeof WOWTerms !== 'undefined') {
     WOWTerms.renderConsentBlock('#wtc-consent-container', { context: 'ticket' });
