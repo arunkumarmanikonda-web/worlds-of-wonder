@@ -134,9 +134,8 @@ input:focus{outline:none;border-color:var(--brand);}
   <div>
     <div class="card" style="margin-bottom:16px;">
       <div class="card-title"><i class="fa fa-receipt" style="color:var(--brand);"></i> Order Summary</div>
-      <div class="order-item"><div><div class="order-item-name">💧 Water Park — Adult × 2</div><div class="order-item-sub">28 Mar 2025 · Any Time Entry</div></div><div class="order-item-price">₹1,598</div></div>
-      <div class="order-item"><div><div class="order-item-name">💧 Water Park — Child × 1</div><div class="order-item-sub">Age 3–12 · 28 Mar 2025</div></div><div class="order-item-price">₹499</div></div>
-      <div class="order-item"><div><div class="order-item-name">🎢 Amusement Add-on × 3</div><div class="order-item-sub">Combo upgrade</div></div><div class="order-item-price">₹750</div></div>
+      <!-- Dynamic order items injected from sessionStorage -->
+      <div id="order-items-dynamic"></div>
       <div class="order-item" id="addon-locker" style="display:none;"><div><div class="order-item-name">🔑 Locker × 2</div><div class="order-item-sub">Full Day · Large</div></div><div class="order-item-price">₹200</div></div>
       <div class="order-item" id="addon-meal" style="display:none;"><div><div class="order-item-name">🍽 Meal Voucher × 3</div><div class="order-item-sub">F&B Buffet Credit</div></div><div class="order-item-price">₹897</div></div>
       <div style="margin-top:14px;padding:14px;background:#f8fafc;border-radius:10px;border:1.5px dashed var(--border);">
@@ -145,10 +144,10 @@ input:focus{outline:none;border-color:var(--brand);}
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" onchange="toggleAddon('meal',897)"/> F&B Meal Voucher × 3 — <strong>₹897</strong></label>
       </div>
       <table class="gst-table">
-        <tr><td>Subtotal</td><td id="subtotal-val">₹2,847</td></tr>
-        <tr><td>GST (CGST 9% + SGST 9%)</td><td id="gst-val">₹512</td></tr>
+        <tr><td>Subtotal (incl. GST)</td><td id="subtotal-val">—</td></tr>
+        <tr><td>GST 18% (incl. CGST 9% + SGST 9%)</td><td id="gst-val">—</td></tr>
         <tr id="discount-row" style="display:none;"><td style="color:var(--green);">Promo Discount</td><td id="discount-val" style="color:var(--green);">−₹0</td></tr>
-        <tr class="total-row"><td>Total Payable</td><td id="total-val">₹3,359</td></tr>
+        <tr class="total-row"><td>Total Payable</td><td id="total-val">—</td></tr>
       </table>
       <div class="promo-row">
         <input type="text" id="promo-input" placeholder="Enter promo code (try WOW20)" style="text-transform:uppercase;"/>
@@ -158,12 +157,8 @@ input:focus{outline:none;border-color:var(--brand);}
     </div>
     <div class="card">
       <div class="card-title"><i class="fa fa-user" style="color:var(--brand);"></i> Guest Details</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;">
-        <div><span style="color:var(--muted);font-size:11px;">PRIMARY GUEST</span><div style="font-weight:700;margin-top:2px;">Rajesh Kumar</div></div>
-        <div><span style="color:var(--muted);font-size:11px;">MOBILE</span><div style="font-weight:700;margin-top:2px;">+91 98765 43210</div></div>
-        <div><span style="color:var(--muted);font-size:11px;">EMAIL</span><div style="font-weight:700;margin-top:2px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f5d4e454a5c476f4a424e4643014c4042">[email&#160;protected]</a></div></div>
-        <div><span style="color:var(--muted);font-size:11px;">VISIT DATE</span><div style="font-weight:700;margin-top:2px;">28 Mar 2025</div></div>
-      </div>
+      <!-- Dynamic guest details injected from sessionStorage -->
+      <div id="guest-details-dynamic" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;"></div>
     </div>
   </div>
   <!-- PAYMENT WIDGET -->
@@ -285,69 +280,290 @@ input:focus{outline:none;border-color:var(--brand);}
       <button class="btn btn-brand" style="flex:1;" onclick="alert('📄 Downloading PDF tickets...')"><i class="fa fa-download"></i> Download Tickets (PDF)</button>
       <button class="btn btn-outline" style="flex:1;" onclick="alert('📱 Sharing via WhatsApp...')"><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp</button>
     </div>
-    <div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;background:#f8fafc;border-radius:8px;">📧 Confirmation sent to <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1d6f7c77786e755d78707c7471337e7270">[email&#160;protected]</a></strong> · 📱 SMS to <strong>+91 98765 43210</strong></div>
+    <div class="conf-contact" style="font-size:12px;color:var(--muted);text-align:center;padding:10px;background:#f8fafc;border-radius:8px;">📧 Confirmation details will appear here.</div>
     <div style="text-align:center;"><a href="../index.html" class="btn btn-brand" style="display:inline-flex;margin-top:4px;"><i class="fa fa-home"></i> Back to Home</a></div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-let base=2847,extras=0,discount=0;
+<script>
+// ── Read booking data from sessionStorage (set by booking.js validateAndCheckout) ──
+let _booking = null;
+let _txId    = null;
+try {
+  const raw = sessionStorage.getItem('wow_booking');
+  _txId     = sessionStorage.getItem('wow_tx_id') || ('WOW-' + Date.now().toString(36).toUpperCase());
+  if (raw) _booking = JSON.parse(raw);
+} catch(e) {}
+
+// ── Fallback guard: if no booking data, show a warning ──
+if (!_booking) {
+  document.addEventListener('DOMContentLoaded', function() {
+    const layout = document.getElementById('payment-layout');
+    if (layout) layout.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+        <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+        <h2 style="font-size:20px;font-weight:800;color:#0a1628;margin-bottom:8px;">No Booking Found</h2>
+        <p style="font-size:14px;color:#64748b;margin-bottom:24px;">It looks like you arrived here without selecting tickets.<br>Please go back and select your tickets first.</p>
+        <a href="water-park.html" class="btn btn-brand" style="margin-right:10px;"><i class="fa fa-arrow-left"></i> Water Park</a>
+        <a href="amusement-park.html" class="btn btn-brand"><i class="fa fa-arrow-left"></i> Amusement Park</a>
+        <a href="combo.html" class="btn btn-brand" style="margin-left:10px;"><i class="fa fa-arrow-left"></i> Combo</a>
+      </div>`;
+  });
+}
+
+// INR formatter
+function inr(n){ return '₹\u202F' + Number(Math.round(n)).toLocaleString('en-IN'); }
+
+// ── Base amounts from booking data ──
+let base     = _booking ? _booking.total : 2847;
+let extras   = 0;
+let discount = 0;
+
+// ── Populate order summary from booking data ──
+function populateOrderSummary() {
+  if (!_booking) return;
+
+  const parkLabels = { waterpark:'Water Park', amusement:'Amusement Park', combo:'Combo (Both Parks)' };
+  const parkEmoji  = { waterpark:'🌊', amusement:'🎢', combo:'🎟' };
+  const park = _booking.park || 'waterpark';
+  const parkLabel = parkLabels[park] || 'Park';
+  const emoji     = parkEmoji[park]  || '🎫';
+  const dateStr   = _booking.date ? new Date(_booking.date + 'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+
+  // Build order items HTML
+  const catMap = {
+    adults:   { label:'Adult',            emoji:'🧑' },
+    children: { label:'Child',            emoji:'🧒' },
+    seniors:  { label:'Senior Citizen',   emoji:'👴' },
+    armed:    { label:'Armed Forces',     emoji:'🎖' },
+    disabled: { label:'Differently Abled',emoji:'♿' },
+  };
+
+  let itemsHtml = '';
+  if (_booking.items && _booking.items.length) {
+    _booking.items.forEach(function(item) {
+      itemsHtml += `<div class="order-item">
+        <div><div class="order-item-name">${emoji} ${parkLabel} — ${item.name} × ${item.qty}</div>
+        <div class="order-item-sub">${dateStr} · Any Time Entry</div></div>
+        <div class="order-item-price">${inr(item.price * item.qty)}</div>
+      </div>`;
+    });
+  } else {
+    // Fallback: generate from qty fields
+    Object.keys(catMap).forEach(function(k) {
+      const qty = _booking[k] || 0;
+      if (qty > 0) {
+        itemsHtml += `<div class="order-item">
+          <div><div class="order-item-name">${emoji} ${parkLabel} — ${catMap[k].label} × ${qty}</div>
+          <div class="order-item-sub">${dateStr}</div></div>
+          <div class="order-item-price">—</div>
+        </div>`;
+      }
+    });
+  }
+
+  // Offer/discount row
+  if (_booking.discount && _booking.discount > 0) {
+    const offerLabel = _booking.offerName || (_booking.promoCode ? 'Promo: '+_booking.promoCode : 'Discount');
+    itemsHtml += `<div class="order-item" style="color:#059669;">
+      <div><div class="order-item-name">🎉 ${offerLabel}</div></div>
+      <div class="order-item-price" style="color:#059669;">−${inr(_booking.discount)}</div>
+    </div>`;
+  }
+
+  // Buffet row
+  if (_booking.buffetQty && _booking.buffetQty > 0) {
+    itemsHtml += `<div class="order-item">
+      <div><div class="order-item-name">🍽 Buffet Meal × ${_booking.buffetQty}</div></div>
+      <div class="order-item-price">${inr(_booking.buffetTotal)}</div>
+    </div>`;
+  }
+
+  // Replace static items in summary card
+  const itemsContainer = document.getElementById('order-items-dynamic');
+  if (itemsContainer) itemsContainer.innerHTML = itemsHtml;
+
+  // Guest details
+  const guestEl = document.getElementById('guest-details-dynamic');
+  if (guestEl) {
+    guestEl.innerHTML = `
+      <div><span style="color:var(--muted);font-size:11px;">PRIMARY GUEST</span><div style="font-weight:700;margin-top:2px;">${_booking.name || '—'}</div></div>
+      <div><span style="color:var(--muted);font-size:11px;">MOBILE</span><div style="font-weight:700;margin-top:2px;">+91 ${_booking.mobile || '—'}</div></div>
+      <div><span style="color:var(--muted);font-size:11px;">EMAIL</span><div style="font-weight:700;margin-top:2px;">${_booking.email || '—'}</div></div>
+      <div><span style="color:var(--muted);font-size:11px;">VISIT DATE</span><div style="font-weight:700;margin-top:2px;">${dateStr}</div></div>`;
+  }
+}
+
 function recalc(){
-  const sub=base+extras,gst=Math.round(sub*.18),total=sub+gst-discount;
-  document.getElementById('subtotal-val').textContent='₹'+sub.toLocaleString('en-IN');
-  document.getElementById('gst-val').textContent='₹'+gst.toLocaleString('en-IN');
-  document.getElementById('total-val').textContent='₹'+total.toLocaleString('en-IN');
-  document.getElementById('pay-amount').textContent='₹'+total.toLocaleString('en-IN');
-  window._total=total;
+  // Prices are already GST-inclusive; GST is embedded (18% GST → 18/118 of total)
+  const total   = base + extras - discount;
+  const gstAmt  = Math.round(total - total / 1.18);
+  const stEl    = document.getElementById('subtotal-val');
+  const gstEl   = document.getElementById('gst-val');
+  const totEl   = document.getElementById('total-val');
+  const payEl   = document.getElementById('pay-amount');
+  if (stEl)  stEl.textContent  = inr(base + extras);
+  if (gstEl) gstEl.textContent = inr(gstAmt) + ' (incl.)';
+  if (totEl) totEl.textContent = inr(total);
+  if (payEl) payEl.textContent = inr(total);
+  window._total = total;
 }
-recalc();
-function toggleAddon(type,amt){
-  const el=document.getElementById('addon-'+type);
-  if(el.style.display==='none'){el.style.display='flex';extras+=amt;}else{el.style.display='none';extras-=amt;}recalc();
+
+function toggleAddon(type, amt){
+  const el = document.getElementById('addon-'+type);
+  if (!el) return;
+  if (el.style.display === 'none') { el.style.display='flex'; extras += amt; }
+  else { el.style.display='none'; extras -= amt; }
+  recalc();
 }
-const promos={WOW20:{pct:20,label:'20% off'},SPLASH10:{pct:10,label:'10% off'},FIRST50:{flat:50,label:'₹50 off'}};
+
+// Apply promo codes — checks against real engine if available, else demo list
+const demoCodes = { WOW20:{pct:20,label:'20% off'}, SPLASH10:{pct:10,label:'10% off'}, FIRST50:{flat:50,label:'₹50 off'} };
 function applyPromo(){
-  const code=document.getElementById('promo-input').value.trim().toUpperCase();
-  const msg=document.getElementById('promo-msg');
-  if(promos[code]){
-    const p=promos[code];
-    discount=p.pct?Math.round((base+extras)*p.pct/100):p.flat;
-    document.getElementById('discount-row').style.display='';
-    document.getElementById('discount-val').textContent='−₹'+discount.toLocaleString('en-IN');
-    msg.style.color='var(--green)';msg.textContent='✓ Promo applied: '+p.label;recalc();
-  }else{msg.style.color='var(--red)';msg.textContent='Invalid code. Try WOW20';}
+  const code = document.getElementById('promo-input').value.trim().toUpperCase();
+  const msg  = document.getElementById('promo-msg');
+  if (!code) return;
+  const p = demoCodes[code];
+  if (p) {
+    discount = p.pct ? Math.round((base+extras)*p.pct/100) : p.flat;
+    document.getElementById('discount-row').style.display = '';
+    document.getElementById('discount-val').textContent = '−' + inr(discount);
+    msg.style.color = 'var(--green)'; msg.textContent = '✓ Promo ' + code + ' applied: ' + p.label;
+    recalc();
+  } else {
+    msg.style.color = 'var(--red)'; msg.textContent = '✗ Invalid code. Try WOW20';
+  }
 }
-function selectMethod(m,el){
+
+function selectMethod(m, el){
   document.querySelectorAll('.pay-method').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.pay-section').forEach(s=>s.classList.remove('show'));
-  el.classList.add('active');document.getElementById('section-'+m).classList.add('show');
+  el.classList.add('active');
+  document.getElementById('section-'+m).classList.add('show');
 }
-function selectUPI(el,app){document.querySelectorAll('.upi-app').forEach(e=>e.style.borderColor='var(--border)');el.style.borderColor='var(--brand)';document.getElementById('upi-id').value=app+'@upi';}
-function verifyUPI(){const v=document.getElementById('upi-verified');v.style.color='var(--green)';v.textContent='✓ UPI ID verified';}
-function selBank(el){document.querySelectorAll('.bank-btn').forEach(b=>b.style.borderColor='var(--border)');el.style.borderColor='var(--brand)';}
-function formatCard(el){let v=el.value.replace(/\D/g,''),f='';for(let i=0;i<v.length;i++){if(i&&i%4===0)f+='  ';f+=v[i];}el.value=f;const ic=document.getElementById('card-brand-icon');ic.className=v.startsWith('4')?'fab fa-cc-visa card-brand-icon':v.startsWith('5')?'fab fa-cc-mastercard card-brand-icon':'fa fa-credit-card card-brand-icon';}
-function formatExpiry(el){let v=el.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2,4);el.value=v;}
+function selectUPI(el, app){
+  document.querySelectorAll('.upi-app').forEach(e=>e.style.borderColor='var(--border)');
+  el.style.borderColor='var(--brand)';
+  document.getElementById('upi-id').value=app+'@upi';
+}
+function verifyUPI(){ const v=document.getElementById('upi-verified'); v.style.color='var(--green)'; v.textContent='✓ UPI ID verified'; }
+function selBank(el){ document.querySelectorAll('.bank-btn').forEach(b=>b.style.borderColor='var(--border)'); el.style.borderColor='var(--brand)'; }
+function formatCard(el){
+  let v=el.value.replace(/\D/g,''),f='';
+  for(let i=0;i<v.length;i++){if(i&&i%4===0)f+='  ';f+=v[i];}
+  el.value=f;
+  const ic=document.getElementById('card-brand-icon');
+  ic.className=v.startsWith('4')?'fab fa-cc-visa card-brand-icon':v.startsWith('5')?'fab fa-cc-mastercard card-brand-icon':'fa fa-credit-card card-brand-icon';
+}
+function formatExpiry(el){ let v=el.value.replace(/\D/g,''); if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2,4); el.value=v; }
+
 function initiatePayment(){
-  const o=document.getElementById('processing');
+  const o = document.getElementById('processing');
   o.classList.add('show');
-  setTimeout(()=>{document.getElementById('proc-title').textContent='Authenticating…';document.getElementById('proc-sub').textContent='Verifying with bank…';},800);
-  setTimeout(()=>{document.getElementById('proc-title').textContent='Payment Successful!';document.getElementById('proc-spinner').style.borderTopColor='var(--green)';},2200);
-  setTimeout(()=>{o.classList.remove('show');showConfirmation();},3500);
+  setTimeout(()=>{ document.getElementById('proc-title').textContent='Authenticating…'; document.getElementById('proc-sub').textContent='Verifying with bank…'; }, 800);
+  setTimeout(()=>{ document.getElementById('proc-title').textContent='Payment Successful!'; document.getElementById('proc-spinner').style.borderTopColor='var(--green)'; }, 2200);
+  setTimeout(()=>{ o.classList.remove('show'); showConfirmation(); }, 3500);
 }
-function genId(prefix,len){return prefix+'-'+Math.random().toString(36).substr(2,len).toUpperCase();}
+
+function genId(prefix, len){ return prefix+'-'+Math.random().toString(36).substr(2,len).toUpperCase(); }
+
 function showConfirmation(){
-  document.getElementById('payment-layout').style.display='none';
-  const bid=genId('WOW-2025',5),t1=genId('TKT',8),t2=genId('TKT',8);
-  document.getElementById('booking-id').textContent=bid;
-  document.getElementById('conf-amount').textContent=document.getElementById('pay-amount').textContent;
-  document.getElementById('tid-1').textContent=t1;
-  document.getElementById('tid-2').textContent=t2;
-  document.getElementById('stepper-bar').innerHTML='<div class="stepper-inner"><div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Choose Tickets</div></div><div class="step-line done"></div><div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Guest Details</div></div><div class="step-line done"></div><div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Payment</div></div><div class="step-line done"></div><div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Confirmation</div></div></div>';
-  document.getElementById('confirmation-page').style.display='block';
-  try{new QRCode(document.getElementById('qr-1'),{text:t1+'|WaterPark|28Mar2025',width:80,height:80,colorDark:'#0a1628',colorLight:'#fff'});}catch(e){}
-  try{new QRCode(document.getElementById('qr-2'),{text:t2+'|Amusement|28Mar2025',width:80,height:80,colorDark:'#6d28d9',colorLight:'#fff'});}catch(e){}
+  // Commit offer usage counts if booking engine is in scope
+  try { if (typeof window._wowCommitOfferUsage === 'function') window._wowCommitOfferUsage(); } catch(_){}
+
+  document.getElementById('payment-layout').style.display = 'none';
+
+  const year    = new Date().getFullYear();
+  const bid     = 'WOW-' + year + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
+  const t1      = genId('TKT', 8);
+  const confAmt = document.getElementById('pay-amount').textContent;
+  const gname   = _booking ? _booking.name   : 'Guest';
+  const gmobile = _booking ? '+91 ' + _booking.mobile : '—';
+  const gemail  = _booking ? _booking.email  : '—';
+  const gdate   = _booking && _booking.date
+    ? new Date(_booking.date+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'long',year:'numeric'})
+    : '—';
+
+  const parkLabels = { waterpark:'Water Park', amusement:'Amusement Park', combo:'Combo — Both Parks' };
+  const parkEmoji  = { waterpark:'💧', amusement:'🎢', combo:'🎟' };
+  const park = _booking ? (_booking.park || 'waterpark') : 'waterpark';
+  const parkLabel = parkLabels[park] || 'Park';
+  const emoji     = parkEmoji[park]  || '🎫';
+
+  const totalTix = _booking
+    ? ((_booking.adults||0)+(_booking.children||0)+(_booking.seniors||0)+(_booking.armed||0)+(_booking.disabled||0))
+    : 1;
+  const catSummary = _booking ? [
+    _booking.adults   ? 'Adult ×'+_booking.adults   : '',
+    _booking.children ? 'Child ×'+_booking.children : '',
+    _booking.seniors  ? 'Senior ×'+_booking.seniors : '',
+    _booking.armed    ? 'Armed Forces ×'+_booking.armed : '',
+    _booking.disabled ? 'PwD ×'+_booking.disabled   : '',
+  ].filter(Boolean).join(' · ') : '1 Ticket';
+
+  // Save booking confirmation to localStorage for history
+  try {
+    const confirmed = {
+      bookingId: bid, txId: _txId, ticketId: t1,
+      ..._booking,
+      paidAt: Date.now(), amountPaid: window._total || base,
+      status: 'confirmed'
+    };
+    const hist = JSON.parse(localStorage.getItem('wow_booking_history') || '[]');
+    hist.unshift(confirmed);
+    if (hist.length > 50) hist.length = 50;
+    localStorage.setItem('wow_booking_history', JSON.stringify(hist));
+    // Clear session booking data
+    sessionStorage.removeItem('wow_booking');
+    sessionStorage.removeItem('wow_tx_id');
+  } catch(_) {}
+
+  document.getElementById('booking-id').textContent = bid;
+  document.getElementById('conf-amount').textContent = confAmt;
+  document.getElementById('tid-1').textContent = t1;
+
+  // Update ticket card content dynamically
+  const ticketTop = document.querySelector('.ticket-top h3');
+  if (ticketTop) ticketTop.textContent = emoji + ' ' + parkLabel + ' Admission';
+  const ticketSpan = document.querySelector('.ticket-top span');
+  if (ticketSpan) ticketSpan.textContent = _booking ? _booking.date : '';
+  const ticketCatSpan = document.querySelector('.ticket-top div span');
+  if (ticketCatSpan) ticketCatSpan.textContent = catSummary;
+  const ticketName = document.querySelector('.ticket-info .name');
+  if (ticketName) ticketName.textContent = gname;
+  const ticketMeta = document.querySelector('.ticket-info .meta');
+  if (ticketMeta) ticketMeta.textContent = 'Worlds of Wonder, Sector 38A, Noida';
+  const ticketFooter = document.querySelector('.ticket-footer span:first-child');
+  if (ticketFooter) ticketFooter.textContent = '🕒 Valid: ' + (_booking ? _booking.date : '') + ' · 09:00–18:00';
+
+  // Confirmation contact info
+  const confContact = document.querySelector('.conf-contact');
+  if (confContact) confContact.innerHTML = '📧 Confirmation sent to <strong>' + gemail + '</strong> · 📱 SMS to <strong>' + gmobile + '</strong>';
+
+  document.getElementById('stepper-bar').innerHTML = `<div class="stepper-inner">
+    <div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Choose Tickets</div></div>
+    <div class="step-line done"></div>
+    <div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Guest Details</div></div>
+    <div class="step-line done"></div>
+    <div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Payment</div></div>
+    <div class="step-line done"></div>
+    <div class="step done"><div class="step-dot"><i class="fa fa-check"></i></div><div class="step-label">Confirmation</div></div>
+  </div>`;
+  document.getElementById('confirmation-page').style.display = 'block';
+
+  try {
+    const qrData = t1 + '|' + parkLabel + '|' + (_booking ? _booking.date : '') + '|' + gname;
+    new QRCode(document.getElementById('qr-1'),{text:qrData,width:100,height:100,colorDark:'#0a1628',colorLight:'#fff'});
+  } catch(e){}
+
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// ── Init on DOM ready ──
+document.addEventListener('DOMContentLoaded', function() {
+  populateOrderSummary();
+  recalc();
+});
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
 </html>
