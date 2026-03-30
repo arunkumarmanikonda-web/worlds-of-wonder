@@ -635,17 +635,18 @@ function emailLogin(e) {
     showMsg('ind-msg','error','Please enter both email and password.');
     return;
   }
-  showMsg('ind-msg','success','✅ Signing in… Redirecting to your dashboard.');
-  if (typeof WOWAuth !== 'undefined') {
-    WOWAuth.setSession({id:'DEMO-CUST',name:email.split('@')[0]||'Customer',email:email,role:'CUSTOMER',loginAt:Date.now()});
-  }
-  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+  setCustomerSession({id:'DEMO-CUST',name:email.split('@')[0]||'Customer',email:email,role:'CUSTOMER'});
+  var dest = getPostLoginDest();
+  showMsg('ind-msg','success','✅ Signing in… Redirecting to ' + dest + '…');
+  setTimeout(function(){ window.location.href = dest; }, 800);
 }
 
 // ── SOCIAL LOGIN ──────────────────────────────────────────────────────
 function socialLogin(provider) {
-  showMsg('ind-msg','success','Redirecting to ' + provider + ' sign-in...');
-  setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+  setCustomerSession({id:'DEMO-CUST',name:provider+'User',email:'social@wow.in',role:'CUSTOMER'});
+  var dest = getPostLoginDest();
+  showMsg('ind-msg','success','Redirecting to ' + provider + ' sign-in…');
+  setTimeout(function(){ window.location.href = dest; }, 1200);
 }
 
 // ── BUSINESS LOGIN ────────────────────────────────────────────────────
@@ -734,15 +735,22 @@ window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   if (params.get('type') === 'business') setTab('business');
   if (params.get('error') === 'access_denied') showMsg('ind-msg','error','Session expired or access denied.');
+
+  // Passport hint — show contextual banner when redirected from passport pages
+  if (params.get('hint') === 'passport') {
+    const hintBar = document.createElement('div');
+    hintBar.style.cssText = 'background:linear-gradient(135deg,#78350f,#92400e);border:1px solid rgba(201,168,76,.3);color:#fde68a;font-size:13px;font-weight:600;padding:10px 16px;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;gap:8px;';
+    hintBar.innerHTML = '<span style="font-size:18px">🪪</span> Sign in to view your <strong>WOW Passport</strong> — it\'s the same as your individual account.';
+    const msgEl = document.getElementById('ind-msg');
+    if (msgEl && msgEl.parentNode) msgEl.parentNode.insertBefore(hintBar, msgEl);
+  }
   if (typeof WOWAuth !== 'undefined') {
     const session = WOWAuth.getSession();
-    // Only redirect CUSTOMER role — Super Admin should go to admin dashboard, not here
+    // Only redirect CUSTOMER role — Super Admin should NOT auto-redirect from this portal login
     if (session && session.role === 'CUSTOMER') {
-      window.location.href = params.get('redirect') || 'dashboard.html'; return;
+      window.location.href = getPostLoginDest(); return;
     }
-    if (session && session.role === 'SUPER_ADMIN') {
-      window.location.href = params.get('redirect') || '../admin/index.html'; return;
-    }
+    // Super Admin is NOT a customer — do not auto-redirect them into the customer portal
     // SA bypass button at extreme top-right
     const saBtn = document.createElement('div');
     saBtn.style.cssText = 'position:fixed;top:12px;right:14px;z-index:1000;';
@@ -751,22 +759,60 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Patch OTP verify — always redirect to CUSTOMER dashboard
+// Shared redirect helper — keeps customers inside portal/booking pages, never admin
+function getPostLoginDest() {
+  var params = new URLSearchParams(window.location.search);
+  var raw = (params.get('redirect') || '').trim();
+  // Block anything that could route to restricted staff portals
+  if (!raw || /admin|super|internal|sales|partner|reseller|ta\b|\.\./i.test(raw)) {
+    return 'dashboard.html';
+  }
+  // Allowed portal pages (relative to portal/)
+  var allowedPortal = ['dashboard.html','wow-passport.html','my-bookings.html',
+                       'passport.html','passport-card.html','tickets.html',
+                       'loyalty.html','wallet.html','profile.html','offers.html',
+                       'notifications.html','referral.html','guest-details.html'];
+  // Allowed booking pages (relative to book/)
+  var allowedBook   = ['water-park.html','amusement-park.html','combo.html',
+                       'passport.html','group.html','payment.html'];
+
+  // Determine if the redirect is a book/ page or portal/ page
+  var cleanPath = raw.replace(/^[./]+/,''); // strip leading ./ or ../
+  if (/^book\//.test(cleanPath)) {
+    var bookPage = cleanPath.replace('book/','').split('?')[0];
+    if (allowedBook.indexOf(bookPage) !== -1) {
+      // Build the URL back from the login page (portal/) to book/
+      var qs = raw.includes('?') ? raw.split('?').slice(1).join('?') : '';
+      return '../book/' + bookPage + (qs ? '?' + qs : '');
+    }
+  }
+  var pageName = raw.split('/').pop().split('?')[0];
+  return allowedPortal.indexOf(pageName) !== -1 ? pageName : 'dashboard.html';
+}
+
+// ── Persist customer session to BOTH sessionStorage AND localStorage ──
+// This ensures the session survives new tabs, page navigations, and browser
+// restores — critical so Quick Book from the portal doesn't loop back to login.
+function setCustomerSession(payload) {
+  var s = Object.assign({}, payload, { loginAt: payload.loginAt || Date.now() });
+  var json = JSON.stringify(s);
+  try { sessionStorage.setItem('wow_auth_session', json); } catch(e) {}
+  try { localStorage.setItem('wow_auth_session', json);   } catch(e) {}
+  // Also write to portal-specific key for backwards compat with wow-session-prefill
+  try { sessionStorage.setItem('wow_portal_session', json); } catch(e) {}
+  try { localStorage.setItem('wow_portal_session', json);   } catch(e) {}
+}
+
+// Patch OTP verify — always redirect CUSTOMER to portal page, never to admin
 function verifyOTP() {
   const otp = ['otp1','otp2','otp3','otp4'].map(function(id){ var el=document.getElementById(id); return el?el.value:''; }).join('');
   if (otp === '1234') {
-    if (typeof WOWAuth !== 'undefined') {
-      WOWAuth.setSession({id:'DEMO-CUST',name:'Demo Customer',email:'customer@wow.in',role:'CUSTOMER',pin:'1234',loginAt:Date.now()});
-    }
-    showMsg('ind-msg','success','✅ Verified! Redirecting to your dashboard…');
-    var params = new URLSearchParams(window.location.search);
-    // Always redirect CUSTOMER to their dashboard, never to admin
-    var dest = params.get('redirect');
-    if (!dest || dest.includes('admin')) dest = 'dashboard.html';
-    setTimeout(function(){ window.location.href = dest; }, 1000);
+    setCustomerSession({id:'DEMO-CUST',name:'Demo Customer',email:'customer@wow.in',role:'CUSTOMER',pin:'1234'});
+    var dest = getPostLoginDest();
+    showMsg('ind-msg','success','✅ Verified! Redirecting to ' + dest + '…');
+    setTimeout(function(){ window.location.href = dest; }, 800);
   } else {
     showMsg('ind-msg','error','✗ Incorrect OTP. Demo OTP is: 1 2 3 4');
-    // Shake OTP boxes on error
     document.querySelectorAll('.otp-input').forEach(function(el){
       el.style.borderColor='#ef4444';
       setTimeout(function(){ el.style.borderColor=''; },1500);
