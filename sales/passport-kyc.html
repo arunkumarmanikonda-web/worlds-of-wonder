@@ -301,15 +301,15 @@ a{text-decoration:none;color:inherit;}
       <!-- Upload mode -->
       <div id="upload-mode">
         <div class="photo-zone">
-          <div class="photo-box" id="selfie-box" onclick="document.getElementById('selfie-file').click()">
-            <input type="file" id="selfie-file" accept="image/*" capture="user" onchange="handleSelfieUpload(event)" style="display:none;"/>
+          <div class="photo-box" id="selfie-box">
+            <input type="file" id="selfie-file" accept="image/*" capture="user" onchange="handleSelfieUpload(event)"/>
             <span class="photo-box-icon" id="selfie-icon">🤳</span>
             <div class="photo-box-label">Selfie / Live Photo</div>
             <div class="photo-box-hint">Front-facing, no glasses, plain background</div>
             <img id="selfie-preview" class="photo-preview"/>
           </div>
-          <div class="photo-box" id="id-photo-box" onclick="document.getElementById('id-photo-file').click()">
-            <input type="file" id="id-photo-file" accept="image/*" onchange="handleIdPhotoUpload(event)" style="display:none;"/>
+          <div class="photo-box" id="id-photo-box">
+            <input type="file" id="id-photo-file" accept="image/*" onchange="handleIdPhotoUpload(event)"/>
             <span class="photo-box-icon" id="id-photo-icon">🪪</span>
             <div class="photo-box-label">Selfie with ID (Enhanced KYC)</div>
             <div class="photo-box-hint">Hold ID card next to your face</div>
