@@ -49,51 +49,313 @@ a{text-decoration:none;color:inherit;}
 .pp-pill-info strong{font-size:12px;font-weight:700;display:block;}
 .pp-pill-info small{font-size:10px;color:var(--muted);}
 
-/* DIGITAL PASSPORT CARD */
-.passport-card-wrap{perspective:1000px;margin-bottom:24px;}
+/* ══════════════════════════════════════
+   INDIAN PASSPORT BOOKLET DESIGN
+   ══════════════════════════════════════ */
+
+/* PASSPORT BOOKLET WRAPPER */
+.passport-booklet-wrap{
+  width:100%;max-width:660px;margin-bottom:20px;
+  cursor:pointer;
+  filter:drop-shadow(0 20px 60px rgba(0,0,0,.35));
+  transition:filter .3s;
+}
+.passport-booklet-wrap:hover{filter:drop-shadow(0 28px 70px rgba(0,0,0,.45));}
+
+/* COVER */
+.pp-cover{
+  border-radius:14px 14px 4px 4px;
+  background:linear-gradient(160deg,#1a0900 0%,#2c1200 18%,#1e0b00 36%,#2c1200 55%,#1a0900 72%,#2c1200 100%);
+  padding:32px 28px 24px;
+  position:relative;overflow:hidden;
+  border:2px solid var(--gold3);
+  box-shadow:0 0 0 1px rgba(240,208,128,.08) inset,0 2px 0 rgba(240,208,128,.15) inset;
+}
+.pp-cover::before{
+  content:'';
+  position:absolute;inset:6px;
+  border:1px solid rgba(201,168,76,.12);
+  border-radius:9px;
+  pointer-events:none;
+}
+/* Guilloché security pattern */
+.pp-cover::after{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    repeating-linear-gradient(30deg,transparent,transparent 8px,rgba(201,168,76,.025) 8px,rgba(201,168,76,.025) 9px),
+    repeating-linear-gradient(-30deg,transparent,transparent 8px,rgba(201,168,76,.025) 8px,rgba(201,168,76,.025) 9px),
+    repeating-linear-gradient(90deg,transparent,transparent 16px,rgba(201,168,76,.015) 16px,rgba(201,168,76,.015) 17px);
+  pointer-events:none;
+}
+.cov-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;position:relative;z-index:2;
+}
+.cov-title-block{text-align:center;flex:1;}
+.cov-country{
+  font-family:'Cinzel',serif;font-size:8.5px;font-weight:600;
+  letter-spacing:4px;color:var(--gold2);text-transform:uppercase;
+  margin-bottom:1px;
+}
+.cov-org{
+  font-family:'Cinzel',serif;font-size:13px;font-weight:700;
+  color:var(--gold);letter-spacing:.5px;
+}
+.cov-sub{
+  font-family:'Cinzel',serif;font-size:7px;
+  letter-spacing:2.5px;color:rgba(240,208,128,.45);
+  text-transform:uppercase;margin-top:1px;
+}
+.cov-ornament{font-size:22px;color:rgba(201,168,76,.25);line-height:1;}
+
+/* WOW EMBLEM — SVG line-art */
+.cov-emblem-wrap{
+  display:flex;justify-content:center;align-items:center;
+  margin:10px 0 16px;
+  position:relative;z-index:2;
+}
+.cov-emblem-ring{
+  width:100px;height:100px;border-radius:50%;
+  border:2px solid rgba(201,168,76,.5);
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%);
+  box-shadow:0 0 20px rgba(201,168,76,.2),inset 0 0 20px rgba(201,168,76,.06);
+  position:relative;
+}
+.cov-emblem-ring::before{
+  content:'';
+  position:absolute;inset:5px;
+  border-radius:50%;
+  border:1px solid rgba(201,168,76,.2);
+}
+.cov-emblem-svg{width:70px;height:70px;}
+.cov-passport-label{
+  text-align:center;position:relative;z-index:2;margin-bottom:12px;
+}
+.cov-pp-text{
+  font-family:'Cinzel',serif;font-size:18px;font-weight:300;
+  letter-spacing:8px;color:var(--gold2);text-transform:uppercase;
+}
+.cov-pp-hindi{
+  font-size:11px;color:rgba(240,208,128,.4);letter-spacing:2px;margin-top:2px;
+}
+.cov-plan-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);
+  border-radius:20px;padding:5px 14px;
+  font-family:'Cinzel',serif;font-size:8px;font-weight:600;
+  color:var(--gold);letter-spacing:.5px;text-transform:uppercase;
+  position:relative;z-index:2;
+}
+.cov-bottom{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-top:14px;position:relative;z-index:2;
+}
+.cov-bot-lbl{font-size:7px;color:rgba(240,208,128,.35);letter-spacing:2px;text-transform:uppercase;}
+.cov-bot-val{font-size:9px;color:rgba(240,208,128,.7);font-weight:700;font-family:'Cinzel',serif;letter-spacing:.3px;}
+
+/* SPINE */
+.pp-spine{
+  height:7px;
+  background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold2),var(--gold),var(--gold3));
+  box-shadow:0 1px 6px rgba(201,168,76,.4);
+}
+
+/* INNER PAGES */
+.pp-inner{
+  background:linear-gradient(180deg,#f8f3e6 0%,#fffdf5 40%,#f5f0e0 100%);
+  border-radius:0 0 12px 12px;
+  border:1px solid #c8b870;
+  border-top:none;
+  overflow:hidden;
+  position:relative;
+}
+/* Security strip at top of inner page */
+.pp-sec-strip{
+  background:linear-gradient(90deg,#00256b 0%,#003399 50%,#00256b 100%);
+  padding:7px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.pp-sec-strip-text{
+  font-family:'Courier New',monospace;font-size:7.5px;
+  color:rgba(255,255,255,.65);letter-spacing:2px;text-transform:uppercase;
+}
+.pp-sec-strip-id{
+  font-family:'Courier New',monospace;font-size:9px;
+  color:var(--gold);font-weight:700;letter-spacing:1.5px;
+}
+/* Data page */
+.pp-data-page{padding:20px 24px;position:relative;}
+.pp-watermark{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;z-index:0;
+}
+.pp-wm-text{
+  font-family:'Cinzel',serif;font-size:80px;font-weight:700;
+  color:rgba(180,150,50,.06);letter-spacing:8px;transform:rotate(-25deg);
+  user-select:none;
+}
+.pp-page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;position:relative;z-index:1;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(180,150,50,.25);
+}
+.pp-page-header-left .pp-type-line{
+  font-family:'Courier New',monospace;font-size:8.5px;
+  color:rgba(10,22,40,.5);letter-spacing:2px;text-transform:uppercase;
+}
+.pp-page-header-left .pp-page-title{
+  font-family:'Cinzel',serif;font-size:14px;font-weight:700;
+  color:#0a1628;letter-spacing:.5px;margin-top:2px;
+}
+.pp-page-header-right{text-align:right;}
+.pp-page-header-right .pp-issued-by{font-size:8px;color:rgba(10,22,40,.45);letter-spacing:1px;text-transform:uppercase;}
+.pp-page-header-right .pp-org-name{font-family:'Cinzel',serif;font-size:11px;font-weight:700;color:#0a1628;}
+/* Passport number bar */
+.pp-num-bar{
+  background:linear-gradient(135deg,rgba(0,37,107,.08),rgba(0,37,107,.04));
+  border:1px solid rgba(0,37,107,.12);
+  border-radius:8px;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;position:relative;z-index:1;
+}
+.pp-num-bar-label{font-size:8px;color:rgba(10,22,40,.45);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:2px;}
+.pp-num-bar-id{font-family:'Courier New',monospace;font-size:16px;font-weight:700;color:#0a1628;letter-spacing:2px;}
+.pp-num-bar-qr{flex-shrink:0;}
+
+/* BIO SECTION */
+.pp-bio{
+  display:grid;grid-template-columns:100px 1fr;gap:16px;
+  margin-bottom:14px;position:relative;z-index:1;
+}
+.pp-photo-wrap{
+  width:100px;height:120px;
+  border:2px solid rgba(0,37,107,.25);
+  border-radius:4px;
+  background:rgba(0,37,107,.04);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;flex-shrink:0;
+}
+.pp-photo-wrap img{width:100%;height:100%;object-fit:cover;}
+.pp-photo-placeholder{font-size:36px;color:rgba(0,37,107,.2);}
+.pp-photo-label{font-size:8px;color:rgba(10,22,40,.4);letter-spacing:1px;text-align:center;margin-top:4px;text-transform:uppercase;}
+.pp-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pp-field{}
+.pp-field-label{font-size:8px;color:rgba(10,22,40,.45);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:2px;}
+.pp-field-val{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:#0a1628;}
+.pp-field.full{grid-column:1/-1;}
+.pp-field-name{font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:#0a1628;letter-spacing:.5px;}
+/* Validity strip */
+.pp-validity-strip{
+  background:linear-gradient(90deg,rgba(0,37,107,.06),rgba(0,37,107,.03));
+  border:1px solid rgba(0,37,107,.1);
+  border-radius:6px;padding:8px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;position:relative;z-index:1;
+}
+.pp-validity-col{text-align:center;}
+.pp-validity-col label{font-size:7.5px;color:rgba(10,22,40,.4);letter-spacing:1px;text-transform:uppercase;display:block;}
+.pp-validity-col span{font-family:'Courier New',monospace;font-size:12px;font-weight:700;color:#0a1628;}
+.pp-validity-divider{color:rgba(10,22,40,.2);font-size:16px;}
+/* Status badge on inner page */
+.pp-inner-status{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;border-radius:20px;
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;
+}
+.pp-inner-status.active{background:#dcfce7;color:#166534;border:1px solid #86efac;}
+.pp-inner-status.expired{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.pp-inner-status.suspended{background:#fef9c3;color:#854d0e;border:1px solid #fde047;}
+/* MRZ strip at bottom */
+.pp-mrz{
+  background:#0a1628;padding:10px 14px;margin:-0px;
+  border-top:3px solid var(--gold3);
+}
+.pp-mrz-line{
+  font-family:'Courier New',monospace;font-size:9px;font-weight:700;
+  color:rgba(255,255,255,.7);letter-spacing:3px;line-height:2;
+  word-break:break-all;white-space:pre;
+}
+/* Flip panel (QR side) */
+.pp-qr-panel{
+  padding:20px 24px;
+  background:linear-gradient(160deg,#0a1628 0%,#0e1e40 100%);
+  position:relative;overflow:hidden;
+}
+.pp-qr-panel::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(201,168,76,.02) 10px,rgba(201,168,76,.02) 11px);
+  pointer-events:none;
+}
+.pp-qr-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:18px;padding-bottom:12px;
+  border-bottom:1px solid rgba(201,168,76,.2);
+}
+.pp-qr-header-text{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:1px;}
+.pp-qr-header-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;margin-top:1px;}
+.pp-qr-body{display:flex;gap:20px;align-items:flex-start;position:relative;z-index:1;}
+.pp-qr-box{
+  background:white;border-radius:10px;padding:10px;
+  border:2px solid rgba(201,168,76,.3);
+  flex-shrink:0;
+  box-shadow:0 0 20px rgba(201,168,76,.15);
+}
+.pp-qr-box canvas,.pp-qr-box img,.pp-qr-box div,.pp-qr-box table{display:block!important;max-width:140px;}
+#passport-qr{width:140px;height:140px;overflow:hidden;}
+#passport-qr canvas,#passport-qr img,#passport-qr table{width:140px!important;height:140px!important;}
+.pp-qr-info{flex:1;}
+.pp-qr-info-row{display:flex;align-items:center;gap:8px;font-size:11px;color:rgba(255,255,255,.55);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.pp-qr-info-row:last-child{border:none;margin-bottom:0;}
+.pp-qr-info-row i{width:14px;color:var(--gold);font-size:11px;flex-shrink:0;}
+.pp-qr-info-row strong{color:rgba(255,255,255,.85);}
+.pp-qr-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.pp-flip-hint{font-size:10px;color:rgba(255,255,255,.25);cursor:pointer;display:flex;align-items:center;gap:4px;margin-top:14px;}
+
+/* PASSPORT CARD WRAPPER (flip container) */
+.passport-card-wrap{perspective:1400px;margin-bottom:20px;}
 .passport-card{
-  width:100%;max-width:640px;min-height:360px;
-  border-radius:20px;overflow:hidden;position:relative;
-  box-shadow:0 24px 80px rgba(0,0,0,.25);
-  transition:transform .6s;transform-style:preserve-3d;
+  width:100%;position:relative;
+  transition:transform .7s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;
+  /* height is synced to front-face by JS — set min to avoid collapse */
+  min-height:200px;
 }
 .passport-card.flipped{transform:rotateY(180deg);}
-.card-front,.card-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;overflow:hidden;}
-.card-back{transform:rotateY(180deg);}
+.passport-face{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  /* Ensure both faces are fully opaque; Safari needs this */
+  -webkit-transform:translateZ(0);
+}
+.passport-face.front{
+  position:relative;
+  /* Front face sits at z=0 in 3D space */
+}
+.passport-face.back{
+  /* Back face is rotated 180° around Y so it faces away at rest
+     and faces the viewer when the card is flipped.
+     Content inside is NOT mirrored — the paired rotations cancel out. */
+  position:absolute;top:0;left:0;width:100%;
+  transform:rotateY(180deg);
+}
 
-/* CARD FRONT */
-.card-front-gradient{position:absolute;inset:0;}
-.card-front-content{position:relative;z-index:5;padding:28px;height:100%;display:flex;flex-direction:column;}
-.cf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:auto;}
-.cf-logo{font-family:'Cinzel',serif;font-size:11px;color:rgba(255,255,255,.6);letter-spacing:1px;}
-.cf-badge{font-size:9px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);text-transform:uppercase;}
-.cf-emblem{font-size:56px;opacity:.08;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-.cf-body{margin-top:auto;}
-.cf-holder-photo{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.3);object-fit:cover;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;}
-.cf-holder-info{margin-top:12px;}
-.cf-holder-name{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:.5px;}
-.cf-tier-name{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;}
-.cf-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;}
-.cf-pp-number{font-family:'Courier New',monospace;font-size:13px;color:rgba(255,255,255,.8);letter-spacing:2px;}
-.cf-validity{text-align:right;}
-.cf-validity label{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;display:block;}
-.cf-validity span{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);}
-.cf-chip{width:38px;height:28px;background:linear-gradient(135deg,rgba(201,168,76,.6),rgba(240,208,128,.4));border-radius:5px;margin-right:12px;}
-.cf-status-stripe{position:absolute;top:12px;right:-28px;transform:rotate(45deg);background:var(--green);color:#fff;font-size:9px;font-weight:700;padding:3px 30px;letter-spacing:1px;}
-.cf-status-stripe.expired{background:var(--red);}
-.cf-status-stripe.suspended{background:var(--amber);}
-.card-flip-hint{font-size:10px;color:rgba(255,255,255,.35);cursor:pointer;display:flex;align-items:center;gap:4px;margin-top:10px;}
-
-/* CARD BACK */
-.card-back{background:linear-gradient(145deg,#0a0a1a,#111128);padding:24px;}
-.cb-qr-row{display:flex;gap:20px;align-items:flex-start;}
-.cb-qr-wrap{background:white;border-radius:12px;padding:12px;flex-shrink:0;}
-.cb-qr-wrap canvas{display:block!important;}
-.cb-info h3{font-family:'Cinzel',serif;font-size:14px;color:#fff;margin-bottom:8px;}
-.cb-info-row{display:flex;gap:8px;align-items:center;font-size:11px;color:rgba(255,255,255,.55);margin-bottom:5px;}
-.cb-info-row strong{color:rgba(255,255,255,.8);}
-.cb-mrz{font-family:'Courier New',monospace;font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:12px;word-break:break-all;line-height:1.6;}
-.cb-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+/* Status ribbon */
+.pp-status-ribbon{
+  position:absolute;top:14px;right:-26px;
+  transform:rotate(45deg);
+  background:var(--green);color:#fff;
+  font-size:8px;font-weight:700;padding:3px 28px;
+  letter-spacing:1.5px;text-transform:uppercase;
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+  z-index:5;
+}
+.pp-status-ribbon.expired{background:var(--red);}
+.pp-status-ribbon.suspended{background:var(--amber);color:#0a1628;}
 
 /* TABS */
 .pp-tabs{display:flex;gap:2px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:20px;overflow-x:auto;}
@@ -262,69 +524,236 @@ a{text-decoration:none;color:inherit;}
     <!-- PASSPORT SELECTOR (if multiple) -->
     <div class="pp-selector" id="pp-selector"></div>
 
-    <!-- DIGITAL PASSPORT CARD -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;" id="card-row">
-      <!-- Card -->
+    <!-- DIGITAL PASSPORT BOOKLET -->
+    <div style="display:grid;grid-template-columns:minmax(0,660px) 1fr;gap:24px;margin-bottom:24px;align-items:start;" id="card-row">
+      <!-- Passport Booklet -->
       <div>
         <div class="passport-card-wrap" onclick="flipCard()">
           <div class="passport-card" id="passport-card">
-            <!-- FRONT -->
-            <div class="card-front">
-              <div class="card-front-gradient" id="card-gradient"></div>
-              <div class="card-front-content">
-                <div class="cf-header">
-                  <div>
-                    <div class="cf-logo">WORLDS OF WONDER · NOIDA</div>
-                    <div style="font-family:'Cinzel',serif;font-size:8px;color:rgba(255,255,255,.3);letter-spacing:2px;">OFFICIAL PASSPORT</div>
-                  </div>
-                  <span class="cf-badge" id="card-tier-badge">EXPLORE</span>
+
+            <!-- ══ FRONT FACE: COVER + INNER DATA PAGE ══ -->
+            <div class="passport-face front">
+
+              <!-- COVER -->
+              <div class="pp-cover">
+                <div style="position:absolute;top:10px;right:10px;z-index:5;overflow:hidden;width:60px;height:60px;">
+                  <div class="pp-status-ribbon" id="card-status-stripe">ACTIVE</div>
                 </div>
-                <div class="cf-emblem" id="card-emblem">🌟</div>
-                <div class="cf-body">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <div class="cf-chip"></div>
-                    <div class="cf-holder-photo" id="card-photo">👤</div>
+                <div class="cov-top">
+                  <div class="cov-ornament">❧</div>
+                  <div class="cov-title-block">
+                    <div class="cov-country">Republic of Entertainment</div>
+                    <div class="cov-org">WORLDS OF WONDER</div>
+                    <div class="cov-sub">Annual Membership Passport</div>
                   </div>
-                  <div class="cf-holder-info">
-                    <div class="cf-holder-name" id="card-holder-name">HOLDER NAME</div>
-                    <div class="cf-tier-name" id="card-tier-label">WOW Explore Passport</div>
+                  <div class="cov-ornament">❧</div>
+                </div>
+
+                <!-- WOW Line-Art Emblem -->
+                <div class="cov-emblem-wrap">
+                  <div class="cov-emblem-ring">
+                    <svg class="cov-emblem-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <!-- Outer ring -->
+                      <circle cx="50" cy="50" r="46" stroke="#C9A84C" stroke-width="1.2" stroke-dasharray="2 3" opacity=".5"/>
+                      <!-- Inner ring -->
+                      <circle cx="50" cy="50" r="38" stroke="#C9A84C" stroke-width=".8" opacity=".4"/>
+                      <!-- Ferris wheel hub -->
+                      <circle cx="50" cy="50" r="6" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+                      <circle cx="50" cy="50" r="2.5" fill="#C9A84C" opacity=".8"/>
+                      <!-- Ferris wheel spokes (12) -->
+                      <line x1="50" y1="44" x2="50" y2="13" stroke="#C9A84C" stroke-width="1" opacity=".6"/>
+                      <line x1="50" y1="56" x2="50" y2="87" stroke="#C9A84C" stroke-width="1" opacity=".6"/>
+                      <line x1="44" y1="50" x2="13" y2="50" stroke="#C9A84C" stroke-width="1" opacity=".6"/>
+                      <line x1="56" y1="50" x2="87" y2="50" stroke="#C9A84C" stroke-width="1" opacity=".6"/>
+                      <line x1="45.8" y1="45.8" x2="23.4" y2="23.4" stroke="#C9A84C" stroke-width=".8" opacity=".5"/>
+                      <line x1="54.2" y1="54.2" x2="76.6" y2="76.6" stroke="#C9A84C" stroke-width=".8" opacity=".5"/>
+                      <line x1="54.2" y1="45.8" x2="76.6" y2="23.4" stroke="#C9A84C" stroke-width=".8" opacity=".5"/>
+                      <line x1="45.8" y1="54.2" x2="23.4" y2="76.6" stroke="#C9A84C" stroke-width=".8" opacity=".5"/>
+                      <!-- Ferris wheel gondolas -->
+                      <circle cx="50" cy="14" r="4" stroke="#C9A84C" stroke-width="1.2" fill="rgba(201,168,76,.1)"/>
+                      <circle cx="50" cy="86" r="4" stroke="#C9A84C" stroke-width="1.2" fill="rgba(201,168,76,.1)"/>
+                      <circle cx="14" cy="50" r="4" stroke="#C9A84C" stroke-width="1.2" fill="rgba(201,168,76,.1)"/>
+                      <circle cx="86" cy="50" r="4" stroke="#C9A84C" stroke-width="1.2" fill="rgba(201,168,76,.1)"/>
+                      <circle cx="24" cy="24" r="3.5" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.08)"/>
+                      <circle cx="76" cy="76" r="3.5" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.08)"/>
+                      <circle cx="76" cy="24" r="3.5" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.08)"/>
+                      <circle cx="24" cy="76" r="3.5" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.08)"/>
+                      <!-- WOW text -->
+                      <text x="50" y="54" text-anchor="middle" font-family="serif" font-size="11" font-weight="700" fill="#C9A84C" letter-spacing="2" opacity=".9">WOW</text>
+                    </svg>
                   </div>
-                  <div class="cf-footer">
-                    <div class="cf-pp-number" id="card-pp-number">WOW-PAX-2025-000001</div>
-                    <div class="cf-validity">
-                      <label>Valid Until</label>
+                </div>
+
+                <div class="cov-passport-label">
+                  <div class="cov-pp-text">PASSPORT</div>
+                  <div class="cov-pp-hindi">पासपोर्ट · Annual Membership</div>
+                </div>
+
+                <div style="text-align:center;position:relative;z-index:2;">
+                  <div class="cov-plan-badge" id="card-tier-badge">
+                    <span id="card-emblem">⭐</span>
+                    <span id="card-tier-label-cover">EXPLORE PASSPORT</span>
+                  </div>
+                </div>
+
+                <div class="cov-bottom">
+                  <div><div class="cov-bot-lbl">Issued By</div><div class="cov-bot-val">WOW · NOIDA</div></div>
+                  <div style="font-size:14px;color:rgba(201,168,76,.2);">☽ ✦ ☾</div>
+                  <div style="text-align:right;"><div class="cov-bot-lbl">Valid For</div><div class="cov-bot-val">365 DAYS</div></div>
+                </div>
+              </div>
+
+              <!-- SPINE -->
+              <div class="pp-spine"></div>
+
+              <!-- INNER DATA PAGE -->
+              <div class="pp-inner">
+                <div class="pp-sec-strip">
+                  <span class="pp-sec-strip-text">Official Membership Document · Worlds of Wonder · Not Transferable</span>
+                  <span class="pp-sec-strip-id" id="card-pp-number">WOW-PAX-—</span>
+                </div>
+
+                <div class="pp-data-page">
+                  <div class="pp-watermark"><div class="pp-wm-text">WOW</div></div>
+
+                  <div class="pp-page-header">
+                    <div class="pp-page-header-left">
+                      <div class="pp-type-line">MEMBERSHIP · ANNUAL</div>
+                      <div class="pp-page-title">Member Data Page</div>
+                    </div>
+                    <div class="pp-page-header-right">
+                      <div class="pp-issued-by">Issued By</div>
+                      <div class="pp-org-name">Worlds of Wonder</div>
+                    </div>
+                  </div>
+
+                  <!-- Passport Number Bar -->
+                  <div class="pp-num-bar">
+                    <div>
+                      <span class="pp-num-bar-label">Passport / Membership No.</span>
+                      <div class="pp-num-bar-id" id="pp-inner-number">WOW-PAX-2026-000001</div>
+                    </div>
+                    <div class="pp-num-bar-qr" id="pp-inner-qr-mini" style="width:50px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                      <i class="fas fa-qrcode" style="font-size:24px;color:#94a3b8;"></i>
+                    </div>
+                  </div>
+
+                  <!-- Photo + Bio Fields -->
+                  <div class="pp-bio">
+                    <div>
+                      <div class="pp-photo-wrap" id="card-photo">
+                        <div class="pp-photo-placeholder"><i class="fas fa-user"></i></div>
+                      </div>
+                      <div class="pp-photo-label">Member Photo</div>
+                    </div>
+                    <div class="pp-fields">
+                      <div class="pp-field full">
+                        <span class="pp-field-label">Full Name / नाम</span>
+                        <div class="pp-field-name" id="card-holder-name">HOLDER NAME</div>
+                      </div>
+                      <div class="pp-field">
+                        <span class="pp-field-label">Date of Birth</span>
+                        <span class="pp-field-val" id="pp-dob">—</span>
+                      </div>
+                      <div class="pp-field">
+                        <span class="pp-field-label">Gender</span>
+                        <span class="pp-field-val" id="pp-gender">—</span>
+                      </div>
+                      <div class="pp-field">
+                        <span class="pp-field-label">Tier / Plan</span>
+                        <span class="pp-field-val" id="card-tier-label">EXPLORE</span>
+                      </div>
+                      <div class="pp-field">
+                        <span class="pp-field-label">Channel</span>
+                        <span class="pp-field-val" id="pp-channel">DIRECT</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Validity Strip -->
+                  <div class="pp-validity-strip">
+                    <div class="pp-validity-col">
+                      <label>Issue Date</label>
+                      <span id="pp-issue-date">—</span>
+                    </div>
+                    <div class="pp-validity-divider">→</div>
+                    <div class="pp-validity-col">
+                      <label>Expiry Date</label>
                       <span id="card-expiry">—</span>
                     </div>
-                  </div>
-                  <div class="card-flip-hint"><i class="fas fa-redo-alt"></i> Tap to see QR code</div>
-                </div>
-                <div class="cf-status-stripe" id="card-status-stripe">ACTIVE</div>
-              </div>
-            </div>
-            <!-- BACK -->
-            <div class="card-back">
-              <div style="padding:24px;">
-                <div class="cb-qr-row">
-                  <div class="cb-qr-wrap">
-                    <div id="passport-qr" style="width:120px;height:120px;"></div>
-                  </div>
-                  <div class="cb-info">
-                    <h3 id="cb-pp-number">WOW-PAX-2025-000001</h3>
-                    <div class="cb-info-row"><i class="fas fa-user" style="width:12px;"></i><strong id="cb-holder-name">—</strong></div>
-                    <div class="cb-info-row"><i class="fas fa-layer-group" style="width:12px;"></i><span id="cb-tier">—</span></div>
-                    <div class="cb-info-row"><i class="fas fa-calendar" style="width:12px;"></i><span id="cb-validity">—</span></div>
-                    <div class="cb-actions">
-                      <button class="btn btn-outline btn-sm" onclick="downloadPassport();event.stopPropagation()"><i class="fas fa-download"></i> Save</button>
-                      <button class="btn btn-outline btn-sm" onclick="sharePassport();event.stopPropagation()"><i class="fas fa-share"></i> Share</button>
+                    <div class="pp-validity-divider">|</div>
+                    <div class="pp-validity-col">
+                      <label>Status</label>
+                      <span class="pp-inner-status active" id="pp-status-badge">ACTIVE</span>
                     </div>
                   </div>
+
+                  <div style="font-size:10px;color:rgba(10,22,40,.35);text-align:center;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:5px;">
+                    <i class="fas fa-redo-alt"></i> Tap card to flip &amp; see QR code
+                  </div>
                 </div>
-                <div class="cb-mrz" id="cb-mrz">P<INDWOW<<HOLDER<NAME<<<<<<<<<<<<<<<<<<<<<<<<<<</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;cursor:pointer;" onclick="flipCard();event.stopPropagation()">← Back to card front</div>
+
+                <!-- MRZ Strip -->
+                <div class="pp-mrz">
+                  <div class="pp-mrz-line" id="cb-mrz">P&lt;INDWOW&lt;&lt;HOLDER&lt;NAME&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+
+            <!-- ══ BACK FACE: QR CODE PAGE ══ -->
+            <div class="passport-face back">
+              <!-- Match cover height with a dark cover-back -->
+              <div style="background:linear-gradient(160deg,#1a0900,#2c1200);padding:20px 28px;border-radius:14px 14px 0 0;border:2px solid var(--gold3);border-bottom:none;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                  <div style="font-family:'Cinzel',serif;font-size:9px;color:rgba(201,168,76,.5);letter-spacing:3px;">WORLDS OF WONDER</div>
+                  <div style="font-size:14px;color:rgba(201,168,76,.2);">✦</div>
+                </div>
+              </div>
+              <div class="pp-spine"></div>
+              <!-- QR Panel -->
+              <div class="pp-inner">
+                <div class="pp-sec-strip">
+                  <span class="pp-sec-strip-text">Scan QR at Park Gate · 1 Scan = 1 Entry</span>
+                  <span class="pp-sec-strip-id" id="cb-pp-number">WOW-PAX-—</span>
+                </div>
+                <div class="pp-qr-panel">
+                  <div class="pp-qr-header">
+                    <div>
+                      <div class="pp-qr-header-text">🔐 Digital Entry QR Code</div>
+                      <div class="pp-qr-header-sub">Show this QR at the gate scanner for entry</div>
+                    </div>
+                    <div style="font-family:'Cinzel',serif;font-size:8px;color:rgba(201,168,76,.4);letter-spacing:2px;">WOW SECURE</div>
+                  </div>
+                  <div class="pp-qr-body">
+                    <div>
+                      <div class="pp-qr-box">
+                        <div id="passport-qr" style="width:140px;height:140px;"></div>
+                      </div>
+                      <div style="font-size:8px;color:rgba(255,255,255,.25);text-align:center;margin-top:6px;letter-spacing:1px;">SCAN TO VERIFY</div>
+                    </div>
+                    <div class="pp-qr-info">
+                      <div class="pp-qr-info-row"><i class="fas fa-id-card"></i><div><div style="font-size:9px;color:rgba(255,255,255,.4);">Passport No.</div><strong id="cb-holder-pp">—</strong></div></div>
+                      <div class="pp-qr-info-row"><i class="fas fa-user"></i><div><div style="font-size:9px;color:rgba(255,255,255,.4);">Member</div><strong id="cb-holder-name">—</strong></div></div>
+                      <div class="pp-qr-info-row"><i class="fas fa-layer-group"></i><div><div style="font-size:9px;color:rgba(255,255,255,.4);">Tier</div><strong id="cb-tier">—</strong></div></div>
+                      <div class="pp-qr-info-row"><i class="fas fa-calendar-check"></i><div><div style="font-size:9px;color:rgba(255,255,255,.4);">Valid Until</div><strong id="cb-validity">—</strong></div></div>
+                      <div class="pp-qr-actions">
+                        <button class="btn btn-gold btn-sm" onclick="downloadPassport();event.stopPropagation()"><i class="fas fa-download"></i> Save</button>
+                        <button class="btn btn-outline btn-sm" style="color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.15);" onclick="sharePassport();event.stopPropagation()"><i class="fas fa-share"></i> Share</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="pp-flip-hint" onclick="flipCard();event.stopPropagation()">
+                    <i class="fas fa-arrow-left"></i> Back to passport
+                  </div>
+                </div>
+                <div class="pp-mrz">
+                  <div class="pp-mrz-line" id="cb-mrz-back">WOW&lt;PAX&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /passport-card -->
+        </div><!-- /passport-card-wrap -->
       </div>
 
       <!-- Passport Info Panel -->
@@ -444,9 +873,9 @@ a{text-decoration:none;color:inherit;}
         <i class="fas fa-phone" style="color:var(--gold);font-size:18px;"></i>
         <div><strong style="font-size:13px;display:block;">Call Support</strong><small style="color:var(--muted);">080-6909-0000 · Mon–Sat 9am–7pm</small></div>
       </a>
-      <a href="/cdn-cgi/l/email-protection#f080918383809f8284b0879f829c94839f96879f9e949582de999e" style="display:flex;align-items:center;gap:12px;padding:14px;background:#f9fafb;border-radius:10px;border:1px solid var(--border);">
+      <a href="/cdn-cgi/l/email-protection#6d1d0c1e1e1d021f192d1a021f01091e020b1a020309081f430403" style="display:flex;align-items:center;gap:12px;padding:14px;background:#f9fafb;border-radius:10px;border:1px solid var(--border);">
         <i class="fas fa-envelope" style="color:var(--gold);font-size:18px;"></i>
-        <div><strong style="font-size:13px;display:block;">Email Support</strong><small style="color:var(--muted);"><span class="__cf_email__" data-cfemail="5525342626253a272115223a273931263a33223a3b3130277b3c3b">[email&#160;protected]</span></small></div>
+        <div><strong style="font-size:13px;display:block;">Email Support</strong><small style="color:var(--muted);"><span class="__cf_email__" data-cfemail="0171607272716e737541766e736d65726e67766e6f6564732f686f">[email&#160;protected]</span></small></div>
       </a>
       <a href="https://wa.me/918069090000" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px;background:#f9fafb;border-radius:10px;border:1px solid var(--border);">
         <i class="fab fa-whatsapp" style="color:#25d366;font-size:18px;"></i>
@@ -474,8 +903,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   WPE.initialize ? WPE.initialize() : null;
 
-  // Simulate session (demo mode)
-  const sess = getSession();
+  // ── AUTH CHECK ──
+  // Check for customer session; if missing, redirect to customer login
+  // (does NOT use the aggressive admin overlay — keeps users in the customer portal)
+  const params = new URLSearchParams(window.location.search);
+  const isAgentPreview = params.get('preview') === 'agent'; // Sales agent viewing customer passport
+
+  let authSession = null;
+  try {
+    const raw = sessionStorage.getItem('wow_auth_session') || localStorage.getItem('wow_auth_session');
+    if (raw) authSession = JSON.parse(raw);
+  } catch(e) {}
+
+  const hasCustomerSession = authSession && authSession.role === 'CUSTOMER';
+  const hasFreshPassport    = !!sessionStorage.getItem('wow_passport'); // just completed booking
+  const isAgentSession      = authSession && (authSession.role === 'SALES_AGENT' || authSession.role === 'SUPER_ADMIN');
+
+  if (!isAgentPreview && !hasCustomerSession && !hasFreshPassport) {
+    // No valid session — redirect to customer login with correct return URL
+    window.location.replace('login.html?redirect=wow-passport.html&hint=passport');
+    return;
+  }
+
+  // Show agent-preview banner if accessed from sales portal
+  if (isAgentPreview || isAgentSession) {
+    const agentBanner = document.createElement('div');
+    agentBanner.style.cssText = 'background:#1e293b;color:#f59e0b;text-align:center;padding:8px 16px;font-size:12px;font-weight:700;position:sticky;top:56px;z-index:40;border-bottom:1px solid rgba(245,158,11,.3);';
+    agentBanner.innerHTML = '<i class="fas fa-user-tie"></i> Agent Preview Mode — This is the customer\'s passport view. <a href="../sales/passport-issued.html" style="color:#f59e0b;text-decoration:underline;">Back to Sales Portal</a>';
+    const main = document.querySelector('.portal-main');
+    if (main) main.prepend(agentBanner);
+  }
+
+  // Load session info for UI display
+  const sess = authSession || getSession();
   loadUserInfo(sess);
 
   // Load passports for this user
@@ -501,14 +961,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function getSession(){
-  try{ return JSON.parse(sessionStorage.getItem('wow_portal_session') || '{}'); }catch(e){ return {}; }
+  try{
+    // Check main auth session first, then portal-specific session
+    const mainRaw = sessionStorage.getItem('wow_auth_session') || localStorage.getItem('wow_auth_session');
+    if (mainRaw) return JSON.parse(mainRaw);
+    return JSON.parse(sessionStorage.getItem('wow_portal_session') || '{}');
+  }catch(e){ return {}; }
 }
 
 function loadUserInfo(sess){
   const nameEl = document.getElementById('ps-user-name');
   const emailEl = document.getElementById('ps-user-email');
-  if(nameEl) nameEl.textContent = sess.name || 'Demo User';
-  if(emailEl) emailEl.textContent = sess.email || 'demo@worldsofwonder.in';
+  if (!sess) { if(nameEl) nameEl.textContent = 'Guest'; return; }
+  if(nameEl) nameEl.textContent = sess.name || 'WOW Member';
+  if(emailEl) emailEl.textContent = sess.email || 'member@worldsofwonder.in';
 }
 
 function seedDemo(){
@@ -561,60 +1027,176 @@ function selectPassport(passportId){
 
 function renderCard(){
   const p = currentPassport;
-  const tiers = WPE.getTiers();
+  const tiers = WPE.getTiers ? WPE.getTiers() : [];
   const tier = tiers.find(t => t.id === p.tierId) || {};
 
-  // Gradient
-  const grad = document.getElementById('card-gradient');
-  grad.style.cssText = `background:linear-gradient(145deg,${tier.gradientFrom || '#0f2057'},${tier.gradientTo || '#1a56db'});position:absolute;inset:0;`;
+  // ── COVER tier badge & emblem ──
+  const tierBadgeEl = document.getElementById('card-tier-badge');
+  if(tierBadgeEl) tierBadgeEl.innerHTML = `<span id="card-emblem">${tier.emblemIcon || '⭐'}</span> <span id="card-tier-label-cover">${(tier.name || p.tierId || 'EXPLORE').toUpperCase()} PASSPORT</span>`;
 
-  // Status stripe
-  const stripe = document.getElementById('card-status-stripe');
-  stripe.textContent = p.status.toUpperCase();
-  stripe.className = `cf-status-stripe${p.status === 'expired' ? ' expired' : p.status === 'suspended' ? ' suspended' : ''}`;
-
-  document.getElementById('card-tier-badge').textContent = tier.code || tier.id?.toUpperCase();
-  document.getElementById('card-emblem').textContent = tier.emblemIcon || '🌟';
-  document.getElementById('card-holder-name').textContent = (p.customerName || 'HOLDER').toUpperCase();
-  document.getElementById('card-tier-label').textContent = p.productName || tier.displayName;
-  document.getElementById('card-pp-number').textContent = p.number;
-  document.getElementById('card-expiry').textContent = p.expiryDate || '—';
-
-  // Photo
-  const photoEl = document.getElementById('card-photo');
-  if(p.customerPhoto) photoEl.innerHTML = `<img src="${p.customerPhoto}" alt="photo" style="width:100%;height:100%;object-fit:cover;"/>`;
-  else photoEl.textContent = '👤';
-
-  // Back
-  document.getElementById('cb-pp-number').textContent = p.number;
-  document.getElementById('cb-holder-name').textContent = p.customerName || '—';
-  document.getElementById('cb-tier').textContent = tier.displayName || tier.name;
-  document.getElementById('cb-validity').textContent = `${p.startDate} → ${p.expiryDate}`;
-
-  // MRZ line
-  const mrzName = (p.customerName || '').toUpperCase().replace(/\s+/g,'<').padEnd(39,'<');
-  document.getElementById('cb-mrz').textContent = `P<IND${mrzName.slice(0,39)}\n${p.number.replace(/-/g,'').padEnd(9,'<')}IND${(p.customerDob||'900101').replace(/-/g,'').slice(2)}0${(p.expiryDate||'261231').replace(/-/g,'').slice(2)}0M`;
-
-  // Generate QR for the passport
-  const qrDiv = document.getElementById('passport-qr');
-  qrDiv.innerHTML = '';
-  if(typeof QRCode !== 'undefined'){
-    new QRCode(qrDiv, {
-      text: `WOW-PASSPORT:${p.number}:ENTRY:${p.tierId}`,
-      width: 120, height: 120,
-      colorDark: '#0a1628', colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  } else {
-    qrDiv.innerHTML = `<div style="width:120px;height:120px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;">📱</div>`;
+  // ── Cover plan color (tint the cover strip) ──
+  const coverEl = document.querySelector('.pp-cover');
+  if(coverEl && tier.gradientFrom){
+    // Subtle tint on top of the dark cover — don't override the whole BG
+    coverEl.style.borderColor = tier.gradientFrom;
   }
 
-  // Reset flip
+  // ── Status ribbon ──
+  const stripe = document.getElementById('card-status-stripe');
+  if(stripe){
+    stripe.textContent = (p.status || 'ACTIVE').toUpperCase();
+    stripe.className = `pp-status-ribbon${p.status === 'expired' ? ' expired' : p.status === 'suspended' ? ' suspended' : ''}`;
+  }
+
+  // ── Inner page — passport number bar ──
+  const ppInnerNum = document.getElementById('pp-inner-number');
+  if(ppInnerNum) ppInnerNum.textContent = p.number || 'WOW-PAX-—';
+
+  // ── Security strip number ──
+  const ppNumTop = document.getElementById('card-pp-number');
+  if(ppNumTop) ppNumTop.textContent = p.number || '—';
+
+  // ── Holder name ──
+  const holderEl = document.getElementById('card-holder-name');
+  if(holderEl) holderEl.textContent = (p.customerName || 'HOLDER NAME').toUpperCase();
+
+  // ── DOB & Gender ──
+  const dobEl = document.getElementById('pp-dob');
+  if(dobEl) dobEl.textContent = p.customerDob || '—';
+  const genderEl = document.getElementById('pp-gender');
+  if(genderEl) genderEl.textContent = (p.gender || '—').toUpperCase();
+
+  // ── Tier / Plan ──
+  const tierLabelEl = document.getElementById('card-tier-label');
+  if(tierLabelEl) tierLabelEl.textContent = (p.productName || tier.displayName || tier.name || p.tierId || 'EXPLORE').toUpperCase();
+
+  // ── Channel ──
+  const chanEl = document.getElementById('pp-channel');
+  if(chanEl) chanEl.textContent = (p.channel || 'DIRECT').toUpperCase();
+
+  // ── Validity strip ──
+  const issueDateEl = document.getElementById('pp-issue-date');
+  if(issueDateEl) issueDateEl.textContent = p.startDate || p.issueDate || '—';
+  const expiryEl = document.getElementById('card-expiry');
+  if(expiryEl) expiryEl.textContent = p.expiryDate || '—';
+
+  // ── Status badge ──
+  const statusBadgeEl = document.getElementById('pp-status-badge');
+  if(statusBadgeEl){
+    statusBadgeEl.textContent = (p.status || 'active').toUpperCase();
+    statusBadgeEl.className = `pp-inner-status ${p.status === 'expired' ? 'expired' : p.status === 'suspended' ? 'suspended' : 'active'}`;
+  }
+
+  // ── Member Photo ──
+  const photoEl = document.getElementById('card-photo');
+  if(photoEl){
+    if(p.customerPhoto){
+      photoEl.innerHTML = `<img src="${p.customerPhoto}" alt="photo" style="width:100%;height:100%;object-fit:cover;"/>`;
+    } else {
+      photoEl.innerHTML = '<div class="pp-photo-placeholder"><i class="fas fa-user"></i></div>';
+    }
+  }
+
+  // ── MRZ ──
+  const mrzName = (p.customerName || '').toUpperCase().replace(/\s+/g,'<').padEnd(39,'<');
+  const mrzEl = document.getElementById('cb-mrz');
+  if(mrzEl) mrzEl.textContent = `P<IND${mrzName.slice(0,39)}\n${(p.number||'').replace(/-/g,'').slice(0,9).padEnd(9,'<')}IND${(p.customerDob||'900101').replace(/-/g,'').slice(2)}0${(p.expiryDate||'261231').replace(/-/g,'').slice(2)}0M`;
+
+  // ── Back face: QR panel header info ──
+  const cbPpNum = document.getElementById('cb-pp-number');
+  if(cbPpNum) cbPpNum.textContent = p.number || '—';
+  const cbHolder = document.getElementById('cb-holder-pp');
+  if(cbHolder) cbHolder.textContent = p.number || '—';
+  const cbName = document.getElementById('cb-holder-name');
+  if(cbName) cbName.textContent = p.customerName || '—';
+  const cbTier = document.getElementById('cb-tier');
+  if(cbTier) cbTier.textContent = tier.displayName || tier.name || (p.tierId||'').toUpperCase();
+  const cbValidity = document.getElementById('cb-validity');
+  if(cbValidity) cbValidity.textContent = `${p.startDate||'—'} → ${p.expiryDate||'—'}`;
+  const mrzBack = document.getElementById('cb-mrz-back');
+  if(mrzBack) mrzBack.textContent = `WOW<PAX<${(p.number||'').replace(/-/g,'').padEnd(20,'<')}${(p.customerName||'').toUpperCase().replace(/\s+/g,'<').padEnd(20,'<')}`;
+
+  // ── QR CODE — generate robustly ──────────────────────────────────────────
+  // QRCode.js can fail to render canvas inside backface-hidden / 3D-transformed
+  // elements on Safari. Strategy: generate into a VISIBLE off-screen node, then
+  // transplant the resulting <canvas>/<img> into the real slot.
+  setTimeout(() => {
+    const qrDiv = document.getElementById('passport-qr');
+    if(!qrDiv) return;
+    qrDiv.innerHTML = '';
+    const qrText = `WOW-PASSPORT|${p.number}|${p.tierId}|${p.expiryDate||''}|ENTRY`;
+
+    function placeQR(canvas){
+      // Canvas/img from QRCode.js — style and insert
+      canvas.style.cssText = 'display:block;width:140px;height:140px;max-width:140px;';
+      qrDiv.innerHTML = '';
+      qrDiv.appendChild(canvas);
+    }
+
+    if(typeof QRCode !== 'undefined'){
+      try{
+        // Render into a temp div that is briefly visible (position off-screen)
+        const tmp = document.createElement('div');
+        tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:140px;height:140px;';
+        document.body.appendChild(tmp);
+        new QRCode(tmp, {
+          text: qrText, width: 140, height: 140,
+          colorDark: '#0a1628', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        // Give browser one frame to paint, then transplant
+        requestAnimationFrame(() => {
+          const generated = tmp.querySelector('canvas') || tmp.querySelector('img');
+          if(generated){
+            placeQR(generated);
+          } else {
+            qrDiv.innerHTML = `<div style="width:140px;height:140px;line-height:140px;text-align:center;font-size:11px;color:#C9A84C;">${p.number}</div>`;
+          }
+          tmp.remove();
+        });
+      }catch(err){
+        qrDiv.innerHTML = `<div style="width:140px;height:140px;background:#0a1628;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#C9A84C;font-size:10px;text-align:center;padding:10px;">QR<br>${p.number}</div>`;
+      }
+    } else {
+      // Fallback: text-based QR placeholder with passport number
+      qrDiv.innerHTML = `<div style="width:140px;height:140px;background:#0a1628;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:36px;">📱<div style="font-size:9px;color:#C9A84C;margin-top:6px;text-align:center;letter-spacing:1px;">${p.number}</div></div>`;
+    }
+  }, 120);
+
+  // ── Sync card + back-face height to front-face after render ────────────────
+  // Use a slightly longer delay than the QR timer so layout is fully settled.
+  setTimeout(() => {
+    const front = document.querySelector('.passport-face.front');
+    const back  = document.querySelector('.passport-face.back');
+    const card  = document.getElementById('passport-card');
+    if(front && back && card){
+      const h = front.offsetHeight;
+      if(h > 0){
+        back.style.height = h + 'px';
+        card.style.height = h + 'px';
+      }
+    }
+  }, 250);
+
+  // Reset flip state
   document.getElementById('passport-card').classList.remove('flipped');
 }
 
 function flipCard(){
-  document.getElementById('passport-card').classList.toggle('flipped');
+  const card = document.getElementById('passport-card');
+  card.classList.toggle('flipped');
+  // Re-sync heights on every flip to handle dynamic content changes
+  requestAnimationFrame(() => {
+    const front = document.querySelector('.passport-face.front');
+    const back  = document.querySelector('.passport-face.back');
+    if(front && back){
+      const h = front.offsetHeight;
+      if(h > 0){
+        back.style.height = h + 'px';
+        card.style.height = h + 'px';
+      }
+    }
+  });
 }
 
 function renderInfoPanel(){
