@@ -200,6 +200,7 @@
     <button class="act-btn green" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Send via WhatsApp</button>
     <button class="act-btn outline" onclick="sendEmail()"><i class="fas fa-envelope"></i> Email to Customer</button>
     <button class="act-btn outline" onclick="downloadPassport()"><i class="fas fa-download"></i> Download PDF</button>
+    <button class="act-btn outline" onclick="viewCustomerPassport()" style="border-color:var(--gold);color:var(--gold);"><i class="fas fa-eye"></i> View Customer Portal</button>
   </div>
 
   <!-- PASSPORT BOOKLET -->
@@ -566,6 +567,26 @@ function sharePassport(){
 function downloadPassport(){ showToast('PDF download: Use Print → Save as PDF for a digital copy.'); }
 
 function newSale(){ sessionStorage.removeItem('wow_passport_kyc'); sessionStorage.removeItem('wow_payment'); window.location.href='passport-kyc.html'; }
+
+function viewCustomerPassport(){
+  // Open customer portal passport view in a new tab so agent's session is unaffected
+  const passport = JSON.parse(sessionStorage.getItem('latest_passport')||'{}');
+  const ppId = passport.id || '';
+  // Store passport data for portal to pick up
+  try {
+    sessionStorage.setItem('wow_passport', JSON.stringify({
+      passportId: ppId,
+      plan: (passport.plan||{}).id || 'combo',
+      planName: (passport.plan||{}).name || 'Combo Passport',
+      issuedAt: passport.issuedAt,
+      expiresAt: passport.expiresAt,
+      customerName: ((passport.kyc||{}).fname||'')+' '+((passport.kyc||{}).lname||''),
+      fromSalesAgent: true
+    }));
+  } catch(e) {}
+  // Open customer portal with a note that this is agent preview
+  window.open('../portal/wow-passport.html?preview=agent&id='+encodeURIComponent(ppId), '_blank');
+}
 
 function showToast(msg,dur=3000){
   const t=document.getElementById('toast');
