@@ -181,6 +181,20 @@
             </div>
           </section>
 
+          <!-- ── TERMS & CONDITIONS ──────────────────────── -->
+          <section class="bk-card" id="wtc-section" style="border:1.5px solid #DDE3EE;">
+            <div class="bk-card-step" style="margin-bottom:4px;">
+              <div class="bk-step-num bk-step-num--amusement">4</div>
+              <div>
+                <div class="bk-step-title">Terms &amp; Conditions</div>
+                <div class="bk-step-sub">Please read and accept before completing your booking</div>
+              </div>
+            </div>
+            <div class="bk-card-body">
+              <div id="wtc-consent-container"></div>
+            </div>
+          </section>
+
           <!-- MOBILE CTA -->
           <div class="bk-cta-mobile">
             <div class="bk-cta-mobile-total">
@@ -226,6 +240,10 @@
 
             <div class="bk-summary-cta">
               <button class="btn bk-cta-btn bk-cta-btn--amusement" id="checkout-btn">Pay &amp; Confirm Booking →</button>
+              <div style="font-size:11px;color:#9CA3AF;text-align:center;margin-top:8px;line-height:1.5;">
+                By paying you agree to our
+                <button onclick="WOWTerms.openModal();return false;" style="background:none;border:none;color:#5E35B1;font-size:11px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;">Terms &amp; Conditions</button>
+              </div>
               <div class="bk-cta-meta">🔒 Secure payment &nbsp;·&nbsp; ✅ No booking fee</div>
             </div>
           </div>
@@ -294,6 +312,7 @@
 <script src="../js/wow-offer-engine-v4.js"></script>
 <script src="../js/shell.js"></script>
 <script src="../js/booking.js"></script>
+<script src="../js/wow-terms.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if (typeof WOWContent !== 'undefined') {
@@ -311,6 +330,18 @@ document.addEventListener('DOMContentLoaded', function () {
     WOWContent.apply();
   }
   WOWBooking.initBookingForm('AMUSEMENT_DAY');
+  if (typeof WOWTerms !== 'undefined') {
+    WOWTerms.renderConsentBlock('#wtc-consent-container', { context: 'ticket' });
+  }
+  ['checkout-btn','checkout-btn-mobile'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(e) {
+      if (typeof WOWTerms !== 'undefined' && !WOWTerms.validate()) {
+        e.stopImmediatePropagation(); e.preventDefault();
+      }
+    }, true);
+  });
 });
 </script>
 <script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
