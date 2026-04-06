@@ -1,94 +1,35 @@
-'use strict';
-// ============================================================
-//  Razorpay Integration Service
-//  Docs: https://razorpay.com/docs/payments/server-integration/
-// ============================================================
-const Razorpay = require('razorpay');
-const crypto   = require('crypto');
-
-let _rzp = null;
-
+﻿'use strict';
+var crypto = require('crypto');
+var _rzp = null;
+function isPlaceholderKey(k) { return !k || k.indexOf('XXXX') !== -1 || k.indexOf('YYYY') !== -1 || k.length < 20; }
+function isDevMock() {
+  return process.env.NODE_ENV !== 'production' &&
+    (isPlaceholderKey(process.env.RAZORPAY_KEY_ID) || isPlaceholderKey(process.env.RAZORPAY_KEY_SECRET));
+}
 function getRzp() {
-  if (!_rzp) {
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      throw new Error('RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be set in .env');
-    }
-    _rzp = new Razorpay({
-      key_id:     process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET
-    });
-  }
+  if (isDevMock()) return null;
+  if (!_rzp) { var R = require('razorpay'); _rzp = new R({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET }); }
   return _rzp;
 }
-
-/**
- * Create a Razorpay order (Step 1 of payment flow)
- * @param {object} booking - booking row from DB
- * @returns {object} Razorpay order
- */
 async function createOrder(booking) {
-  const rzp = getRzp();
-  const order = await rzp.orders.create({
-    amount:   booking.grand_total * 100,   // convert ₹ to paise
-    currency: 'INR',
-    receipt:  booking.booking_ref,
-    notes: {
-      booking_ref: booking.booking_ref,
-      park:        booking.park,
-      visit_date:  booking.visit_date
-    }
-  });
-  return order;
+  if (isDevMock()) {
+    var mid = 'order_MOCK' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,6).toUpperCase();
+    console.log('[RAZORPAY MOCK] createOrder -> ' + mid + ' Rs.' + booking.grand_total);
+    return { id: mid, amount: booking.grand_total * 100, currency: 'INR', receipt: booking.booking_ref, status: 'created', mock: true };
+  }
+  return await getRzp().orders.create({ amount: booking.grand_total*100, currency:'INR', receipt: booking.booking_ref, notes:{ booking_ref: booking.booking_ref, park: booking.park } });
 }
-
-/**
- * Verify Razorpay payment signature (Step 2 — after customer pays)
- * @param {string} orderId     - razorpay_order_id from callback
- * @param {string} paymentId   - razorpay_payment_id from callback
- * @param {string} signature   - razorpay_signature from callback
- * @returns {boolean}
- */
-function verifySignature(orderId, paymentId, signature) {
-  const expected = crypto
-    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-    .update(`${orderId}|${paymentId}`)
-    .digest('hex');
-  return expected === signature;
+function verifySignature(oid, pid, sig) {
+  if (isDevMock()) return true;
+  return crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET).update(oid+'|'+pid).digest('hex') === sig;
 }
-
-/**
- * Verify Razorpay webhook signature
- * @param {string} rawBody   - raw request body string
- * @param {string} signature - X-Razorpay-Signature header
- */
-function verifyWebhookSignature(rawBody, signature) {
-  const expected = crypto
-    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
-    .update(rawBody)
-    .digest('hex');
-  return expected === signature;
+function verifyWebhookSignature(raw, sig) {
+  if (isDevMock()) return true;
+  return crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET).update(raw).digest('hex') === sig;
 }
-
-/**
- * Fetch payment details from Razorpay (for reconciliation)
- */
-async function fetchPayment(paymentId) {
-  const rzp = getRzp();
-  return rzp.payments.fetch(paymentId);
+async function fetchPayment(pid) { if (isDevMock()) return { id:pid, status:'captured', mock:true }; return getRzp().payments.fetch(pid); }
+async function refundPayment(pid, amt) {
+  if (isDevMock()) { var r='rfnd_MOCK'+Date.now().toString(36).toUpperCase(); return { id:r, amount:amt*100, status:'processed', mock:true }; }
+  return getRzp().payments.refund(pid, { amount: amt*100 });
 }
-
-/**
- * Issue a refund
- */
-async function refundPayment(paymentId, amount) {
-  const rzp = getRzp();
-  return rzp.payments.refund(paymentId, { amount: amount * 100 });
-}
-
-module.exports = {
-  createOrder,
-  verifySignature,
-  verifyWebhookSignature,
-  fetchPayment,
-  refundPayment
-};
+module.exports = { createOrder, verifySignature, verifyWebhookSignature, fetchPayment, refundPayment, isDevMock };
