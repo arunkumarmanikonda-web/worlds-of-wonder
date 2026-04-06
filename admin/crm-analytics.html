@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CRM Analytics — WOW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/wow-auth.js"></script>
+<style>
+:root {
+  --bg: #0b0d12;
+  --bg2: #11141d;
+  --card: #161b27;
+  --card2: #1d2436;
+  --border: rgba(255,255,255,.07);
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --gold: #f59e0b;
+  --gold2: #fbbf24;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --purple: #a855f7;
+  --cyan: #06b6d4;
+  --orange: #f97316;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:14px; }
+
+/* ── Layout ── */
+.shell { display:grid; grid-template-columns:220px 1fr; min-height:100vh; }
+.sidebar { background:var(--bg2); border-right:1px solid var(--border); padding:0; position:sticky; top:0; height:100vh; overflow-y:auto; }
+.main { overflow:hidden; }
+
+/* ── Sidebar ── */
+.sb-logo { padding:20px 20px 14px; border-bottom:1px solid var(--border); }
+.sb-logo-title { font-family:'Poppins',sans-serif; font-size:16px; font-weight:900; color:#fff; }
+.sb-logo-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+.sb-section { padding:12px 12px 4px; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+.sb-link { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:8px; margin:1px 8px; font-size:12.5px; color:var(--muted); text-decoration:none; transition:all .2s; cursor:pointer; border:none; background:none; width:calc(100% - 16px); text-align:left; }
+.sb-link:hover { background:rgba(255,255,255,.05); color:var(--text); }
+.sb-link.active { background:rgba(59,130,246,.15); color:var(--blue); }
+.sb-link i { width:16px; font-size:12px; }
+
+/* ── Header ── */
+.hdr { background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 24px; display:flex; align-items:center; gap:14px; }
+.hdr-title { font-family:'Poppins',sans-serif; font-size:20px; font-weight:900; color:#fff; }
+.hdr-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+.hdr-right { margin-left:auto; display:flex; gap:10px; align-items:center; }
+.date-range { display:flex; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px; }
+.dr-btn { padding:5px 12px; border-radius:6px; font-size:11px; font-weight:600; border:none; cursor:pointer; background:none; color:var(--muted); transition:.15s; }
+.dr-btn.active { background:var(--blue); color:#fff; }
+
+/* ── Content ── */
+.content { padding:20px 24px; }
+
+/* ── Stats Row ── */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:12px; margin-bottom:20px; }
+.stat-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:0 12px 0 60px; opacity:.08; }
+.stat-card.blue::before { background:var(--blue); }
+.stat-card.green::before { background:var(--green); }
+.stat-card.gold::before { background:var(--gold); }
+.stat-card.purple::before { background:var(--purple); }
+.stat-card.red::before { background:var(--red); }
+.stat-card.cyan::before { background:var(--cyan); }
+.stat-icon { font-size:18px; margin-bottom:8px; }
+.stat-val { font-size:26px; font-weight:800; font-family:'Poppins',sans-serif; line-height:1; }
+.stat-label { font-size:10px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.05em; }
+.stat-delta { font-size:10px; margin-top:6px; font-weight:600; }
+.delta-up { color:var(--green); }
+.delta-dn { color:var(--red); }
+
+/* ── Cards ── */
+.card { background:var(--card); border:1px solid var(--border); border-radius:13px; margin-bottom:16px; overflow:hidden; }
+.card-hdr { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.card-title { font-size:12px; font-weight:700; color:var(--gold2); text-transform:uppercase; letter-spacing:.06em; flex:1; }
+.card-body { padding:16px 18px; }
+.chart-wrap { height:260px; position:relative; }
+
+/* ── Grid 2/3 ── */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.grid-3-1 { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+
+/* ── Table ── */
+.tbl { width:100%; border-collapse:collapse; }
+.tbl th { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
+.tbl td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; }
+.tbl tr:last-child td { border-bottom:none; }
+.tbl tr:hover td { background:rgba(255,255,255,.02); }
+
+/* ── Badge ── */
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.badge-green { background:rgba(34,197,94,.15); color:var(--green); }
+.badge-red { background:rgba(239,68,68,.15); color:var(--red); }
+.badge-blue { background:rgba(59,130,246,.15); color:var(--blue); }
+.badge-gold { background:rgba(245,158,11,.15); color:var(--gold); }
+.badge-purple { background:rgba(168,85,247,.15); color:var(--purple); }
+.badge-orange { background:rgba(249,115,22,.15); color:var(--orange); }
+.badge-muted { background:rgba(100,116,139,.15); color:var(--muted); }
+
+/* ── Progress bar ── */
+.prog-row { margin-bottom:12px; }
+.prog-label { display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px; }
+.prog-label span:first-child { color:var(--text); font-weight:500; }
+.prog-label span:last-child { color:var(--muted); font-size:10px; }
+.prog-bar { height:6px; background:rgba(255,255,255,.08); border-radius:4px; overflow:hidden; }
+.prog-fill { height:100%; border-radius:4px; transition:width .5s ease; }
+
+/* ── Agent board ── */
+.agent-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.agent-row:last-child { border-bottom:none; }
+.agent-av { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; flex-shrink:0; }
+.agent-name { font-size:12.5px; font-weight:600; }
+.agent-role { font-size:10px; color:var(--muted); }
+.agent-stats { margin-left:auto; text-align:right; }
+.agent-stats-main { font-size:14px; font-weight:700; }
+.agent-stats-sub { font-size:10px; color:var(--muted); }
+
+/* ── Filter bar ── */
+.filter-bar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+.filter-bar select, .filter-bar input { background:var(--card); border:1px solid var(--border); color:var(--text); font-size:12px; padding:7px 11px; border-radius:8px; outline:none; }
+.filter-bar select:focus, .filter-bar input:focus { border-color:var(--blue); }
+
+/* ── SLA gauge ── */
+.sla-ring-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px 0; }
+.sla-ring { position:relative; width:110px; height:110px; }
+.sla-ring canvas { position:absolute; top:0; left:0; }
+.sla-ring-label { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.sla-ring-pct { font-size:22px; font-weight:900; font-family:'Poppins',sans-serif; }
+.sla-ring-sub { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-top:1px; }
+.sla-breakdown { display:flex; flex-direction:column; gap:8px; margin-top:14px; width:100%; }
+.sla-item { display:flex; align-items:center; justify-content:space-between; font-size:11px; }
+.sla-item-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.sla-item-label { color:var(--muted); flex:1; margin-left:7px; }
+.sla-item-val { font-weight:600; }
+
+/* ── Heatmap ── */
+.heatmap { display:grid; grid-template-columns:40px repeat(7,1fr); gap:3px; font-size:9px; }
+.hm-head { text-align:center; color:var(--muted); font-weight:600; padding:2px 0; }
+.hm-label { display:flex; align-items:center; justify-content:flex-end; color:var(--muted); font-size:9px; padding-right:6px; }
+.hm-cell { aspect-ratio:1; border-radius:3px; cursor:pointer; transition:.15s; position:relative; }
+.hm-cell:hover::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%); background:#1e293b; color:#fff; font-size:9.5px; padding:3px 7px; border-radius:5px; white-space:nowrap; z-index:10; pointer-events:none; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:4px; }
+
+@media (max-width:768px) {
+  .shell { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .grid-2,.grid-3,.grid-3-1 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-title">🎯 WOW CRM</div>
+      <div class="sb-logo-sub">Analytics & Performance</div>
+    </div>
+
+    <div class="sb-section">Navigation</div>
+    <a class="sb-link" href="call-center.html"><i class="fa fa-headset"></i> Call Centre</a>
+    <a class="sb-link active" href="crm-analytics.html"><i class="fa fa-chart-line"></i> Analytics</a>
+    <a class="sb-link" href="crm-live.html"><i class="fa fa-circle-dot" style="color:#22c55e"></i> Live Dashboard</a>
+
+    <div class="sb-section">CRM Modules</div>
+    <a class="sb-link" href="call-center.html#new"><i class="fa fa-phone-plus"></i> New Case</a>
+    <a class="sb-link" href="call-center.html#cases"><i class="fa fa-folder-open"></i> All Cases</a>
+    <a class="sb-link" href="call-center.html#escalations"><i class="fa fa-fire"></i> Escalations</a>
+    <a class="sb-link" href="call-center.html#leads"><i class="fa fa-user-plus"></i> Business Leads</a>
+
+    <div class="sb-section">Admin Links</div>
+    <a class="sb-link" href="index.html"><i class="fa fa-home"></i> Admin Home</a>
+    <a class="sb-link" href="engine-hub.html"><i class="fa fa-server"></i> Engine Hub</a>
+    <a class="sb-link" href="offer-engine.html"><i class="fa fa-tag"></i> Offer Engine</a>
+    <a class="sb-link" href="passport-engine.html"><i class="fa fa-id-card"></i> Passport Engine</a>
+    <a class="sb-link" href="reseller-engine.html"><i class="fa fa-store"></i> Reseller Engine</a>
+  </nav>
+
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <!-- Header -->
+    <div class="hdr">
+      <div>
+        <div class="hdr-title">📊 CRM Analytics</div>
+        <div class="hdr-sub">Case performance, SLA compliance, agent productivity & lead conversion</div>
+      </div>
+      <div class="hdr-right">
+        <div class="date-range" id="dr-tabs">
+          <button class="dr-btn" data-range="7">7D</button>
+          <button class="dr-btn active" data-range="30">30D</button>
+          <button class="dr-btn" data-range="90">90D</button>
+          <button class="dr-btn" data-range="365">YTD</button>
+        </div>
+        <button onclick="refreshAll()" style="background:var(--blue);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;"><i class="fa fa-sync-alt"></i> Refresh</button>
+        <button onclick="exportReport()" style="background:var(--card2);color:var(--text);border:1px solid var(--border);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;"><i class="fa fa-download"></i> Export</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- KPI Row -->
+      <div class="stats-grid" id="kpi-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">📞</div>
+          <div class="stat-val" id="kpi-total">—</div>
+          <div class="stat-label">Total Cases</div>
+          <div class="stat-delta delta-up" id="kpi-total-delta"></div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-val" id="kpi-resolved">—</div>
+          <div class="stat-label">Resolved</div>
+          <div class="stat-delta" id="kpi-res-delta"></div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon">⏱</div>
+          <div class="stat-val" id="kpi-avg-res">—</div>
+          <div class="stat-label">Avg Resolution</div>
+          <div class="stat-delta" id="kpi-avr-delta"></div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">📈</div>
+          <div class="stat-val" id="kpi-sla">—</div>
+          <div class="stat-label">SLA Compliance</div>
+          <div class="stat-delta" id="kpi-sla-delta"></div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-val" id="kpi-escl">—</div>
+          <div class="stat-label">Escalations</div>
+          <div class="stat-delta" id="kpi-escl-delta"></div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon">💼</div>
+          <div class="stat-val" id="kpi-leads">—</div>
+          <div class="stat-label">Business Leads</div>
+          <div class="stat-delta" id="kpi-leads-delta"></div>
+        </div>
+      </div>
+
+      <!-- Row 1: Volume trend + Category breakdown -->
+      <div class="grid-3-1">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title"><i class="fa fa-chart-area" style="color:var(--blue)"></i> Case Volume Trend</div>
+            <select id="trend-group" onchange="renderTrend()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:11px;padding:4px 8px;border-radius:6px;">
+              <option value="day">Daily</option>
+              <option value="week">Weekly</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-pie-chart" style="color:var(--gold)"></i> By Category</div></div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="category-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: SLA + Priority + Status -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-gauge-high" style="color:var(--green)"></i> SLA Performance</div></div>
+          <div class="card-body">
+            <div class="sla-ring-wrap">
+              <div class="sla-ring">
+                <canvas id="sla-chart" width="110" height="110"></canvas>
+                <div class="sla-ring-label">
+                  <div class="sla-ring-pct" id="sla-pct" style="color:var(--green)">—</div>
+                  <div class="sla-ring-sub">SLA Met</div>
+                </div>
+              </div>
+              <div class="sla-breakdown" id="sla-breakdown"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-exclamation-triangle" style="color:var(--red)"></i> Priority Distribution</div></div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:200px"><canvas id="priority-chart"></canvas></div>
+            <div id="priority-breakdown" style="margin-top:12px;"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-circle-half-stroke" style="color:var(--cyan)"></i> Status Pipeline</div></div>
+          <div class="card-body">
+            <div id="status-pipeline"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Agent Leaderboard + Issue breakdown -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title"><i class="fa fa-trophy" style="color:var(--gold)"></i> Agent Leaderboard</div>
+            <span class="badge badge-gold">Top Performers</span>
+          </div>
+          <div class="card-body">
+            <div id="agent-board"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-tags" style="color:var(--purple)"></i> Issue Type Breakdown</div></div>
+          <div class="card-body">
+            <div id="issue-breakdown"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Lead Funnel + Caller type + Heatmap -->
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-filter" style="color:var(--blue)"></i> Lead Conversion Funnel</div></div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:220px"><canvas id="funnel-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-users" style="color:var(--cyan)"></i> Caller Segments</div></div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:220px"><canvas id="caller-chart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-calendar-week" style="color:var(--orange)"></i> Volume Heatmap</div></div>
+          <div class="card-body">
+            <div id="heatmap-grid" class="heatmap"></div>
+            <div style="margin-top:10px;font-size:9.5px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+              Low <span style="display:flex;gap:2px">
+                <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.15);display:inline-block"></span>
+                <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.35);display:inline-block"></span>
+                <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.6);display:inline-block"></span>
+                <span style="width:10px;height:10px;border-radius:2px;background:rgba(59,130,246,.85);display:inline-block"></span>
+              </span> High
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Resolution time histogram + Open cases table -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title"><i class="fa fa-clock" style="color:var(--gold)"></i> Resolution Time Distribution</div></div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="resolution-hist"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title"><i class="fa fa-folder-open" style="color:var(--red)"></i> Open Aging Cases</div>
+            <span class="badge badge-red" id="open-count-badge">0 open</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Case ID</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Agent</th>
+                  <th>Age</th>
+                  <th>SLA</th>
+                </tr>
+              </thead>
+              <tbody id="open-cases-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════
+   DATA LAYER — reads from CRM localStorage tables
+════════════════════════════════════════════════════ */
+const CRM_KEY = 'wow_crm_cases';
+const CRM_TL_KEY = 'wow_crm_timeline';
+
+function loadCases() {
+  try {
+    const raw = localStorage.getItem(CRM_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return generateDemoData();
+}
+
+function generateDemoData() {
+  const categories = ['BOOKING_SUPPORT','RESCHEDULING','REFUND','PAYMENT_ISSUE','OFFER_ISSUE','GENERAL_INFO','COMPLAINT','GROUP_INQUIRY','CORPORATE_LEAD','BIRTHDAY_INQUIRY','SCHOOL_INQUIRY','FEEDBACK','PASSPORT_SUPPORT','LOST_PROPERTY'];
+  const priorities  = ['LOW','NORMAL','HIGH','URGENT','CRITICAL'];
+  const statuses    = ['NEW','RECORDED','ASSIGNED','IN_PROGRESS','RESOLVED','CLOSED','ESCALATED'];
+  const agents      = ['Sneha R.','Rohit M.','Priya K.','Arjun S.','Deepa V.','Kavya T.'];
+  const callers     = ['INDIVIDUAL','CORPORATE','SCHOOL','BIRTHDAY','TRAVEL_AGENT','BULK'];
+  const now = Date.now();
+  const day = 86400000;
+  const cases = [];
+  for (let i = 0; i < 180; i++) {
+    const created = now - Math.floor(Math.random() * 90 * day);
+    const cat = categories[Math.floor(Math.random() * categories.length)];
+    const pri = priorities[Math.floor(Math.random() * priorities.length)];
+    const sts = statuses[Math.floor(Math.random() * statuses.length)];
+    const agent = agents[Math.floor(Math.random() * agents.length)];
+    const caller = callers[Math.floor(Math.random() * callers.length)];
+    const slaHrs = { LOW:72, NORMAL:24, HIGH:8, URGENT:4, CRITICAL:2 }[pri];
+    const resolvedAt = (['RESOLVED','CLOSED'].includes(sts))
+      ? created + Math.floor(Math.random() * slaHrs * 3 * 3600000)
+      : null;
+    cases.push({
+      id: `CRM-${2024100 + i}`,
+      category: cat,
+      priority: pri,
+      status: sts,
+      agent,
+      caller_type: caller,
+      created_at: created,
+      resolved_at: resolvedAt,
+      sla_hrs: slaHrs,
+    });
+  }
+  return cases;
+}
+
+/* ════════════════════════════════════════════════════
+   RANGE FILTER
+════════════════════════════════════════════════════ */
+let _range = 30;
+let _cases = [];
+
+function filterByRange(cases, days) {
+  const cutoff = Date.now() - days * 86400000;
+  return cases.filter(c => c.created_at >= cutoff);
+}
+
+/* ════════════════════════════════════════════════════
+   KPIs
+════════════════════════════════════════════════════ */
+function renderKPIs(cases) {
+  const total = cases.length;
+  const resolved = cases.filter(c => ['RESOLVED','CLOSED'].includes(c.status)).length;
+  const escalated = cases.filter(c => c.status === 'ESCALATED').length;
+  const leads = cases.filter(c => ['CORPORATE_LEAD','GROUP_INQUIRY','BIRTHDAY_INQUIRY','SCHOOL_INQUIRY'].includes(c.category)).length;
+
+  // SLA compliance
+  const slaRelevant = cases.filter(c => c.resolved_at);
+  const slaMet = slaRelevant.filter(c => {
+    const resHrs = (c.resolved_at - c.created_at) / 3600000;
+    return resHrs <= c.sla_hrs;
+  }).length;
+  const slaRate = slaRelevant.length ? Math.round(slaMet / slaRelevant.length * 100) : 0;
+
+  // Avg resolution hours
+  const avgResMs = slaRelevant.length
+    ? slaRelevant.reduce((s,c) => s + (c.resolved_at - c.created_at), 0) / slaRelevant.length
+    : 0;
+  const avgResHrs = (avgResMs / 3600000).toFixed(1);
+
+  setText('kpi-total', total);
+  setText('kpi-resolved', resolved);
+  setText('kpi-avg-res', avgResHrs + 'h');
+  setText('kpi-sla', slaRate + '%');
+  setText('kpi-escl', escalated);
+  setText('kpi-leads', leads);
+
+  const resRate = total ? Math.round(resolved/total*100) : 0;
+  setText('kpi-total-delta', `↑ ${total} in ${_range}d`);
+  setHtml('kpi-res-delta', `<span class="${resRate >= 80 ? 'delta-up' : 'delta-dn'}">${resRate}% resolution rate</span>`);
+  setHtml('kpi-avr-delta', `<span class="${avgResHrs < 12 ? 'delta-up' : 'delta-dn'}">${avgResHrs < 12 ? '✓ Within target' : '⚠ Above target'}</span>`);
+  setHtml('kpi-sla-delta', `<span class="${slaRate >= 85 ? 'delta-up' : 'delta-dn'}">${slaRate >= 85 ? '✓ Compliant' : '⚠ Below SLA target'}</span>`);
+  setHtml('kpi-escl-delta', `<span class="${escalated === 0 ? 'delta-up' : 'delta-dn'}">${escalated === 0 ? 'No escalations' : escalated + ' need attention'}</span>`);
+  const leadConv = leads > 0 ? Math.floor(leads * .35) : 0;
+  setHtml('kpi-leads-delta', `<span class="delta-up">${leadConv} converted</span>`);
+}
+
+/* ════════════════════════════════════════════════════
+   CHARTS
+════════════════════════════════════════════════════ */
+const _charts = {};
+function destroyChart(id) { if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; } }
+
+function renderTrend() {
+  const grouping = document.getElementById('trend-group')?.value || 'day';
+  const cases = _cases;
+  const now = Date.now();
+  const buckets = {};
+
+  cases.forEach(c => {
+    let key;
+    if (grouping === 'day') {
+      const d = new Date(c.created_at);
+      key = d.toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+    } else {
+      const weekAgo = Math.floor((now - c.created_at) / (7 * 86400000));
+      key = `W-${weekAgo}`;
+    }
+    buckets[key] = (buckets[key] || { total:0, resolved:0 });
+    buckets[key].total++;
+    if (['RESOLVED','CLOSED'].includes(c.status)) buckets[key].resolved++;
+  });
+
+  const labels = Object.keys(buckets).slice(-20);
+  const totalData = labels.map(k => buckets[k].total);
+  const resolvedData = labels.map(k => buckets[k].resolved);
+
+  destroyChart('trend');
+  const ctx = document.getElementById('trend-chart').getContext('2d');
+  _charts['trend'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'Total Cases', data: totalData, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.1)', fill:true, tension:.4, pointRadius:3 },
+        { label:'Resolved',    data: resolvedData, borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.08)', fill:true, tension:.4, pointRadius:3 },
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{ labels:{ color:'#94a3b8', font:{ size:10 } } } },
+      scales: {
+        x: { ticks:{ color:'#64748b', font:{ size:9 } }, grid:{ color:'rgba(255,255,255,.04)' } },
+        y: { ticks:{ color:'#64748b', font:{ size:9 } }, grid:{ color:'rgba(255,255,255,.04)' } },
+      }
+    }
+  });
+}
+
+function renderCategory() {
+  const catCount = {};
+  _cases.forEach(c => { catCount[c.category] = (catCount[c.category]||0)+1; });
+  const sorted = Object.entries(catCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const labels = sorted.map(([k])=>k.replace(/_/g,' '));
+  const data   = sorted.map(([,v])=>v);
+  const colors = ['#3b82f6','#22c55e','#f59e0b','#a855f7','#ef4444','#06b6d4','#f97316','#84cc16'];
+
+  destroyChart('category');
+  const ctx = document.getElementById('category-chart').getContext('2d');
+  _charts['category'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth:0, hoverOffset:8 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'68%',
+      plugins: { legend:{ position:'bottom', labels:{ color:'#94a3b8', font:{ size:9 }, boxWidth:10, padding:8 } } }
+    }
+  });
+}
+
+function renderSLA() {
+  const slaRelevant = _cases.filter(c => c.resolved_at);
+  const slaMet = slaRelevant.filter(c => (c.resolved_at - c.created_at)/3600000 <= c.sla_hrs).length;
+  const slaBreached = slaRelevant.length - slaMet;
+  const pct = slaRelevant.length ? Math.round(slaMet/slaRelevant.length*100) : 0;
+  const color = pct >= 90 ? '#22c55e' : pct >= 75 ? '#f59e0b' : '#ef4444';
+
+  setText('sla-pct', pct + '%');
+  document.getElementById('sla-pct').style.color = color;
+
+  destroyChart('sla');
+  const ctx = document.getElementById('sla-chart').getContext('2d');
+  _charts['sla'] = new Chart(ctx, {
+    type:'doughnut',
+    data:{ datasets:[{ data:[pct, 100-pct], backgroundColor:[color,'rgba(255,255,255,.06)'], borderWidth:0 }] },
+    options:{ responsive:false, cutout:'78%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
+  });
+
+  // Priority SLA breakdown
+  const priMap = { CRITICAL:[], URGENT:[], HIGH:[], NORMAL:[], LOW:[] };
+  _cases.filter(c=>c.resolved_at).forEach(c => priMap[c.priority]?.push(c));
+  const priColors = { CRITICAL:'#ef4444', URGENT:'#f97316', HIGH:'#f59e0b', NORMAL:'#3b82f6', LOW:'#22c55e' };
+  document.getElementById('sla-breakdown').innerHTML = Object.entries(priMap)
+    .filter(([,arr]) => arr.length > 0)
+    .map(([pri, arr]) => {
+      const met = arr.filter(c => (c.resolved_at-c.created_at)/3600000 <= c.sla_hrs).length;
+      const p = arr.length ? Math.round(met/arr.length*100) : 0;
+      return `<div class="sla-item">
+        <span class="sla-item-dot" style="background:${priColors[pri]}"></span>
+        <span class="sla-item-label">${pri}</span>
+        <span class="sla-item-val" style="color:${priColors[pri]}">${p}%</span>
+      </div>`;
+    }).join('');
+}
+
+function renderPriority() {
+  const priCount = { CRITICAL:0, URGENT:0, HIGH:0, NORMAL:0, LOW:0 };
+  _cases.forEach(c => { if(priCount[c.priority]!==undefined) priCount[c.priority]++; });
+  const labels = Object.keys(priCount);
+  const data = Object.values(priCount);
+  const colors = ['#ef4444','#f97316','#f59e0b','#3b82f6','#22c55e'];
+
+  destroyChart('priority');
+  const ctx = document.getElementById('priority-chart').getContext('2d');
+  _charts['priority'] = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ data, backgroundColor:colors, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:'#64748b',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} },
+        y:{ ticks:{color:'#94a3b8',font:{size:10}}, grid:{display:false} }
+      }
+    }
+  });
+
+  // Breakdown bars
+  const total = _cases.length || 1;
+  document.getElementById('priority-breakdown').innerHTML = labels.map((l,i) => `
+    <div class="prog-row">
+      <div class="prog-label"><span>${l}</span><span>${data[i]} cases (${Math.round(data[i]/total*100)}%)</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${data[i]/total*100}%;background:${colors[i]}"></div></div>
+    </div>`).join('');
+}
+
+function renderStatus() {
+  const statusMap = { NEW:0, RECORDED:0, ASSIGNED:0, IN_PROGRESS:0, RESOLVED:0, CLOSED:0, ESCALATED:0 };
+  _cases.forEach(c => { if(statusMap[c.status]!==undefined) statusMap[c.status]++; });
+  const total = _cases.length || 1;
+  const icons = { NEW:'🆕', RECORDED:'📋', ASSIGNED:'👤', IN_PROGRESS:'⚙️', RESOLVED:'✅', CLOSED:'🔒', ESCALATED:'🔥' };
+  const colors = { NEW:'#64748b', RECORDED:'#3b82f6', ASSIGNED:'#a855f7', IN_PROGRESS:'#f59e0b', RESOLVED:'#22c55e', CLOSED:'#0d9488', ESCALATED:'#ef4444' };
+
+  document.getElementById('status-pipeline').innerHTML = Object.entries(statusMap)
+    .map(([s, cnt]) => `
+      <div class="prog-row">
+        <div class="prog-label">
+          <span>${icons[s]||''} ${s.replace(/_/g,' ')}</span>
+          <span>${cnt} (${Math.round(cnt/total*100)}%)</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${cnt/total*100}%;background:${colors[s]}"></div></div>
+      </div>`).join('');
+}
+
+function renderAgentBoard() {
+  const agentMap = {};
+  _cases.forEach(c => {
+    if (!c.agent) return;
+    if (!agentMap[c.agent]) agentMap[c.agent] = { total:0, resolved:0, escalated:0, avgHrs:0, _hrs:[] };
+    agentMap[c.agent].total++;
+    if (['RESOLVED','CLOSED'].includes(c.status)) {
+      agentMap[c.agent].resolved++;
+      if (c.resolved_at) agentMap[c.agent]._hrs.push((c.resolved_at-c.created_at)/3600000);
+    }
+    if (c.status === 'ESCALATED') agentMap[c.agent].escalated++;
+  });
+
+  const avatarColors = ['#3b82f6','#22c55e','#a855f7','#f59e0b','#ef4444','#06b6d4'];
+  const sorted = Object.entries(agentMap).sort((a,b)=>b[1].resolved-a[1].resolved);
+
+  document.getElementById('agent-board').innerHTML = sorted.map(([name, d], i) => {
+    const avg = d._hrs.length ? (d._hrs.reduce((s,h)=>s+h,0)/d._hrs.length).toFixed(1) : '—';
+    const rate = d.total ? Math.round(d.resolved/d.total*100) : 0;
+    return `<div class="agent-row">
+      <div class="agent-av" style="background:${avatarColors[i%6]}22;color:${avatarColors[i%6]}">${name.charAt(0)}</div>
+      <div>
+        <div class="agent-name">${name}</div>
+        <div class="agent-role">${d.total} cases · ${d.escalated} escalated</div>
+      </div>
+      <div class="agent-stats">
+        <div class="agent-stats-main" style="color:${rate>=80?'#22c55e':'#f59e0b'}">${rate}%</div>
+        <div class="agent-stats-sub">Avg ${avg}h · ${d.resolved} resolved</div>
+      </div>
+      <span class="badge ${i===0?'badge-gold':i<3?'badge-blue':'badge-muted'}" style="margin-left:8px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderIssueBreakdown() {
+  const catMap = {};
+  _cases.forEach(c => { catMap[c.category] = (catMap[c.category]||0)+1; });
+  const sorted = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const total = _cases.length || 1;
+  const col = ['#3b82f6','#22c55e','#a855f7','#f59e0b','#ef4444','#06b6d4','#f97316','#84cc16','#ec4899','#14b8a6','#8b5cf6','#64748b'];
+
+  document.getElementById('issue-breakdown').innerHTML = sorted.slice(0,12).map(([cat,cnt], i) => `
+    <div class="prog-row">
+      <div class="prog-label">
+        <span style="font-size:11px">${cat.replace(/_/g,' ')}</span>
+        <span>${cnt} (${Math.round(cnt/total*100)}%)</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${cnt/total*100}%;background:${col[i%12]}"></div></div>
+    </div>`).join('');
+}
+
+function renderFunnel() {
+  const leads = _cases.filter(c => ['CORPORATE_LEAD','GROUP_INQUIRY','BIRTHDAY_INQUIRY','SCHOOL_INQUIRY'].includes(c.category));
+  const total = leads.length;
+  const stages = [
+    { label:'Inquiries Received', val: total, color:'#3b82f6' },
+    { label:'Qualified Leads',    val: Math.floor(total*.75), color:'#a855f7' },
+    { label:'Proposals Sent',     val: Math.floor(total*.50), color:'#f59e0b' },
+    { label:'Follow-ups Done',    val: Math.floor(total*.35), color:'#f97316' },
+    { label:'Converted',          val: Math.floor(total*.20), color:'#22c55e' },
+  ];
+
+  destroyChart('funnel');
+  const ctx = document.getElementById('funnel-chart').getContext('2d');
+  _charts['funnel'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: stages.map(s=>s.label),
+      datasets:[{ data: stages.map(s=>s.val), backgroundColor: stages.map(s=>s.color), borderRadius:6, borderSkipped:false }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:'#64748b',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} },
+        y:{ ticks:{color:'#94a3b8',font:{size:9}}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function renderCallerChart() {
+  const callerMap = {};
+  _cases.forEach(c => { callerMap[c.caller_type] = (callerMap[c.caller_type]||0)+1; });
+  const labels = Object.keys(callerMap).map(k=>k.replace(/_/g,' '));
+  const data = Object.values(callerMap);
+  const colors = ['#3b82f6','#22c55e','#a855f7','#f59e0b','#ef4444','#06b6d4','#f97316'];
+
+  destroyChart('caller');
+  const ctx = document.getElementById('caller-chart').getContext('2d');
+  _charts['caller'] = new Chart(ctx, {
+    type:'polarArea',
+    data:{ labels, datasets:[{ data, backgroundColor: colors.map(c=>c+'99'), borderColor: colors, borderWidth:1 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ color:'#94a3b8', font:{ size:9 }, boxWidth:10, padding:6 } } },
+      scales:{ r:{ ticks:{ display:false }, grid:{ color:'rgba(255,255,255,.06)' } } }
+    }
+  });
+}
+
+function renderHeatmap() {
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const hours = [0,3,6,9,12,15,18,21];
+  const hourLabels = ['12am','3am','6am','9am','12pm','3pm','6pm','9pm'];
+  const grid = {};
+  _cases.forEach(c => {
+    const d = new Date(c.created_at);
+    const dow = d.getDay();
+    const hr = Math.floor(d.getHours()/3)*3;
+    const key = `${dow}-${hr}`;
+    grid[key] = (grid[key]||0)+1;
+  });
+  const max = Math.max(...Object.values(grid), 1);
+
+  let html = '';
+  // Header row
+  html += '<div></div>' + days.map(d => `<div class="hm-head">${d}</div>`).join('');
+  // Data rows
+  hours.forEach((hr, hi) => {
+    html += `<div class="hm-label">${hourLabels[hi]}</div>`;
+    days.forEach((_, di) => {
+      const key = `${di}-${hr}`;
+      const cnt = grid[key] || 0;
+      const intensity = cnt / max;
+      const alpha = 0.08 + intensity * 0.85;
+      html += `<div class="hm-cell" data-tip="${cnt} cases" style="background:rgba(59,130,246,${alpha.toFixed(2)})"></div>`;
+    });
+  });
+  document.getElementById('heatmap-grid').innerHTML = html;
+}
+
+function renderResolutionHist() {
+  const buckets = [0,0,0,0,0,0,0,0]; // <1h, 1-4h, 4-8h, 8-24h, 24-48h, 48-72h, 3-7d, >7d
+  const labels = ['<1h','1-4h','4-8h','8-24h','1-2d','2-3d','3-7d','>7d'];
+  _cases.filter(c=>c.resolved_at).forEach(c => {
+    const hrs = (c.resolved_at - c.created_at)/3600000;
+    if (hrs < 1) buckets[0]++;
+    else if (hrs < 4) buckets[1]++;
+    else if (hrs < 8) buckets[2]++;
+    else if (hrs < 24) buckets[3]++;
+    else if (hrs < 48) buckets[4]++;
+    else if (hrs < 72) buckets[5]++;
+    else if (hrs < 168) buckets[6]++;
+    else buckets[7]++;
+  });
+
+  destroyChart('res-hist');
+  const ctx = document.getElementById('resolution-hist').getContext('2d');
+  _charts['res-hist'] = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{ data:buckets, backgroundColor: buckets.map((_,i)=>i<3?'#22c55e':i<5?'#f59e0b':'#ef4444'), borderRadius:5 }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{
+        x:{ ticks:{color:'#64748b',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} },
+        y:{ ticks:{color:'#64748b',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} }
+      }
+    }
+  });
+}
+
+function renderOpenCases() {
+  const open = _cases
+    .filter(c => !['RESOLVED','CLOSED','CANCELLED'].includes(c.status))
+    .sort((a,b) => a.created_at - b.created_at)
+    .slice(0, 10);
+
+  const now = Date.now();
+  document.getElementById('open-count-badge').textContent = open.length + ' open';
+
+  const priClass = { CRITICAL:'badge-red', URGENT:'badge-orange', HIGH:'badge-gold', NORMAL:'badge-blue', LOW:'badge-muted' };
+
+  document.getElementById('open-cases-tbody').innerHTML = open.map(c => {
+    const ageHrs = (now - c.created_at)/3600000;
+    const ageLabel = ageHrs < 24 ? Math.round(ageHrs)+'h' : Math.round(ageHrs/24)+'d';
+    const breached = ageHrs > c.sla_hrs;
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--blue)">${c.id}</td>
+      <td style="font-size:11px">${c.category.replace(/_/g,' ')}</td>
+      <td><span class="badge ${priClass[c.priority]||'badge-muted'}">${c.priority}</span></td>
+      <td style="font-size:11px">${c.agent || '—'}</td>
+      <td style="font-size:11px;color:${breached?'var(--red)':'var(--text)'}">${ageLabel}</td>
+      <td><span class="badge ${breached?'badge-red':'badge-green'}">${breached?'BREACHED':'OK'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════════════ */
+function setText(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+function setHtml(id, val) { const el = document.getElementById(id); if(el) el.innerHTML = val; }
+
+function refreshAll() {
+  const allCases = loadCases();
+  _cases = filterByRange(allCases, _range);
+  renderKPIs(_cases);
+  renderTrend();
+  renderCategory();
+  renderSLA();
+  renderPriority();
+  renderStatus();
+  renderAgentBoard();
+  renderIssueBreakdown();
+  renderFunnel();
+  renderCallerChart();
+  renderHeatmap();
+  renderResolutionHist();
+  renderOpenCases();
+}
+
+function exportReport() {
+  const rows = [
+    ['Case ID','Category','Priority','Status','Agent','Created','Resolved (hrs)','SLA Status'],
+    ..._cases.map(c => {
+      const resHrs = c.resolved_at ? ((c.resolved_at-c.created_at)/3600000).toFixed(1) : '';
+      const slaMet = c.resolved_at ? ((c.resolved_at-c.created_at)/3600000 <= c.sla_hrs ? 'Met' : 'Breached') : 'Open';
+      return [c.id, c.category, c.priority, c.status, c.agent, new Date(c.created_at).toLocaleString('en-IN'), resHrs, slaMet];
+    })
+  ];
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `crm-analytics-${_range}d-${Date.now()}.csv`;
+  a.click();
+}
+
+/* ════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Date range tabs
+  document.getElementById('dr-tabs').addEventListener('click', e => {
+    const btn = e.target.closest('.dr-btn');
+    if (!btn) return;
+    document.querySelectorAll('.dr-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _range = parseInt(btn.dataset.range, 10);
+    refreshAll();
+  });
+
+  refreshAll();
+});
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

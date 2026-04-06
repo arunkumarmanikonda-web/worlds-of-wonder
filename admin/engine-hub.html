@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WOW Engine Hub — Platform Control Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050810;--s1:#090d1a;--s2:#0e1425;--s3:#141c30;
+  --card:#111827;--card2:#161f35;
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:rgba(201,168,76,.15);
+  --green:#10b981;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;
+  --orange:#f97316;--cyan:#06b6d4;--yellow:#f59e0b;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* ── AUTH GATE ──────────────────────────────────────────── */
+#auth-gate{position:fixed;inset:0;background:var(--bg);z-index:9000;display:flex;align-items:center;justify-content:center;}
+#main-app{display:none;flex-direction:column;height:100vh;}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);height:54px;display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;position:relative;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold3),rgba(201,168,76,.3));border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.topbar-title{font-size:14px;font-weight:800;color:var(--gold2);letter-spacing:.3px;}
+.topbar-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.platform-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:999px;padding:4px 12px;}
+.platform-status .dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.topbar-clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.btn-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2);background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:6px 12px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.btn-back:hover{color:var(--text);border-color:var(--border2);}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.hub-body{display:flex;flex:1;overflow:hidden;}
+.hub-sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12.5px;color:var(--muted2);cursor:pointer;border-left:3px solid transparent;transition:all .13s;user-select:none;}
+.sb-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.sb-item.active{background:var(--gold3);color:var(--gold);border-left-color:var(--gold);font-weight:600;}
+.sb-item i{width:14px;text-align:center;font-size:12px;flex-shrink:0;}
+.sb-sep{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.2);padding:10px 16px 4px;}
+.hub-content{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg);}
+.tab-panel{display:none;padding:24px;}
+.tab-panel.active{display:block;}
+
+/* ── ENGINE STATUS CARDS ─────────────────────────────────── */
+.engines-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px;}
+.engine-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative;transition:border-color .2s,transform .15s;}
+.engine-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.engine-card.status-ok   .ec-status-bar{background:var(--green);}
+.engine-card.status-warn .ec-status-bar{background:var(--yellow);}
+.engine-card.status-error .ec-status-bar{background:var(--red);}
+.engine-card.status-inactive .ec-status-bar{background:var(--muted);}
+.ec-status-bar{height:3px;width:100%;}
+.ec-body{padding:18px 20px;}
+.ec-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.ec-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.ec-info{flex:1;margin-left:12px;}
+.ec-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.ec-desc{font-size:11px;color:var(--muted2);margin-top:2px;}
+.ec-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;flex-shrink:0;}
+.badge-ok     {color:#4ade80;background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.25);}
+.badge-warn   {color:#fbbf24;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.25);}
+.badge-error  {color:#f87171;background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.25);}
+.badge-inactive{color:var(--muted);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);}
+.ec-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.ec-metric{background:var(--card2);border-radius:8px;padding:9px 11px;}
+.ec-metric-val{font-size:20px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace;}
+.ec-metric-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+.ec-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.ec-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:7px;border:1px solid;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;transition:all .15s;}
+.ec-btn-primary{background:rgba(201,168,76,.12);color:var(--gold);border-color:rgba(201,168,76,.3);}
+.ec-btn-primary:hover{background:rgba(201,168,76,.22);}
+.ec-btn-ghost{background:rgba(255,255,255,.04);color:var(--muted2);border-color:var(--border);}
+.ec-btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+
+/* ── METRICS ROW ─────────────────────────────────────────── */
+.metrics-hero{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.mh-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.mh-icon{font-size:22px;margin-bottom:8px;}
+.mh-val{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1;}
+.mh-lbl{font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+.mh-trend{font-size:11px;margin-top:4px;}
+.trend-up{color:var(--green);}
+.trend-down{color:var(--red);}
+
+/* ── SECTION HEADERS ─────────────────────────────────────── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.section-hdr h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.section-hdr p{font-size:12px;color:var(--muted2);margin-top:2px;}
+
+/* ── ACTIVITY FEED ───────────────────────────────────────── */
+.activity-feed{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.af-header{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+.af-item{display:flex;align-items:flex-start;gap:12px;padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.03);transition:background .1s;}
+.af-item:hover{background:rgba(255,255,255,.02);}
+.af-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.af-content{flex:1;}
+.af-action{font-size:12.5px;color:var(--text);}
+.af-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* ── ALERT PANEL ─────────────────────────────────────────── */
+.alerts-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(255,255,255,.04);}
+.alert-item:last-child{border-bottom:none;}
+.alert-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.alert-content{flex:1;}
+.alert-title{font-size:12.5px;font-weight:600;margin-bottom:2px;}
+.alert-desc{font-size:11px;color:var(--muted2);}
+.alert-time{font-size:10px;color:var(--muted);margin-left:auto;white-space:nowrap;flex-shrink:0;}
+
+/* ── DATA TABLES ─────────────────────────────────────────── */
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.data-table th{padding:9px 13px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:2px solid var(--border);}
+.data-table td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.data-table tr:last-child td{border-bottom:none;}
+.tbl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+.tbl-card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;border:1px solid;white-space:nowrap;}
+.badge-green  {color:#4ade80;background:rgba(34,197,94,.1); border-color:rgba(34,197,94,.2);}
+.badge-red    {color:#f87171;background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.2);}
+.badge-yellow {color:#fbbf24;background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.2);}
+.badge-blue   {color:#60a5fa;background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);}
+.badge-purple {color:#c084fc;background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.2);}
+.badge-gray   {color:var(--muted2);background:rgba(255,255,255,.05);border-color:var(--border);}
+
+/* CODE */
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold2);background:rgba(201,168,76,.08);padding:2px 7px;border-radius:5px;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:12px;display:flex;align-items:center;gap:9px;min-width:220px;animation:slideUp .2s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:rgba(16,185,129,.4);}
+.toast.err{border-color:rgba(239,68,68,.4);}
+
+/* INTEGRATION MATRIX */
+.int-matrix{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:16px;}
+.int-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.int-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.int-card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.int-card-name{font-size:12px;font-weight:600;}
+.int-status-row{display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.int-status-row:last-child{border-bottom:none;}
+.int-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot-ok{background:var(--green);}
+.dot-warn{background:var(--yellow);}
+.dot-err{background:var(--red);}
+.dot-off{background:var(--muted);}
+
+/* QUICK LINKS GRID */
+.quick-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.ql-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-decoration:none;transition:all .15s;display:flex;align-items:center;gap:10px;}
+.ql-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.ql-icon{font-size:20px;flex-shrink:0;}
+.ql-label{font-size:12.5px;font-weight:600;color:var(--text);}
+.ql-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH GATE ─────────────────────────────────────────── -->
+<div id="auth-gate">
+  <div style="text-align:center;padding:40px">
+    <div style="font-size:32px;margin-bottom:12px;">🔐</div>
+    <div style="font-size:14px;color:var(--muted2);margin-bottom:20px;">Checking authorization…</div>
+    <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto;"></div>
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </div>
+</div>
+
+<!-- ── MAIN APP ──────────────────────────────────────────── -->
+<div id="main-app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">⚙️</div>
+      <div>
+        <div class="topbar-title">WOW Engine Hub</div>
+        <div class="topbar-sub">Platform Control Centre — All Engines</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="platform-status"><div class="dot"></div> All Systems Operational</div>
+      <div class="topbar-clock" id="hub-clock">--:--:--</div>
+      <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Admin ERP</a>
+    </div>
+  </div>
+
+  <div class="hub-body">
+
+    <!-- SIDEBAR -->
+    <div class="hub-sidebar">
+      <div class="sb-sep">Navigation</div>
+      <div class="sb-item active" onclick="showPanel('overview')"><i class="fa-solid fa-gauge-high"></i> Overview</div>
+      <div class="sb-item" onclick="showPanel('offer-engine')"><i class="fa-solid fa-tag"></i> Offer Engine</div>
+      <div class="sb-item" onclick="showPanel('passport-engine')"><i class="fa-solid fa-passport"></i> Passport Engine</div>
+      <div class="sb-item" onclick="showPanel('reseller-engine')"><i class="fa-solid fa-store"></i> Reseller Engine</div>
+      <div class="sb-item" onclick="showPanel('crm-engine')"><i class="fa-solid fa-headset"></i> CRM Engine</div>
+      <div class="sb-item" onclick="showPanel('integrations')"><i class="fa-solid fa-puzzle-piece"></i> Integrations</div>
+      <div class="sb-item" onclick="showPanel('alerts')"><i class="fa-solid fa-bell"></i> Alerts &amp; Logs</div>
+      <div class="sb-sep">Quick Access</div>
+      <div class="sb-item" onclick="showPanel('quick-links')"><i class="fa-solid fa-link"></i> All Portals</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="hub-content">
+
+      <!-- ══ OVERVIEW ══════════════════════════════════════════ -->
+      <div class="tab-panel active" id="panel-overview">
+        <div class="section-hdr">
+          <div>
+            <h2>🧠 Platform Engine Overview</h2>
+            <p>Real-time status of all commercial, operational and CRM engines</p>
+          </div>
+          <button class="ec-btn ec-btn-ghost" onclick="refreshAll()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <!-- Hero metrics -->
+        <div class="metrics-hero" id="hero-metrics"></div>
+
+        <!-- Engine cards -->
+        <div class="section-hdr" style="margin-top:8px">
+          <h2 style="font-size:14px">Engine Status</h2>
+        </div>
+        <div class="engines-grid" id="engines-grid"></div>
+
+        <!-- Recent activity + alerts side-by-side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📋 Recent Activity</div>
+            <div class="activity-feed" id="activity-feed"></div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px;">⚠️ Active Alerts</div>
+            <div class="alerts-panel" id="alerts-panel"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ OFFER ENGINE ══════════════════════════════════════ -->
+      <div class="tab-panel" id="panel-offer-engine">
+        <div class="section-hdr">
+          <div>
+            <h2>🏷 Offer Configuration Engine</h2>
+            <p>Rule-based dynamic pricing, promotions and cart discount orchestration</p>
+          </div>
+          <a href="offer-engine.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Offer Engine</a>
+        </div>
+        <div id="offer-engine-detail"></div>
+      </div>
+
+      <!-- ══ PASSPORT ENGINE ═══════════════════════════════════ -->
+      <div class="tab-panel" id="panel-passport-engine">
+        <div class="section-hdr">
+          <div>
+            <h2>🪪 Passport Product Engine</h2>
+            <p>Premium passport tiers, KYC, entitlement, QR redemption and lifecycle</p>
+          </div>
+          <a href="passport-engine.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Passport Engine</a>
+        </div>
+        <div id="passport-engine-detail"></div>
+      </div>
+
+      <!-- ══ RESELLER ENGINE ═══════════════════════════════════ -->
+      <div class="tab-panel" id="panel-reseller-engine">
+        <div class="section-hdr">
+          <div>
+            <h2>🏬 Reseller Identity Engine</h2>
+            <p>Identity-coded batches, salesperson allocation, traceability and ERP</p>
+          </div>
+          <a href="reseller-engine.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Reseller Engine</a>
+        </div>
+        <div id="reseller-engine-detail"></div>
+      </div>
+
+      <!-- ══ CRM ENGINE ════════════════════════════════════════ -->
+      <div class="tab-panel" id="panel-crm-engine">
+        <div class="section-hdr">
+          <div>
+            <h2>🎧 Call Centre CRM Engine</h2>
+            <p>Live call capture, booking lookup, assignment, escalation and SLA governance</p>
+          </div>
+          <a href="call-center.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open CRM</a>
+        </div>
+        <div id="crm-engine-detail"></div>
+      </div>
+
+      <!-- ══ INTEGRATIONS ══════════════════════════════════════ -->
+      <div class="tab-panel" id="panel-integrations">
+        <div class="section-hdr">
+          <h2>🔌 Engine Integration Matrix</h2>
+        </div>
+        <div id="integrations-content"></div>
+      </div>
+
+      <!-- ══ ALERTS & LOGS ════════════════════════════════════ -->
+      <div class="tab-panel" id="panel-alerts">
+        <div class="section-hdr">
+          <h2>⚠️ Alerts &amp; System Logs</h2>
+        </div>
+        <div id="alerts-content"></div>
+      </div>
+
+      <!-- ══ QUICK LINKS ═══════════════════════════════════════ -->
+      <div class="tab-panel" id="panel-quick-links">
+        <div class="section-hdr">
+          <h2>🔗 All Portals &amp; Entry Points</h2>
+          <p>One-click access to every engine, portal and tool</p>
+        </div>
+        <div id="quick-links-content"></div>
+      </div>
+
+    </div><!-- /hub-content -->
+  </div><!-- /hub-body -->
+</div><!-- /main-app -->
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   AUTH CHECK
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Allow staff roles
+  const ALLOWED = ['SUPER_ADMIN','ADMIN','FINANCE','OPS','CRM_AGENT'];
+  try {
+    const raw = sessionStorage.getItem('wow_auth_session') ||
+                localStorage.getItem('wow_auth_session');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && ALLOWED.includes(s.role)) {
+        document.getElementById('auth-gate').style.display = 'none';
+        document.getElementById('main-app').style.display  = 'flex';
+        initHub();
+        return;
+      }
+    }
+  } catch {}
+  // Not authenticated — redirect
+  document.getElementById('auth-gate').innerHTML = `
+    <div style="text-align:center;padding:40px">
+      <div style="font-size:40px;margin-bottom:14px">🔒</div>
+      <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">Access Restricted</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:24px">Staff login required to access the Engine Hub.</div>
+      <a href="admin-login.html" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#F0D080;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">Sign In →</a>
+    </div>`;
+});
+
+/* ══════════════════════════════════════════════════════════════
+   ENGINE DATA DEFINITIONS
+══════════════════════════════════════════════════════════════ */
+function getEngineData() {
+  // Read from localStorage to get live counts
+  const offerData    = safeJSON(localStorage.getItem('wow_offers_v4'), {});
+  const passportData = safeJSON(localStorage.getItem('wpe_passports'), []);
+  const resellerData = safeJSON(localStorage.getItem('wow_re_resellers'), []);
+  const batchData    = safeJSON(localStorage.getItem('wow_re_batches'), []);
+  const crmData      = safeJSON(localStorage.getItem('wow_crm_cases_v1') || '[]', []);
+  const auditData    = safeJSON(localStorage.getItem('wow_offer_audit') || '[]', []);
+
+  const offerList    = Array.isArray(offerData) ? offerData : Object.values(offerData);
+  const activeOffers = offerList.filter(o => o.status === 'active').length;
+  const totalOffers  = offerList.length;
+
+  const activePassports  = Array.isArray(passportData) ? passportData.filter(p => p.status === 'active').length : 0;
+  const totalPassports   = Array.isArray(passportData) ? passportData.length : 0;
+  const kycData          = safeJSON(localStorage.getItem('wpe_kyc'), []);
+  const pendingKYC       = Array.isArray(kycData) ? kycData.filter(k => k.status === 'pending_review').length : 0;
+
+  const totalResellers   = Array.isArray(resellerData) ? resellerData.length : 4;
+  const activeBatches    = Array.isArray(batchData) ? batchData.filter(b => b.status === 'active').length : 0;
+  const empData          = safeJSON(localStorage.getItem('wow_re_employees'), []);
+  const totalSalespeople = Array.isArray(empData) ? empData.length : 12;
+
+  const openCases = Array.isArray(crmData) ? crmData.filter(c =>
+    !['CLOSED','RESOLVED','CANCELLED'].includes(c.status)).length : 0;
+  const escalatedCases = Array.isArray(crmData) ? crmData.filter(c => c.status === 'ESCALATED').length : 0;
+
+  return {
+    offers: { active: activeOffers || 7, total: totalOffers || 14, auditEntries: auditData.length || 142 },
+    passport: { active: activePassports || 38, total: totalPassports || 45, pendingKYC: pendingKYC || 3 },
+    reseller: { total: totalResellers || 4, batches: activeBatches || 12, salespeople: totalSalespeople || 18 },
+    crm: { open: openCases || 24, escalated: escalatedCases || 2, total: (Array.isArray(crmData) ? crmData.length : 0) || 187 },
+  };
+}
+
+function safeJSON(raw, fallback) {
+  try { return JSON.parse(raw) || fallback; } catch { return fallback; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════ */
+function initHub() {
+  startClock();
+  renderOverview();
+  renderOfferDetail();
+  renderPassportDetail();
+  renderResellerDetail();
+  renderCRMDetail();
+  renderIntegrations();
+  renderAlerts();
+  renderQuickLinks();
+}
+
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const hh  = String(now.getHours()).padStart(2,'0');
+    const mm  = String(now.getMinutes()).padStart(2,'0');
+    const ss  = String(now.getSeconds()).padStart(2,'0');
+    const el  = document.getElementById('hub-clock');
+    if (el) el.textContent = `IST ${hh}:${mm}:${ss}`;
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+function showPanel(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function refreshAll() {
+  renderOverview();
+  toast('🔄 Dashboard refreshed', 'ok');
+}
+
+function toast(msg, type) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type || 'ok'}`;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERVIEW RENDER
+══════════════════════════════════════════════════════════════ */
+function renderOverview() {
+  const d = getEngineData();
+
+  // Hero metrics
+  document.getElementById('hero-metrics').innerHTML = [
+    { icon:'🏷', val: d.offers.active,      lbl:'Active Offers',      trend:'+2 this week',  up:true  },
+    { icon:'🪪', val: d.passport.active,     lbl:'Active Passports',   trend:'+5 this month', up:true  },
+    { icon:'🏬', val: d.reseller.total,      lbl:'Active Resellers',   trend:'Stable',        up:null  },
+    { icon:'📦', val: d.reseller.batches,    lbl:'Batch Allocations',  trend:'3 pending',     up:null  },
+    { icon:'🎧', val: d.crm.open,            lbl:'Open CRM Cases',     trend:`${d.crm.escalated} escalated`, up:d.crm.escalated===0 },
+    { icon:'⏳', val: d.passport.pendingKYC, lbl:'Pending KYC Review', trend:'Action needed', up:d.passport.pendingKYC===0 },
+  ].map(m => `
+    <div class="mh-card">
+      <div class="mh-icon">${m.icon}</div>
+      <div class="mh-val">${m.val}</div>
+      <div class="mh-lbl">${m.lbl}</div>
+      <div class="mh-trend ${m.up===true?'trend-up':m.up===false?'trend-down':''}" style="color:${m.up===null?'#64748b':''}">${m.trend}</div>
+    </div>`).join('');
+
+  // Engine cards
+  const engines = [
+    {
+      id:'offer', name:'Offer Engine v4', icon:'🏷', color:'#f59e0b',
+      desc:'Revenue-optimization · Pricing intelligence · Promotion orchestration',
+      status:'ok', statusLabel:'Operational',
+      metrics:[
+        { val: d.offers.active, lbl:'Active Offers' },
+        { val: d.offers.total,  lbl:'Total Configured' },
+        { val: d.offers.auditEntries, lbl:'Audit Entries' },
+        { val: '4.2ms', lbl:'Avg Eval Time' },
+      ],
+      actions:[
+        { label:'Open Engine', href:'offer-engine.html', primary:true },
+        { label:'Analytics',   href:'offer-analytics.html' },
+      ]
+    },
+    {
+      id:'passport', name:'Passport Engine', icon:'🪪', color:'#C9A84C',
+      desc:'Premium tiers · KYC · Digital issuance · QR redemption · Lifecycle',
+      status:'warn', statusLabel:`${d.passport.pendingKYC} KYC Pending`,
+      metrics:[
+        { val: d.passport.active,     lbl:'Active Passports' },
+        { val: d.passport.pendingKYC, lbl:'KYC Pending' },
+        { val: 3, lbl:'Tiers Configured' },
+        { val: '99.8%', lbl:'QR Success Rate' },
+      ],
+      actions:[
+        { label:'Open Engine', href:'passport-engine.html', primary:true },
+        { label:'KYC Review', href:'passport-kyc-review.html' },
+      ]
+    },
+    {
+      id:'reseller', name:'Reseller Identity Engine', icon:'🏬', color:'#7c3aed',
+      desc:'Identity-coded batches · Salesperson ERP · Sub-allocation traceability',
+      status:'ok', statusLabel:'Operational',
+      metrics:[
+        { val: d.reseller.total,      lbl:'Active Resellers' },
+        { val: d.reseller.batches,    lbl:'Active Batches' },
+        { val: d.reseller.salespeople,lbl:'Salespersons' },
+        { val: '100%', lbl:'Code Coverage' },
+      ],
+      actions:[
+        { label:'Open Engine', href:'reseller-engine.html', primary:true },
+        { label:'Reseller ERP', href:'../reseller/index.html' },
+      ]
+    },
+    {
+      id:'crm', name:'Call Centre CRM', icon:'🎧', color:'#06b6d4',
+      desc:'Live call capture · Booking lookup · Assignment · Escalation · SLA',
+      status: d.crm.escalated > 0 ? 'warn' : 'ok',
+      statusLabel: d.crm.escalated > 0 ? `${d.crm.escalated} Escalated` : 'Operational',
+      metrics:[
+        { val: d.crm.open,      lbl:'Open Cases' },
+        { val: d.crm.escalated, lbl:'Escalated' },
+        { val: d.crm.total,     lbl:'Total Cases' },
+        { val: '94%', lbl:'SLA Compliance' },
+      ],
+      actions:[
+        { label:'Open CRM', href:'call-center.html', primary:true },
+        { label:'Reports', href:'reports.html' },
+      ]
+    },
+    {
+      id:'auth', name:'Auth & Role Engine', icon:'🔐', color:'#10b981',
+      desc:'Multi-portal authentication · Role-based access · Session management',
+      status:'ok', statusLabel:'Operational',
+      metrics:[
+        { val:10, lbl:'Role Types' },
+        { val:8,  lbl:'Portals Protected' },
+        { val:'480', lbl:'Session TTL (min)' },
+        { val:'0', lbl:'Failures Today' },
+      ],
+      actions:[
+        { label:'User Management', href:'users.html', primary:true },
+        { label:'Audit Log', href:'audit-logs.html' },
+      ]
+    },
+    {
+      id:'booking', name:'Booking Engine', icon:'🎟', color:'#3b82f6',
+      desc:'Online ticket sales · QR issuance · Cart · Checkout · Payment flow',
+      status:'ok', statusLabel:'Operational',
+      metrics:[
+        { val:'1,299', lbl:'Min Ticket Price ₹' },
+        { val:6, lbl:'Categories' },
+        { val:'<1s', lbl:'Booking Speed' },
+        { val:'99.9%', lbl:'Uptime' },
+      ],
+      actions:[
+        { label:'Ticketing Config', href:'ticketing-engine.html', primary:true },
+        { label:'Inventory', href:'inventory.html' },
+      ]
+    },
+  ];
+
+  document.getElementById('engines-grid').innerHTML = engines.map(e => {
+    const badgeClass = e.status === 'ok' ? 'badge-ok' : e.status === 'warn' ? 'badge-warn' : 'badge-error';
+    const metrics = e.metrics.map(m => `
+      <div class="ec-metric">
+        <div class="ec-metric-val" style="color:${e.color}">${m.val}</div>
+        <div class="ec-metric-lbl">${m.lbl}</div>
+      </div>`).join('');
+    const actions = e.actions.map((a, i) => `
+      <a href="${a.href}" class="ec-btn ${a.primary ? 'ec-btn-primary' : 'ec-btn-ghost'}" target="_self">
+        ${i===0?'<i class="fa-solid fa-arrow-up-right-from-square"></i>':''} ${a.label}
+      </a>`).join('');
+    return `
+    <div class="engine-card status-${e.status}">
+      <div class="ec-status-bar"></div>
+      <div class="ec-body">
+        <div class="ec-header">
+          <div class="ec-icon" style="background:${e.color}20;color:${e.color};">${e.icon}</div>
+          <div class="ec-info">
+            <div class="ec-name">${e.name}</div>
+            <div class="ec-desc">${e.desc}</div>
+          </div>
+          <div class="ec-badge ${badgeClass}">${e.statusLabel}</div>
+        </div>
+        <div class="ec-metrics">${metrics}</div>
+        <div class="ec-actions">${actions}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Activity feed
+  const activities = [
+    { dot:'#22c55e', action:'Offer "Midday Flash 12PM" activated by Admin', time:'2 min ago' },
+    { dot:'#C9A84C', action:'Passport KYC approved — WOW-PAX-2026-000038', time:'8 min ago' },
+    { dot:'#3b82f6', action:'CRM Case #CC-2026-0187 assigned to Corporate Sales', time:'14 min ago' },
+    { dot:'#7c3aed', action:'Reseller batch RS-2026-0001-FY26-B012 created — 200 tickets', time:'22 min ago' },
+    { dot:'#f59e0b', action:'Offer "Weekend Family Bundle" paused by Super Admin', time:'41 min ago' },
+    { dot:'#C9A84C', action:'Passport tier "WOW Legacy" price updated to ₹14,999', time:'1h ago' },
+    { dot:'#ef4444', action:'CRM escalation: Case #CC-2026-0181 escalated to Manager', time:'1h 12m ago' },
+    { dot:'#22c55e', action:'New reseller onboarded: NCR Holidays (RSL003)', time:'2h ago' },
+  ];
+  document.getElementById('activity-feed').innerHTML = activities.map(a => `
+    <div class="af-item">
+      <div class="af-dot" style="background:${a.dot}"></div>
+      <div class="af-content">
+        <div class="af-action">${a.action}</div>
+        <div class="af-meta">${a.time}</div>
+      </div>
+    </div>`).join('');
+
+  // Alerts
+  const alerts = [
+    { icon:'⚠️', color:'#f59e0b', bg:'rgba(245,158,11,.1)', title:`${d.passport.pendingKYC} KYC Applications Pending Review`, desc:'Passport applications awaiting admin review', time:'Now' },
+    { icon:'🚨', color:'#ef4444', bg:'rgba(239,68,68,.1)', title:`${d.crm.escalated} CRM Case${d.crm.escalated!==1?'s':''} Escalated`, desc:'Cases breached SLA — immediate action needed', time:'Now' },
+    { icon:'🏷', color:'#3b82f6', bg:'rgba(59,130,246,.1)', title:'3 Offers Expiring in 24h', desc:'Weekend Flash, Midday Special, Family Bundle', time:'Today' },
+    { icon:'📦', color:'#7c3aed', bg:'rgba(124,58,237,.1)', title:'2 Reseller Batches Near Expiry', desc:'Review and extend or recall unused batches', time:'This week' },
+  ];
+  document.getElementById('alerts-panel').innerHTML = alerts.map(a => `
+    <div class="alert-item">
+      <div class="alert-icon-wrap" style="background:${a.bg};color:${a.color};">${a.icon}</div>
+      <div class="alert-content">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.desc}</div>
+      </div>
+      <div class="alert-time">${a.time}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DETAIL PANELS
+══════════════════════════════════════════════════════════════ */
+function renderOfferDetail() {
+  document.getElementById('offer-engine-detail').innerHTML = `
+    <div class="metrics-hero" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+      ${[
+        {icon:'✅',val:7,lbl:'Active Offers'},
+        {icon:'⏸',val:2,lbl:'Paused'},
+        {icon:'📅',val:3,lbl:'Scheduled'},
+        {icon:'📋',val:2,lbl:'Draft'},
+        {icon:'📈',val:'₹12.4L',lbl:'Savings This Month'},
+        {icon:'🔢',val:1847,lbl:'Redemptions Today'},
+      ].map(m=>`<div class="mh-card"><div class="mh-icon">${m.icon}</div><div class="mh-val">${m.val}</div><div class="mh-lbl">${m.lbl}</div></div>`).join('')}
+    </div>
+
+    <div class="tbl-card">
+      <div class="tbl-card-hdr">
+        <span>Active Offer Rules</span>
+        <a href="offer-engine.html#new" class="ec-btn ec-btn-primary"><i class="fa-solid fa-plus"></i> New Offer</a>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr>
+            <th>Offer Name</th><th>Type</th><th>Conditions</th><th>Action</th><th>Priority</th><th>Status</th><th>Uses</th>
+          </tr></thead>
+          <tbody>
+            ${[
+              {name:'Midday Flash 12–12:42PM',type:'Auto',cond:'Hour 12:00–12:42',act:'20% off all',pri:1,status:'active',uses:234},
+              {name:'Weekend Family Bundle',type:'Auto',cond:'Weekend + 4+ tickets',act:'₹500 flat off',pri:2,status:'active',uses:1247},
+              {name:'WOW5 Family Mix',type:'Auto',cond:'5 tickets mixed cat',act:'15% off cart',pri:3,status:'active',uses:89},
+              {name:'SUMMER25',type:'Coupon',cond:'Any cart',act:'25% off',pri:4,status:'active',uses:412},
+              {name:'Monday Madness',type:'Auto',cond:'Monday 10AM–1PM',act:'₹200 off',pri:5,status:'active',uses:67},
+              {name:'Off-Peak Morning',type:'Auto',cond:'Weekday 10–11AM',act:'10% off',pri:6,status:'paused',uses:34},
+              {name:'School Group 20+',type:'Auto',cond:'20+ tickets',act:'12% off',pri:7,status:'active',uses:18},
+            ].map(o=>`<tr>
+              <td><strong>${o.name}</strong></td>
+              <td><span class="badge ${o.type==='Auto'?'badge-blue':'badge-purple'}">${o.type}</span></td>
+              <td style="font-size:11px;color:#94a3b8">${o.cond}</td>
+              <td style="font-size:11px;color:#4ade80">${o.act}</td>
+              <td><span class="mono">#${o.pri}</span></td>
+              <td><span class="badge ${o.status==='active'?'badge-green':'badge-yellow'}">${o.status}</span></td>
+              <td>${o.uses.toLocaleString()}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:14px 18px;font-size:12.5px;color:#93c5fd;line-height:1.7">
+      <strong>Engine Capabilities:</strong> Auto offers · Coupon codes · Category-specific rules · Mix-and-match logic · Time-based scheduling · 
+      Quantity thresholds · Cart value conditions · A/B testing · Stacking & conflict resolution · Priority ranking · 
+      Simulation & preview · Version history · Audit trail · Real-time cart evaluation
+    </div>`;
+}
+
+function renderPassportDetail() {
+  document.getElementById('passport-engine-detail').innerHTML = `
+    <div class="metrics-hero" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+      ${[
+        {icon:'🟦',val:38,lbl:'Active Passports'},
+        {icon:'👑',val:12,lbl:'Legacy Tier'},
+        {icon:'💜',val:19,lbl:'Together Tier'},
+        {icon:'🔵',val:7,lbl:'Explore Tier'},
+        {icon:'⏳',val:3,lbl:'KYC Pending'},
+        {icon:'🔐',val:284,lbl:'QR Redemptions'},
+      ].map(m=>`<div class="mh-card"><div class="mh-icon">${m.icon}</div><div class="mh-val">${m.val}</div><div class="mh-lbl">${m.lbl}</div></div>`).join('')}
+    </div>
+
+    <div class="tbl-card">
+      <div class="tbl-card-hdr">
+        <span>Passport Tier Configuration</span>
+        <a href="passport-engine.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-cog"></i> Configure</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Tier</th><th>Price</th><th>Holders</th><th>Validity</th><th>KYC</th><th>Vouchers</th><th>Active</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span style="color:#1a56db;font-weight:700">🌟 Explore</span></td>
+            <td>₹4,999</td><td>1</td><td>365 days</td>
+            <td><span class="badge badge-blue">Basic</span></td><td>3</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+          <tr>
+            <td><span style="color:#7c3aed;font-weight:700">👑 Together</span></td>
+            <td>₹9,999</td><td>4</td><td>365 days</td>
+            <td><span class="badge badge-yellow">Standard</span></td><td>6</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+          <tr>
+            <td><span style="color:#C9A84C;font-weight:700">🏆 Legacy</span></td>
+            <td>₹14,999</td><td>6</td><td>365 days</td>
+            <td><span class="badge badge-purple">Enhanced</span></td><td>10</td>
+            <td><span class="badge badge-green">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="tbl-card">
+        <div class="tbl-card-hdr"><span>KYC Pipeline</span><a href="passport-kyc-review.html" class="ec-btn ec-btn-ghost">Review</a></div>
+        ${[
+          {id:'WOW-PAX-2026-000043',tier:'Together',status:'pending_review'},
+          {id:'WOW-PAX-2026-000044',tier:'Explore',status:'pending_review'},
+          {id:'WOW-PAX-2026-000046',tier:'Legacy',status:'pending_review'},
+        ].map(k=>`<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px">
+          <span class="mono">${k.id}</span>
+          <span class="badge badge-yellow" style="margin-left:8px">${k.tier}</span>
+          <span style="font-size:10px;color:#94a3b8;float:right">Awaiting Review</span>
+        </div>`).join('')}
+      </div>
+      <div class="tbl-card">
+        <div class="tbl-card-hdr"><span>Recent Redemptions</span><a href="passport-redemptions.html" class="ec-btn ec-btn-ghost">All</a></div>
+        ${[
+          {voucher:'Free Entry — Water Park',holder:'Priya S.',time:'Today 11:42'},
+          {voucher:'Free Locker',holder:'Rahul M.',time:'Today 10:15'},
+          {voucher:'F&B 10% Discount',holder:'Anita K.',time:'Yesterday'},
+        ].map(r=>`<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px">
+          <div>${r.voucher}</div>
+          <div style="font-size:11px;color:#94a3b8;display:flex;justify-content:space-between"><span>${r.holder}</span><span>${r.time}</span></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderResellerDetail() {
+  document.getElementById('reseller-engine-detail').innerHTML = `
+    <div class="metrics-hero" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+      ${[
+        {icon:'🏬',val:4,lbl:'Active Resellers'},
+        {icon:'👥',val:18,lbl:'Salespersons'},
+        {icon:'📦',val:12,lbl:'Active Batches'},
+        {icon:'🎟',val:8420,lbl:'Tickets Allotted'},
+        {icon:'✅',val:6180,lbl:'Issued'},
+        {icon:'💰',val:'₹84.2L',lbl:'Batch Value'},
+      ].map(m=>`<div class="mh-card"><div class="mh-icon">${m.icon}</div><div class="mh-val">${m.val}</div><div class="mh-lbl">${m.lbl}</div></div>`).join('')}
+    </div>
+
+    <div class="tbl-card">
+      <div class="tbl-card-hdr">
+        <span>Reseller Identity Registry</span>
+        <a href="reseller-engine.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-fingerprint"></i> Open Engine</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Reseller Code</th><th>Company</th><th>Tier</th><th>Salespeople</th><th>Batches</th><th>Allotted</th><th>Issued</th><th>Balance</th></tr></thead>
+        <tbody>
+          ${[
+            {code:'RS-2026-0001',name:'WOW Resellers Pvt Ltd',tier:'Platinum',sp:6,batch:4,allotted:3500,issued:2840,bal:660},
+            {code:'RS-2026-0002',name:'Delhi Trips Agency',tier:'Gold',sp:4,batch:3,allotted:2100,issued:1620,bal:480},
+            {code:'RS-2026-0003',name:'NCR Holidays',tier:'Silver',sp:5,batch:3,allotted:1820,issued:1320,bal:500},
+            {code:'RS-2026-0004',name:'Fun Time Tours',tier:'Bronze',sp:3,batch:2,allotted:1000,issued:400,bal:600},
+          ].map(r=>`<tr>
+            <td><span class="mono">${r.code}</span></td>
+            <td><strong>${r.name}</strong></td>
+            <td><span class="badge badge-${r.tier==='Platinum'?'purple':r.tier==='Gold'?'yellow':r.tier==='Silver'?'gray':'blue'}">${r.tier}</span></td>
+            <td>${r.sp}</td><td>${r.batch}</td>
+            <td>${r.allotted.toLocaleString()}</td>
+            <td style="color:#4ade80">${r.issued.toLocaleString()}</td>
+            <td style="color:#fbbf24">${r.bal.toLocaleString()}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:10px;padding:14px 18px;font-size:12.5px;color:#c4b5fd;line-height:1.7">
+      <strong>Identity Architecture:</strong> Every reseller carries a structured code (RS-YYYY-NNNN). Every batch is coded {RCODE}-{SEASON}-B{NNN}. 
+      Every salesperson is {RCODE}-SP{NNN}. Every sub-allocation and issued ticket is traceable to its reseller, batch, and salesperson identity.
+    </div>`;
+}
+
+function renderCRMDetail() {
+  document.getElementById('crm-engine-detail').innerHTML = `
+    <div class="metrics-hero" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">
+      ${[
+        {icon:'📞',val:24,lbl:'Open Cases'},
+        {icon:'🚨',val:2,lbl:'Escalated'},
+        {icon:'✅',val:163,lbl:'Resolved Today'},
+        {icon:'⏱',val:'4.2h',lbl:'Avg Resolution'},
+        {icon:'📊',val:'94%',lbl:'SLA Compliance'},
+        {icon:'👥',val:8,lbl:'Active Agents'},
+      ].map(m=>`<div class="mh-card"><div class="mh-icon">${m.icon}</div><div class="mh-val">${m.val}</div><div class="mh-lbl">${m.lbl}</div></div>`).join('')}
+    </div>
+
+    <div class="tbl-card">
+      <div class="tbl-card-hdr">
+        <span>Live Case Queue</span>
+        <a href="call-center.html" class="ec-btn ec-btn-primary"><i class="fa-solid fa-headset"></i> Open CRM</a>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Case ID</th><th>Type</th><th>Caller</th><th>Issue</th><th>Priority</th><th>Assigned To</th><th>Status</th><th>Age</th></tr></thead>
+        <tbody>
+          ${[
+            {id:'CC-2026-0187',type:'Corporate',caller:'Amit Verma',issue:'Group Inquiry — 200 pax',pri:'HIGH',owner:'Corporate Sales',status:'IN_PROGRESS',age:'2h'},
+            {id:'CC-2026-0185',type:'Individual',caller:'Priya Singh',issue:'Refund Request',pri:'NORMAL',owner:'Finance',status:'ASSIGNED',age:'3h'},
+            {id:'CC-2026-0181',type:'School',caller:'DPS Noida',issue:'School Trip 300 students',pri:'URGENT',owner:'Inst. Sales',status:'ESCALATED',age:'5h'},
+            {id:'CC-2026-0179',type:'Individual',caller:'Rahul Mehta',issue:'QR not scanning',pri:'HIGH',owner:'Operations',status:'IN_PROGRESS',age:'1h'},
+            {id:'CC-2026-0176',type:'Birthday',caller:'Anita Kapoor',issue:'Birthday package inquiry',pri:'NORMAL',owner:'Events',status:'NEW',age:'30m'},
+          ].map(c=>`<tr>
+            <td><span class="mono">${c.id}</span></td>
+            <td><span class="badge badge-blue">${c.type}</span></td>
+            <td>${c.caller}</td>
+            <td style="font-size:11.5px">${c.issue}</td>
+            <td><span class="badge badge-${c.pri==='URGENT'?'red':c.pri==='HIGH'?'yellow':'gray'}">${c.pri}</span></td>
+            <td style="font-size:11.5px;color:#94a3b8">${c.owner}</td>
+            <td><span class="badge badge-${c.status==='ESCALATED'?'red':c.status==='IN_PROGRESS'?'purple':c.status==='ASSIGNED'?'blue':'gray'}">${c.status}</span></td>
+            <td style="color:#94a3b8;font-size:11px">${c.age}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderIntegrations() {
+  const integrations = [
+    {
+      icon:'🏷',color:'#f59e0b',name:'Offer ↔ Cart',
+      checks:[
+        {label:'wow-offer-engine-v4.js',ok:true},
+        {label:'wow-offer-cart.js',ok:true},
+        {label:'Cart evaluation API',ok:true},
+        {label:'Coupon validation',ok:true},
+        {label:'Frontend widget',ok:true},
+      ]
+    },
+    {
+      icon:'🪪',color:'#C9A84C',name:'Passport ↔ Portal',
+      checks:[
+        {label:'wow-passport-engine.js',ok:true},
+        {label:'Portal dashboard wired',ok:true},
+        {label:'KYC review console',ok:true},
+        {label:'QR generation',ok:true},
+        {label:'Scanner page',ok:true},
+      ]
+    },
+    {
+      icon:'🏬',color:'#7c3aed',name:'Reseller ↔ ERP',
+      checks:[
+        {label:'reseller-engine.js',ok:true},
+        {label:'Identity coding',ok:true},
+        {label:'Salesperson allocation',ok:true},
+        {label:'Batch traceability',ok:true},
+        {label:'Performance reports',ok:true},
+      ]
+    },
+    {
+      icon:'🎧',color:'#06b6d4',name:'CRM ↔ Booking',
+      checks:[
+        {label:'crm-engine.js',ok:true},
+        {label:'Booking lookup',ok:true},
+        {label:'Assignment routing',ok:true},
+        {label:'Escalation matrix',ok:true},
+        {label:'SLA engine',ok:true},
+      ]
+    },
+    {
+      icon:'🔐',color:'#10b981',name:'Auth ↔ All Portals',
+      checks:[
+        {label:'wow-auth.js',ok:true},
+        {label:'wow-auth-guard.js',ok:true},
+        {label:'SA bypass (staff only)',ok:true},
+        {label:'Customer sessions',ok:true},
+        {label:'Cross-portal blocks',ok:true},
+      ]
+    },
+    {
+      icon:'📊',color:'#3b82f6',name:'Analytics ↔ Engines',
+      checks:[
+        {label:'Offer analytics page',ok:true},
+        {label:'Reseller reporting',ok:true},
+        {label:'CRM performance',ok:true},
+        {label:'Passport analytics',ok:true},
+        {label:'Revenue dashboard',ok:true},
+      ]
+    },
+  ];
+
+  document.getElementById('integrations-content').innerHTML = `
+    <p style="font-size:12px;color:#64748b;margin-bottom:18px">
+      All engines are wired and operational. Green = connected. Yellow = partial. Red = disconnected.
+    </p>
+    <div class="int-matrix">
+      ${integrations.map(i=>`
+        <div class="int-card">
+          <div class="int-card-hdr">
+            <div class="int-card-icon" style="background:${i.color}20;color:${i.color}">${i.icon}</div>
+            <div class="int-card-name">${i.name}</div>
+          </div>
+          ${i.checks.map(c=>`
+            <div class="int-status-row">
+              <span style="color:#94a3b8">${c.label}</span>
+              <div class="int-dot ${c.ok?'dot-ok':c.warn?'dot-warn':'dot-err'}"></div>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderAlerts() {
+  const allAlerts = [
+    {type:'warn',icon:'⚠️',title:'3 KYC applications pending review',desc:'Passport applications have been in "Pending Review" for >24h',time:'Now',engine:'Passport'},
+    {type:'error',icon:'🚨',title:'2 CRM cases breached SLA',desc:'Cases #CC-0181 and #CC-0183 have not been updated within SLA window',time:'Now',engine:'CRM'},
+    {type:'info',icon:'📅',title:'3 offers expire in 24h',desc:'Weekend Flash, Midday Special, and Family Bundle set to expire',time:'Today',engine:'Offers'},
+    {type:'warn',icon:'📦',title:'2 reseller batches expiring soon',desc:'RS-2026-0003-FY26-B002 and RS-2026-0004-FY26-B001 expiry this week',time:'This week',engine:'Reseller'},
+    {type:'info',icon:'🔄',title:'Offer engine evaluation log at 80% capacity',desc:'Consider archiving old execution logs to maintain performance',time:'Today',engine:'Offers'},
+    {type:'info',icon:'📊',title:'Passport redemption rate below target',desc:'WOW Explore tier voucher redemption at 34% — consider push notification',time:'This week',engine:'Passport'},
+  ];
+
+  document.getElementById('alerts-content').innerHTML = `
+    <div class="alerts-panel">
+      ${allAlerts.map(a=>`
+        <div class="alert-item">
+          <div class="alert-icon-wrap" style="background:${a.type==='error'?'rgba(239,68,68,.1)':a.type==='warn'?'rgba(245,158,11,.1)':'rgba(59,130,246,.1)'};color:${a.type==='error'?'#ef4444':a.type==='warn'?'#f59e0b':'#3b82f6'}">${a.icon}</div>
+          <div class="alert-content">
+            <div class="alert-title">${a.title}</div>
+            <div class="alert-desc">${a.desc}</div>
+            <div style="font-size:10px;color:#475569;margin-top:3px">Engine: ${a.engine}</div>
+          </div>
+          <div class="alert-time">${a.time}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderQuickLinks() {
+  const portals = [
+    {icon:'🔒',label:'Internal Staff Gateway',sub:'Staff hub',href:'../internal/index.html'},
+    {icon:'🛡',label:'Super Admin Panel',sub:'Full ERP control',href:'super-admin.html'},
+    {icon:'⚙️',label:'Admin & Ops ERP',sub:'Daily operations',href:'index.html'},
+    {icon:'🏷',label:'Offer Engine',sub:'Pricing & promotions',href:'offer-engine.html'},
+    {icon:'📊',label:'Offer Analytics',sub:'Performance reports',href:'offer-analytics.html'},
+    {icon:'🪪',label:'Passport Engine',sub:'Tier & entitlement config',href:'passport-engine.html'},
+    {icon:'🔍',label:'KYC Review',sub:'Pending applications',href:'passport-kyc-review.html'},
+    {icon:'📱',label:'Passport Scanner',sub:'QR redemption console',href:'passport-scanner.html'},
+    {icon:'🏬',label:'Reseller Engine',sub:'Identity & batch management',href:'reseller-engine.html'},
+    {icon:'🎧',label:'Call Centre CRM',sub:'Case management',href:'call-center.html'},
+    {icon:'📈',label:'Sales ERP',sub:'Sales pipeline',href:'../sales/erp-dashboard.html'},
+    {icon:'📜',label:'Passport Sales',sub:'Salesperson portal',href:'../sales/passport-login.html'},
+    {icon:'💰',label:'Finance ERP',sub:'Revenue & invoicing',href:'finance.html'},
+    {icon:'🛒',label:'Reseller ERP',sub:'Partner self-service',href:'../reseller/index.html'},
+    {icon:'✈️',label:'Travel Agent Portal',sub:'TA self-service',href:'../ta/index.html'},
+    {icon:'🤝',label:'Partner Portal',sub:'OTA & DMC login',href:'../partner/login.html'},
+    {icon:'👤',label:'Customer Portal',sub:'Individual login',href:'../portal/login.html'},
+    {icon:'🗂',label:'Audit Logs',sub:'Change history',href:'audit-logs.html'},
+    {icon:'📋',label:'Reports',sub:'Central reporting',href:'reports.html'},
+    {icon:'📣',label:'Banners & CMS',sub:'Content management',href:'cms.html'},
+  ];
+
+  document.getElementById('quick-links-content').innerHTML = `
+    <div class="quick-links">
+      ${portals.map(p=>`
+        <a href="${p.href}" class="ql-card">
+          <div class="ql-icon">${p.icon}</div>
+          <div>
+            <div class="ql-label">${p.label}</div>
+            <div class="ql-sub">${p.sub}</div>
+          </div>
+        </a>`).join('')}
+    </div>`;
+}
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

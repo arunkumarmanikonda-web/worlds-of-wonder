@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CRM Live Agent Console — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="../js/crm-engine.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f172a;--navy2:#1e293b;--navy3:#334155;
+  --gold:#C9A84C;--gold2:#e8c96b;--gold3:rgba(201,168,76,.15);
+  --red:#ef4444;--green:#10b981;--blue:#3b82f6;--purple:#8b5cf6;
+  --orange:#f97316;--cyan:#06b6d4;--yellow:#f59e0b;
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#64748b;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --surface:rgba(255,255,255,.04);
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--navy);color:var(--text);}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:100vh;flex-direction:column;}
+.topbar{background:var(--navy2);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 18px;gap:12px;flex-shrink:0;}
+.tb-brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--gold);}
+.tb-brand i{font-size:16px;}
+.tb-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);padding:3px 10px;border-radius:999px;margin-left:8px;}
+.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.tb-clock{font-size:11px;color:var(--text3);font-family:monospace;}
+.tb-user{font-size:12px;color:var(--text2);}
+
+/* ── THREE COLUMN LAYOUT ── */
+.columns{display:flex;flex:1;overflow:hidden;}
+
+/* ── LEFT: NEW CALL PANEL ── */
+.col-left{width:340px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:#080e1a;}
+.panel-title{padding:14px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.new-call-form{padding:14px 16px;}
+
+/* ── CENTER: CASE QUEUE ── */
+.col-center{width:320px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--navy);}
+.case-list{padding:8px;}
+.case-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:all .13s;border-left:3px solid transparent;}
+.case-card:hover{background:rgba(255,255,255,.05);border-color:var(--border2);}
+.case-card.selected{background:rgba(201,168,76,.05);border-color:var(--gold);border-left-color:var(--gold);}
+.case-card.escalated{border-left-color:var(--red);}
+.case-card.urgent{border-left-color:var(--orange);}
+.cc-id{font-size:10px;font-family:monospace;color:var(--text3);}
+.cc-name{font-size:12.5px;font-weight:600;margin:2px 0;}
+.cc-issue{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cc-footer{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;}
+
+/* ── RIGHT: CASE DETAIL ── */
+.col-right{flex:1;overflow-y:auto;background:#060c18;}
+.no-case{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);gap:10px;}
+.no-case i{font-size:40px;opacity:.3;}
+.case-detail{padding:18px 22px;}
+.cd-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px;}
+.cd-title{font-size:16px;font-weight:800;}
+.cd-meta{font-size:11px;color:var(--text3);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
+.cd-actions{display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0;}
+
+/* ── FORM ELEMENTS ── */
+label.lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:4px;}
+.inp{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;width:100%;transition:border .15s;}
+.inp:focus{outline:none;border-color:rgba(201,168,76,.4);}
+.inp::placeholder{color:rgba(255,255,255,.2);}
+select.inp option{background:#1e293b;}
+textarea.inp{resize:vertical;min-height:64px;}
+.form-row{margin-bottom:10px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.btn-gold{background:linear-gradient(135deg,rgba(201,168,76,.3),rgba(201,168,76,.15));color:var(--gold2);border-color:var(--gold);}
+.btn-gold:hover{background:rgba(201,168,76,.3);}
+.btn-green{background:rgba(16,185,129,.1);color:#34d399;border-color:rgba(16,185,129,.25);}
+.btn-green:hover{background:rgba(16,185,129,.18);}
+.btn-red{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.2);}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text2);border-color:var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:var(--text);}
+.btn-blue{background:rgba(59,130,246,.1);color:#60a5fa;border-color:rgba(59,130,246,.2);}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:6px;}
+.btn-full{width:100%;justify-content:center;}
+
+/* ── BOOKING LOOKUP ── */
+.lookup-wrap{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:9px;padding:12px 14px;margin-bottom:12px;}
+.lookup-header{font-size:11px;font-weight:700;color:#60a5fa;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.booking-result{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:background .1s;}
+.booking-result:hover{background:rgba(255,255,255,.07);}
+.booking-result.selected{background:rgba(201,168,76,.06);border-color:var(--gold);}
+.br-id{font-size:10px;font-family:monospace;color:var(--text3);}
+.br-name{font-size:12.5px;font-weight:600;}
+.br-info{font-size:11px;color:var(--text2);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;border:1px solid;white-space:nowrap;}
+.b-new{color:#94a3b8;background:rgba(148,163,184,.1);border-color:rgba(148,163,184,.2);}
+.b-assigned{color:#60a5fa;background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);}
+.b-inprog{color:#c084fc;background:rgba(192,132,252,.1);border-color:rgba(192,132,252,.2);}
+.b-escalated{color:#f87171;background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2);}
+.b-resolved{color:#34d399;background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.2);}
+.b-closed{color:#4ade80;background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.2);}
+.b-low{color:#64748b;background:rgba(100,116,139,.08);border-color:rgba(100,116,139,.15);}
+.b-normal{color:#60a5fa;background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.15);}
+.b-high{color:#fbbf24;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.15);}
+.b-urgent{color:#fb923c;background:rgba(249,115,22,.08);border-color:rgba(249,115,22,.15);}
+.b-critical{color:#f87171;background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.15);}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:1px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-21px;top:3px;width:10px;height:10px;border-radius:50%;border:2px solid;background:var(--navy);}
+.tl-time{font-size:10px;color:var(--text3);margin-bottom:2px;}
+.tl-text{font-size:12px;line-height:1.5;}
+.tl-by{font-size:10.5px;color:var(--text3);margin-top:2px;}
+
+/* ── SECTIONS ── */
+.section-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+.sc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+/* ── BUSINESS FORM ── */
+.biz-form{display:none;}
+.biz-form.show{display:block;}
+
+/* ── TOAST ── */
+#toast-wrap{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:7px;}
+.toast{background:var(--navy2);border:1px solid var(--border2);border-radius:9px;padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;min-width:200px;animation:slideUp .2s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.toast.ok{border-color:rgba(16,185,129,.4);}
+.toast.err{border-color:rgba(239,68,68,.4);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-brand"><i class="fa-solid fa-headset"></i> WOW Call Centre CRM</div>
+    <div class="tb-status"><div class="dot"></div> Agent Online</div>
+    <div class="tb-right">
+      <div class="tb-clock" id="crm-clock"></div>
+      <div class="tb-user" id="agent-name">Agent: Loading…</div>
+      <a href="call-center.html" class="btn btn-ghost btn-sm"><i class="fa-solid fa-gauge-high"></i> Full Dashboard</a>
+      <a href="admin-login.html" class="btn btn-ghost btn-sm"><i class="fa-solid fa-right-from-bracket"></i> Exit</a>
+    </div>
+  </div>
+
+  <!-- 3 COLUMNS -->
+  <div class="columns">
+
+    <!-- ══ COL LEFT: NEW CALL CAPTURE ══════════════════════════ -->
+    <div class="col-left">
+      <div class="panel-title">
+        <span>📞 Capture New Call</span>
+        <button class="btn btn-ghost btn-sm" onclick="clearForm()">Clear</button>
+      </div>
+
+      <div class="new-call-form">
+
+        <!-- CALLER PHONE LOOKUP -->
+        <div class="form-row">
+          <label class="lbl">Caller Mobile Number</label>
+          <div style="display:flex;gap:6px">
+            <input type="tel" id="lookup-mobile" class="inp" placeholder="+91 98765 43210" maxlength="15" style="flex:1"/>
+            <button class="btn btn-blue btn-sm" onclick="doBookingLookup()"><i class="fa-solid fa-magnifying-glass"></i> Look Up</button>
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">Enter number to auto-fetch linked bookings</div>
+        </div>
+
+        <!-- BOOKING LOOKUP RESULTS -->
+        <div class="lookup-wrap" id="lookup-results" style="display:none">
+          <div class="lookup-header"><i class="fa-solid fa-ticket"></i> Bookings Found — Select One</div>
+          <div id="booking-results-list"></div>
+          <div id="no-booking-msg" style="font-size:11.5px;color:var(--text3);display:none;padding:4px 0">No bookings found for this number.</div>
+        </div>
+
+        <!-- CALLER TYPE -->
+        <div class="form-row">
+          <label class="lbl">Caller Type</label>
+          <select id="caller-type" class="inp" onchange="onCallerTypeChange()">
+            <option value="">— Select —</option>
+            <option value="INDIVIDUAL">👤 Individual Customer</option>
+            <option value="CORPORATE">🏢 Corporate / Company</option>
+            <option value="SCHOOL">🏫 School</option>
+            <option value="COLLEGE">🎓 College / University</option>
+            <option value="INSTITUTION">🏛 Institution / NGO</option>
+            <option value="BIRTHDAY">🎂 Birthday / Social Event</option>
+            <option value="TRAVEL_AGENT">✈️ Travel Agent</option>
+            <option value="BULK">📦 Bulk / Group Buyer</option>
+            <option value="EVENT">🎪 Event Organiser</option>
+            <option value="VENUE">🏟 Venue Inquiry</option>
+          </select>
+        </div>
+
+        <!-- INDIVIDUAL CALLER INFO -->
+        <div id="individual-fields">
+          <div class="form-grid">
+            <div class="form-row">
+              <label class="lbl">Caller Name</label>
+              <input type="text" id="caller-name" class="inp" placeholder="Full name"/>
+            </div>
+            <div class="form-row">
+              <label class="lbl">Alternate Mobile</label>
+              <input type="tel" id="alt-mobile" class="inp" placeholder="Optional"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUSINESS CALLER INFO -->
+        <div id="business-fields" class="biz-form">
+          <div class="form-row">
+            <label class="lbl">Organisation / Company Name</label>
+            <input type="text" id="org-name" class="inp" placeholder="DPS Noida / ABC Corp"/>
+          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label class="lbl">Contact Person</label>
+              <input type="text" id="contact-person" class="inp" placeholder="Name"/>
+            </div>
+            <div class="form-row">
+              <label class="lbl">Designation</label>
+              <input type="text" id="designation" class="inp" placeholder="HR Manager / Teacher"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="lbl">Email Address</label>
+            <input type="email" id="contact-email" class="inp" placeholder="email@company.com"/>
+          </div>
+
+          <!-- EVENT DETAILS -->
+          <div style="background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:7px;padding:10px;margin-bottom:8px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;">📅 Event Details</div>
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="lbl">Preferred Date</label>
+                <input type="date" id="event-date" class="inp"/>
+              </div>
+              <div class="form-row">
+                <label class="lbl">Alternate Date</label>
+                <input type="date" id="event-date-alt" class="inp"/>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="lbl">Date Range From</label>
+                <input type="date" id="event-from" class="inp"/>
+              </div>
+              <div class="form-row">
+                <label class="lbl">Date Range To</label>
+                <input type="date" id="event-to" class="inp"/>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-row">
+                <label class="lbl">Approx. Group Size</label>
+                <select id="group-size" class="inp">
+                  <option value="">— Select —</option>
+                  <option>10–25</option><option>25–50</option><option>50–100</option>
+                  <option>100–200</option><option>200–300</option><option>300–400</option>
+                  <option>400–500</option><option>500+</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label class="lbl">Custom Count (if known)</label>
+                <input type="number" id="exact-count" class="inp" placeholder="e.g. 240"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- PACKAGE REQUIREMENTS -->
+          <div style="background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:7px;padding:10px;margin-bottom:8px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;">📦 Package Requirements</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${[
+                {id:'pkg-lawn',label:'Lawn / Venue Rental Only'},
+                {id:'pkg-food',label:'Package with Food'},
+                {id:'pkg-combo',label:'Ticket + Food Combined'},
+                {id:'pkg-entry',label:'Entry + Venue Package'},
+                {id:'pkg-birthday',label:'Birthday Package'},
+                {id:'pkg-school',label:'School Outing Package'},
+                {id:'pkg-corporate',label:'Corporate Offsite Package'},
+                {id:'pkg-tickets',label:'Ticketing Only (No Venue)'},
+              ].map(p=>`<label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer">
+                <input type="checkbox" id="${p.id}" style="accent-color:var(--gold)"/>
+                ${p.label}
+              </label>`).join('')}
+            </div>
+            <div class="form-row" style="margin-top:8px">
+              <label class="lbl">Special Arrangements</label>
+              <input type="text" id="special-arrangements" class="inp" placeholder="AV setup, photo wall, etc."/>
+            </div>
+          </div>
+        </div>
+
+        <!-- ISSUE CLASSIFICATION -->
+        <div class="form-row">
+          <label class="lbl">Issue / Inquiry Type</label>
+          <select id="issue-type" class="inp">
+            <option value="">— Select —</option>
+            <optgroup label="Individual Support">
+              <option value="BOOKING_SUPPORT">🎟 Booking Support</option>
+              <option value="RESCHEDULING">📅 Rescheduling Request</option>
+              <option value="REFUND">💰 Refund Request</option>
+              <option value="MODIFICATION">✏️ Booking Modification</option>
+              <option value="PAYMENT_ISSUE">💳 Payment Issue</option>
+              <option value="QR_ENTRY_ISSUE">📱 QR / Entry Issue</option>
+              <option value="OFFER_ISSUE">🏷 Offer / Promo Issue</option>
+              <option value="GENERAL_INFO">ℹ️ General Inquiry</option>
+              <option value="COMPLAINT">⚠️ Complaint</option>
+            </optgroup>
+            <optgroup label="Business / Group">
+              <option value="GROUP_INQUIRY">👥 Group Inquiry</option>
+              <option value="CORPORATE_LEAD">🏢 Corporate Lead</option>
+              <option value="SCHOOL_INQUIRY">🏫 School Inquiry</option>
+              <option value="BIRTHDAY_INQUIRY">🎂 Birthday / Social Event</option>
+              <option value="TRAVEL_AGENT_INQUIRY">✈️ Travel Agent Inquiry</option>
+              <option value="EVENT_INQUIRY">🎪 Event Inquiry</option>
+              <option value="VENUE_RENTAL">🏟 Venue / Lawn Rental</option>
+              <option value="BULK_TICKET">📦 Bulk Ticket Purchase</option>
+            </optgroup>
+            <option value="OTHER">❓ Other</option>
+          </select>
+        </div>
+
+        <!-- PRIORITY -->
+        <div class="form-row">
+          <label class="lbl">Priority</label>
+          <select id="priority" class="inp">
+            <option value="LOW">🔵 Low</option>
+            <option value="NORMAL" selected>⚪ Normal</option>
+            <option value="HIGH">🟡 High</option>
+            <option value="URGENT">🟠 Urgent</option>
+            <option value="CRITICAL">🔴 Critical</option>
+          </select>
+        </div>
+
+        <!-- CALL NOTES -->
+        <div class="form-row">
+          <label class="lbl">Call Notes (Summary)</label>
+          <textarea id="call-notes" class="inp" rows="3" placeholder="Summarise what the caller said and what they need…"></textarea>
+        </div>
+
+        <!-- ASSIGN TO -->
+        <div class="form-row">
+          <label class="lbl">Assign To</label>
+          <select id="assign-to" class="inp">
+            <option value="SELF">👤 Self (I'll handle this)</option>
+            <optgroup label="Internal Teams">
+              <option value="CALL_CENTER">🎧 Call Centre Team</option>
+              <option value="FINANCE">💰 Finance</option>
+              <option value="OPERATIONS">⚙️ Operations</option>
+              <option value="DIGITAL_MARKETING">📣 Digital Marketing</option>
+            </optgroup>
+            <optgroup label="Sales Teams">
+              <option value="SALES">📈 General Sales</option>
+              <option value="CORPORATE_SALES">🏢 Corporate Sales</option>
+              <option value="GROUP_SALES">👥 Group Sales</option>
+              <option value="INSTITUTIONAL_SALES">🏫 Institutional Sales</option>
+              <option value="EVENTS">🎪 Events &amp; Celebrations</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- FOLLOW UP -->
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="lbl">Follow-up Date</label>
+            <input type="date" id="followup-date" class="inp"/>
+          </div>
+          <div class="form-row">
+            <label class="lbl">Follow-up Time</label>
+            <input type="time" id="followup-time" class="inp"/>
+          </div>
+        </div>
+
+        <button class="btn btn-gold btn-full" onclick="createCase()" style="margin-top:6px">
+          <i class="fa-solid fa-circle-plus"></i> Create Case &amp; Assign
+        </button>
+        <button class="btn btn-green btn-full" onclick="createAndResolve()" style="margin-top:6px">
+          <i class="fa-solid fa-check-circle"></i> Resolved on Call — Close
+        </button>
+
+      </div>
+    </div><!-- /col-left -->
+
+    <!-- ══ COL CENTER: CASE QUEUE ════════════════════════════════ -->
+    <div class="col-center">
+      <div class="panel-title">
+        <span>📋 My Case Queue</span>
+        <span id="queue-count" style="font-size:11px;color:var(--text3)">0 open</span>
+      </div>
+
+      <div style="padding:8px;border-bottom:1px solid var(--border);">
+        <input type="text" id="search-cases" class="inp" placeholder="Search cases…" oninput="filterCases()"/>
+      </div>
+
+      <div style="display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm active-filter" data-filter="ALL" onclick="setFilter('ALL',this)">All</button>
+        <button class="btn btn-ghost btn-sm" data-filter="NEW" onclick="setFilter('NEW',this)">New</button>
+        <button class="btn btn-ghost btn-sm" data-filter="OPEN" onclick="setFilter('OPEN',this)">Open</button>
+        <button class="btn btn-ghost btn-sm" data-filter="ESCALATED" onclick="setFilter('ESCALATED',this)" style="color:var(--red)">⚠ Escalated</button>
+      </div>
+
+      <div class="case-list" id="case-list-items"></div>
+    </div><!-- /col-center -->
+
+    <!-- ══ COL RIGHT: CASE DETAIL ════════════════════════════════ -->
+    <div class="col-right">
+      <div class="no-case" id="no-case-msg">
+        <i class="fa-solid fa-headset"></i>
+        <div style="font-size:14px;font-weight:600">Select a case or create a new one</div>
+        <div style="font-size:12px;color:var(--text3)">Use the form on the left to capture a new call</div>
+      </div>
+      <div class="case-detail" id="case-detail" style="display:none">
+        <div id="case-detail-content"></div>
+      </div>
+    </div>
+
+  </div><!-- /columns -->
+</div><!-- /app -->
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+let currentAgent = null;
+let allCases     = [];
+let selectedCase = null;
+let filterMode   = 'ALL';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAgent();
+  startClock();
+  loadCases();
+  prefillToday();
+});
+
+function initAgent() {
+  try {
+    const raw = sessionStorage.getItem('wow_auth_session') ||
+                localStorage.getItem('wow_auth_session');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && ['CRM_AGENT','ADMIN','SUPER_ADMIN','OPS'].includes(s.role)) {
+        currentAgent = s;
+        document.getElementById('agent-name').textContent = `Agent: ${s.name || s.email}`;
+        return;
+      }
+    }
+  } catch {}
+  // Demo mode
+  currentAgent = { id:'DEMO-AGENT', name:'Sneha Sharma', email:'sneha.crm@wow.in', role:'CRM_AGENT' };
+  document.getElementById('agent-name').textContent = 'Agent: Sneha Sharma (Demo)';
+}
+
+function startClock() {
+  function tick() {
+    const n = new Date();
+    const pad = v => String(v).padStart(2,'0');
+    document.getElementById('crm-clock').textContent =
+      `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+function prefillToday() {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('followup-date').value = today;
+}
+
+/* ═══════════════════════════════════════════════════
+   BOOKING LOOKUP
+═══════════════════════════════════════════════════ */
+// Demo booking database keyed by phone
+const DEMO_BOOKINGS = {
+  '9876543210': [
+    { id:'WOW-BK-20260342', name:'Ravi Kumar', date:'2026-03-28', visit:'2026-04-05', tickets:'2 Adult + 1 Child — Water Park', status:'Confirmed', total:'₹3,397' },
+    { id:'WOW-BK-20260219', name:'Ravi Kumar', date:'2026-02-14', visit:'2026-02-20', tickets:'2 Adult — Combo', status:'Completed', total:'₹3,998' },
+  ],
+  '8800112233': [
+    { id:'WOW-BK-20260388', name:'Priya Sharma', date:'2026-03-30', visit:'2026-04-12', tickets:'4 Adult + 2 Child — Combo', status:'Confirmed', total:'₹11,994' },
+  ],
+  '7777888899': [
+    { id:'WOW-BK-20260275', name:'Amit Verma', date:'2026-03-10', visit:'2026-03-15', tickets:'1 Adult — Amusement', status:'Completed', total:'₹1,199' },
+  ],
+};
+
+function doBookingLookup() {
+  const mobile = document.getElementById('lookup-mobile').value.replace(/\D/g,'').slice(-10);
+  const resultsWrap  = document.getElementById('lookup-results');
+  const resultsList  = document.getElementById('booking-results-list');
+  const noBookingMsg = document.getElementById('no-booking-msg');
+
+  resultsWrap.style.display = 'block';
+  resultsList.innerHTML     = '';
+
+  const bookings = DEMO_BOOKINGS[mobile] || [];
+  if (!bookings.length) {
+    noBookingMsg.style.display = 'block';
+    return;
+  }
+  noBookingMsg.style.display = 'none';
+
+  bookings.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'booking-result';
+    div.innerHTML = `
+      <div class="br-id">${b.id}</div>
+      <div class="br-name">${b.name}</div>
+      <div class="br-info">${b.tickets}</div>
+      <div class="br-info">Visit: ${b.visit} &nbsp;|&nbsp; ${b.status} &nbsp;|&nbsp; ${b.total}</div>`;
+    div.onclick = () => selectBooking(div, b);
+    resultsList.appendChild(div);
+  });
+
+  // Auto-fill name
+  if (bookings[0]) {
+    document.getElementById('caller-name').value = bookings[0].name;
+  }
+}
+
+let selectedBooking = null;
+function selectBooking(el, b) {
+  document.querySelectorAll('.booking-result').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBooking = b;
+  toast(`Booking ${b.id} linked`, 'ok');
+}
+
+/* ═══════════════════════════════════════════════════
+   CALLER TYPE TOGGLE
+═══════════════════════════════════════════════════ */
+function onCallerTypeChange() {
+  const type = document.getElementById('caller-type').value;
+  const bizTypes = ['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','TRAVEL_AGENT','BULK','EVENT','VENUE'];
+  const isBiz = bizTypes.includes(type);
+  document.getElementById('business-fields').classList.toggle('show', isBiz);
+}
+
+/* ═══════════════════════════════════════════════════
+   CASE CREATION
+═══════════════════════════════════════════════════ */
+function buildCaseData(status) {
+  const callerType = document.getElementById('caller-type').value;
+  const issueType  = document.getElementById('issue-type').value;
+  if (!callerType || !issueType) { toast('Please select caller type and issue type', 'err'); return null; }
+
+  const notes = document.getElementById('call-notes').value.trim();
+  if (!notes) { toast('Please enter call notes', 'err'); return null; }
+
+  const bizTypes = ['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','TRAVEL_AGENT','BULK','EVENT','VENUE'];
+  const isBiz    = bizTypes.includes(callerType);
+
+  const now = new Date();
+  const caseId = 'CC-' + now.getFullYear() + '-' + String(_nextCaseNum()).padStart(4,'0');
+
+  const packages = ['pkg-lawn','pkg-food','pkg-combo','pkg-entry','pkg-birthday','pkg-school','pkg-corporate','pkg-tickets']
+    .filter(id => document.getElementById(id)?.checked)
+    .map(id => document.getElementById(id)?.nextSibling?.textContent?.trim())
+    .filter(Boolean);
+
+  return {
+    id          : caseId,
+    status      : status || 'RECORDED',
+    callerType,
+    issueType,
+    priority    : document.getElementById('priority').value || 'NORMAL',
+    callerName  : document.getElementById('caller-name').value || document.getElementById('contact-person').value || 'Unknown',
+    mobile      : document.getElementById('lookup-mobile').value,
+    altMobile   : document.getElementById('alt-mobile').value,
+    orgName     : isBiz ? document.getElementById('org-name').value : '',
+    contactPerson: isBiz ? document.getElementById('contact-person').value : '',
+    designation : isBiz ? document.getElementById('designation').value : '',
+    email       : document.getElementById('contact-email').value,
+    eventDate   : document.getElementById('event-date').value,
+    eventDateAlt: document.getElementById('event-date-alt').value,
+    eventFrom   : document.getElementById('event-from').value,
+    eventTo     : document.getElementById('event-to').value,
+    groupSize   : document.getElementById('group-size').value,
+    exactCount  : document.getElementById('exact-count').value,
+    packages,
+    specialArrangements: document.getElementById('special-arrangements').value,
+    notes,
+    assignedTo  : document.getElementById('assign-to').value || 'SELF',
+    followupDate: document.getElementById('followup-date').value,
+    followupTime: document.getElementById('followup-time').value,
+    linkedBookingId: selectedBooking ? selectedBooking.id : null,
+    createdBy   : currentAgent ? currentAgent.name : 'Agent',
+    createdAt   : now.toISOString(),
+    updatedAt   : now.toISOString(),
+    timeline    : [{
+      ts     : now.toISOString(),
+      event  : status === 'CLOSED' ? 'Case created and resolved on call' : 'Case created and captured',
+      by     : currentAgent ? currentAgent.name : 'Agent',
+      color  : '#22c55e',
+    }],
+  };
+}
+
+function _nextCaseNum() {
+  const key = 'wow_crm_case_counter';
+  let n = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  localStorage.setItem(key, n);
+  return n;
+}
+
+function createCase() {
+  const c = buildCaseData('RECORDED');
+  if (!c) return;
+  _saveCase(c);
+  toast(`Case ${c.id} created — assigned to ${c.assignedTo}`, 'ok');
+  loadCases();
+  clearForm();
+  openCase(c);
+}
+
+function createAndResolve() {
+  const c = buildCaseData('CLOSED');
+  if (!c) return;
+  c.resolvedAt = new Date().toISOString();
+  c.resolutionNotes = c.notes;
+  _saveCase(c);
+  toast(`Case ${c.id} resolved and closed`, 'ok');
+  loadCases();
+  clearForm();
+  openCase(c);
+}
+
+function _saveCase(c) {
+  const key = 'wow_crm_cases_v1';
+  const list = _loadCases();
+  list.unshift(c);
+  try { localStorage.setItem(key, JSON.stringify(list)); } catch {}
+}
+
+function _loadCases() {
+  try { return JSON.parse(localStorage.getItem('wow_crm_cases_v1') || '[]'); } catch { return []; }
+}
+
+/* ═══════════════════════════════════════════════════
+   CASE LIST RENDER
+═══════════════════════════════════════════════════ */
+function loadCases() {
+  allCases = _loadCases();
+  if (!allCases.length) {
+    allCases = getDemoCases();
+  }
+  renderCaseList();
+}
+
+function getDemoCases() {
+  return [
+    {id:'CC-2026-0187',status:'IN_PROGRESS',priority:'HIGH',callerType:'CORPORATE',callerName:'Amit Verma',orgName:'TCS Noida',issueType:'CORPORATE_LEAD',notes:'Group inquiry for 200+ employees offsite',assignedTo:'CORPORATE_SALES',createdAt:'2026-03-30T09:14:00Z',timeline:[{ts:'2026-03-30T09:14:00Z',event:'Case created',by:'Sneha Sharma',color:'#3b82f6'}]},
+    {id:'CC-2026-0186',status:'ASSIGNED',priority:'NORMAL',callerType:'INDIVIDUAL',callerName:'Priya Singh',issueType:'REFUND',notes:'Booking cancelled — refund not received',assignedTo:'FINANCE',linkedBookingId:'WOW-BK-20260388',createdAt:'2026-03-30T08:47:00Z',timeline:[{ts:'2026-03-30T08:47:00Z',event:'Case created',by:'Agent',color:'#3b82f6'}]},
+    {id:'CC-2026-0185',status:'ESCALATED',priority:'URGENT',callerType:'SCHOOL',callerName:'DPS Noida',orgName:'DPS Noida',issueType:'SCHOOL_INQUIRY',notes:'School trip for 300 students April 15–20',assignedTo:'INSTITUTIONAL_SALES',createdAt:'2026-03-30T07:22:00Z',timeline:[{ts:'2026-03-30T07:22:00Z',event:'Case created',by:'Agent',color:'#3b82f6'},{ts:'2026-03-30T11:22:00Z',event:'Auto-escalated: no response in 4h',by:'System',color:'#ef4444'}]},
+    {id:'CC-2026-0184',status:'NEW',priority:'NORMAL',callerType:'BIRTHDAY',callerName:'Anita Kapoor',issueType:'BIRTHDAY_INQUIRY',notes:'Birthday party for 50 guests, wants lawn + food',assignedTo:'EVENTS',createdAt:'2026-03-30T10:55:00Z',timeline:[{ts:'2026-03-30T10:55:00Z',event:'Case created',by:'Ravi G.',color:'#3b82f6'}]},
+    {id:'CC-2026-0183',status:'CLOSED',priority:'LOW',callerType:'INDIVIDUAL',callerName:'Suresh Mehta',issueType:'GENERAL_INFO',notes:'Asked about timing and parking',assignedTo:'SELF',createdAt:'2026-03-30T10:30:00Z',resolvedAt:'2026-03-30T10:31:00Z',timeline:[{ts:'2026-03-30T10:30:00Z',event:'Case created and resolved on call',by:'Agent',color:'#22c55e'}]},
+  ];
+}
+
+function filterCases() {
+  renderCaseList();
+}
+
+function setFilter(f, el) {
+  filterMode = f;
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active-filter'));
+  el.classList.add('active-filter');
+  renderCaseList();
+}
+
+function renderCaseList() {
+  const search = (document.getElementById('search-cases')?.value || '').toLowerCase();
+  let filtered = allCases;
+
+  if (filterMode === 'NEW')       filtered = filtered.filter(c => c.status === 'NEW' || c.status === 'RECORDED');
+  if (filterMode === 'OPEN')      filtered = filtered.filter(c => !['CLOSED','RESOLVED','CANCELLED'].includes(c.status));
+  if (filterMode === 'ESCALATED') filtered = filtered.filter(c => c.status === 'ESCALATED');
+
+  if (search) {
+    filtered = filtered.filter(c =>
+      (c.id || '').toLowerCase().includes(search) ||
+      (c.callerName || '').toLowerCase().includes(search) ||
+      (c.orgName || '').toLowerCase().includes(search) ||
+      (c.issueType || '').toLowerCase().includes(search) ||
+      (c.notes || '').toLowerCase().includes(search)
+    );
+  }
+
+  const openCount = allCases.filter(c => !['CLOSED','RESOLVED','CANCELLED'].includes(c.status)).length;
+  document.getElementById('queue-count').textContent = `${openCount} open`;
+
+  const el = document.getElementById('case-list-items');
+  if (!filtered.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">No cases match</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(c => {
+    const statusMap = {NEW:'b-new',RECORDED:'b-new',ASSIGNED:'b-assigned',IN_PROGRESS:'b-inprog',ESCALATED:'b-escalated',RESOLVED:'b-resolved',CLOSED:'b-closed'};
+    const priMap    = {LOW:'b-low',NORMAL:'b-normal',HIGH:'b-high',URGENT:'b-urgent',CRITICAL:'b-critical'};
+    const selected  = selectedCase && selectedCase.id === c.id;
+    return `
+    <div class="case-card ${c.status === 'ESCALATED' ? 'escalated' : c.priority === 'URGENT' || c.priority === 'CRITICAL' ? 'urgent' : ''} ${selected?'selected':''}"
+         onclick="openCase(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      <div class="cc-id">${c.id}</div>
+      <div class="cc-name">${c.orgName || c.callerName || 'Unknown'}</div>
+      <div class="cc-issue">${c.notes || c.issueType || ''}</div>
+      <div class="cc-footer">
+        <span class="badge ${statusMap[c.status] || 'b-new'}">${c.status}</span>
+        <span class="badge ${priMap[c.priority] || 'b-normal'}">${c.priority}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   CASE DETAIL
+═══════════════════════════════════════════════════ */
+function openCase(c) {
+  if (typeof c === 'string') c = JSON.parse(c.replace(/&quot;/g,'"'));
+  selectedCase = c;
+
+  // Update case-list selection
+  document.querySelectorAll('.case-card').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.case-card').forEach(el => {
+    if (el.querySelector('.cc-id')?.textContent === c.id) el.classList.add('selected');
+  });
+
+  document.getElementById('no-case-msg').style.display = 'none';
+  document.getElementById('case-detail').style.display = 'block';
+
+  const statusMap = {NEW:'b-new',RECORDED:'b-new',ASSIGNED:'b-assigned',IN_PROGRESS:'b-inprog',ESCALATED:'b-escalated',RESOLVED:'b-resolved',CLOSED:'b-closed'};
+  const priMap    = {LOW:'b-low',NORMAL:'b-normal',HIGH:'b-high',URGENT:'b-urgent',CRITICAL:'b-critical'};
+
+  const bizFields = c.callerType && ['CORPORATE','SCHOOL','COLLEGE','INSTITUTION','BIRTHDAY','TRAVEL_AGENT','BULK','EVENT','VENUE'].includes(c.callerType);
+
+  const timeline = (c.timeline || []).map(t => `
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:${t.color || '#3b82f6'};background:${t.color || '#3b82f6'}22"></div>
+      <div class="tl-time">${new Date(t.ts).toLocaleString('en-IN')}</div>
+      <div class="tl-text">${t.event}</div>
+      <div class="tl-by">by ${t.by}</div>
+    </div>`).join('');
+
+  document.getElementById('case-detail-content').innerHTML = `
+    <div class="cd-header">
+      <div>
+        <div class="cd-title">${c.id} — ${c.orgName || c.callerName || 'Unknown Caller'}</div>
+        <div class="cd-meta">
+          <span class="badge ${statusMap[c.status] || 'b-new'}">${c.status}</span>
+          <span class="badge ${priMap[c.priority] || 'b-normal'}">${c.priority}</span>
+          <span>${c.callerType}</span>
+          <span>${new Date(c.createdAt).toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+      <div class="cd-actions">
+        ${c.status !== 'CLOSED' ? `
+          <button class="btn btn-green btn-sm" onclick="updateCaseStatus('${c.id}','RESOLVED')"><i class="fa-solid fa-check"></i> Resolve</button>
+          <button class="btn btn-red btn-sm" onclick="updateCaseStatus('${c.id}','ESCALATED')"><i class="fa-solid fa-triangle-exclamation"></i> Escalate</button>
+        ` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="addNote('${c.id}')"><i class="fa-solid fa-note-sticky"></i> Add Note</button>
+      </div>
+    </div>
+
+    ${c.linkedBookingId ? `
+    <div class="section-card" style="border-color:rgba(59,130,246,.2)">
+      <div class="sc-title"><i class="fa-solid fa-ticket" style="color:var(--blue)"></i> Linked Booking</div>
+      <span class="badge b-assigned" style="font-size:12px;padding:4px 12px">${c.linkedBookingId}</span>
+    </div>` : ''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="section-card">
+        <div class="sc-title">👤 Caller Details</div>
+        <div style="font-size:12px;line-height:2">
+          <div><span style="color:var(--text3)">Name:</span> ${c.callerName || '—'}</div>
+          <div><span style="color:var(--text3)">Mobile:</span> ${c.mobile || '—'}</div>
+          ${c.altMobile ? `<div><span style="color:var(--text3)">Alt:</span> ${c.altMobile}</div>` : ''}
+          ${c.email ? `<div><span style="color:var(--text3)">Email:</span> ${c.email}</div>` : ''}
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="sc-title">📋 Case Info</div>
+        <div style="font-size:12px;line-height:2">
+          <div><span style="color:var(--text3)">Issue:</span> ${c.issueType || '—'}</div>
+          <div><span style="color:var(--text3)">Assigned:</span> ${c.assignedTo || '—'}</div>
+          <div><span style="color:var(--text3)">Agent:</span> ${c.createdBy || '—'}</div>
+          ${c.followupDate ? `<div><span style="color:var(--text3)">Follow-up:</span> ${c.followupDate} ${c.followupTime || ''}</div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    ${bizFields && (c.orgName || c.eventDate || c.groupSize) ? `
+    <div class="section-card">
+      <div class="sc-title">🏢 Business / Event Details</div>
+      <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;line-height:2">
+        ${c.orgName ? `<div><span style="color:var(--text3)">Organisation:</span> ${c.orgName}</div>` : ''}
+        ${c.contactPerson ? `<div><span style="color:var(--text3)">Contact:</span> ${c.contactPerson}</div>` : ''}
+        ${c.designation ? `<div><span style="color:var(--text3)">Role:</span> ${c.designation}</div>` : ''}
+        ${c.eventDate ? `<div><span style="color:var(--text3)">Event Date:</span> ${c.eventDate}</div>` : ''}
+        ${c.eventFrom ? `<div><span style="color:var(--text3)">Date Range:</span> ${c.eventFrom} → ${c.eventTo || '?'}</div>` : ''}
+        ${c.groupSize ? `<div><span style="color:var(--text3)">Group Size:</span> ${c.groupSize}${c.exactCount?' ('+c.exactCount+'':''}</div>` : ''}
+        ${c.packages && c.packages.length ? `<div style="grid-column:1/-1"><span style="color:var(--text3)">Packages:</span> ${c.packages.join(', ')}</div>` : ''}
+        ${c.specialArrangements ? `<div style="grid-column:1/-1"><span style="color:var(--text3)">Special:</span> ${c.specialArrangements}</div>` : ''}
+      </div>
+    </div>` : ''}
+
+    <div class="section-card">
+      <div class="sc-title">📝 Call Notes</div>
+      <div style="font-size:12.5px;line-height:1.7;color:var(--text2)">${c.notes || '—'}</div>
+    </div>
+
+    <div class="section-card">
+      <div class="sc-title"><i class="fa-solid fa-timeline"></i> Case Timeline</div>
+      <div class="timeline">${timeline || '<div style="font-size:12px;color:var(--text3)">No timeline events</div>'}</div>
+    </div>
+
+    <div id="add-note-area" style="display:none">
+      <div class="section-card">
+        <div class="sc-title">➕ Add Note</div>
+        <textarea id="new-note-text" class="inp" rows="3" placeholder="Enter note or update…" style="margin-bottom:8px"></textarea>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-gold btn-sm" onclick="saveNote('${c.id}')">Save Note</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('add-note-area').style.display='none'">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function updateCaseStatus(caseId, newStatus) {
+  const list = _loadCases();
+  const idx = list.findIndex(c => c.id === caseId);
+  if (idx < 0) {
+    // Try demo cases - just show toast
+    toast(`Status updated to ${newStatus}`, 'ok');
+    return;
+  }
+  list[idx].status = newStatus;
+  list[idx].updatedAt = new Date().toISOString();
+  list[idx].timeline = list[idx].timeline || [];
+  list[idx].timeline.push({
+    ts   : new Date().toISOString(),
+    event: `Status changed to ${newStatus}`,
+    by   : currentAgent ? currentAgent.name : 'Agent',
+    color: newStatus === 'ESCALATED' ? '#ef4444' : '#22c55e',
+  });
+  try { localStorage.setItem('wow_crm_cases_v1', JSON.stringify(list)); } catch {}
+  allCases = list;
+  renderCaseList();
+  openCase(list[idx]);
+  toast(`Case ${caseId} → ${newStatus}`, 'ok');
+}
+
+function addNote(caseId) {
+  document.getElementById('add-note-area').style.display = 'block';
+  document.getElementById('new-note-text').focus();
+}
+
+function saveNote(caseId) {
+  const text = document.getElementById('new-note-text').value.trim();
+  if (!text) return;
+  const list = _loadCases();
+  const idx = list.findIndex(c => c.id === caseId);
+  if (idx >= 0) {
+    list[idx].timeline = list[idx].timeline || [];
+    list[idx].timeline.push({
+      ts   : new Date().toISOString(),
+      event: `Note: ${text}`,
+      by   : currentAgent ? currentAgent.name : 'Agent',
+      color: '#3b82f6',
+    });
+    list[idx].updatedAt = new Date().toISOString();
+    try { localStorage.setItem('wow_crm_cases_v1', JSON.stringify(list)); } catch {}
+    allCases = list;
+    renderCaseList();
+    openCase(list[idx]);
+    toast('Note saved', 'ok');
+  } else {
+    // Demo case
+    toast('Note saved (demo)', 'ok');
+  }
+  document.getElementById('add-note-area').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════════ */
+function clearForm() {
+  ['lookup-mobile','caller-name','alt-mobile','org-name','contact-person','designation',
+   'contact-email','event-date','event-date-alt','event-from','event-to','exact-count',
+   'call-notes','special-arrangements'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  ['pkg-lawn','pkg-food','pkg-combo','pkg-entry','pkg-birthday','pkg-school','pkg-corporate','pkg-tickets']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.checked = false; });
+  document.getElementById('caller-type').value = '';
+  document.getElementById('issue-type').value  = '';
+  document.getElementById('priority').value    = 'NORMAL';
+  document.getElementById('assign-to').value   = 'SELF';
+  document.getElementById('group-size').value  = '';
+  document.getElementById('business-fields').classList.remove('show');
+  document.getElementById('lookup-results').style.display = 'none';
+  selectedBooking = null;
+  prefillToday();
+}
+
+function toast(msg, type) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type || 'ok'}`;
+  t.innerHTML = `${type === 'ok' ? '✅' : '❌'} ${msg}`;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Filter button active state
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('[data-filter="ALL"]')?.classList.add('active-filter');
+});
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

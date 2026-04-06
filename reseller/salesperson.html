@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Salesperson Performance Report — WOW Reseller ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<!-- Reseller Portal: uses wow_reseller_session, not wow-auth.js -->
+<script>
+(function resellerGuard(){
+  var raw = sessionStorage.getItem('wow_reseller_session');
+  if(!raw){ window.location.replace('login.html?redirect=salesperson.html'); return; }
+  try{
+    var s = JSON.parse(raw);
+    if(!s || s.role !== 'RESELLER'){ window.location.replace('login.html?error=access_denied'); return; }
+    if(s.loginAt && (Date.now()-s.loginAt) > 480*60*1000){ sessionStorage.removeItem('wow_reseller_session'); window.location.replace('login.html?redirect=salesperson.html'); return; }
+  }catch(e){ window.location.replace('login.html'); }
+})();
+</script>
+<script src="../js/reseller-engine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--brand:#7c3aed;--navy:#0a1628;--green:#059669;--red:#dc2626;--amber:#d97706;--blue:#1a56db;--teal:#0891b2;--border:#e2e8f0;--text:#1e293b;--muted:#64748b;--surface:#f8fafc;--white:#fff;}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;}
+.topbar{background:var(--navy);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-brand .mark{width:32px;height:32px;background:linear-gradient(135deg,var(--brand),#4f46e5);border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:900;color:#fff;}
+.topbar-brand .name{font-size:14px;font-weight:700;color:#fff;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.content{max-width:1400px;margin:0 auto;padding:24px 28px;}
+/* FILTER PANEL */
+.filter-panel{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;}
+.filter-panel-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.fg input,.fg select{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;font-family:'Inter',sans-serif;}
+.fg input:focus,.fg select:focus{border-color:var(--brand);}
+.filter-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;}
+.kpi{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.kpi-lbl{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.kpi-val{font-size:26px;font-weight:900;margin:4px 0 2px;}
+.kpi-sub{font-size:11px;color:var(--muted);}
+/* LEADERBOARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px;}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:800;}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1.5px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);}
+tbody tr:last-child{border:none;}
+tbody td{padding:12px 14px;vertical-align:middle;}
+tbody tr:hover{background:#f9fafb;}
+/* CODE CHIPS */
+.code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;border:1px solid;white-space:nowrap;}
+.code-res{background:#f0f4ff;color:#3730a3;border-color:#c7d2fe;}
+.code-bat{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.code-emp{background:#ecfeff;color:#155e75;border-color:#a5f3fc;}
+.code-tkt{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.code-alc{background:#faf5ff;color:#6d28d9;border-color:#e9d5ff;}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#d1fae5;color:#065f46;}
+.badge-blue{background:#dbeafe;color:#1e40af;}
+.badge-amber{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-gray{background:#f3f4f6;color:#374151;}
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:.15s;}
+.btn-purple{background:var(--brand);color:#fff;} .btn-purple:hover{background:#6d28d9;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);} .btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+.btn-sm{padding:6px 13px;font-size:12px;}
+/* PROGRESS */
+.prog{height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;}
+/* CHART GRID */
+.chart-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+/* EMPLOYEE DETAIL CARD */
+.emp-detail{background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:14px;padding:22px;color:#fff;margin-bottom:24px;}
+.emp-detail-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:16px;align-items:center;}
+.emp-name{font-size:20px;font-weight:800;}
+.emp-code-disp{font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(255,255,255,.6);margin-top:4px;}
+.emp-stat{text-align:center;}
+.emp-stat-val{font-size:22px;font-weight:900;}
+.emp-stat-lbl{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+/* RANK BADGE */
+.rank{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;flex-shrink:0;}
+.rank-1{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#0a0e1a;}
+.rank-2{background:linear-gradient(135deg,#adb5bd,#868e96);color:#fff;}
+.rank-3{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff;}
+.rank-n{background:#f1f5f9;color:var(--muted);}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:10000;display:none;align-items:center;gap:8px;}
+.toast.show{display:flex;}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
+.empty-state i{font-size:36px;margin-bottom:12px;display:block;opacity:.35;}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(3,1fr);}.emp-detail-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:768px){.chart-2{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="mark">SP</div>
+    <div class="name">Salesperson Performance Report</div>
+  </div>
+  <div class="topbar-right">
+    <div id="topbar-auth"></div>
+    <a href="index.html" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    <button class="btn btn-purple btn-sm" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- FILTER PANEL -->
+<div class="filter-panel">
+  <div class="filter-panel-title"><i class="fas fa-filter" style="color:var(--brand);"></i> Report Filters</div>
+  <div class="filter-grid">
+    <div class="fg"><label>Reseller Code</label>
+      <select id="f-reseller" onchange="loadResellerDeps()"><option value="">All Resellers</option></select>
+    </div>
+    <div class="fg"><label>Salesperson Code / Name</label>
+      <select id="f-employee"><option value="">All Salespersons</option></select>
+    </div>
+    <div class="fg"><label>Batch Code</label>
+      <select id="f-batch"><option value="">All Batches</option></select>
+    </div>
+    <div class="fg"><label>Status</label>
+      <select id="f-status">
+        <option value="">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="suspended">Suspended</option>
+      </select>
+    </div>
+    <div class="fg"><label>Channel</label>
+      <select id="f-channel">
+        <option value="">All Channels</option>
+        <option value="counter">Counter</option>
+        <option value="online">Online</option>
+        <option value="field">Field</option>
+        <option value="hotel">Hotel</option>
+      </select>
+    </div>
+    <div class="fg"><label>Date From</label><input type="date" id="f-from"/></div>
+    <div class="fg"><label>Date To</label><input type="date" id="f-to"/></div>
+    <div class="fg"><label>Ticket Status</label>
+      <select id="f-tkt-status">
+        <option value="">All Ticket Statuses</option>
+        <option value="issued">Issued</option>
+        <option value="redeemed">Redeemed</option>
+        <option value="expired">Expired</option>
+      </select>
+    </div>
+  </div>
+  <div class="filter-actions">
+    <button class="btn btn-purple" onclick="runReport()"><i class="fas fa-sync"></i> Run Report</button>
+    <button class="btn btn-outline" onclick="clearFilters()"><i class="fas fa-times"></i> Clear Filters</button>
+  </div>
+</div>
+
+<!-- SINGLE EMPLOYEE DETAIL (when one employee is selected) -->
+<div id="emp-detail-section" style="display:none;"></div>
+
+<!-- KPI CARDS -->
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-lbl">Salespersons</div><div class="kpi-val" id="kpi-count" style="color:var(--brand);">—</div><div class="kpi-sub" id="kpi-count-s">in report</div></div>
+  <div class="kpi"><div class="kpi-lbl">Tickets Sold</div><div class="kpi-val" id="kpi-issued" style="color:var(--blue);">—</div><div class="kpi-sub">total across all SPs</div></div>
+  <div class="kpi"><div class="kpi-lbl">Tickets Redeemed</div><div class="kpi-val" id="kpi-redeemed" style="color:var(--green);">—</div><div class="kpi-sub" id="kpi-rd-rate">—% redemption rate</div></div>
+  <div class="kpi"><div class="kpi-lbl">Balance Remaining</div><div class="kpi-val" id="kpi-balance" style="color:var(--amber);">—</div><div class="kpi-sub">unsold tickets</div></div>
+  <div class="kpi"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val" id="kpi-revenue" style="color:var(--teal);">—</div><div class="kpi-sub">from issued tickets</div></div>
+</div>
+
+<!-- CHARTS -->
+<div class="chart-2">
+  <div class="card"><div class="card-hdr"><span class="card-title">Tickets Sold by Salesperson</span></div><div style="height:280px;"><canvas id="chart-issued"></canvas></div></div>
+  <div class="card"><div class="card-hdr"><span class="card-title">Redemption Rate by Salesperson</span></div><div style="height:280px;"><canvas id="chart-rd"></canvas></div></div>
+</div>
+
+<!-- BATCH BREAKDOWN (when batch filter applied) -->
+<div id="batch-breakdown-section" style="display:none;" class="card">
+  <div class="card-hdr"><span class="card-title"><i class="fas fa-layer-group" style="margin-right:6px;color:var(--brand);"></i>Batch Allocation Breakdown</span></div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Batch Code</th><th>Reseller Code</th><th>Product</th><th>Total Allocated</th><th>Issued</th><th>Balance</th></tr></thead>
+    <tbody id="batch-breakdown-tbody"></tbody>
+  </table></div>
+</div>
+
+<!-- LEADERBOARD TABLE -->
+<div class="card">
+  <div class="card-hdr">
+    <span class="card-title"><i class="fas fa-trophy" style="margin-right:6px;color:var(--amber);"></i>Salesperson Leaderboard</span>
+    <span class="badge badge-purple" id="rpt-row-count">—</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>#</th>
+        <th>Employee Code <i class="fas fa-lock" style="color:var(--amber);font-size:9px;"></i></th>
+        <th>Name</th>
+        <th>Reseller Code</th>
+        <th>Role</th>
+        <th>Channel</th>
+        <th>Tickets Sold</th>
+        <th>Redeemed</th>
+        <th>Expired</th>
+        <th>Balance</th>
+        <th>Revenue</th>
+        <th>Redemption %</th>
+        <th>Utilization %</th>
+        <th>Last Sale</th>
+        <th>Status</th>
+        <th>Batch Breakdown</th>
+      </tr></thead>
+      <tbody id="leaderboard-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- INDIVIDUAL TICKET LOG (when single employee selected) -->
+<div id="ticket-log-section" style="display:none;" class="card">
+  <div class="card-hdr">
+    <span class="card-title"><i class="fas fa-ticket-alt" style="margin-right:6px;color:var(--green);"></i>Ticket Issuance Log</span>
+    <span class="badge badge-green" id="tkt-log-count">—</span>
+  </div>
+  <div class="filter-panel" style="margin-bottom:14px;padding:12px 16px;">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <input id="tkt-log-q" placeholder="Search ticket code, customer…" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;flex:1;min-width:200px;" oninput="filterTicketLog()"/>
+      <select id="tkt-log-status" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;" onchange="filterTicketLog()">
+        <option value="">All Statuses</option>
+        <option value="issued">Issued</option>
+        <option value="redeemed">Redeemed</option>
+        <option value="expired">Expired</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticket Code</th><th>Reseller Code</th><th>Batch Code</th><th>Alloc Code</th>
+        <th>Customer</th><th>Product</th><th>Visit Date</th><th>Sale Price</th>
+        <th>Status</th><th>Issued At</th><th>Redemption Trace</th>
+      </tr></thead>
+      <tbody id="tkt-log-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /.content -->
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<script>
+'use strict';
+var _RE = window.ResellerEngine;
+var _charts = {};
+var _reportData = [];
+var _allTickets = [];
+var _empTickets = [];
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function inr(v){ return '₹'+(v||0).toLocaleString('en-IN'); }
+function dtFmt(ts){ if(!ts) return '—'; return new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.style.background=type==='error'?'#dc2626':'#1e293b';
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000);
+}
+function statusBadge(s){
+  var map={active:'badge-green',inactive:'badge-gray',suspended:'badge-red',issued:'badge-blue',redeemed:'badge-green',cancelled:'badge-red',expired:'badge-red'};
+  return '<span class="badge '+(map[s]||'badge-gray')+'">'+(s||'—').replace(/_/g,' ')+'</span>';
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  if (window.WOWAuth) WOWAuth.renderTopbarWidget('topbar-auth');
+  _RE.seedDemoData();
+  populateTopFilters();
+
+  // Pre-select from URL param
+  var params = new URLSearchParams(window.location.search);
+  var empCode = params.get('emp');
+  var resId   = params.get('res');
+  if (resId) document.getElementById('f-reseller').value = resId;
+  if (resId) loadResellerDeps();
+  if (empCode) {
+    setTimeout(function(){
+      var sel = document.getElementById('f-employee');
+      for (var i=0; i<sel.options.length; i++) {
+        if (sel.options[i].text.indexOf(empCode) !== -1) { sel.value = sel.options[i].value; break; }
+      }
+      runReport();
+    }, 200);
+  } else {
+    runReport();
+  }
+}
+
+function populateTopFilters() {
+  var resSel = document.getElementById('f-reseller');
+  resSel.innerHTML = '<option value="">All Resellers</option>';
+  _RE.loadResellers().forEach(function(r){
+    resSel.innerHTML += '<option value="' + r.id + '">' + r.resellerCode + ' — ' + (r.tradeName||r.name) + '</option>';
+  });
+  loadResellerDeps();
+}
+
+function loadResellerDeps() {
+  var resId  = document.getElementById('f-reseller').value;
+  var empSel = document.getElementById('f-employee');
+  var batSel = document.getElementById('f-batch');
+  empSel.innerHTML = '<option value="">All Salespersons</option>';
+  batSel.innerHTML = '<option value="">All Batches</option>';
+
+  var employees = resId ? _RE.getEmployeesByReseller(resId) : _RE.loadEmployees();
+  var batches   = resId ? _RE.getBatchesByReseller(resId)   : _RE.loadBatches();
+
+  employees.forEach(function(e){
+    empSel.innerHTML += '<option value="' + e.id + '">' + e.employeeCode + ' — ' + e.name + '</option>';
+  });
+  batches.forEach(function(b){
+    batSel.innerHTML += '<option value="' + b.batchCode + '">' + b.batchCode + ' (' + (b.productName||b.productId) + ')</option>';
+  });
+}
+
+// ─── RUN REPORT ────────────────────────────────────────────────────────────
+function runReport() {
+  var resId      = document.getElementById('f-reseller').value;
+  var empId      = document.getElementById('f-employee').value;
+  var batchCode  = document.getElementById('f-batch').value;
+  var status     = document.getElementById('f-status').value;
+  var channel    = document.getElementById('f-channel').value;
+  var from       = document.getElementById('f-from').value;
+  var to         = document.getElementById('f-to').value;
+  var tktStatus  = document.getElementById('f-tkt-status').value;
+
+  var rescode = resId ? (_RE.getReseller(resId)||{}).resellerCode : '';
+  var filters = {
+    resellerId:    resId || undefined,
+    resellerCode:  rescode || undefined,
+    fromDate:      from || undefined,
+    toDate:        to || undefined,
+  };
+
+  _reportData = _RE.reportByEmployee(filters);
+
+  // Additional client-side filters
+  if (empId)    _reportData = _reportData.filter(function(e){ return e.employeeId === empId; });
+  if (status)   _reportData = _reportData.filter(function(e){ return e.status === status; });
+  if (channel)  _reportData = _reportData.filter(function(e){ return e.channel === channel; });
+  if (batchCode) {
+    _reportData = _reportData.filter(function(e){
+      return e.batchBreakdown && e.batchBreakdown.some(function(b){ return b.batchCode === batchCode; });
+    });
+  }
+
+  // KPIs
+  var totIssued   = _reportData.reduce(function(s,e){ return s+e.issued; },0);
+  var totRedeemed = _reportData.reduce(function(s,e){ return s+e.redeemed; },0);
+  var totBalance  = _reportData.reduce(function(s,e){ return s+e.balance; },0);
+  var totRevenue  = _reportData.reduce(function(s,e){ return s+e.revenue; },0);
+  var rdRate      = totIssued > 0 ? Math.round(totRedeemed/totIssued*100) : 0;
+
+  document.getElementById('kpi-count').textContent    = _reportData.length;
+  document.getElementById('kpi-issued').textContent   = totIssued.toLocaleString();
+  document.getElementById('kpi-redeemed').textContent = totRedeemed.toLocaleString();
+  document.getElementById('kpi-rd-rate').textContent  = rdRate + '% redemption rate';
+  document.getElementById('kpi-balance').textContent  = totBalance.toLocaleString();
+  document.getElementById('kpi-revenue').textContent  = inr(totRevenue);
+  document.getElementById('rpt-row-count').textContent= _reportData.length + ' salespersons';
+
+  // Single employee detail view
+  if (empId && _reportData.length === 1) {
+    renderEmpDetail(_reportData[0]);
+  } else {
+    document.getElementById('emp-detail-section').style.display = 'none';
+    document.getElementById('ticket-log-section').style.display = 'none';
+  }
+
+  // Batch breakdown
+  if (batchCode) {
+    document.getElementById('batch-breakdown-section').style.display = 'block';
+    renderBatchBreakdown(batchCode);
+  } else {
+    document.getElementById('batch-breakdown-section').style.display = 'none';
+  }
+
+  renderLeaderboard(tktStatus);
+  renderCharts();
+}
+
+function renderEmpDetail(e) {
+  var section = document.getElementById('emp-detail-section');
+  section.style.display = 'block';
+  var rdPct = e.issued>0 ? Math.round(e.redeemed/e.issued*100) : 0;
+  var utPct = e.allocated>0 ? Math.round(e.issued/e.allocated*100) : 0;
+  section.innerHTML =
+    '<div class="emp-detail">' +
+    '<div class="emp-detail-grid">' +
+      '<div><div class="emp-name">' + (e.employeeName||'—') + '</div><div class="emp-code-disp"><span style="color:rgba(255,255,255,.35);font-size:10px;">EMPLOYEE CODE</span><br>' + e.employeeCode + '</div>' +
+        '<div style="margin-top:8px;"><span style="font-family:JetBrains Mono,monospace;font-size:10px;color:rgba(255,255,255,.4);">Reseller: </span><span style="font-family:JetBrains Mono,monospace;font-size:11px;color:#c4b5fd;">' + e.resellerCode + '</span></div>' +
+        '<div style="margin-top:4px;">' + statusBadge(e.status) + ' <span class="badge badge-blue">' + (e.channel||'all') + '</span> <span class="badge badge-purple">' + (e.role||'—') + '</span></div></div>' +
+      '<div class="emp-stat"><div class="emp-stat-val" style="color:#60a5fa;">' + e.issued + '</div><div class="emp-stat-lbl">Tickets Sold</div></div>' +
+      '<div class="emp-stat"><div class="emp-stat-val" style="color:#34d399;">' + e.redeemed + '</div><div class="emp-stat-lbl">Redeemed</div></div>' +
+      '<div class="emp-stat"><div class="emp-stat-val" style="color:#fbbf24;">' + e.balance + '</div><div class="emp-stat-lbl">Balance</div></div>' +
+      '<div class="emp-stat"><div class="emp-stat-val" style="color:#2dd4bf;">' + inr(e.revenue) + '</div><div class="emp-stat-lbl">Revenue</div></div>' +
+    '</div>' +
+    '<div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+      '<div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;">REDEMPTION RATE — ' + rdPct + '%</div>' +
+        '<div style="height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;"><div style="height:100%;width:'+rdPct+'%;background:'+(rdPct>70?'#34d399':rdPct>40?'#fbbf24':'#f87171')+';border-radius:99px;"></div></div></div>' +
+      '<div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;">UTILIZATION RATE — ' + utPct + '%</div>' +
+        '<div style="height:8px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden;"><div style="height:100%;width:'+utPct+'%;background:#818cf8;border-radius:99px;"></div></div></div>' +
+    '</div></div>';
+
+  // Load ticket log
+  renderTicketLog(e.employeeId);
+}
+
+function renderTicketLog(empId) {
+  var logSection = document.getElementById('ticket-log-section');
+  logSection.style.display = 'block';
+  _empTickets = _RE.loadTickets().filter(function(t){ return t.employeeId===empId; })
+    .sort(function(a,b){ return b.issuedAt-a.issuedAt; });
+  filterTicketLog();
+}
+
+function filterTicketLog() {
+  var q      = document.getElementById('tkt-log-q').value || '';
+  var status = document.getElementById('tkt-log-status').value || '';
+  var list   = _empTickets.slice();
+  if (q)      list = list.filter(function(t){ return (t.ticketCode+(t.customerName||'')+(t.batchCode||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (status) list = list.filter(function(t){ return t.status===status; });
+
+  document.getElementById('tkt-log-count').textContent = list.length + ' tickets';
+  var tbody = document.getElementById('tkt-log-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><i class="fas fa-ticket-alt"></i><p>No tickets</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.slice(0,300).map(function(t){
+    var redemptionTrace = t.status === 'redeemed' ? (t.redeemedAt ? '✅ ' + new Date(t.redeemedAt).toLocaleDateString('en-IN') + (t.redeemedBy ? ' · ' + t.redeemedBy : '') : '✅ Redeemed') : '—';
+    return '<tr>' +
+      '<td><span class="code code-tkt">' + t.ticketCode + '</span></td>' +
+      '<td><span class="code code-res">' + t.resellerCode + '</span></td>' +
+      '<td><span class="code code-bat">' + t.batchCode + '</span></td>' +
+      '<td><span class="code code-alc" style="font-size:10px;">' + (t.allocationCode||'—') + '</span></td>' +
+      '<td><div style="font-weight:600;font-size:12px;">' + (t.customerName||'—') + '</div><div style="font-size:11px;color:var(--muted);">' + (t.customerMobile||'') + '</div></td>' +
+      '<td style="font-size:12px;">' + (t.productName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (t.visitDate||'—') + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(t.salePrice) + '</td>' +
+      '<td>' + statusBadge(t.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + dtFmt(t.issuedAt) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + redemptionTrace + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderBatchBreakdown(batchCode) {
+  var allocs  = _RE.loadAllocations().filter(function(a){ return a.batchCode===batchCode; });
+  var empRpt  = _RE.reportByEmployee({});
+  var tbody   = document.getElementById('batch-breakdown-tbody');
+  var empMap  = {};
+  empRpt.forEach(function(e){ empMap[e.employeeId] = e; });
+
+  var rows = allocs.map(function(a){
+    var ep = empMap[a.employeeId] || {};
+    return '<tr>' +
+      '<td><span class="code code-bat">' + a.batchCode + '</span></td>' +
+      '<td><span class="code code-res">' + a.resellerCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (a.productName||'—') + '</td>' +
+      '<td style="font-weight:700;">' + a.quantity + '</td>' +
+      '<td style="color:var(--blue);">' + a.issued + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + a.balance + '</td>' +
+    '</tr>';
+  }).join('');
+  tbody.innerHTML = rows || '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted);">No allocations for this batch</td></tr>';
+}
+
+// ─── LEADERBOARD ───────────────────────────────────────────────────────────
+function renderLeaderboard(tktStatusFilter) {
+  var tbody = document.getElementById('leaderboard-tbody');
+  if (!_reportData.length) {
+    tbody.innerHTML = '<tr><td colspan="16"><div class="empty-state"><i class="fas fa-users"></i><p>No salespersons found for these filters</p><small>Try adjusting the filter criteria</small></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = _reportData.map(function(e,i){
+    var rank = i+1;
+    var rankCls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-n';
+    var rdPct = e.issued>0 ? Math.round(e.redeemed/e.issued*100) : 0;
+    var utPct = e.allocated>0 ? Math.round(e.issued/e.allocated*100) : 0;
+
+    // Batch breakdown pills
+    var batchPills = (e.batchBreakdown||[]).slice(0,3).map(function(b){
+      return '<span class="code code-bat" style="font-size:9px;display:inline-block;margin:1px 2px;">' + b.batchCode + '</span>';
+    }).join('') + (e.batchBreakdown && e.batchBreakdown.length > 3 ? '<span style="font-size:10px;color:var(--muted);"> +' + (e.batchBreakdown.length-3) + '</span>' : '');
+
+    return '<tr>' +
+      '<td><div class="rank ' + rankCls + '">' + (rank<=3?['🥇','🥈','🥉'][rank-1]:rank) + '</div></td>' +
+      '<td><span class="code code-emp">' + e.employeeCode + '</span></td>' +
+      '<td style="font-weight:600;">' + (e.employeeName||'—') + '</td>' +
+      '<td><span class="code code-res">' + e.resellerCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (e.role||'—') + '</td>' +
+      '<td><span class="badge badge-blue">' + (e.channel||'all') + '</span></td>' +
+      '<td style="font-weight:800;color:var(--blue);font-size:15px;">' + e.issued + '</td>' +
+      '<td style="color:var(--green);font-weight:700;">' + e.redeemed + '</td>' +
+      '<td style="color:var(--red);">' + e.expired + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + e.balance + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(e.revenue) + '</td>' +
+      '<td>' +
+        '<div style="display:flex;align-items:center;gap:6px;min-width:90px;">' +
+          '<div class="prog" style="flex:1;"><div class="prog-fill" style="width:'+rdPct+'%;background:'+(rdPct>70?'#059669':rdPct>40?'#d97706':'#dc2626')+'"></div></div>' +
+          '<span style="font-size:11px;font-weight:700;color:'+(rdPct>70?'#059669':rdPct>40?'#d97706':'#dc2626')+'">'+rdPct+'%</span>' +
+        '</div>' +
+      '</td>' +
+      '<td style="font-weight:700;">' + utPct + '%</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + (e.lastIssuance||'—') + '</td>' +
+      '<td>' + statusBadge(e.status) + '</td>' +
+      '<td style="font-size:11px;">' + batchPills + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ─── CHARTS ────────────────────────────────────────────────────────────────
+function renderCharts() {
+  var labels   = _reportData.map(function(e){ return e.employeeCode; });
+  var issuedD  = _reportData.map(function(e){ return e.issued; });
+  var redeemedD= _reportData.map(function(e){ return e.redeemed; });
+  var rdRates  = _reportData.map(function(e){ return e.issued>0 ? Math.round(e.redeemed/e.issued*100) : 0; });
+
+  if (_charts['issued']) _charts['issued'].destroy();
+  _charts['issued'] = new Chart(document.getElementById('chart-issued'), {
+    type:'bar',
+    data:{ labels:labels, datasets:[
+      { label:'Issued', data:issuedD, backgroundColor:'#7c3aed' },
+      { label:'Redeemed', data:redeemedD, backgroundColor:'#059669' },
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } },
+      scales:{ y:{ beginAtZero:true } }
+    }
+  });
+
+  if (_charts['rd']) _charts['rd'].destroy();
+  _charts['rd'] = new Chart(document.getElementById('chart-rd'), {
+    type:'bar',
+    data:{ labels:labels, datasets:[{ label:'Redemption %', data:rdRates,
+      backgroundColor: rdRates.map(function(r){ return r>70?'#059669':r>40?'#d97706':'#dc2626'; }) }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ y:{ beginAtZero:true, max:100, ticks:{ callback:function(v){ return v+'%'; } } } }
+    }
+  });
+}
+
+// ─── CLEAR FILTERS ─────────────────────────────────────────────────────────
+function clearFilters() {
+  ['f-reseller','f-employee','f-batch','f-status','f-channel','f-tkt-status'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-from').value = '';
+  document.getElementById('f-to').value = '';
+  loadResellerDeps();
+  document.getElementById('emp-detail-section').style.display = 'none';
+  document.getElementById('ticket-log-section').style.display = 'none';
+  document.getElementById('batch-breakdown-section').style.display = 'none';
+  runReport();
+}
+
+// ─── CSV EXPORT ────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!_reportData.length) { toast('No data to export', 'warn'); return; }
+  var headers = ['Employee Code','Name','Reseller Code','Role','Channel','Allocated','Issued','Redeemed','Expired','Balance','Revenue','Redemption %','Utilization %','Last Sale','Status'];
+  var rows = _reportData.map(function(e){
+    var rdPct = e.issued>0?Math.round(e.redeemed/e.issued*100):0;
+    var utPct = e.allocated>0?Math.round(e.issued/e.allocated*100):0;
+    return [e.employeeCode,e.employeeName,e.resellerCode,e.role,e.channel,e.allocated,e.issued,e.redeemed,e.expired,e.balance,e.revenue,rdPct+'%',utPct+'%',e.lastIssuance||'',e.status];
+  });
+  var csv = headers.join(',') + '\n' + rows.map(function(r){ return r.map(function(c){ return '"'+(c||'').toString().replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv],{type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wow_salesperson_report_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('Report exported to CSV');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

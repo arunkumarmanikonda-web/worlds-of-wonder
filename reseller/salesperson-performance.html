@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Salesperson Performance — Reseller ERP | WOW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../js/reseller-engine.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#060b18;--navy:#0a1628;--blue:#1a56db;--teal:#0891b2;
+  --green:#059669;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+  --orange:#ea580c;--pink:#db2777;--gold:#C9A84C;
+  --border:#e2e8f0;--text:#1e293b;--muted:#64748b;--surface:#f8fafc;
+  --white:#fff;--sidebar-w:248px;
+}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+/* TOPBAR */
+.topbar{background:var(--navy);height:56px;display:flex;align-items:center;padding:0 24px;gap:14px;}
+.tb-brand{display:flex;align-items:center;gap:9px;}
+.tb-logo{width:34px;height:34px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;}
+.tb-title{color:#fff;font-size:13px;font-weight:700;}
+.tb-sub{color:rgba(255,255,255,.4);font-size:10px;}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.tb-reseller-badge{background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.5);color:#c4b5fd;font-size:11px;font-weight:700;padding:3px 12px;border-radius:999px;}
+.btn-back{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:11.5px;padding:6px 12px;border-radius:7px;cursor:pointer;text-decoration:none;transition:.15s;}
+.btn-back:hover{color:#fff;background:rgba(255,255,255,.12);}
+
+/* CONTENT */
+.page{max-width:1300px;margin:0 auto;padding:24px;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-title{font-size:22px;font-weight:900;}
+.page-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* FILTERS */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center;}
+.filter-bar select,.filter-bar input{padding:7px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;background:#fff;color:var(--text);font-family:'Inter',sans-serif;}
+.filter-bar select:focus,.filter-bar input:focus{outline:none;border-color:var(--purple);}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px;}
+.kpi-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.kpi-icon{font-size:20px;margin-bottom:6px;}
+.kpi-val{font-size:24px;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1;}
+.kpi-label{font-size:10.5px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.04em;}
+.kpi-trend{font-size:11px;margin-top:4px;}
+.up{color:var(--green);}
+.down{color:var(--red);}
+
+/* PERFORMANCE TABLE */
+.perf-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+.perf-card-hdr{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border);}
+.perf-card-title{font-size:14px;font-weight:800;color:var(--ink);}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border);white-space:nowrap;background:#f9fafb;}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;}
+tbody tr:hover{background:#f0f4ff;}
+tbody td{padding:11px 14px;vertical-align:middle;}
+.code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;background:#f0f4ff;color:#3730a3;padding:2px 8px;border-radius:5px;border:1px solid #c7d2fe;white-space:nowrap;}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;border:1px solid;white-space:nowrap;}
+.b-plat{color:#7c3aed;background:#faf5ff;border-color:#e9d5ff;}
+.b-gold{color:#92400e;background:#fffbeb;border-color:#fde68a;}
+.b-silv{color:#374151;background:#f9fafb;border-color:#d1d5db;}
+.b-bron{color:#92400e;background:#fff7ed;border-color:#fed7aa;}
+.b-active{color:var(--green);background:#f0fdf4;border-color:#bbf7d0;}
+.b-inactive{color:var(--muted);background:#f9fafb;border-color:#e5e7eb;}
+
+/* PROGRESS BAR */
+.progress-wrap{display:flex;align-items:center;gap:8px;}
+.progress-bar-outer{flex:1;height:7px;background:#f1f5f9;border-radius:4px;min-width:80px;}
+.progress-bar-inner{height:100%;border-radius:4px;transition:width .5s;}
+.pct-label{font-size:11px;font-weight:700;white-space:nowrap;}
+
+/* RANK MEDALS */
+.rank-medal{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;}
+.rank-1{background:#fef08a;color:#713f12;}
+.rank-2{background:#e2e8f0;color:#374151;}
+.rank-3{background:#fed7aa;color:#7c2d12;}
+.rank-n{background:#f1f5f9;color:#64748b;font-size:11px;}
+
+/* CHART SECTION */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.chart-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.chart-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+
+/* SP DETAIL PANEL */
+.sp-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.sp-detail-overlay.open{display:flex;}
+.sp-detail{background:#fff;border-radius:14px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;}
+.sp-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.sp-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;flex-shrink:0;}
+.sp-close{margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px;border-radius:5px;}
+.sp-close:hover{color:var(--text);}
+.alloc-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.alloc-table th{padding:7px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
+.alloc-table td{padding:9px 12px;border-bottom:1px solid var(--border);}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;text-decoration:none;}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border-color:#7c3aed;}
+.btn-primary:hover{opacity:.9;}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);background:#f8fafc;}
+.btn-sm{padding:4px 10px;font-size:11px;border-radius:6px;}
+
+/* TOAST */
+#toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:#1e293b;border:1px solid #334155;border-radius:9px;color:#f1f5f9;padding:10px 16px;font-size:12px;display:flex;align-items:center;gap:8px;animation:slideUp .2s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-brand">
+    <div class="tb-logo">RS</div>
+    <div>
+      <div class="tb-title">Salesperson Performance ERP</div>
+      <div class="tb-sub">Identity-traced sales reporting</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-reseller-badge" id="reseller-badge">Loading…</div>
+    <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back to ERP</a>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">👥 Salesperson Performance</div>
+      <div class="page-sub">Identity-coded team performance — allocation vs issuance vs redemption</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="exportReport()"><i class="fa-solid fa-download"></i> Export</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddSP()"><i class="fa-solid fa-user-plus"></i> Add Salesperson</button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <select id="filter-period" onchange="renderAll()">
+      <option value="today">Today</option>
+      <option value="week" selected>This Week</option>
+      <option value="month">This Month</option>
+      <option value="custom">Custom Range</option>
+    </select>
+    <select id="filter-batch" onchange="renderAll()">
+      <option value="">All Batches</option>
+    </select>
+    <select id="filter-status" onchange="renderAll()">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+    <input type="text" id="filter-search" placeholder="Search salesperson…" oninput="renderAll()" style="width:200px"/>
+  </div>
+
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">📊 Tickets Issued by Salesperson</div>
+      <canvas id="chart-issued" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">📈 Balance vs Issued — Allocation Health</div>
+      <canvas id="chart-balance" height="220"></canvas>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE TABLE -->
+  <div class="perf-card">
+    <div class="perf-card-hdr">
+      <div class="perf-card-title">Salesperson Performance Ledger</div>
+      <div style="font-size:11.5px;color:var(--muted)" id="table-summary"></div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>SP Code</th>
+            <th>Name</th>
+            <th>Reseller</th>
+            <th>Batch Ref</th>
+            <th>Allocated</th>
+            <th>Issued</th>
+            <th>Balance</th>
+            <th>Utilisation</th>
+            <th>Redeemed</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sp-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOTTOM ALERTS -->
+  <div id="alerts-section"></div>
+
+</div><!-- /page -->
+
+<!-- SALESPERSON DETAIL OVERLAY -->
+<div class="sp-detail-overlay" id="sp-overlay">
+  <div class="sp-detail" id="sp-detail-content"></div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DEMO DATA (reflects ResellerEngine identity schema)
+═══════════════════════════════════════════════════ */
+const DEMO_RESELLER = {
+  code: 'RS-2026-0001',
+  name: 'WOW Resellers Pvt. Ltd.',
+  tier: 'Platinum',
+};
+
+const DEMO_SALESPERSONS = [
+  { code:'RS-2026-0001-SP001', name:'Amit Kumar',   reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B001', allocated:600, issued:562, redeemed:498, status:'active',  joinDate:'2026-01-10' },
+  { code:'RS-2026-0001-SP002', name:'Deepa Sharma', reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B002', allocated:500, issued:480, redeemed:440, status:'active',  joinDate:'2026-01-15' },
+  { code:'RS-2026-0001-SP003', name:'Rahul Verma',  reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B001', allocated:450, issued:389, redeemed:320, status:'active',  joinDate:'2026-01-20' },
+  { code:'RS-2026-0001-SP004', name:'Sunita Jain',  reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B003', allocated:400, issued:310, redeemed:275, status:'active',  joinDate:'2026-02-01' },
+  { code:'RS-2026-0001-SP005', name:'Kiran Patel',  reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B003', allocated:350, issued:280, redeemed:210, status:'active',  joinDate:'2026-02-10' },
+  { code:'RS-2026-0001-SP006', name:'Vijay Singh',  reseller:'RS-2026-0001', batchRef:'RS-2026-0001-FY26-B002', allocated:400, issued:180, redeemed:120, status:'inactive', joinDate:'2026-02-15' },
+];
+
+let chartIssued  = null;
+let chartBalance = null;
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('reseller-badge').textContent =
+    `${DEMO_RESELLER.code} — ${DEMO_RESELLER.name}`;
+  populateBatchFilter();
+  renderAll();
+  renderCharts();
+  checkAlerts();
+});
+
+function populateBatchFilter() {
+  const sel = document.getElementById('filter-batch');
+  const batches = [...new Set(DEMO_SALESPERSONS.map(s => s.batchRef))];
+  batches.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b; opt.textContent = b;
+    sel.appendChild(opt);
+  });
+}
+
+function getFiltered() {
+  const statusF = document.getElementById('filter-status').value;
+  const batchF  = document.getElementById('filter-batch').value;
+  const searchF = (document.getElementById('filter-search').value || '').toLowerCase();
+
+  return DEMO_SALESPERSONS.filter(sp => {
+    if (statusF && sp.status !== statusF) return false;
+    if (batchF  && sp.batchRef !== batchF) return false;
+    if (searchF && !sp.name.toLowerCase().includes(searchF) &&
+        !sp.code.toLowerCase().includes(searchF)) return false;
+    return true;
+  });
+}
+
+function renderAll() {
+  const filtered = getFiltered();
+  renderKPIs(filtered);
+  renderTable(filtered);
+  renderCharts(filtered);
+}
+
+/* ═══════════════════════════════════════════════════
+   KPIs
+═══════════════════════════════════════════════════ */
+function renderKPIs(data) {
+  const totalAllocated = data.reduce((s,d) => s+d.allocated, 0);
+  const totalIssued    = data.reduce((s,d) => s+d.issued, 0);
+  const totalBalance   = data.reduce((s,d) => s+(d.allocated-d.issued), 0);
+  const totalRedeemed  = data.reduce((s,d) => s+d.redeemed, 0);
+  const utilPct        = totalAllocated ? Math.round(totalIssued/totalAllocated*100) : 0;
+  const redPct         = totalIssued    ? Math.round(totalRedeemed/totalIssued*100) : 0;
+
+  document.getElementById('kpi-row').innerHTML = [
+    {icon:'👥', val:data.length,       lbl:'Active Salespeople',    trend:`${data.filter(d=>d.status==='active').length} active`, up:true},
+    {icon:'📦', val:totalAllocated.toLocaleString(), lbl:'Tickets Allocated', trend:'Total pool distributed', up:null},
+    {icon:'🎟', val:totalIssued.toLocaleString(),    lbl:'Tickets Issued',    trend:`${utilPct}% utilisation`, up:utilPct>70},
+    {icon:'🟡', val:totalBalance.toLocaleString(),   lbl:'Balance Remaining', trend:'Un-issued inventory', up:null},
+    {icon:'✅', val:totalRedeemed.toLocaleString(),  lbl:'Tickets Redeemed',  trend:`${redPct}% redemption rate`, up:redPct>60},
+    {icon:'💰', val:'₹'+Math.round(totalIssued*1649).toLocaleString('en-IN'), lbl:'Estimated Revenue',trend:'@avg ₹1,649/ticket', up:true},
+  ].map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-val">${k.val}</div>
+      <div class="kpi-label">${k.lbl}</div>
+      <div class="kpi-trend ${k.up===true?'up':k.up===false?'down':''}">${k.trend}</div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   TABLE
+═══════════════════════════════════════════════════ */
+function renderTable(data) {
+  // Sort by issued desc
+  const sorted = [...data].sort((a,b) => b.issued - a.issued);
+  document.getElementById('table-summary').textContent =
+    `${sorted.length} salespersons · ${sorted.reduce((s,d)=>s+d.issued,0).toLocaleString()} total issued`;
+
+  document.getElementById('sp-table-body').innerHTML = sorted.map((sp, i) => {
+    const rank = i + 1;
+    const util = sp.allocated ? Math.round(sp.issued / sp.allocated * 100) : 0;
+    const redRate = sp.issued ? Math.round(sp.redeemed / sp.issued * 100) : 0;
+    const balance = sp.allocated - sp.issued;
+
+    const rankHtml = rank === 1 ? `<div class="rank-medal rank-1">🥇</div>` :
+                     rank === 2 ? `<div class="rank-medal rank-2">🥈</div>` :
+                     rank === 3 ? `<div class="rank-medal rank-3">🥉</div>` :
+                     `<div class="rank-medal rank-n">${rank}</div>`;
+
+    const barColor = util >= 80 ? '#059669' : util >= 50 ? '#d97706' : '#dc2626';
+
+    return `<tr onclick="openSPDetail('${sp.code}')">
+      <td>${rankHtml}</td>
+      <td><span class="code">${sp.code}</span></td>
+      <td><strong>${sp.name}</strong></td>
+      <td style="font-size:11px;color:var(--muted)">${sp.reseller}</td>
+      <td><span class="code" style="background:#f0fdf4;color:#15803d;border-color:#bbf7d0;font-size:10px">${sp.batchRef.split('-').slice(-2).join('-')}</span></td>
+      <td>${sp.allocated.toLocaleString()}</td>
+      <td style="font-weight:700;color:var(--blue)">${sp.issued.toLocaleString()}</td>
+      <td style="color:${balance > 50 ? '#d97706' : '#059669'}">${balance.toLocaleString()}</td>
+      <td style="min-width:140px">
+        <div class="progress-wrap">
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" style="width:${util}%;background:${barColor}"></div>
+          </div>
+          <div class="pct-label" style="color:${barColor}">${util}%</div>
+        </div>
+      </td>
+      <td>
+        <div class="progress-wrap">
+          <div class="progress-bar-outer">
+            <div class="progress-bar-inner" style="width:${redRate}%;background:#7c3aed"></div>
+          </div>
+          <div class="pct-label" style="color:#7c3aed">${redRate}%</div>
+        </div>
+      </td>
+      <td><span class="badge ${sp.status === 'active' ? 'b-active' : 'b-inactive'}">${sp.status}</span></td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();reallocate('${sp.code}')"><i class="fa-solid fa-arrows-rotate"></i> Reallocate</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════════ */
+function renderCharts(data) {
+  const d = data || getFiltered();
+  const sorted = [...d].sort((a,b) => b.issued - a.issued);
+  const labels = sorted.map(s => s.name.split(' ')[0]);
+  const issued  = sorted.map(s => s.issued);
+  const balance = sorted.map(s => s.allocated - s.issued);
+
+  // Issued chart
+  if (chartIssued) chartIssued.destroy();
+  chartIssued = new Chart(document.getElementById('chart-issued'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Tickets Issued',
+        data: issued,
+        backgroundColor: ['#1a56db','#7c3aed','#0891b2','#059669','#d97706','#dc2626'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f1f5f9'}},x:{grid:{display:false}}}
+    }
+  });
+
+  // Balance chart
+  if (chartBalance) chartBalance.destroy();
+  chartBalance = new Chart(document.getElementById('chart-balance'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Issued',  data:issued,  backgroundColor:'#1a56db', borderRadius:4 },
+        { label:'Balance', data:balance, backgroundColor:'#fde68a', borderRadius:4 },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},
+      scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'#f1f5f9'}}}
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   SALESPERSON DETAIL
+═══════════════════════════════════════════════════ */
+function openSPDetail(code) {
+  const sp = DEMO_SALESPERSONS.find(s => s.code === code);
+  if (!sp) return;
+
+  const util    = sp.allocated ? Math.round(sp.issued/sp.allocated*100) : 0;
+  const redRate = sp.issued    ? Math.round(sp.redeemed/sp.issued*100)  : 0;
+  const balance = sp.allocated - sp.issued;
+
+  // Demo sub-allocations
+  const allocations = [
+    {alloc:`${sp.code}-A001`, batch:sp.batchRef, qty:Math.round(sp.allocated*0.4), issued:Math.round(sp.issued*0.5), date:'2026-01-15'},
+    {alloc:`${sp.code}-A002`, batch:sp.batchRef, qty:Math.round(sp.allocated*0.35),issued:Math.round(sp.issued*0.3), date:'2026-02-01'},
+    {alloc:`${sp.code}-A003`, batch:sp.batchRef, qty:Math.round(sp.allocated*0.25),issued:Math.round(sp.issued*0.2), date:'2026-03-01'},
+  ];
+
+  document.getElementById('sp-detail-content').innerHTML = `
+    <div class="sp-header">
+      <div class="sp-avatar">${sp.name.charAt(0)}</div>
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:800">${sp.name}</div>
+        <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+          <span class="code">${sp.code}</span>
+          <span class="badge ${sp.status==='active'?'b-active':'b-inactive'}">${sp.status}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:4px">Joined: ${sp.joinDate} · Reseller: ${sp.reseller}</div>
+      </div>
+      <button class="sp-close" onclick="closeSPDetail()">×</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px">
+      ${[
+        {lbl:'Allocated',val:sp.allocated,color:'#1a56db'},
+        {lbl:'Issued',   val:sp.issued,   color:'#059669'},
+        {lbl:'Balance',  val:balance,     color:'#d97706'},
+        {lbl:'Redeemed', val:sp.redeemed, color:'#7c3aed'},
+      ].map(m=>`<div style="background:#f9fafb;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;text-align:center">
+        <div style="font-size:22px;font-weight:900;font-family:'JetBrains Mono',monospace;color:${m.color}">${m.val.toLocaleString()}</div>
+        <div style="font-size:10px;color:#64748b;margin-top:2px;text-transform:uppercase">${m.lbl}</div>
+      </div>`).join('')}
+    </div>
+
+    <div style="display:flex;gap:14px;margin-bottom:16px">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Utilisation (Issued / Allocated)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:10px;background:#f1f5f9;border-radius:5px">
+            <div style="width:${util}%;height:100%;background:${util>70?'#059669':util>40?'#d97706':'#dc2626'};border-radius:5px"></div>
+          </div>
+          <strong style="font-size:14px;color:${util>70?'#059669':util>40?'#d97706':'#dc2626'}">${util}%</strong>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Redemption Rate (Redeemed / Issued)</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:10px;background:#f1f5f9;border-radius:5px">
+            <div style="width:${redRate}%;height:100%;background:#7c3aed;border-radius:5px"></div>
+          </div>
+          <strong style="font-size:14px;color:#7c3aed">${redRate}%</strong>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">📦 Sub-Allocation History</div>
+    <table class="alloc-table">
+      <thead>
+        <tr><th>Allocation Code</th><th>Batch Ref</th><th>Qty Allocated</th><th>Qty Issued</th><th>Balance</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        ${allocations.map(a=>`<tr>
+          <td><span class="code" style="font-size:10px">${a.alloc}</span></td>
+          <td style="font-size:10.5px;color:var(--muted)">${a.batch.split('-').slice(-2).join('-')}</td>
+          <td>${a.qty}</td>
+          <td style="color:#1a56db;font-weight:700">${a.issued}</td>
+          <td style="color:#d97706">${a.qty - a.issued}</td>
+          <td style="color:var(--muted)">${a.date}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+
+    <div style="margin-top:18px;display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" onclick="reallocate('${sp.code}')"><i class="fa-solid fa-plus"></i> Add Allocation</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeSPDetail()">Close</button>
+    </div>`;
+
+  document.getElementById('sp-overlay').classList.add('open');
+}
+
+function closeSPDetail() {
+  document.getElementById('sp-overlay').classList.remove('open');
+}
+
+/* ═══════════════════════════════════════════════════
+   ALERTS / INSIGHTS
+═══════════════════════════════════════════════════ */
+function checkAlerts() {
+  const alerts = [];
+  DEMO_SALESPERSONS.forEach(sp => {
+    const util    = sp.allocated ? sp.issued/sp.allocated : 0;
+    const balance = sp.allocated - sp.issued;
+    if (util < 0.4 && sp.status === 'active') {
+      alerts.push({type:'warn',msg:`${sp.name} (${sp.code}) has only ${Math.round(util*100)}% utilisation — inventory underperforming`});
+    }
+    if (balance > 200) {
+      alerts.push({type:'info',msg:`${sp.name} has ${balance} tickets unused — consider reallocation or push campaign`});
+    }
+  });
+
+  if (!alerts.length) { document.getElementById('alerts-section').innerHTML = ''; return; }
+
+  document.getElementById('alerts-section').innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <div style="padding:14px 20px;font-size:13px;font-weight:700;border-bottom:1px solid var(--border)">⚠️ Performance Insights</div>
+      ${alerts.map(a=>`
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 20px;border-bottom:1px solid #f1f5f9">
+          <div style="margin-top:2px;font-size:14px">${a.type==='warn'?'⚠️':'ℹ️'}</div>
+          <div style="font-size:12.5px">${a.msg}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   ACTIONS
+═══════════════════════════════════════════════════ */
+function reallocate(code) {
+  toast(`✅ Reallocation wizard opened for ${code}`);
+}
+
+function openAddSP() {
+  toast('👤 Add Salesperson form opened');
+}
+
+function exportReport() {
+  const d = getFiltered();
+  const csv = ['Rank,SP Code,Name,Reseller,Batch,Allocated,Issued,Balance,Utilisation%,Redeemed,Status'];
+  const sorted = [...d].sort((a,b)=>b.issued-a.issued);
+  sorted.forEach((sp,i) => {
+    const util = sp.allocated ? Math.round(sp.issued/sp.allocated*100) : 0;
+    const bal  = sp.allocated - sp.issued;
+    csv.push(`${i+1},"${sp.code}","${sp.name}","${sp.reseller}","${sp.batchRef}",${sp.allocated},${sp.issued},${bal},${util}%,${sp.redeemed},${sp.status}`);
+  });
+  const blob = new Blob([csv.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `sp-performance-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('📥 Report exported');
+}
+
+function toast(msg) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
+</body>
+</html>

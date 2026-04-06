@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WOW Booking Deep Stress Test — Real API Engine v4</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#060a12;--bg2:#0d1117;--card:#0f1623;--card2:#161e2e;--card3:#1a2338;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --green:#22c55e;--green-d:#15803d;--green-lt:rgba(34,197,94,.12);
+  --red:#ef4444;--red-lt:rgba(239,68,68,.12);
+  --yellow:#f59e0b;--yellow-lt:rgba(245,158,11,.12);
+  --blue:#3b82f6;--blue-lt:rgba(59,130,246,.12);
+  --purple:#a855f7;--purple-lt:rgba(168,85,247,.12);
+  --cyan:#06b6d4;--orange:#f97316;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#64748b;--muted2:#334155;
+  --mono:'JetBrains Mono',monospace;--font:'Inter',sans-serif;--r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+button{font-family:var(--font);cursor:pointer;}
+
+/* ─── TOP BAR ─── */
+.topbar{position:sticky;top:0;z-index:300;background:rgba(6,10,18,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;padding:0 18px;height:50px;}
+.tb-logo{width:32px;height:32px;background:linear-gradient(135deg,#1d4ed8,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tb-title{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.tb-sub{font-size:9px;color:var(--muted);font-family:var(--mono);margin-top:1px;}
+.tb-sp{flex:1;}
+.tb-chip{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:1px solid;}
+.tb-chip.idle{background:rgba(100,116,139,.1);color:var(--muted);border-color:var(--border);}
+.tb-chip.running{background:var(--yellow-lt);color:var(--yellow);border-color:rgba(245,158,11,.35);}
+.tb-chip.done{background:var(--green-lt);color:var(--green);border-color:rgba(34,197,94,.35);}
+.tb-chip.error{background:var(--red-lt);color:var(--red);border-color:rgba(239,68,68,.35);}
+.pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+.tb-stat{font-family:var(--mono);font-size:11px;color:var(--muted);border-left:1px solid var(--border);padding-left:10px;}
+.tb-stat span{color:var(--cyan);}
+
+/* ─── LAYOUT ─── */
+.layout{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 50px);}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:14px;overflow-y:auto;max-height:calc(100vh - 50px);position:sticky;top:50px;}
+.main-area{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+
+/* ─── SIDEBAR ─── */
+.s-section{margin-bottom:14px;}
+.s-label{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.s-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.chip-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.chip{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);transition:all .15s;}
+.chip:hover{border-color:var(--blue);color:var(--blue);}
+.chip.active{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue);}
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.field label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.field input,.field select{background:var(--card2);border:1.5px solid var(--border);border-radius:6px;padding:6px 9px;color:var(--text);font-family:var(--font);font-size:11px;outline:none;transition:border-color .15s;width:100%;}
+.field input:focus,.field select:focus{border-color:var(--blue);}
+.field select option{background:#1a2338;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.range-row{display:flex;align-items:center;gap:7px;}
+.range-row input[type=range]{flex:1;accent-color:var(--blue);}
+.range-val{font-family:var(--mono);font-size:11px;color:var(--cyan);min-width:34px;text-align:right;}
+.check-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.check-row input[type=checkbox]{width:13px;height:13px;accent-color:var(--blue);flex-shrink:0;}
+.check-row label{font-size:11px;color:var(--text);}
+.mix-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.mix-lbl{font-size:9px;color:var(--muted);width:64px;flex-shrink:0;}
+.mix-row input[type=range]{flex:1;accent-color:var(--purple);}
+.mix-val{font-family:var(--mono);font-size:10px;color:var(--purple);min-width:30px;text-align:right;}
+
+/* ─── BUTTONS ─── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .16s;letter-spacing:.01em;font-family:var(--font);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-primary{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;}
+.btn-primary:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px);}
+.btn-green{background:linear-gradient(135deg,#15803d,#16a34a);color:#fff;}
+.btn-green:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px);}
+.btn-red{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;}
+.btn-orange{background:linear-gradient(135deg,#c2410c,#ea580c);color:#fff;}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border);}
+.btn-ghost:hover:not(:disabled){border-color:var(--blue);color:var(--blue);}
+.btn-sm{padding:4px 10px;font-size:10px;}
+.btn-lg{padding:9px 20px;font-size:12px;}
+.btn-block{width:100%;}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* ─── KPI STRIP ─── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi.green::before{background:var(--green);}
+.kpi.red::before{background:var(--red);}
+.kpi.yellow::before{background:var(--yellow);}
+.kpi.blue::before{background:var(--blue);}
+.kpi.cyan::before{background:var(--cyan);}
+.kpi.purple::before{background:var(--purple);}
+.kpi.orange::before{background:var(--orange);}
+.kpi-lbl{font-size:8px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.kpi-val{font-size:20px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1;}
+.kpi-sub{font-size:8px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+
+/* ─── PIPELINE ─── */
+.pipeline{display:flex;align-items:center;flex-wrap:wrap;gap:3px;}
+.pipe-step{flex-shrink:0;background:var(--card2);border:1.5px solid var(--border);border-radius:6px;padding:5px 9px;font-size:9px;font-weight:700;color:var(--muted);text-align:center;line-height:1.3;min-width:60px;transition:all .2s;}
+.pipe-step.active{background:rgba(59,130,246,.15);border-color:var(--blue);color:var(--blue);}
+.pipe-step.done{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.4);color:var(--green);}
+.pipe-step.error{background:var(--red-lt);border-color:rgba(239,68,68,.4);color:var(--red);}
+.pipe-arr{color:var(--muted);font-size:10px;}
+
+/* ─── VU GRID ─── */
+.vu-grid{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px;}
+.vu-dot{width:15px;height:15px;border-radius:3px;background:var(--card2);border:1px solid var(--border);font-size:6px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.vu-dot.idle{background:var(--card2);border-color:var(--border);}
+.vu-dot.running{background:rgba(245,158,11,.3);border-color:var(--yellow);}
+.vu-dot.ok{background:rgba(34,197,94,.2);border-color:var(--green);}
+.vu-dot.fail{background:rgba(239,68,68,.2);border-color:var(--red);}
+
+/* ─── CARDS ─── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.card-hd{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.card-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);}
+.card-body{padding:12px 14px;}
+
+/* ─── TABS ─── */
+.tab-bar{display:flex;gap:3px;border-bottom:1px solid var(--border);margin-bottom:12px;overflow-x:auto;}
+.tab-btn{padding:7px 12px;border:none;background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* ─── LOG ─── */
+.log-box{background:var(--bg);border:1px solid var(--border);border-radius:6px;height:300px;overflow-y:auto;font-family:var(--mono);font-size:10px;padding:8px;line-height:1.6;}
+.log-line{display:flex;gap:7px;border-bottom:1px solid rgba(255,255,255,.03);padding:1px 0;}
+.log-ts{color:var(--muted);flex-shrink:0;width:60px;}
+.log-vu{color:var(--cyan);flex-shrink:0;width:36px;}
+.log-msg{color:var(--text);flex:1;word-break:break-all;}
+.log-msg.dim{color:var(--muted);}
+.log-msg.ok{color:var(--green);}
+.log-msg.err{color:var(--red);}
+.log-msg.warn{color:var(--yellow);}
+.log-msg.sys{color:var(--purple);}
+.log-msg.http{color:var(--blue);}
+
+/* ─── RESULTS TABLE ─── */
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:10px;}
+thead th{background:var(--card2);padding:7px 9px;text-align:left;font-size:8px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;}
+tbody tr:hover{background:rgba(255,255,255,.03);}
+tbody td{padding:5px 9px;color:var(--text);font-family:var(--mono);font-size:10px;white-space:nowrap;}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:3px;font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.badge.ok{background:var(--green-lt);color:var(--green);}
+.badge.fail{background:var(--red-lt);color:var(--red);}
+.badge.timeout{background:var(--yellow-lt);color:var(--yellow);}
+.badge.partial{background:var(--purple-lt);color:var(--purple);}
+.lat-ok{color:var(--green);}
+.lat-warn{color:var(--yellow);}
+.lat-bad{color:var(--red);}
+
+/* ─── HEALTH PANEL ─── */
+.health-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;}
+.health-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;}
+.health-icon{font-size:18px;flex-shrink:0;}
+.health-body{flex:1;min-width:0;}
+.health-endpoint{font-family:var(--mono);font-size:9px;color:var(--cyan);margin-bottom:2px;word-break:break-all;}
+.health-status{font-size:10px;font-weight:700;}
+.health-status.ok{color:var(--green);}
+.health-status.fail{color:var(--red);}
+.health-status.pending{color:var(--muted);}
+.health-lat{font-family:var(--mono);font-size:9px;color:var(--muted);}
+
+/* ─── PROGRESS ─── */
+.progress-bar-wrap{background:var(--card2);border-radius:4px;height:6px;overflow:hidden;margin-bottom:10px;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:4px;transition:width .3s ease;width:0%;}
+
+/* ─── INFO BOXES ─── */
+.info-box{background:var(--blue-lt);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--text);line-height:1.6;}
+.warn-box{background:var(--yellow-lt);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 13px;font-size:11px;color:var(--text);line-height:1.6;}
+.code-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:10px;color:var(--cyan);line-height:1.7;overflow-x:auto;white-space:pre;}
+.section-title{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* ─── PAST RUNS ─── */
+.run-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.run-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.run-label{font-weight:800;font-size:13px;}
+.run-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;}
+.run-stat{background:var(--card);border-radius:6px;padding:6px 9px;}
+.run-stat-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.run-stat-val{font-family:var(--mono);font-size:12px;font-weight:700;}
+
+/* ─── CHART HEIGHT FIX ─── */
+.chart-wrap{position:relative;height:220px;}
+.chart-wrap-sm{position:relative;height:180px;}
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:12px;}
+
+/* ─── STEPS FLOW ─── */
+.flow-steps{display:flex;gap:0;flex-wrap:wrap;}
+.flow-step{flex:1;min-width:120px;background:var(--card2);border:1px solid var(--border);padding:10px;position:relative;}
+.flow-step:not(:last-child)::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px;z-index:2;}
+.flow-step-num{width:20px;height:20px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;margin-bottom:5px;}
+.flow-step-title{font-size:10px;font-weight:700;margin-bottom:3px;}
+.flow-step-body{font-size:9px;color:var(--muted);line-height:1.5;}
+
+/* ─── ARCH TRUTH ─── */
+.arch-block{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:14px;margin-bottom:10px;}
+.arch-title{font-size:11px;font-weight:800;color:var(--cyan);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.arch-body{font-size:10px;color:var(--muted);line-height:1.7;}
+.arch-body code{background:rgba(6,182,212,.1);color:var(--cyan);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:9px;}
+.truth-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:9px;font-weight:700;margin:2px;}
+.truth-chip.real{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+.truth-chip.mock{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3);}
+.truth-chip.static{background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3);}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{max-height:none;position:static;}
+  .charts-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-logo">🎢</div>
+  <div><div class="tb-title">WOW Booking Deep Stress Test</div><div class="tb-sub">Real Tables REST API · booking.js Pricing Engine · v4.0</div></div>
+  <div class="tb-sp"></div>
+  <div class="tb-stat">VUs: <span id="topVU">0</span></div>
+  <div class="tb-stat">RPS: <span id="topRPS">0</span></div>
+  <div class="tb-stat">Elapsed: <span id="topElapsed">0s</span></div>
+  <div class="tb-chip idle" id="statusChip"><span class="pulse"></span><span id="statusText">IDLE</span></div>
+</div>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <!-- SCENARIO PRESETS -->
+  <div class="s-section">
+    <div class="s-label">Scenario Preset</div>
+    <div class="chip-grid">
+      <div class="chip active" onclick="applyScenario('smoke',this)">🔬 Smoke</div>
+      <div class="chip" onclick="applyScenario('load',this)">📈 Load</div>
+      <div class="chip" onclick="applyScenario('stress',this)">🔥 Stress</div>
+      <div class="chip" onclick="applyScenario('spike',this)">⚡ Spike</div>
+      <div class="chip" onclick="applyScenario('soak',this)">🌊 Soak</div>
+      <div class="chip" onclick="applyScenario('api',this)">🔧 API Only</div>
+    </div>
+  </div>
+
+  <!-- LOAD PARAMETERS -->
+  <div class="s-section">
+    <div class="s-label">Load Parameters</div>
+    <div class="row2">
+      <div class="field"><label>Virtual Users</label><input type="number" id="cfgVU" value="5" min="1" max="500"/></div>
+      <div class="field"><label>Bookings / VU</label><input type="number" id="cfgBPV" value="3" min="1" max="100"/></div>
+    </div>
+    <div class="field">
+      <label>Think Time (ms between steps)</label>
+      <div class="range-row"><input type="range" id="cfgThink" min="0" max="2000" value="50" oninput="this.nextElementSibling.textContent=this.value+'ms'"/><span class="range-val">50ms</span></div>
+    </div>
+    <div class="field">
+      <label>Request Timeout (ms)</label>
+      <div class="range-row"><input type="range" id="cfgTimeout" min="500" max="30000" value="8000" step="500" oninput="this.nextElementSibling.textContent=this.value+'ms'"/><span class="range-val">8000ms</span></div>
+    </div>
+    <div class="field">
+      <label>Ramp-up Delay (ms per VU)</label>
+      <div class="range-row"><input type="range" id="cfgRamp" min="0" max="2000" value="100" step="50" oninput="this.nextElementSibling.textContent=this.value+'ms'"/><span class="range-val">100ms</span></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Adults (max)</label><input type="number" id="cfgAdultMax" value="4" min="1" max="8"/></div>
+      <div class="field"><label>Children (max)</label><input type="number" id="cfgChildMax" value="3" min="0" max="6"/></div>
+    </div>
+    <div class="field">
+      <label>Offer %</label>
+      <div class="range-row"><input type="range" id="cfgOfferPct" min="0" max="100" value="30" oninput="this.nextElementSibling.textContent=this.value+'%'"/><span class="range-val">30%</span></div>
+    </div>
+  </div>
+
+  <!-- PARK MIX -->
+  <div class="s-section">
+    <div class="s-label">Park Traffic Mix</div>
+    <div class="mix-row"><span class="mix-lbl">🌊 Water</span><input type="range" id="mixW" min="0" max="100" value="50" oninput="syncMix()"/><span class="mix-val" id="mixWV">50%</span></div>
+    <div class="mix-row"><span class="mix-lbl">🎢 Amusemnt</span><input type="range" id="mixA" min="0" max="100" value="30" oninput="syncMix()"/><span class="mix-val" id="mixAV">30%</span></div>
+    <div class="mix-row"><span class="mix-lbl">🎟 Combo</span><input type="range" id="mixC" min="0" max="100" value="20" oninput="syncMix()"/><span class="mix-val" id="mixCV">20%</span></div>
+  </div>
+
+  <!-- FAULT INJECTION -->
+  <div class="s-section">
+    <div class="s-label">Fault Injection</div>
+    <div class="check-row"><input type="checkbox" id="faultNetwork"/><label>Network Timeout (5%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultPayment"/><label>Payment Declined (8%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultSoldOut"/><label>Date Sold Out (3%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultApi"/><label>API 500 Error (2%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultAbort"/><label>User Abandons (10%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultGst"/><label>GST Calc Error (1%)</label></div>
+    <div class="check-row"><input type="checkbox" id="faultDup"/><label>Duplicate Booking (0.5%)</label></div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="s-section">
+    <div class="s-label">Actions</div>
+    <div class="btn-row" style="margin-bottom:6px;">
+      <button class="btn btn-green btn-lg" id="btnStart" onclick="startTest()"><i class="fas fa-play"></i> Run Test</button>
+      <button class="btn btn-red btn-lg" id="btnStop" disabled onclick="stopTest()"><i class="fas fa-stop"></i> Stop</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-sm" onclick="clearResults()"><i class="fas fa-trash"></i> Clear</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('past',null);loadPastRuns()"><i class="fas fa-history"></i> History</button>
+    </div>
+    <div style="margin-top:8px;padding:7px;background:var(--green-lt);border:1px solid rgba(34,197,94,.2);border-radius:6px;font-size:9px;color:var(--green);line-height:1.5;">
+      ✅ Real HTTP POSTs to <code style="font-family:monospace">tables/stress_bookings</code> via Tables REST API.<br/>
+      ✅ Pricing from actual <code style="font-family:monospace">booking.js</code> TICKET_CATEGORIES.<br/>
+      ✅ Run metadata to <code style="font-family:monospace">tables/stress_test_runs</code>.
+    </div>
+  </div>
+</div><!-- /sidebar -->
+
+<!-- MAIN AREA -->
+<div class="main-area">
+
+  <!-- KPI STRIP -->
+  <div class="kpi-strip">
+    <div class="kpi blue"><div class="kpi-lbl">Total Bookings</div><div class="kpi-val" id="kpiTotal">0</div><div class="kpi-sub">of <span id="kpiPlanned">0</span> planned</div></div>
+    <div class="kpi green"><div class="kpi-lbl">Success</div><div class="kpi-val" id="kpiSuccess">0</div><div class="kpi-sub" id="kpiSuccessPct">0%</div></div>
+    <div class="kpi red"><div class="kpi-lbl">Failed</div><div class="kpi-val" id="kpiFailed">0</div><div class="kpi-sub" id="kpiFailedPct">0%</div></div>
+    <div class="kpi yellow"><div class="kpi-lbl">Avg Latency</div><div class="kpi-val" id="kpiAvgLat">—</div><div class="kpi-sub">per booking</div></div>
+    <div class="kpi orange"><div class="kpi-lbl">P95 Latency</div><div class="kpi-val" id="kpiP95">—</div><div class="kpi-sub">95th percentile</div></div>
+    <div class="kpi cyan"><div class="kpi-lbl">Throughput</div><div class="kpi-val" id="kpiRPS">0</div><div class="kpi-sub">bookings/sec</div></div>
+    <div class="kpi purple"><div class="kpi-lbl">Revenue (sim)</div><div class="kpi-val" id="kpiRevenue">₹0</div><div class="kpi-sub" id="kpiAOV">AOV ₹0</div></div>
+    <div class="kpi green"><div class="kpi-lbl">GST Collected</div><div class="kpi-val" id="kpiGST">₹0</div><div class="kpi-sub">18% on base</div></div>
+    <div class="kpi blue"><div class="kpi-lbl">Offer Savings</div><div class="kpi-val" id="kpiDiscount">₹0</div><div class="kpi-sub" id="kpiOfferCount">0 applied</div></div>
+    <div class="kpi cyan"><div class="kpi-lbl">API Writes</div><div class="kpi-val" id="kpiApiWrites">0</div><div class="kpi-sub" id="kpiApiErrors">0 errors</div></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="card">
+    <div class="card-hd">
+      <i class="fas fa-chart-line" style="color:var(--blue)"></i>
+      <span class="card-title">Progress</span>
+      <span id="progressPct" style="font-family:var(--mono);font-size:11px;color:var(--cyan);margin-left:auto;">0%</span>
+      <span id="resultCount" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:10px;">0 results</span>
+    </div>
+    <div class="card-body">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <!-- LIVE PIPELINE -->
+      <div class="pipeline" id="pipeline">
+        <div class="pipe-step" id="pipe0">1. Select<br/>Park</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe1">2. Pick<br/>Date</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe2">3. Calc<br/>Price</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe3">4. Apply<br/>Offer</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe4">5. GST<br/>Invoice</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe5">6. Payment<br/>Gateway</div>
+        <div class="pipe-arr">→</div>
+        <div class="pipe-step" id="pipe6">7. API<br/>Write</div>
+      </div>
+      <!-- VU GRID -->
+      <div class="vu-grid" id="vuGrid"></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('charts',this)">📊 Live Charts</button>
+      <button class="tab-btn" onclick="switchTab('log',this)">📋 Live Log</button>
+      <button class="tab-btn" onclick="switchTab('results',this)">📄 Results</button>
+      <button class="tab-btn" onclick="switchTab('arch',this)">🏗️ Architecture</button>
+      <button class="tab-btn" onclick="switchTab('health',this)">💊 API Health</button>
+      <button class="tab-btn" onclick="switchTab('past',this);loadPastRuns()">🕐 Past Runs</button>
+    </div>
+
+    <!-- CHARTS TAB -->
+    <div class="tab-pane active" id="tab-charts">
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Latency Over Time (ms)</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartLatCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Throughput (bookings/sec)</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartTputCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Success vs Failed</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartSFCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Park Mix Distribution</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartMixCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Latency Percentiles (ms)</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartPercCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Revenue Accumulation (₹)</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartRevCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Active Virtual Users</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartVUCanvas"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><span class="card-title">API Write Latency (ms)</span></div>
+          <div class="card-body"><div class="chart-wrap"><canvas id="chartApiLatCanvas"></canvas></div></div>
+        </div>
+      </div>
+    </div><!-- /tab-charts -->
+
+    <!-- LOG TAB -->
+    <div class="tab-pane" id="tab-log">
+      <div class="card">
+        <div class="card-hd">
+          <i class="fas fa-terminal" style="color:var(--green)"></i>
+          <span class="card-title">Real-Time Execution Log</span>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" onclick="clearLog()"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-ghost btn-sm" id="btnAutoscroll" onclick="toggleAutoScroll()"><i class="fas fa-arrow-down"></i> Auto</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;"><div class="log-box" id="logBox"></div></div>
+      </div>
+    </div><!-- /tab-log -->
+
+    <!-- RESULTS TAB -->
+    <div class="tab-pane" id="tab-results">
+      <div class="card">
+        <div class="card-hd">
+          <span class="card-title">Booking Results</span>
+          <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
+            <select id="filterStatus" onchange="renderResultsTable()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:10px;padding:3px 6px;border-radius:4px;">
+              <option value="">All Status</option>
+              <option value="success">Success</option>
+              <option value="failed">Failed</option>
+              <option value="timeout">Timeout</option>
+              <option value="partial">Partial</option>
+            </select>
+            <select id="filterPark" onchange="renderResultsTable()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:10px;padding:3px 6px;border-radius:4px;">
+              <option value="">All Parks</option>
+              <option value="WATER_DAY">Water</option>
+              <option value="AMUSEMENT_DAY">Amusement</option>
+              <option value="COMBO_DAY">Combo</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="tbl-wrap">
+            <table id="resultsTable">
+              <thead><tr>
+                <th>#</th><th>Booking Ref</th><th>Park</th><th>Tickets</th>
+                <th>Base</th><th>GST</th><th>Total</th><th>Offer</th>
+                <th>Payment</th><th>Step</th><th>Lat</th><th>API Lat</th><th>Status</th><th>Error</th>
+              </tr></thead>
+              <tbody id="resultsTbody"><tr><td colspan="14" style="text-align:center;color:var(--muted);padding:20px;">Run a test to see results</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-results -->
+
+    <!-- ARCHITECTURE TAB -->
+    <div class="tab-pane" id="tab-arch">
+      <div class="arch-block">
+        <div class="arch-title"><i class="fas fa-exclamation-triangle" style="color:var(--yellow)"></i> Architecture Truth — What Is Actually Being Tested</div>
+        <div class="arch-body">
+          This is a <strong>100% static website</strong>. There is no Node.js, no Express, no backend server, no database server, no API gateway. The only real HTTP endpoints are the platform's built-in <code>Tables REST API</code>. Here is what each "step" in the stress test actually does:
+        </div>
+      </div>
+
+      <div class="flow-steps" style="margin-bottom:12px;">
+        <div class="flow-step">
+          <div class="flow-step-num">1</div>
+          <div class="flow-step-title">Park Selection</div>
+          <div class="flow-step-body"><span class="truth-chip mock">JS only</span><br/>Random pick from PARKS config. No HTTP.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">2</div>
+          <div class="flow-step-title">Date Picking</div>
+          <div class="flow-step-body"><span class="truth-chip mock">JS only</span><br/>Random future date. No HTTP.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">3</div>
+          <div class="flow-step-title">Price Calc</div>
+          <div class="flow-step-body"><span class="truth-chip static">booking.js</span><br/>Exact TICKET_CATEGORIES pricing + GST + group discount.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">4</div>
+          <div class="flow-step-title">Offer Apply</div>
+          <div class="flow-step-body"><span class="truth-chip mock">JS only</span><br/>Rate-based discount. No API call.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">5</div>
+          <div class="flow-step-title">GST Invoice</div>
+          <div class="flow-step-body"><span class="truth-chip static">booking.js</span><br/>CGST 9% + SGST 9% split. Pure JS.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">6</div>
+          <div class="flow-step-title">Payment</div>
+          <div class="flow-step-body"><span class="truth-chip mock">JS only</span><br/>Simulated Razorpay. No real payment gateway call.</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">7</div>
+          <div class="flow-step-title">API Write</div>
+          <div class="flow-step-body"><span class="truth-chip real">REAL HTTP</span><br/>POST tables/stress_bookings → 201. This is the actual test.</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-hd"><span class="card-title">Real API Targets</span></div>
+        <div class="card-body">
+          <div class="code-box">POST   tables/stress_bookings        ← Create booking record (REAL)
+PATCH  tables/stress_test_runs/{id}  ← Update run metadata (REAL)
+POST   tables/stress_test_runs       ← Create run record (REAL)
+GET    tables/stress_bookings        ← Read past bookings (REAL)
+GET    tables/stress_test_runs       ← Read past runs (REAL)
+GET    tables/crm_bookings_cache     ← Health check target (REAL)
+GET    tables/passport_holders       ← Health check target (REAL)</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-hd"><span class="card-title">Pricing Matrix (from js/booking.js)</span></div>
+        <div class="card-body">
+          <div class="code-box">TICKET_CATEGORIES  (all prices incl. 18% GST)
+┌────────────────────┬────────────┬───────────────┬────────────┐
+│ Category           │ Water Day  │ Amusement Day │ Combo Day  │
+├────────────────────┼────────────┼───────────────┼────────────┤
+│ Adult  (12+)       │ ₹1,299     │ ₹1,199        │ ₹1,999     │
+│ Child  (3-11)      │ ₹899       │ ₹799          │ ₹1,399     │
+│ Senior (60+, -25%) │ ₹975       │ ₹899          │ ₹1,499     │
+│ Armed Forces (-30%)│ ₹909       │ ₹839          │ ₹1,399     │
+│ Differently Abled  │ ₹649       │ ₹599          │ ₹999       │
+│   (-50%)           │            │               │            │
+├────────────────────┼────────────┼───────────────┼────────────┤
+│ Group Discount     │ ₹75/adult  │ ₹50/adult     │ ₹125/adult │
+│   (≥10 tickets)    │            │               │            │
+└────────────────────┴────────────┴───────────────┴────────────┘
+GST_RATE = 0.18 (included in base price)
+CGST = base×0.09  SGST = base×0.09</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><span class="card-title">What This Stress Test Actually Measures</span></div>
+        <div class="card-body">
+          <div class="info-box" style="margin-bottom:8px;">
+            ✅ <strong>Tables REST API throughput</strong> — How many concurrent POST/PATCH requests the Tables API handles per second<br/>
+            ✅ <strong>API write latency</strong> — End-to-end HTTP latency for each booking record write<br/>
+            ✅ <strong>Booking JS engine accuracy</strong> — Pricing, GST, group discounts calculated correctly at scale<br/>
+            ✅ <strong>Concurrency handling</strong> — Race conditions, duplicate booking_ref generation at high VU counts<br/>
+            ✅ <strong>Error rate</strong> — API 4xx/5xx error frequency under load<br/>
+            ✅ <strong>Retry resilience</strong> — Exponential backoff behavior on failures
+          </div>
+          <div class="warn-box">
+            ⚠️ <strong>What this does NOT test:</strong><br/>
+            ❌ Real payment processing (Razorpay is simulated)<br/>
+            ❌ Email/SMS delivery (no notification service)<br/>
+            ❌ QR code generation pipeline (client-side only)<br/>
+            ❌ Session/auth token validation under load (no backend auth)<br/>
+            ❌ Database query performance (Tables API abstracts this)
+          </div>
+        </div>
+      </div>
+    </div><!-- /tab-arch -->
+
+    <!-- HEALTH TAB -->
+    <div class="tab-pane" id="tab-health">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-hd">
+          <span class="card-title">API Health Check</span>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button class="btn btn-primary btn-sm" onclick="runHealthCheck()"><i class="fas fa-heartbeat"></i> Run Health Check</button>
+            <button class="btn btn-ghost btn-sm" onclick="runGetBenchmark()"><i class="fas fa-tachometer-alt"></i> GET Benchmark (50 concurrent)</button>
+            <button class="btn btn-ghost btn-sm" onclick="runPostBenchmark()"><i class="fas fa-database"></i> POST Benchmark (20 concurrent)</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="health-grid" id="healthGrid">
+            <div style="color:var(--muted);font-size:11px;">Click "Run Health Check" to test all API endpoints.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><span class="card-title">Benchmark Results</span></div>
+        <div class="card-body"><div id="benchResults" style="font-family:var(--mono);font-size:11px;color:var(--cyan);line-height:1.8;"></div></div>
+      </div>
+    </div><!-- /tab-health -->
+
+    <!-- PAST RUNS TAB -->
+    <div class="tab-pane" id="tab-past">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-hd">
+          <span class="card-title">Past Test Runs</span>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="loadPastRuns()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+        <div class="card-body">
+          <div id="pastRunsContainer" style="color:var(--muted);font-size:11px;">Loading past runs…</div>
+        </div>
+      </div>
+    </div><!-- /tab-past -->
+
+  </div><!-- /tabs -->
+
+</div><!-- /main-area -->
+</div><!-- /layout -->
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+//  PRICING ENGINE — Copied verbatim from js/booking.js
+//  (identical constants so stress test uses real production pricing)
+// ══════════════════════════════════════════════════════════════
+const TICKET_CATEGORIES = {
+  adult:     { prices: { WATER_DAY:{base:1299}, AMUSEMENT_DAY:{base:1199}, COMBO_DAY:{base:1999} } },
+  child:     { prices: { WATER_DAY:{base:899},  AMUSEMENT_DAY:{base:799},  COMBO_DAY:{base:1399} } },
+  senior:    { prices: { WATER_DAY:{base:975},  AMUSEMENT_DAY:{base:899},  COMBO_DAY:{base:1499} } },
+  armed:     { prices: { WATER_DAY:{base:909},  AMUSEMENT_DAY:{base:839},  COMBO_DAY:{base:1399} } },
+  differently_abled: { prices: { WATER_DAY:{base:649}, AMUSEMENT_DAY:{base:599}, COMBO_DAY:{base:999} } }
+};
+const PARKS = {
+  WATER_DAY:    { label:'Water Day',     groupDiscount:{ minTotal:10, savePerAdult:75  } },
+  AMUSEMENT_DAY:{ label:'Amusement Day', groupDiscount:{ minTotal:10, savePerAdult:50  } },
+  COMBO_DAY:    { label:'Combo Day',     groupDiscount:{ minTotal:10, savePerAdult:125 } }
+};
+const GST_RATE  = 0.18;
+const CATEGORIES = ['adult','child','senior','armed','differently_abled'];
+
+// Offer codes mirror wow-offer-engine-v4.js
+const OFFER_RATES = {
+  BOGO20:0.20, SUMMER25:0.25, COMBO15:0.15,
+  GROUP10:0.10, FLASH30:0.30, FAMILY5:0.05
+};
+const OFFER_CODES = Object.keys(OFFER_RATES);
+const PAY_MODES   = ['UPI','Card','Cash','NetBanking'];
+
+// ══════════════════════════════════════════════════════════════
+//  REAL PRICING FUNCTION (mirrors booking.js computeOrder)
+// ══════════════════════════════════════════════════════════════
+function calcPrice(parkKey, qtys, offerCode) {
+  let subtotal = 0;
+  let lineItems = [];
+
+  CATEGORIES.forEach(cat => {
+    const qty = qtys[cat] || 0;
+    if (qty === 0) return;
+    const unitBase = TICKET_CATEGORIES[cat].prices[parkKey].base;
+    // booking.js: price is inclusive of GST, so base = price / 1.18
+    const unitNet = Math.round(unitBase / (1 + GST_RATE));
+    const lineTotal = unitNet * qty;
+    subtotal += lineTotal;
+    lineItems.push({ cat, qty, unitBase, unitNet, lineTotal });
+  });
+
+  // Group discount — mirrors PARKS[parkKey].groupDiscount
+  const totalTix = CATEGORIES.reduce((s,c) => s+(qtys[c]||0), 0);
+  const gd = PARKS[parkKey].groupDiscount;
+  const groupDisc = totalTix >= gd.minTotal ? (qtys.adult||0) * gd.savePerAdult : 0;
+
+  // Offer discount
+  const offerRate  = offerCode ? (OFFER_RATES[offerCode]||0) : 0;
+  const offerDisc  = offerCode ? Math.round(subtotal * offerRate) : 0;
+
+  // Best discount wins (mirrors booking.js: max of group vs offer)
+  const discount = Math.max(groupDisc, offerDisc);
+  const afterDisc = Math.max(0, subtotal - discount);
+
+  // GST re-applied on net (stress test mirrors production behaviour)
+  const gstAmt  = Math.round(afterDisc * GST_RATE);
+  const cgst    = Math.round(afterDisc * 0.09);
+  const sgst    = Math.round(afterDisc * 0.09);
+  const grand   = afterDisc + gstAmt;
+
+  return {
+    lineItems, subtotal, groupDisc, offerDisc,
+    discount, afterDisc,
+    gst_amount: gstAmt, cgst, sgst, grand_total: grand,
+    ticket_total: totalTix,
+    base_amount: subtotal
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════════════
+const rand   = (lo,hi) => Math.floor(Math.random()*(hi-lo+1))+lo;
+const sleep  = ms => new Promise(r=>setTimeout(r,ms));
+const pNow   = () => performance.now();
+const uid    = () => Math.random().toString(36).slice(2,9).toUpperCase();
+const fmtINR = v => '₹'+(v||0).toLocaleString('en-IN');
+const fmtMs  = ms => ms>=1000?((ms/1000).toFixed(1)+'s'):(Math.round(ms)+'ms');
+const ts     = () => new Date().toTimeString().slice(0,8);
+
+// ══════════════════════════════════════════════════════════════
+//  GLOBAL STATE
+// ══════════════════════════════════════════════════════════════
+const state = {
+  running:false, aborted:false,
+  sessionId:'', runId:'', startTime:0,
+  activeVUs:0, completed:0, totalPlanned:0,
+  results:[], apiWrites:0, apiErrors:0,
+  elapsedTimer:null, chartTimer:null
+};
+
+// ══════════════════════════════════════════════════════════════
+//  CHARTS SETUP
+// ══════════════════════════════════════════════════════════════
+const COPTS = {
+  animation:false, responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#64748b',font:{size:10}}}},
+  scales:{
+    x:{ticks:{color:'#334155',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},
+    y:{ticks:{color:'#334155',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}
+  }
+};
+function mkLine(id, labels, datasets){
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx,{type:'line',data:{labels,datasets},options:{...COPTS,plugins:{legend:{labels:{color:'#64748b',font:{size:10}}}}}});
+}
+function mkBar(id, labels, datasets){
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx,{type:'bar',data:{labels,datasets},options:{...COPTS}});
+}
+function mkDoughnut(id, labels, data, colors){
+  const ctx = document.getElementById(id).getContext('2d');
+  return new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:1}]},
+    options:{animation:false,responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#64748b',font:{size:10}}}}}});
+}
+
+const chartLat    = mkLine('chartLatCanvas',[],[
+  {label:'Avg ms',data:[],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',tension:.4,fill:true,pointRadius:0},
+  {label:'P95 ms',data:[],borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.05)',tension:.4,fill:true,pointRadius:0}
+]);
+const chartTput   = mkBar('chartTputCanvas',[],[
+  {label:'bk/s',data:[],backgroundColor:'rgba(6,182,212,.5)',borderColor:'#06b6d4',borderWidth:1}
+]);
+const chartSF     = mkLine('chartSFCanvas',[],[
+  {label:'Success',data:[],borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',tension:.4,fill:true,pointRadius:0},
+  {label:'Failed',data:[],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.08)',tension:.4,fill:true,pointRadius:0}
+]);
+const chartMix    = mkDoughnut('chartMixCanvas',['Water','Amusement','Combo'],[0,0,0],['#3b82f6','#f97316','#a855f7']);
+const chartPerc   = mkBar('chartPercCanvas',['p10','p25','p50','p75','p90','p95','p99','max'],[
+  {label:'ms',data:[0,0,0,0,0,0,0,0],backgroundColor:'rgba(59,130,246,.6)',borderColor:'#3b82f6',borderWidth:1}
+]);
+const chartRevenue= mkLine('chartRevCanvas',[],[
+  {label:'₹ Revenue',data:[],borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.08)',tension:.4,fill:true,pointRadius:0}
+]);
+const chartVU     = mkLine('chartVUCanvas',[],[
+  {label:'Active VUs',data:[],borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,.1)',tension:.4,fill:true,stepped:true,pointRadius:0}
+]);
+const chartApiLat = mkLine('chartApiLatCanvas',[],[
+  {label:'API Write ms',data:[],borderColor:'#ec4899',backgroundColor:'rgba(236,72,153,.08)',tension:.4,fill:true,pointRadius:0}
+]);
+
+function clearChartData(){
+  [chartLat,chartTput,chartSF,chartRevenue,chartVU,chartApiLat].forEach(ch=>{
+    ch.data.labels=[];
+    ch.data.datasets.forEach(d=>d.data=[]);
+    ch.update('none');
+  });
+  chartMix.data.datasets[0].data=[0,0,0]; chartMix.update('none');
+  chartPerc.data.datasets[0].data=[0,0,0,0,0,0,0,0]; chartPerc.update('none');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CONFIG HELPERS
+// ══════════════════════════════════════════════════════════════
+function getConfig(){
+  return {
+    label: document.getElementById('cfgVU').value+'-VU-'+Date.now().toString(36),
+    vu:       Math.max(1,parseInt(document.getElementById('cfgVU').value)||5),
+    bpv:      Math.max(1,parseInt(document.getElementById('cfgBPV').value)||3),
+    think:    parseInt(document.getElementById('cfgThink').value)||50,
+    timeout:  parseInt(document.getElementById('cfgTimeout').value)||8000,
+    ramp:     parseInt(document.getElementById('cfgRamp').value)||100,
+    adultMax: parseInt(document.getElementById('cfgAdultMax').value)||4,
+    childMax: parseInt(document.getElementById('cfgChildMax').value)||3,
+    offerPct: parseInt(document.getElementById('cfgOfferPct').value)||30,
+    mixW: parseInt(document.getElementById('mixW').value)||50,
+    mixA: parseInt(document.getElementById('mixA').value)||30,
+    mixC: parseInt(document.getElementById('mixC').value)||20,
+    faultNetwork: document.getElementById('faultNetwork').checked,
+    faultPayment: document.getElementById('faultPayment').checked,
+    faultSoldOut: document.getElementById('faultSoldOut').checked,
+    faultApi:     document.getElementById('faultApi').checked,
+    faultAbort:   document.getElementById('faultAbort').checked,
+    faultGst:     document.getElementById('faultGst').checked,
+    faultDup:     document.getElementById('faultDup').checked
+  };
+}
+
+function pickPark(cfg){
+  const total = cfg.mixW + cfg.mixA + cfg.mixC;
+  const r = Math.random() * total;
+  if(r < cfg.mixW) return 'WATER_DAY';
+  if(r < cfg.mixW + cfg.mixA) return 'AMUSEMENT_DAY';
+  return 'COMBO_DAY';
+}
+
+function buildQtys(cfg){
+  const adults   = rand(1, Math.min(cfg.adultMax,8));
+  const children = rand(0, Math.min(cfg.childMax, 8-adults));
+  const senior   = Math.random()<0.1 && adults+children<8 ? rand(0,1) : 0;
+  return { adult:adults, child:children, senior, armed:0, differently_abled:0 };
+}
+
+function randomDate(){
+  const d = new Date(Date.now() + rand(1,90)*86400000);
+  return d.toISOString().slice(0,10);
+}
+
+function pickOffer(cfg){
+  if(Math.random()*100 < cfg.offerPct){
+    return OFFER_CODES[rand(0, OFFER_CODES.length-1)];
+  }
+  return null;
+}
+
+function pickPayMode(){
+  return PAY_MODES[rand(0,PAY_MODES.length-1)];
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOGGING
+// ══════════════════════════════════════════════════════════════
+let autoScroll = true;
+function log(vu, msg, cls=''){
+  const box = document.getElementById('logBox');
+  const line = document.createElement('div');
+  line.className='log-line';
+  line.innerHTML=`<span class="log-ts">${ts()}</span><span class="log-vu">VU${String(vu).padStart(2,'0')}</span><span class="log-msg ${cls}">${msg}</span>`;
+  box.appendChild(line);
+  if(box.children.length>1200) box.removeChild(box.firstChild);
+  if(autoScroll) box.scrollTop=box.scrollHeight;
+}
+function logSys(msg){ log('--','[SYS] '+msg,'sys'); }
+function clearLog(){ document.getElementById('logBox').innerHTML=''; }
+function toggleAutoScroll(){
+  autoScroll=!autoScroll;
+  document.getElementById('btnAutoscroll').style.opacity=autoScroll?'1':'0.4';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════════════
+function setStatus(cls, text){
+  const chip=document.getElementById('statusChip');
+  chip.className='tb-chip '+cls;
+  document.getElementById('statusText').textContent=text;
+}
+
+function buildVUGrid(count){
+  const g = document.getElementById('vuGrid');
+  g.innerHTML='';
+  for(let i=0;i<Math.min(count,200);i++){
+    const d=document.createElement('div');
+    d.className='vu-dot idle'; d.id='vud'+i; d.title='VU '+(i+1);
+    g.appendChild(d);
+  }
+}
+
+function setVU(i, st){ // st: idle|running|ok|fail
+  const d=document.getElementById('vud'+i);
+  if(d) d.className='vu-dot '+st;
+}
+
+function updatePipe(idx, cls){ // -1=reset all
+  for(let i=0;i<7;i++){
+    const p=document.getElementById('pipe'+i);
+    if(p) p.className='pipe-step'+(i===idx?' '+cls:'');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SCENARIO PRESETS
+// ══════════════════════════════════════════════════════════════
+const SCENARIOS = {
+  smoke: { vu:5,   bpv:3,  think:50,  timeout:8000,  ramp:100,  offerPct:20,
+           faultNetwork:false,faultPayment:false,faultSoldOut:false,faultApi:false,faultAbort:false,faultGst:false,faultDup:false },
+  load:  { vu:25,  bpv:5,  think:50,  timeout:8000,  ramp:100,  offerPct:30,
+           faultNetwork:false,faultPayment:false,faultSoldOut:false,faultApi:false,faultAbort:false,faultGst:false,faultDup:false },
+  stress:{ vu:75,  bpv:8,  think:20,  timeout:8000,  ramp:50,   offerPct:30,
+           faultNetwork:true, faultPayment:true, faultSoldOut:false,faultApi:true, faultAbort:false,faultGst:false,faultDup:false },
+  spike: { vu:200, bpv:2,  think:0,   timeout:8000,  ramp:0,    offerPct:40,
+           faultNetwork:true, faultPayment:true, faultSoldOut:true, faultApi:true, faultAbort:true, faultGst:true, faultDup:true  },
+  soak:  { vu:10,  bpv:30, think:100, timeout:10000, ramp:200,  offerPct:25,
+           faultNetwork:false,faultPayment:false,faultSoldOut:false,faultApi:false,faultAbort:false,faultGst:false,faultDup:false },
+  api:   { vu:50,  bpv:4,  think:0,   timeout:10000, ramp:50,   offerPct:0,
+           faultNetwork:false,faultPayment:false,faultSoldOut:false,faultApi:false,faultAbort:false,faultGst:false,faultDup:false }
+};
+
+function applyScenario(name, el){
+  document.querySelectorAll('.chip-grid .chip').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const sc = SCENARIOS[name];
+  if(!sc) return;
+  document.getElementById('cfgVU').value    = sc.vu;
+  document.getElementById('cfgBPV').value   = sc.bpv;
+  document.getElementById('cfgThink').value = sc.think;
+  document.getElementById('cfgThink').nextElementSibling.textContent = sc.think+'ms';
+  document.getElementById('cfgTimeout').value = sc.timeout;
+  document.getElementById('cfgTimeout').nextElementSibling.textContent = sc.timeout+'ms';
+  document.getElementById('cfgRamp').value  = sc.ramp;
+  document.getElementById('cfgRamp').nextElementSibling.textContent = sc.ramp+'ms';
+  document.getElementById('cfgOfferPct').value = sc.offerPct;
+  document.getElementById('cfgOfferPct').nextElementSibling.textContent = sc.offerPct+'%';
+  ['Network','Payment','SoldOut','Api','Abort','Gst','Dup'].forEach(f=>{
+    const key='fault'+f;
+    document.getElementById(key).checked = !!sc[key];
+  });
+}
+
+function syncMix(){
+  const w=parseInt(document.getElementById('mixW').value)||50;
+  const a=parseInt(document.getElementById('mixA').value)||30;
+  const c=parseInt(document.getElementById('mixC').value)||20;
+  document.getElementById('mixWV').textContent=w+'%';
+  document.getElementById('mixAV').textContent=a+'%';
+  document.getElementById('mixCV').textContent=c+'%';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  KPI & CHART UPDATE
+// ══════════════════════════════════════════════════════════════
+function updateKPIs(){
+  const s  = state.results;
+  const ok = s.filter(r=>r.booking_status==='success');
+  const fail = s.filter(r=>r.booking_status!=='success');
+  const lats = s.filter(r=>r.latency_ms>0).map(r=>r.latency_ms).sort((a,b)=>a-b);
+  const avg  = lats.length ? Math.round(lats.reduce((a,b)=>a+b,0)/lats.length) : 0;
+  const p95  = lats.length ? (lats[Math.floor(lats.length*.95)]||lats[lats.length-1]) : 0;
+  const rev  = ok.reduce((a,r)=>a+(r.grand_total||0),0);
+  const gstT = ok.reduce((a,r)=>a+(r.gst_amount||0),0);
+  const disc = ok.reduce((a,r)=>a+(r.offer_discount||0),0);
+  const wOff = ok.filter(r=>r.offer_code).length;
+  const elapsed = (Date.now()-state.startTime)/1000||1;
+  const rps  = parseFloat((s.length/elapsed).toFixed(2));
+
+  const $ = id => document.getElementById(id);
+  $('kpiTotal').textContent     = s.length;
+  $('kpiPlanned').textContent   = state.totalPlanned;
+  $('kpiSuccess').textContent   = ok.length;
+  $('kpiSuccessPct').textContent= s.length?((ok.length/s.length*100).toFixed(1)+'%'):'0%';
+  $('kpiFailed').textContent    = fail.length;
+  $('kpiFailedPct').textContent = s.length?((fail.length/s.length*100).toFixed(1)+'%'):'0%';
+  $('kpiAvgLat').textContent    = avg?avg+'ms':'—';
+  $('kpiP95').textContent       = p95?fmtMs(p95):'—';
+  $('kpiRPS').textContent       = rps;
+  $('kpiRevenue').textContent   = fmtINR(rev);
+  $('kpiAOV').textContent       = ok.length?'AOV '+fmtINR(Math.round(rev/ok.length)):'AOV ₹0';
+  $('kpiGST').textContent       = fmtINR(gstT);
+  $('kpiDiscount').textContent  = fmtINR(disc);
+  $('kpiOfferCount').textContent= wOff+' applied';
+  $('kpiApiWrites').textContent = state.apiWrites;
+  $('kpiApiErrors').textContent = state.apiErrors+' errors';
+  $('topVU').textContent  = state.activeVUs;
+  $('topRPS').textContent = rps;
+
+  const prog = state.totalPlanned ? Math.round((state.completed/state.totalPlanned)*100) : 0;
+  $('progressPct').textContent      = prog+'%';
+  $('progressBar').style.width      = prog+'%';
+  $('resultCount').textContent      = s.length+' results';
+
+  const wt=s.filter(r=>r.park==='WATER_DAY').length;
+  const am=s.filter(r=>r.park==='AMUSEMENT_DAY').length;
+  const cb=s.filter(r=>r.park==='COMBO_DAY').length;
+  chartMix.data.datasets[0].data=[wt,am,cb]; chartMix.update('none');
+
+  if(lats.length>4){
+    const pct=(arr,p)=>arr[Math.floor(arr.length*p/100)]||0;
+    chartPerc.data.datasets[0].data=[
+      pct(lats,10),pct(lats,25),pct(lats,50),pct(lats,75),
+      pct(lats,90),pct(lats,95),pct(lats,99),lats[lats.length-1]
+    ];
+    chartPerc.update('none');
+  }
+}
+
+function pushChartTick(){
+  const s   = state.results;
+  const t   = new Date().toTimeString().slice(3,8);
+  const ok  = s.filter(r=>r.booking_status==='success');
+  const fail= s.filter(r=>r.booking_status!=='success');
+  const lats= s.filter(r=>r.latency_ms>0).map(r=>r.latency_ms);
+  const avg = lats.length ? Math.round(lats.slice(-20).reduce((a,b)=>a+b,0)/Math.min(lats.length,20)) : 0;
+  const p95 = [...lats].sort((a,b)=>a-b)[Math.floor(lats.length*.95)]||0;
+  const elapsed = (Date.now()-state.startTime)/1000||1;
+  const rps = parseFloat((s.length/elapsed).toFixed(2));
+  const rev = ok.reduce((a,r)=>a+(r.grand_total||0),0);
+  const apiLats = s.filter(r=>r.api_latency_ms>0).map(r=>r.api_latency_ms);
+  const avgApi  = apiLats.length ? Math.round(apiLats.slice(-20).reduce((a,b)=>a+b,0)/Math.min(apiLats.length,20)) : 0;
+  const MAX = 60;
+  const push = (ch, vals) => {
+    ch.data.labels.push(t);
+    vals.forEach((v,i) => ch.data.datasets[i].data.push(v));
+    if(ch.data.labels.length>MAX){ ch.data.labels.shift(); ch.data.datasets.forEach(d=>d.data.shift()); }
+    ch.update('none');
+  };
+  push(chartLat,    [avg, p95]);
+  push(chartTput,   [rps]);
+  push(chartSF,     [ok.length, fail.length]);
+  push(chartRevenue,[rev]);
+  push(chartVU,     [state.activeVUs]);
+  push(chartApiLat, [avgApi]);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CORE BOOKING SIMULATOR — Each call = one full booking flow
+//  Steps 1-6 are pure JS (real pricing). Step 7 = REAL HTTP POST.
+// ══════════════════════════════════════════════════════════════
+async function simulateBooking(vuIdx, bookingIdx, cfg){
+  const result = {
+    session_id: state.sessionId, run_label: cfg.label,
+    booking_status: 'failed', step_reached: 'ticket_select',
+    concurrency_slot: vuIdx+1, booking_ref: '',
+    latency_ms: 0, api_latency_ms: 0, error_msg: '',
+    park: '', visit_date: '', ticket_total: 0,
+    base_amount: 0, gst_amount: 0, cgst: 0, sgst: 0, grand_total: 0,
+    offer_code: '', offer_discount: 0, payment_mode: ''
+  };
+  const t0 = pNow();
+
+  try {
+    // ── Step 1: Select Park & Tickets ────────────────────────────
+    updatePipe(0,'active'); setVU(vuIdx,'running');
+    await sleep(rand(30, cfg.think+50));
+    if(cfg.faultAbort && Math.random()<0.10){
+      result.error_msg='User abandoned session'; result.step_reached='ticket_select'; throw new Error('abandon');
+    }
+    const park  = pickPark(cfg);
+    const qtys  = buildQtys(cfg);
+    result.park = park;
+    result.ticket_total = CATEGORIES.reduce((s,c)=>s+(qtys[c]||0),0);
+    log(vuIdx+1, `[${bookingIdx+1}] ${park} — ${result.ticket_total} tickets (A:${qtys.adult} C:${qtys.child} S:${qtys.senior})`,'dim');
+
+    // ── Step 2: Pick Visit Date ───────────────────────────────────
+    updatePipe(1,'active');
+    await sleep(rand(20, cfg.think+30));
+    if(cfg.faultSoldOut && Math.random()<0.03){
+      result.error_msg='Date sold out'; result.step_reached='date_select'; throw new Error('sold_out');
+    }
+    const visitDate = randomDate();
+    result.visit_date = visitDate;
+
+    // ── Step 3: Price Calculation ─────────────────────────────────
+    updatePipe(2,'active');
+    await sleep(rand(10, cfg.think+20));
+    if(cfg.faultGst && Math.random()<0.01){
+      result.error_msg='GST calculation error'; result.step_reached='price_calc'; throw new Error('gst_error');
+    }
+    const offer = pickOffer(cfg);
+    const pricing = calcPrice(park, qtys, offer);
+    result.base_amount  = pricing.base_amount;
+    result.gst_amount   = pricing.gst_amount;
+    result.cgst         = pricing.cgst;
+    result.sgst         = pricing.sgst;
+    result.grand_total  = pricing.grand_total;
+    result.offer_code   = offer || '';
+    result.offer_discount = pricing.offerDisc;
+
+    // ── Step 4: Apply Offer / Promo Code ─────────────────────────
+    updatePipe(3,'active');
+    await sleep(rand(10, cfg.think+20));
+    if(offer) log(vuIdx+1, `Offer ${offer} → −${fmtINR(pricing.offerDisc)} total=${fmtINR(pricing.grand_total)}`,'dim');
+
+    // ── Step 5: GST Invoice & Order Summary ──────────────────────
+    updatePipe(4,'active');
+    await sleep(rand(10, cfg.think+20));
+    result.step_reached = 'summary';
+    log(vuIdx+1, `Summary: base=${fmtINR(pricing.base_amount)} gst=${fmtINR(pricing.gst_amount)} grand=${fmtINR(pricing.grand_total)}`,'dim');
+
+    // ── Step 6: Simulated Payment Gateway ────────────────────────
+    updatePipe(5,'active');
+    const payMode = pickPayMode();
+    result.payment_mode = payMode;
+    await sleep(rand(150, 600)); // Razorpay latency simulation
+    if(cfg.faultNetwork && Math.random()<0.05){
+      result.error_msg='Network timeout during payment'; result.step_reached='payment'; throw new Error('network_timeout');
+    }
+    if(cfg.faultPayment && Math.random()<0.08){
+      result.error_msg='Payment declined by bank'; result.step_reached='payment'; throw new Error('payment_declined');
+    }
+    result.step_reached = 'payment';
+    result.booking_ref  = 'BK'+Date.now().toString(36).toUpperCase()+uid();
+    log(vuIdx+1, `Payment ${payMode} → ${result.booking_ref}`,'dim');
+
+    // ── Step 7: REAL API Write → tables/stress_bookings ──────────
+    updatePipe(6,'active');
+    if(cfg.faultApi && Math.random()<0.02){
+      result.error_msg='API 500 Internal Server Error'; result.step_reached='api_write'; throw new Error('api_500');
+    }
+    if(cfg.faultDup && Math.random()<0.005){
+      result.error_msg='Duplicate booking_ref rejected'; result.step_reached='api_write'; throw new Error('duplicate_booking');
+    }
+
+    const apiPayload = {
+      id:            result.booking_ref,
+      session_id:    result.session_id,
+      run_label:     result.run_label,
+      booking_ref:   result.booking_ref,
+      park:          result.park,
+      visit_date:    result.visit_date,
+      adults:        qtys.adult,
+      children:      qtys.child,
+      ticket_total:  result.ticket_total,
+      base_amount:   result.base_amount,
+      gst_amount:    result.gst_amount,
+      cgst:          result.cgst,
+      sgst:          result.sgst,
+      grand_total:   result.grand_total,
+      offer_code:    result.offer_code,
+      offer_discount:result.offer_discount,
+      payment_mode:  result.payment_mode,
+      booking_status:'success',
+      step_reached:  'confirmation',
+      concurrency_slot: result.concurrency_slot,
+      latency_ms:    0, // filled below
+      api_latency_ms:0
+    };
+
+    const apiT0 = pNow();
+    const resp = await fetchWithTimeout('tables/stress_bookings', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(apiPayload)
+    }, cfg.timeout);
+    const apiLat = Math.round(pNow()-apiT0);
+    result.api_latency_ms = apiLat;
+
+    if(!resp.ok){
+      const errBody = await resp.text().catch(()=>'');
+      result.error_msg = `API ${resp.status}: ${errBody.slice(0,120)}`;
+      result.step_reached = 'api_write';
+      state.apiErrors++;
+      log(vuIdx+1, `❌ API ${resp.status} in ${apiLat}ms — ${result.error_msg}`,'err');
+      throw new Error('api_http_'+resp.status);
+    }
+
+    state.apiWrites++;
+    result.booking_status = 'success';
+    result.step_reached   = 'confirmation';
+    result.latency_ms     = Math.round(pNow()-t0);
+    updatePipe(6,'done');
+    log(vuIdx+1, `✅ ${result.booking_ref} ${park} ${fmtINR(result.grand_total)} [${result.latency_ms}ms API:${apiLat}ms]`,'ok');
+    setVU(vuIdx,'ok');
+
+  } catch(err) {
+    result.latency_ms = Math.round(pNow()-t0);
+    if(!result.error_msg) result.error_msg = err.message || 'unknown error';
+    if(err.message!=='abandon' && err.message!=='sold_out'){
+      log(vuIdx+1, `❌ ${err.message} @${result.step_reached} [${result.latency_ms}ms]`,'err');
+    }
+    // For non-API faults, still write a FAILED record to the DB
+    if(!err.message.startsWith('api_') && err.message!=='abandon'){
+      try {
+        const failPayload = {
+          id:            'BK-F-'+uid()+uid(),
+          session_id:    result.session_id,
+          run_label:     result.run_label,
+          booking_ref:   result.booking_ref || 'BK-FAIL-'+uid(),
+          park:          result.park || 'WATER_DAY',
+          visit_date:    result.visit_date || randomDate(),
+          adults:        0, children:0, ticket_total:0,
+          base_amount:   result.base_amount||0, gst_amount:result.gst_amount||0,
+          cgst:          result.cgst||0, sgst:result.sgst||0, grand_total:result.grand_total||0,
+          offer_code:    result.offer_code||'', offer_discount:result.offer_discount||0,
+          payment_mode:  result.payment_mode||'',
+          booking_status:err.message==='network_timeout'?'timeout':'failed',
+          step_reached:  result.step_reached,
+          concurrency_slot: result.concurrency_slot,
+          latency_ms:    result.latency_ms,
+          api_latency_ms:result.api_latency_ms||0
+        };
+        await fetchWithTimeout('tables/stress_bookings',{
+          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(failPayload)
+        }, cfg.timeout);
+        state.apiWrites++;
+      } catch(_){}
+    }
+    if(err.message==='network_timeout') result.booking_status='timeout';
+    else result.booking_status='failed';
+    setVU(vuIdx,'fail');
+  }
+
+  return result;
+}
+
+// Fetch with timeout wrapper
+async function fetchWithTimeout(url, opts, timeoutMs){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
+  try {
+    const resp = await fetch(url, {...opts, signal:ctrl.signal});
+    clearTimeout(timer);
+    return resp;
+  } catch(e) {
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('network_timeout');
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  VU RUNNER — runs bpv bookings sequentially per VU
+// ══════════════════════════════════════════════════════════════
+async function runVU(vuIdx, cfg){
+  state.activeVUs++;
+  for(let b=0; b<cfg.bpv; b++){
+    if(state.aborted) break;
+    const res = await simulateBooking(vuIdx, b, cfg);
+    state.results.push(res);
+    state.completed++;
+    updateKPIs();
+  }
+  state.activeVUs--;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAIN TEST ORCHESTRATOR
+// ══════════════════════════════════════════════════════════════
+async function startTest(){
+  const cfg = getConfig();
+  if(cfg.vu<1||cfg.bpv<1){ alert('VUs and bookings/VU must be ≥ 1'); return; }
+
+  state.running=true; state.aborted=false;
+  state.sessionId='SID-'+Date.now().toString(36).toUpperCase();
+  state.startTime=Date.now();
+  state.activeVUs=0; state.completed=0;
+  state.totalPlanned=cfg.vu*cfg.bpv;
+  state.results=[]; state.apiWrites=0; state.apiErrors=0;
+
+  clearChartData();
+  document.getElementById('btnStart').disabled=true;
+  document.getElementById('btnStop').disabled=false;
+  setStatus('running','RUNNING');
+  buildVUGrid(cfg.vu);
+  updatePipe(-1,'');
+
+  logSys(`══════════════════════════════════════════`);
+  logSys(`RUN: ${cfg.label}`);
+  logSys(`VUs: ${cfg.vu}  ×  ${cfg.bpv} bookings = ${state.totalPlanned} total`);
+  logSys(`Think: ${cfg.think}ms  Timeout: ${cfg.timeout}ms  Ramp: ${cfg.ramp}ms`);
+  logSys(`Session: ${state.sessionId}`);
+  logSys(`API target: tables/stress_bookings (REAL HTTP)`);
+  logSys(`══════════════════════════════════════════`);
+
+  // Create run record in tables/stress_test_runs
+  state.runId = 'RUN-'+Date.now().toString(36).toUpperCase()+uid();
+  try {
+    await fetch('tables/stress_test_runs', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        id:            state.runId,
+        run_label:     cfg.label,
+        started_at:    state.startTime,
+        concurrency:   cfg.vu,
+        total_bookings:state.totalPlanned,
+        status:        'running',
+        parks_mix:     JSON.stringify({water:cfg.mixW, amusement:cfg.mixA, combo:cfg.mixC}),
+        config_json:   JSON.stringify(cfg),
+        notes:         `VU:${cfg.vu} BPV:${cfg.bpv} Session:${state.sessionId}`
+      })
+    });
+    logSys(`Run record created: ${state.runId}`);
+  } catch(e){ logSys(`⚠ Could not create run record: ${e.message}`,'warn'); }
+
+  // Start elapsed timer
+  state.elapsedTimer = setInterval(()=>{
+    document.getElementById('topElapsed').textContent = Math.round((Date.now()-state.startTime)/1000)+'s';
+  }, 1000);
+  // Start chart push timer
+  state.chartTimer = setInterval(pushChartTick, 1500);
+
+  // Launch VUs with ramp-up
+  const promises = [];
+  for(let i=0; i<cfg.vu; i++){
+    if(state.aborted) break;
+    if(cfg.ramp>0 && i>0) await sleep(cfg.ramp);
+    promises.push(runVU(i, cfg));
+  }
+  await Promise.allSettled(promises);
+
+  // Finalize
+  clearInterval(state.elapsedTimer);
+  clearInterval(state.chartTimer);
+
+  const ok   = state.results.filter(r=>r.booking_status==='success');
+  const fail = state.results.filter(r=>r.booking_status!=='success');
+  const lats = state.results.filter(r=>r.latency_ms>0).map(r=>r.latency_ms).sort((a,b)=>a-b);
+  const avg  = lats.length ? Math.round(lats.reduce((a,b)=>a+b,0)/lats.length) : 0;
+  const p95  = lats.length ? (lats[Math.floor(lats.length*.95)]||lats[lats.length-1]) : 0;
+  const p99  = lats.length ? (lats[Math.floor(lats.length*.99)]||lats[lats.length-1]) : 0;
+  const elapsed = (Date.now()-state.startTime)/1000;
+  const rps  = parseFloat((state.results.length/elapsed).toFixed(3));
+  const rev  = ok.reduce((a,r)=>a+(r.grand_total||0),0);
+  const gstT = ok.reduce((a,r)=>a+(r.gst_amount||0),0);
+  const aov  = ok.length ? Math.round(rev/ok.length) : 0;
+  const finalStatus = state.aborted?'aborted':'completed';
+
+  logSys(`══════════════════════════════════════════`);
+  logSys(`COMPLETED — ${finalStatus.toUpperCase()}`);
+  logSys(`Total: ${state.results.length}  OK: ${ok.length}  Fail: ${fail.length}`);
+  logSys(`Latency: avg=${avg}ms  p95=${p95}ms  p99=${p99}ms`);
+  logSys(`Throughput: ${rps} bk/s over ${elapsed.toFixed(1)}s`);
+  logSys(`Revenue: ${fmtINR(rev)}  GST: ${fmtINR(gstT)}  AOV: ${fmtINR(aov)}`);
+  logSys(`API Writes: ${state.apiWrites}  Errors: ${state.apiErrors}`);
+  logSys(`══════════════════════════════════════════`);
+
+  // PATCH run record with final stats
+  if(state.runId){
+    try {
+      await fetch('tables/stress_test_runs/'+state.runId, {
+        method:'PATCH', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          ended_at:              Date.now(),
+          success_count:         ok.length,
+          failed_count:          fail.length,
+          avg_latency_ms:        avg,
+          p95_latency_ms:        p95,
+          p99_latency_ms:        p99,
+          min_latency_ms:        lats[0]||0,
+          max_latency_ms:        lats[lats.length-1]||0,
+          throughput_rps:        rps,
+          total_revenue_simulated: rev,
+          total_gst_collected:   gstT,
+          avg_order_value:       aov,
+          status:                finalStatus
+        })
+      });
+      logSys(`Run record updated: ${state.runId}`);
+    } catch(e){ logSys(`⚠ Could not update run record: ${e.message}`); }
+  }
+
+  updateKPIs();
+  renderResultsTable();
+  pushChartTick();
+  setStatus(finalStatus==='completed'?'done':'error', finalStatus.toUpperCase());
+  document.getElementById('btnStart').disabled=false;
+  document.getElementById('btnStop').disabled=true;
+  state.running=false;
+}
+
+function stopTest(){
+  state.aborted=true;
+  logSys('⚠ STOP requested — aborting remaining VUs…','warn');
+  setStatus('error','ABORTED');
+  document.getElementById('btnStop').disabled=true;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RESULTS TABLE
+// ══════════════════════════════════════════════════════════════
+function renderResultsTable(){
+  const fs = document.getElementById('filterStatus').value;
+  const fp = document.getElementById('filterPark').value;
+  let rows = state.results;
+  if(fs) rows = rows.filter(r=>r.booking_status===fs);
+  if(fp) rows = rows.filter(r=>r.park===fp);
+  const tb = document.getElementById('resultsTbody');
+  if(rows.length===0){
+    tb.innerHTML='<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:20px;">No results match filter</td></tr>';
+    return;
+  }
+  const parkLabel = {WATER_DAY:'🌊 Water',AMUSEMENT_DAY:'🎢 Amusement',COMBO_DAY:'🎟 Combo'};
+  const latCls = ms => ms<300?'lat-ok':ms<800?'lat-warn':'lat-bad';
+  tb.innerHTML = rows.slice(-500).reverse().map((r,i)=>`
+    <tr>
+      <td>${rows.length-i}</td>
+      <td style="font-size:9px">${r.booking_ref||'—'}</td>
+      <td>${parkLabel[r.park]||r.park||'—'}</td>
+      <td>${r.ticket_total||0}</td>
+      <td>${fmtINR(r.base_amount)}</td>
+      <td>${fmtINR(r.gst_amount)}</td>
+      <td style="font-weight:700">${fmtINR(r.grand_total)}</td>
+      <td style="font-size:9px">${r.offer_code||'—'}</td>
+      <td>${r.payment_mode||'—'}</td>
+      <td style="font-size:9px;color:var(--muted)">${r.step_reached||'—'}</td>
+      <td class="${latCls(r.latency_ms)}">${r.latency_ms?fmtMs(r.latency_ms):'—'}</td>
+      <td class="${latCls(r.api_latency_ms)}">${r.api_latency_ms?fmtMs(r.api_latency_ms):'—'}</td>
+      <td><span class="badge ${r.booking_status==='success'?'ok':r.booking_status==='timeout'?'timeout':r.booking_status==='partial'?'partial':'fail'}">${r.booking_status}</span></td>
+      <td style="font-size:9px;color:var(--red);max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${r.error_msg||''}">${r.error_msg||''}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CSV EXPORT
+// ══════════════════════════════════════════════════════════════
+function exportCSV(){
+  if(!state.results.length){ alert('No results to export.'); return; }
+  const cols = ['booking_ref','park','visit_date','ticket_total','base_amount','gst_amount','cgst','sgst','grand_total','offer_code','offer_discount','payment_mode','booking_status','step_reached','latency_ms','api_latency_ms','error_msg','concurrency_slot','run_label','session_id'];
+  const header = cols.join(',');
+  const rows = state.results.map(r=>cols.map(c=>{
+    const v=r[c]||''; return typeof v==='string'&&v.includes(',') ? `"${v}"` : v;
+  }).join(','));
+  const blob = new Blob([header+'\n'+rows.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`wow-stress-${state.sessionId||'export'}-${Date.now()}.csv`;
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  API HEALTH CHECK — REAL HTTP calls to all Tables endpoints
+// ══════════════════════════════════════════════════════════════
+async function runHealthCheck(){
+  const grid = document.getElementById('healthGrid');
+  const ENDPOINTS = [
+    {method:'GET',  url:'tables/stress_bookings?limit=1',        label:'GET stress_bookings',        icon:'📊'},
+    {method:'GET',  url:'tables/stress_test_runs?limit=1',       label:'GET stress_test_runs',       icon:'🏃'},
+    {method:'GET',  url:'tables/crm_bookings_cache?limit=1',     label:'GET crm_bookings_cache',     icon:'🎟'},
+    {method:'GET',  url:'tables/passport_holders?limit=1',       label:'GET passport_holders',       icon:'🛂'},
+    {method:'GET',  url:'tables/wow_passports?limit=1',          label:'GET wow_passports',          icon:'📘'},
+    {method:'GET',  url:'tables/passport_sales?limit=1',         label:'GET passport_sales',         icon:'💳'},
+    {method:'GET',  url:'tables/ta_applications?limit=1',        label:'GET ta_applications',        icon:'✈'},
+    {method:'GET',  url:'tables/crm_cases?limit=1',              label:'GET crm_cases',              icon:'📞'},
+    {method:'POST', url:'tables/stress_bookings',                label:'POST stress_bookings (write)',icon:'✍',
+      body:{id:'HC-'+uid(), session_id:'healthcheck', run_label:'health-check',
+            booking_ref:'HC-'+uid(), park:'WATER_DAY', visit_date:'2026-06-01',
+            adults:1, children:0, ticket_total:1,
+            base_amount:1101, gst_amount:198, cgst:99, sgst:99, grand_total:1299,
+            offer_code:'', offer_discount:0, payment_mode:'UPI',
+            booking_status:'success', step_reached:'confirmation',
+            concurrency_slot:0, latency_ms:0, api_latency_ms:0}
+    }
+  ];
+
+  grid.innerHTML = ENDPOINTS.map(e=>`
+    <div class="health-card" id="hc-${btoa(e.url+e.method).replace(/[^a-z0-9]/gi,'')}">
+      <div class="health-icon">${e.icon}</div>
+      <div class="health-body">
+        <div class="health-endpoint">${e.method} ${e.url}</div>
+        <div class="health-status pending" id="hs-${btoa(e.url+e.method).replace(/[^a-z0-9]/gi,'')}">Checking…</div>
+        <div class="health-lat" id="hl-${btoa(e.url+e.method).replace(/[^a-z0-9]/gi,'')}">—</div>
+      </div>
+    </div>`).join('');
+
+  for(const ep of ENDPOINTS){
+    const key = btoa(ep.url+ep.method).replace(/[^a-z0-9]/gi,'');
+    const st  = document.getElementById('hs-'+key);
+    const lt  = document.getElementById('hl-'+key);
+    const t0  = pNow();
+    try {
+      const opts = {method:ep.method, headers:{'Content-Type':'application/json'}};
+      if(ep.body) opts.body=JSON.stringify(ep.body);
+      const resp = await fetchWithTimeout(ep.url, opts, 10000);
+      const lat  = Math.round(pNow()-t0);
+      if(resp.ok){
+        st.textContent=`✅ HTTP ${resp.status}`; st.className='health-status ok';
+      } else {
+        st.textContent=`❌ HTTP ${resp.status}`; st.className='health-status fail';
+      }
+      lt.textContent=lat+'ms';
+    } catch(e){
+      const lat=Math.round(pNow()-t0);
+      st.textContent=`❌ ${e.message}`; st.className='health-status fail';
+      lt.textContent=lat+'ms';
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GET BENCHMARK — 50 concurrent GETs
+// ══════════════════════════════════════════════════════════════
+async function runGetBenchmark(){
+  const out = document.getElementById('benchResults');
+  out.textContent = 'Running 50 concurrent GET requests to tables/stress_bookings…';
+  const N=50; const lats=[];
+  const t0=pNow();
+  await Promise.allSettled(Array.from({length:N},(_,i)=>{
+    const pt=pNow();
+    return fetch(`tables/stress_bookings?limit=10&page=${(i%5)+1}`)
+      .then(r=>{ lats.push(Math.round(pNow()-pt)); })
+      .catch(()=>{ lats.push(Math.round(pNow()-pt)); });
+  }));
+  const total=Math.round(pNow()-t0);
+  const sorted=lats.sort((a,b)=>a-b);
+  const avg=Math.round(sorted.reduce((a,b)=>a+b,0)/sorted.length);
+  out.innerHTML=`
+<span style="color:var(--cyan)">GET Benchmark — ${N} concurrent requests</span>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Min latency:    ${sorted[0]}ms
+Max latency:    ${sorted[sorted.length-1]}ms
+Avg latency:    ${avg}ms
+p50 latency:    ${sorted[Math.floor(sorted.length*.5)]}ms
+p95 latency:    ${sorted[Math.floor(sorted.length*.95)]}ms
+p99 latency:    ${sorted[Math.floor(sorted.length*.99)]||sorted[sorted.length-1]}ms
+Total duration: ${total}ms
+Throughput:     ${(N/(total/1000)).toFixed(1)} req/s
+Errors:         ${N-lats.length} (missing)`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  POST BENCHMARK — 20 concurrent POSTs (real writes)
+// ══════════════════════════════════════════════════════════════
+async function runPostBenchmark(){
+  const out = document.getElementById('benchResults');
+  out.textContent = 'Running 20 concurrent POST writes to tables/stress_bookings…';
+  const N=20; const lats=[]; let errors=0;
+  const t0=pNow();
+  await Promise.allSettled(Array.from({length:N},(_,i)=>{
+    const pt=pNow();
+    const payload={
+      id:'BENCH-'+i+'-'+uid(), session_id:'benchmark', run_label:'write-benchmark',
+      booking_ref:'BKB-'+uid(), park:['WATER_DAY','AMUSEMENT_DAY','COMBO_DAY'][i%3],
+      visit_date:'2026-07-15', adults:rand(1,4), children:rand(0,2), ticket_total:rand(1,6),
+      base_amount:rand(1000,8000), gst_amount:rand(180,1440), cgst:rand(90,720), sgst:rand(90,720),
+      grand_total:rand(1180,9440), offer_code:'', offer_discount:0, payment_mode:'UPI',
+      booking_status:'success', step_reached:'confirmation', concurrency_slot:i+1,
+      latency_ms:0, api_latency_ms:0
+    };
+    return fetch('tables/stress_bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(r=>{ lats.push(Math.round(pNow()-pt)); if(!r.ok) errors++; })
+      .catch(()=>{ lats.push(Math.round(pNow()-pt)); errors++; });
+  }));
+  const total=Math.round(pNow()-t0);
+  const sorted=lats.sort((a,b)=>a-b);
+  const avg=Math.round(sorted.reduce((a,b)=>a+b,0)/(sorted.length||1));
+  out.innerHTML=`
+<span style="color:var(--pink)">POST Write Benchmark — ${N} concurrent requests</span>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Min latency:    ${sorted[0]||0}ms
+Max latency:    ${sorted[sorted.length-1]||0}ms
+Avg latency:    ${avg}ms
+p50 latency:    ${sorted[Math.floor(sorted.length*.5)]||0}ms
+p95 latency:    ${sorted[Math.floor(sorted.length*.95)]||0}ms
+Total duration: ${total}ms
+Throughput:     ${(N/(total/1000)).toFixed(1)} writes/s
+HTTP Errors:    ${errors}/${N}
+Records written: ${N-errors} → tables/stress_bookings`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PAST RUNS LOADER
+// ══════════════════════════════════════════════════════════════
+async function loadPastRuns(){
+  const container = document.getElementById('pastRunsContainer');
+  container.innerHTML = '<div style="color:var(--muted);font-size:11px;">Loading…</div>';
+  try {
+    const [runsResp, booksResp] = await Promise.all([
+      fetch('tables/stress_test_runs?limit=30&sort=created_at'),
+      fetch('tables/stress_bookings?limit=2000')
+    ]);
+    const runs  = await runsResp.json();
+    const books = await booksResp.json();
+
+    const totalRuns = runs.total||0;
+    const totalBks  = books.total||0;
+    const runsList  = runs.data||[];
+    const booksList = books.data||[];
+
+    container.innerHTML = `<div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;">
+      <div class="kpi blue" style="min-width:130px"><div class="kpi-lbl">Total Runs</div><div class="kpi-val">${totalRuns}</div></div>
+      <div class="kpi purple" style="min-width:130px"><div class="kpi-lbl">Total Bookings</div><div class="kpi-val">${totalBks}</div></div>
+      <div class="kpi green" style="min-width:130px"><div class="kpi-lbl">OK Bookings</div><div class="kpi-val">${booksList.filter(b=>b.booking_status==='success').length}</div><div class="kpi-sub">of loaded ${booksList.length}</div></div>
+    </div>`;
+
+    if(!runsList.length){
+      container.innerHTML += '<div style="color:var(--muted);padding:20px;text-align:center;">No past runs found. Run a test first.</div>';
+      return;
+    }
+
+    runsList.forEach(run=>{
+      const okPct = run.total_bookings ? Math.round((run.success_count||0)/run.total_bookings*100) : 0;
+      const dur   = (run.started_at && run.ended_at) ? Math.round((run.ended_at-run.started_at)/1000) : null;
+      const stCol = run.status==='completed'?'var(--green)':run.status==='running'?'var(--yellow)':'var(--red)';
+      container.innerHTML += `
+        <div class="run-card">
+          <div class="run-hd">
+            <div class="run-label">${run.run_label||run.id}</div>
+            <span class="badge ${run.status==='completed'?'ok':run.status==='running'?'timeout':'fail'}">${run.status||'?'}</span>
+            <span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--muted)">${run.started_at?new Date(run.started_at).toLocaleString():''}</span>
+          </div>
+          <div class="run-grid">
+            <div class="run-stat"><div class="run-stat-lbl">VUs</div><div class="run-stat-val">${run.concurrency||'—'}</div></div>
+            <div class="run-stat"><div class="run-stat-lbl">Total / OK / Fail</div><div class="run-stat-val">${run.total_bookings||0} / <span style="color:var(--green)">${run.success_count||0}</span> / <span style="color:var(--red)">${run.failed_count||0}</span></div></div>
+            <div class="run-stat"><div class="run-stat-lbl">Avg / P95 Latency</div><div class="run-stat-val" style="font-size:10px">${run.avg_latency_ms||0}ms / ${run.p95_latency_ms||0}ms</div></div>
+            <div class="run-stat"><div class="run-stat-lbl">Throughput</div><div class="run-stat-val">${run.throughput_rps||0} <span style="font-size:9px;color:var(--muted)">bk/s</span></div></div>
+            <div class="run-stat"><div class="run-stat-lbl">Duration</div><div class="run-stat-val">${dur!=null?dur+'s':'—'}</div></div>
+            <div class="run-stat"><div class="run-stat-lbl">Revenue / GST</div><div class="run-stat-val" style="font-size:10px">${fmtINR(run.total_revenue_simulated||0)} / ${fmtINR(run.total_gst_collected||0)}</div></div>
+            <div class="run-stat"><div class="run-stat-lbl">AOV</div><div class="run-stat-val">${fmtINR(run.avg_order_value||0)}</div></div>
+          </div>
+          <div style="margin-top:8px;background:rgba(0,0,0,.3);border-radius:4px;height:5px;overflow:hidden">
+            <div style="height:100%;width:${okPct}%;background:${stCol};border-radius:4px;transition:width .5s"></div>
+          </div>
+          <div style="font-size:8px;color:var(--muted);margin-top:3px;font-family:var(--mono)">${okPct}% success rate</div>
+        </div>`;
+    });
+  } catch(e){
+    container.innerHTML = `<div style="color:var(--red);font-size:11px;">Failed to load past runs: ${e.message}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════════════
+function switchTab(name, elBtn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  const pane=document.getElementById('tab-'+name);
+  if(pane) pane.classList.add('active');
+  if(elBtn) elBtn.classList.add('active');
+  else {
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+name+"'")) b.classList.add('active');
+    });
+  }
+}
+
+function clearResults(){
+  state.results=[]; state.apiWrites=0; state.apiErrors=0;
+  state.completed=0; state.totalPlanned=0; state.activeVUs=0;
+  clearChartData(); updateKPIs(); renderResultsTable();
+  document.getElementById('vuGrid').innerHTML='';
+  updatePipe(-1,'');
+  setStatus('idle','IDLE');
+  document.getElementById('topElapsed').textContent='0s';
+  logSys('Results cleared.');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', ()=>{
+  updatePipe(-1,'');
+  syncMix();
+  applyScenario('smoke', null);
+  logSys('WOW Deep Stress Test Engine v4.0 ready.');
+  logSys('Architecture: Static HTML + Tables REST API (no backend server).');
+  logSys('Pricing engine: booking.js TICKET_CATEGORIES (verbatim copy).');
+  logSys('Real HTTP: POST tables/stress_bookings | PATCH tables/stress_test_runs');
+  logSys('Select a scenario and click Run Test to begin.');
+});
+</script>
+</body>
+</html>

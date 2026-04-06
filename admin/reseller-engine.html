@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Reseller Identity Engine — Super Admin | WOW ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<script src="../js/reseller-engine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#060b18;--navy:#0a1628;--blue:#1a56db;--teal:#0891b2;
+  --green:#059669;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+  --orange:#ea580c;--pink:#db2777;
+  --border:#e2e8f0;--text:#1e293b;--muted:#64748b;--surface:#f8fafc;
+  --white:#fff;--sidebar-w:248px;
+}
+body{font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-w);background:var(--navy);flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;z-index:100;}
+.sb-logo{padding:18px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;}
+.sb-logo .mark{width:36px;height:36px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;}
+.sb-logo .lbl{color:#fff;font-size:13px;font-weight:700;line-height:1.2;}
+.sb-logo .sub{color:rgba(255,255,255,.4);font-size:10px;}
+.sb-section{padding:10px 0 4px;}
+.sb-lbl{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:4px 16px 6px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.65);cursor:pointer;border-left:3px solid transparent;transition:.15s;text-decoration:none;}
+.sb-item:hover,.sb-item.active{background:rgba(255,255,255,.06);color:#fff;border-left-color:#7c3aed;}
+.sb-item i{width:16px;text-align:center;font-size:12px;}
+.sb-badge{margin-left:auto;background:rgba(124,58,237,.3);color:#c4b5fd;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;}
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title{font-size:16px;font-weight:800;color:var(--ink);}
+.topbar-title span{color:var(--purple);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.content{padding:24px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+.m-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.m-label{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.m-val{font-size:24px;font-weight:900;margin:5px 0 2px;font-family:'Inter',sans-serif;}
+.m-sub{font-size:11px;color:var(--muted);}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:18px;}
+.card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.card-title{font-size:14px;font-weight:800;color:var(--ink);}
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead th{padding:9px 13px;text-align:left;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid var(--border);transition:.12s;}
+tbody tr:hover{background:#f9fafb;}
+tbody td{padding:11px 13px;vertical-align:middle;}
+.code{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;background:#f0f4ff;color:#3730a3;padding:2px 8px;border-radius:5px;border:1px solid #c7d2fe;white-space:nowrap;}
+.code.green{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.code.amber{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.code.red{background:#fef2f2;color:#991b1b;border-color:#fecaca;}
+.code.purple{background:#faf5ff;color:#6d28d9;border-color:#e9d5ff;}
+.code.teal{background:#ecfeff;color:#155e75;border-color:#a5f3fc;}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-green{background:#dcfce7;color:#166534;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;}
+.badge-amber{background:#fef9c3;color:#854d0e;}
+.badge-red{background:#fee2e2;color:#991b1b;}
+.badge-purple{background:#ede9fe;color:#5b21b6;}
+.badge-gray{background:#f3f4f6;color:#374151;}
+.badge-orange{background:#ffedd5;color:#9a3412;}
+.badge-teal{background:#ccfbf1;color:#115e59;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:none;transition:.15s;font-family:'Inter',sans-serif;}
+.btn-purple{background:var(--purple);color:#fff;} .btn-purple:hover{background:#6d28d9;}
+.btn-blue{background:var(--blue);color:#fff;} .btn-blue:hover{background:#1e40af;}
+.btn-green{background:var(--green);color:#fff;} .btn-green:hover{background:#047857;}
+.btn-red{background:#fef2f2;color:var(--red);border:1.5px solid #fecaca;}
+.btn-amber{background:#fffbeb;color:var(--amber);border:1.5px solid #fde68a;}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);} .btn-outline:hover{border-color:var(--purple);color:var(--purple);}
+.btn-sm{padding:5px 11px;font-size:11.5px;}
+.btn-xs{padding:3px 8px;font-size:11px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.15s;background:#fff;color:var(--text);}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--purple);}
+.form-group .hint{font-size:10.5px;color:var(--muted);margin-top:2px;}
+.form-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.form-section:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+.form-section-title{font-size:12.5px;font-weight:800;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.full{grid-column:span 2;}
+.full3{grid-column:span 3;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;backdrop-filter:blur(4px);}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:760px;box-shadow:0 24px 64px rgba(0,0,0,.2);margin:auto;}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;z-index:1;}
+.modal-title{font-size:16px;font-weight:800;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px;}
+.modal-body{padding:24px;max-height:72vh;overflow-y:auto;}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;border-radius:0 0 16px 16px;}
+.id-box{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:14px;}
+.id-box-icon{width:44px;height:44px;background:rgba(255,255,255,.1);border-radius:10px;display:grid;place-items:center;font-size:18px;color:#a5b4fc;flex-shrink:0;}
+.id-box-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;}
+.id-box-code{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#fff;letter-spacing:2px;margin-top:2px;}
+.id-box-sub{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:3px;}
+.pattern-card{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.pattern-card.active{border-color:var(--purple);background:#faf5ff;}
+.pattern-title{font-size:12.5px;font-weight:700;margin-bottom:4px;}
+.pattern-code{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--purple);font-weight:600;}
+.pattern-example{font-size:11px;color:var(--muted);margin-top:4px;}
+.prog-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;transition:width .5s;}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+.filter-row input,.filter-row select{padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;outline:none;font-family:'Inter',sans-serif;}
+.filter-row input:focus,.filter-row select:focus{border-color:var(--purple);}
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;}
+.tier-bronze{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;}
+.tier-silver{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+.tier-gold{background:#fffbeb;color:#92400e;border:1px solid #fde68a;}
+.tier-platinum{background:#faf5ff;color:#6d28d9;border:1px solid #e9d5ff;}
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:10000;display:none;align-items:center;gap:8px;max-width:380px;}
+.toast.show{display:flex;}
+.id-chain{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0;}
+.id-chain-node{background:#f0f4ff;border:1px solid #c7d2fe;color:#3730a3;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+.id-chain-arrow{color:var(--muted);font-size:12px;}
+.report-kpi{background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:12px;padding:18px;color:#fff;text-align:center;}
+.report-kpi-val{font-size:28px;font-weight:900;color:#e2e8f0;}
+.report-kpi-lbl{font-size:10.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+.report-kpi-sub{font-size:11.5px;color:rgba(255,255,255,.6);margin-top:6px;}
+.imm-warn{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.section-title{font-size:17px;font-weight:800;color:var(--ink);}
+.section-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.empty-state{text-align:center;padding:52px 20px;color:var(--muted);}
+.empty-state i{font-size:38px;margin-bottom:14px;display:block;opacity:.35;}
+.empty-state p{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--ink);}
+.empty-state small{font-size:12px;}
+@media(max-width:1200px){.metrics{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.form-grid{grid-template-columns:1fr;}.chart-grid{grid-template-columns:1fr;}.metrics{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="mark"><i class="fas fa-id-card"></i></div>
+    <div><div class="lbl">Reseller Engine</div><div class="sub">Identity Architecture v1.0</div></div>
+  </div>
+  <nav>
+    <div class="sb-section">
+      <div class="sb-lbl">Engine</div>
+      <a class="sb-item active" onclick="showTab('overview')"><i class="fas fa-th-large"></i>Overview</a>
+      <a class="sb-item" onclick="showTab('resellers')"><i class="fas fa-building"></i>Resellers <span class="sb-badge" id="sb-reseller-cnt">0</span></a>
+      <a class="sb-item" onclick="showTab('batches')"><i class="fas fa-layer-group"></i>Batch Pools <span class="sb-badge" id="sb-batch-cnt">0</span></a>
+      <a class="sb-item" onclick="showTab('employees')"><i class="fas fa-users"></i>Salespersons</a>
+      <a class="sb-item" onclick="showTab('allocations')"><i class="fas fa-sitemap"></i>Sub-Allocations</a>
+      <a class="sb-item" onclick="showTab('tickets')"><i class="fas fa-ticket-alt"></i>Issued Tickets</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-lbl">Reporting</div>
+      <a class="sb-item" onclick="showTab('reports')"><i class="fas fa-chart-bar"></i>Central Reports</a>
+      <a class="sb-item" onclick="showTab('audit')"><i class="fas fa-history"></i>Audit Trail</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-lbl">Configuration</div>
+      <a class="sb-item" onclick="showTab('coding-rules')"><i class="fas fa-fingerprint"></i>Identity Coding Rules</a>
+      <a class="sb-item" onclick="showTab('settings')"><i class="fas fa-cog"></i>Engine Settings</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-lbl">Navigation</div>
+      <a class="sb-item" href="index.html"><i class="fas fa-home"></i>Admin Dashboard</a>
+      <a class="sb-item" href="../reseller/index.html" target="_blank"><i class="fas fa-external-link-alt"></i>Reseller ERP</a>
+      <a class="sb-item" href="../reseller/salesperson.html" target="_blank"><i class="fas fa-user-tie"></i>Salesperson Portal</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <div class="topbar-title"><i class="fas fa-id-card" style="color:var(--purple);margin-right:8px;"></i>Reseller Identity <span>&amp; Commerce Engine</span></div>
+  <div class="topbar-right">
+    <div id="topbar-auth"></div>
+    <button class="btn btn-outline btn-sm" onclick="seedAndRefresh()"><i class="fas fa-database"></i> Seed Demo</button>
+    <button class="btn btn-purple btn-sm" onclick="openResellerModal(null)"><i class="fas fa-plus"></i> New Reseller</button>
+    <button class="btn btn-outline btn-sm" onclick="showTab('reports')"><i class="fas fa-file-export"></i> Export</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══ TAB: OVERVIEW ═══ -->
+<div id="tab-overview" class="tab-panel active">
+  <div class="metrics" id="overview-metrics">
+    <div class="m-card"><div class="m-label">Active Resellers</div><div class="m-val" id="m-resellers" style="color:var(--purple);">—</div><div class="m-sub" id="m-resellers-sub">loading…</div></div>
+    <div class="m-card"><div class="m-label">Batches Issued</div><div class="m-val" id="m-batches" style="color:var(--blue);">—</div><div class="m-sub" id="m-batches-sub">total tickets allocated</div></div>
+    <div class="m-card"><div class="m-label">Tickets Sold</div><div class="m-val" id="m-issued" style="color:var(--green);">—</div><div class="m-sub" id="m-issued-sub">— redeemed</div></div>
+    <div class="m-card"><div class="m-label">Inventory Balance</div><div class="m-val" id="m-balance" style="color:var(--amber);">—</div><div class="m-sub">unissued tickets remaining</div></div>
+    <div class="m-card"><div class="m-label">Total Revenue</div><div class="m-val" id="m-revenue" style="color:var(--teal);">—</div><div class="m-sub">across all resellers</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="card"><div class="card-hdr"><span class="card-title">Reseller Performance Ranking</span><span class="badge badge-purple">Tickets Sold</span></div><div style="height:260px;"><canvas id="chart-reseller-perf"></canvas></div></div>
+    <div class="card"><div class="card-hdr"><span class="card-title">Inventory Status</span></div><div style="height:260px;"><canvas id="chart-inventory"></canvas></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title"><i class="fas fa-link" style="color:var(--purple);margin-right:6px;"></i>Identity Chain Architecture — Live View</span><span class="badge badge-purple"><i class="fas fa-lock"></i> Immutable Once Assigned</span></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Every ticket issued carries this full identity chain from Reseller → Batch → Salesperson → Customer Ticket → QR:</p>
+    <div id="chain-demo" style="padding:16px;background:#f8fafc;border-radius:10px;border:1px solid var(--border);"></div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+      <div style="text-align:center;padding:12px;background:#faf5ff;border-radius:8px;border:1px solid #e9d5ff;">
+        <div style="font-size:10px;font-weight:800;color:#5b21b6;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Reseller Master</div>
+        <div style="font-size:11px;color:#6d28d9;">resellerCode embedded in all downstream objects</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#fffbeb;border-radius:8px;border:1px solid #fde68a;">
+        <div style="font-size:10px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Bulk Batch</div>
+        <div style="font-size:11px;color:#78350f;">{RCODE}-{SEASON}-B{SEQ3} → e.g. TM-INDIA-FY26-B001</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#ecfeff;border-radius:8px;border:1px solid #a5f3fc;">
+        <div style="font-size:10px;font-weight:800;color:#155e75;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Salesperson</div>
+        <div style="font-size:11px;color:#0e7490;">{RCODE}-SP{SEQ3} → reseller prefix always present</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;">
+        <div style="font-size:10px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Customer Ticket</div>
+        <div style="font-size:11px;color:#166534;">Carries R-code + E-code + Batch-code + Event-ID</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;">
+        <div style="font-size:10px;font-weight:800;color:#991b1b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">QR + Redemption</div>
+        <div style="font-size:11px;color:#b91c1c;">Full identity trace in QR payload &amp; redemption log</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><span class="card-title">Recent Audit Stream</span><a class="btn btn-outline btn-sm" onclick="showTab('audit')">View All</a></div>
+    <div class="tbl-wrap"><table id="overview-audit-tbl">
+      <thead><tr><th>Timestamp</th><th>Event</th><th>Reseller Code</th><th>Batch Code</th><th>Employee Code</th><th>Ticket Code</th></tr></thead>
+      <tbody id="overview-audit-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: RESELLERS ═══ -->
+<div id="tab-resellers" class="tab-panel">
+  <div class="filter-row">
+    <input id="res-search" placeholder="🔍 Search name, code, city…" style="min-width:260px;" oninput="renderResellers()"/>
+    <select id="res-status-filter" onchange="renderResellers()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="draft">Draft</option>
+      <option value="pending_approval">Pending Approval</option>
+      <option value="paused">Paused</option>
+      <option value="suspended">Suspended</option>
+    </select>
+    <select id="res-tier-filter" onchange="renderResellers()">
+      <option value="">All Tiers</option>
+      <option value="platinum">Platinum</option>
+      <option value="gold">Gold</option>
+      <option value="silver">Silver</option>
+      <option value="bronze">Bronze</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openResellerModal(null)"><i class="fas fa-plus"></i> New Reseller</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('resellers')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Reseller Code <i class="fas fa-lock" style="color:var(--amber);font-size:9px;" title="Immutable once activated"></i></th>
+        <th>Company Name</th><th>Tier</th><th>City / State</th>
+        <th>Commission %</th><th>Batches</th><th>Issued</th><th>Redeemed</th>
+        <th>Balance</th><th>Revenue</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="reseller-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: BATCH POOLS ═══ -->
+<div id="tab-batches" class="tab-panel">
+  <div class="filter-row">
+    <input id="bat-search" placeholder="🔍 Search batch code, reseller, product…" style="min-width:280px;" oninput="renderBatches()"/>
+    <select id="bat-res-filter" onchange="renderBatches()"><option value="">All Resellers</option></select>
+    <select id="bat-product-filter" onchange="renderBatches()">
+      <option value="">All Products</option>
+      <option value="WP_ADULT">Water Park Adult</option>
+      <option value="WP_CHILD">Water Park Child</option>
+      <option value="AP_ADULT">Amusement Adult</option>
+      <option value="AP_CHILD">Amusement Child</option>
+      <option value="CB_ADULT">Combo Adult</option>
+      <option value="CB_CHILD">Combo Child</option>
+    </select>
+    <select id="bat-status-filter" onchange="renderBatches()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="depleted">Depleted</option>
+      <option value="expired">Expired</option>
+      <option value="pending_approval">Pending</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openBatchModal(null)"><i class="fas fa-plus"></i> Push New Batch</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('batches')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Batch Code <i class="fas fa-link" style="color:var(--purple);font-size:9px;"></i></th>
+        <th>Reseller Code</th><th>Product</th><th>Qty</th>
+        <th>Allocated</th><th>Issued</th><th>Redeemed</th><th>Balance</th>
+        <th>Valid To</th><th>Payment</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="batch-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: SALESPERSONS ═══ -->
+<div id="tab-employees" class="tab-panel">
+  <div class="filter-row">
+    <input id="emp-search" placeholder="🔍 Search name, code…" style="min-width:260px;" oninput="renderEmployees()"/>
+    <select id="emp-res-filter" onchange="renderEmployees()"><option value="">All Resellers</option></select>
+    <select id="emp-status-filter" onchange="renderEmployees()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="suspended">Suspended</option>
+    </select>
+    <select id="emp-channel-filter" onchange="renderEmployees()">
+      <option value="">All Channels</option>
+      <option value="counter">Counter</option>
+      <option value="online">Online</option>
+      <option value="field">Field</option>
+      <option value="hotel">Hotel</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openEmployeeModal(null)"><i class="fas fa-plus"></i> Add Salesperson</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('employees')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Employee Code <i class="fas fa-link" style="color:var(--purple);font-size:9px;"></i></th>
+        <th>Name</th><th>Reseller Code</th><th>Role</th><th>Channel</th>
+        <th>Allocated</th><th>Issued</th><th>Balance</th><th>Redemption %</th>
+        <th>Last Sale</th><th>Status</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="emp-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: ALLOCATIONS ═══ -->
+<div id="tab-allocations" class="tab-panel">
+  <div class="filter-row">
+    <input id="alloc-search" placeholder="🔍 Search allocation code, batch, employee…" style="min-width:300px;" oninput="renderAllocations()"/>
+    <select id="alloc-res-filter" onchange="renderAllocations()"><option value="">All Resellers</option></select>
+    <select id="alloc-emp-filter" onchange="renderAllocations()"><option value="">All Employees</option></select>
+    <select id="alloc-status-filter" onchange="renderAllocations()">
+      <option value="">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="depleted">Depleted</option>
+      <option value="recalled">Recalled</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openAllocModal()"><i class="fas fa-plus"></i> New Allocation</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Allocation Code</th><th>Reseller Code</th><th>Batch Code</th>
+        <th>Employee Code</th><th>Employee Name</th><th>Product</th>
+        <th>Qty</th><th>Issued</th><th>Redeemed</th><th>Balance</th>
+        <th>Status</th><th>Date</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="alloc-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: ISSUED TICKETS ═══ -->
+<div id="tab-tickets" class="tab-panel">
+  <div class="filter-row">
+    <input id="tkt-search" placeholder="🔍 Search ticket code, customer, reseller…" style="min-width:300px;" oninput="renderTickets()"/>
+    <select id="tkt-res-filter" onchange="renderTickets()"><option value="">All Resellers</option></select>
+    <select id="tkt-batch-filter" onchange="renderTickets()"><option value="">All Batches</option></select>
+    <select id="tkt-emp-filter" onchange="renderTickets()"><option value="">All Employees</option></select>
+    <select id="tkt-status-filter" onchange="renderTickets()">
+      <option value="">All Statuses</option>
+      <option value="issued">Issued</option>
+      <option value="redeemed">Redeemed</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="expired">Expired</option>
+    </select>
+    <button class="btn btn-purple btn-sm" onclick="openIssueTicketModal()"><i class="fas fa-plus"></i> Issue Ticket</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('tickets')"><i class="fas fa-file-csv"></i> Export CSV</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>Ticket Code <i class="fas fa-fingerprint" style="color:var(--purple);font-size:9px;"></i></th>
+        <th>Reseller Code</th><th>Batch Code</th><th>Employee Code</th>
+        <th>Customer</th><th>Product</th><th>Visit Date</th>
+        <th>Sale Price</th><th>Status</th><th>Issued At</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="tkt-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: CENTRAL REPORTS ═══ -->
+<div id="tab-reports" class="tab-panel">
+  <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+    <select id="rpt-type" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()">
+      <option value="by_reseller">By Reseller Code (§62)</option>
+      <option value="by_batch">By Batch Code (§56)</option>
+      <option value="by_employee">By Salesperson Code (§61)</option>
+      <option value="provenance">Ticket Provenance (§57)</option>
+    </select>
+    <select id="rpt-res" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()"><option value="">All Resellers</option></select>
+    <select id="rpt-batch" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()"><option value="">All Batches</option></select>
+    <select id="rpt-emp" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()"><option value="">All Employees</option></select>
+    <select id="rpt-status" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()">
+      <option value="">All Statuses</option>
+      <option value="issued">Issued</option>
+      <option value="redeemed">Redeemed</option>
+      <option value="expired">Expired</option>
+    </select>
+    <select id="rpt-channel" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()">
+      <option value="">All Channels</option>
+      <option value="counter">Counter</option>
+      <option value="online">Online</option>
+      <option value="field">Field</option>
+      <option value="digital">Digital</option>
+    </select>
+    <input type="date" id="rpt-from" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()"/>
+    <input type="date" id="rpt-to" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;" onchange="renderReport()"/>
+    <button class="btn btn-purple btn-sm" onclick="renderReport()"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="btn btn-outline btn-sm" onclick="exportReport()"><i class="fas fa-file-csv"></i> Export CSV</button>
+  </div>
+  <div id="report-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;"></div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title" id="report-title">Report</span><span id="report-row-count" class="badge badge-purple"></span></div>
+    <div class="tbl-wrap"><table><thead id="report-thead"></thead><tbody id="report-tbody"></tbody></table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: AUDIT TRAIL ═══ -->
+<div id="tab-audit" class="tab-panel">
+  <div class="filter-row">
+    <input id="audit-search" placeholder="🔍 Filter code, action, reseller…" style="min-width:280px;" oninput="renderAudit()"/>
+    <select id="audit-res-filter" onchange="renderAudit()"><option value="">All Resellers</option></select>
+    <select id="audit-action-filter" onchange="renderAudit()">
+      <option value="">All Events</option>
+      <option value="reseller_created">Reseller Created</option>
+      <option value="reseller_activated">Reseller Activated</option>
+      <option value="reseller_status_changed">Status Changed</option>
+      <option value="employee_created">Salesperson Created</option>
+      <option value="batch_created">Batch Created</option>
+      <option value="batch_approved">Batch Approved</option>
+      <option value="allocation_created">Allocation Created</option>
+      <option value="allocation_recalled">Allocation Recalled</option>
+      <option value="ticket_issued">Ticket Issued</option>
+      <option value="ticket_redeemed">Ticket Redeemed</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV('audit')"><i class="fas fa-file-csv"></i> Export</button>
+  </div>
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Timestamp</th><th>Event</th><th>Reseller Code</th><th>Batch Code</th><th>Employee Code</th><th>Ticket Code</th><th>Detail</th></tr></thead>
+      <tbody id="audit-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══ TAB: CODING RULES ═══ -->
+<div id="tab-coding-rules" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title"><i class="fas fa-fingerprint" style="color:var(--purple);margin-right:6px;"></i>Reseller Code Pattern (§55)</span></div>
+        <div class="id-box"><div class="id-box-icon"><i class="fas fa-building"></i></div><div><div class="id-box-label">Current Pattern</div><div class="id-box-code" id="pat-reseller">RS-{YEAR}-{SEQ4}</div><div class="id-box-sub">Example: RS-2026-0001</div></div></div>
+        <div class="form-group"><label>Pattern Template</label><input id="cfg-res-pattern" value="RS-{YEAR}-{SEQ4}" oninput="previewPatterns()"/><div class="hint">Tokens: {PREFIX} {YEAR} {SEQ4} — {SEQ4} = 4-digit zero-padded counter</div></div>
+        <div class="form-group" style="margin-top:10px;"><label>Default Prefix</label><input id="cfg-res-prefix" value="RS" oninput="previewPatterns()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title"><i class="fas fa-user-tag" style="color:var(--teal);margin-right:6px;"></i>Employee Code Pattern (§58)</span></div>
+        <div class="id-box" style="background:linear-gradient(135deg,#0f4c75,#1b6ca8);"><div class="id-box-icon"><i class="fas fa-user"></i></div><div><div class="id-box-label">Current Pattern</div><div class="id-box-code" id="pat-employee">{RCODE}-SP{SEQ3}</div><div class="id-box-sub">Example: RS-2026-0001-SP001</div></div></div>
+        <div class="form-group"><label>Pattern Template</label><input id="cfg-emp-pattern" value="{RCODE}-SP{SEQ3}" oninput="previewPatterns()"/><div class="hint">Tokens: {RCODE} = reseller code (auto), {SEQ3} = 3-digit counter per reseller</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title"><i class="fas fa-layer-group" style="color:var(--amber);margin-right:6px;"></i>Batch Code Pattern (§56)</span></div>
+        <div class="id-box" style="background:linear-gradient(135deg,#451a03,#92400e);"><div class="id-box-icon"><i class="fas fa-boxes"></i></div><div><div class="id-box-label">Current Pattern</div><div class="id-box-code" id="pat-batch">{RCODE}-{SEASON}-B{BSEQ3}</div><div class="id-box-sub">Example: RS-2026-0001-FY26-B001</div></div></div>
+        <div class="form-group"><label>Pattern Template</label><input id="cfg-bat-pattern" value="{RCODE}-{SEASON}-B{BSEQ3}" oninput="previewPatterns()"/><div class="hint">Tokens: {RCODE} {SEASON} {BSEQ3} — configurable per season</div></div>
+        <div class="form-group" style="margin-top:10px;"><label>Current Season</label><input id="cfg-season" value="FY26" oninput="previewPatterns()"/></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><span class="card-title"><i class="fas fa-ticket-alt" style="color:var(--green);margin-right:6px;"></i>Ticket Code Pattern (§57)</span></div>
+        <div class="id-box" style="background:linear-gradient(135deg,#052e16,#166534);"><div class="id-box-icon"><i class="fas fa-qrcode"></i></div><div><div class="id-box-label">Current Pattern</div><div class="id-box-code" id="pat-ticket">{RCODE}-{ECODE_SHORT}-TKT-{TSEQ5}</div><div class="id-box-sub">Example: RS-2026-0001-SP001-TKT-00001</div></div></div>
+        <div class="form-group"><label>Pattern Template</label><input id="cfg-tkt-pattern" value="{RCODE}-{ECODE_SHORT}-TKT-{TSEQ5}" oninput="previewPatterns()"/><div class="hint">Tokens: {RCODE} {ECODE_SHORT} = employee last segment, {TSEQ5} = 5-digit counter</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span class="card-title"><i class="fas fa-lock" style="color:var(--amber);margin-right:6px;"></i>Immutability Rules (§64)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <div style="padding:14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;"><div style="font-weight:700;font-size:13px;color:#92400e;margin-bottom:6px;"><i class="fas fa-lock"></i> Reseller Code</div><div style="font-size:12px;color:#78350f;">Immutable once reseller is ACTIVATED. Code is locked and cannot be changed without historical reconciliation impact. All downstream objects inherit this code.</div></div>
+      <div style="padding:14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;"><div style="font-weight:700;font-size:13px;color:#92400e;margin-bottom:6px;"><i class="fas fa-lock"></i> Employee Code</div><div style="font-size:12px;color:#78350f;">Immutable from assignment. Reseller code prefix is always embedded. Even removed employees retain code for historical reconciliation.</div></div>
+      <div style="padding:14px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;"><div style="font-weight:700;font-size:13px;color:#92400e;margin-bottom:6px;"><i class="fas fa-lock"></i> Batch &amp; Ticket Codes</div><div style="font-size:12px;color:#78350f;">Assigned at creation, never changed. All redemption, refund, QR mapping, and reconciliation records reference these codes immutably.</div></div>
+    </div>
+    <div style="margin-top:14px;text-align:right;">
+      <button class="btn btn-purple" onclick="saveCodingRules()"><i class="fas fa-save"></i> Save Coding Rules</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB: ENGINE SETTINGS ═══ -->
+<div id="tab-settings" class="tab-panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Operational Rules</span></div>
+      <div class="form-group"><label>Max Batch Qty per Request</label><input id="cfg-max-batch" type="number" value="10000"/></div>
+      <div class="form-group" style="margin-top:12px;"><label>Max Employees per Reseller</label><input id="cfg-max-emp" type="number" value="50"/></div>
+      <div class="form-group" style="margin-top:12px;"><label>Default Ticket Validity (Days)</label><input id="cfg-validity" type="number" value="365"/></div>
+      <div class="form-group" style="margin-top:12px;"><label>Require Approval for Batch Push</label>
+        <select id="cfg-batch-approval"><option value="false">No — Auto-approve</option><option value="true">Yes — Require manual approval</option></select></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><span class="card-title">Commission Tier Slabs</span></div>
+      <div id="tier-slabs-display"></div>
+    </div>
+  </div>
+  <div style="text-align:right;margin-top:8px;">
+    <button class="btn btn-purple" onclick="saveEngineSettings()"><i class="fas fa-save"></i> Save Settings</button>
+  </div>
+</div>
+
+</div><!-- /.content -->
+</div><!-- /.main -->
+
+<!-- ══ MODAL: RESELLER ══ -->
+<div class="modal-overlay" id="modal-reseller">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-title" id="modal-reseller-title">New Reseller</div>
+    <button class="modal-close" onclick="closeModal('modal-reseller')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div id="reseller-code-display" style="display:none;margin-bottom:16px;"></div>
+    <div class="imm-warn"><i class="fas fa-lock"></i> The Reseller Code is immutable once the reseller is activated. Choose carefully or use auto-generate.</div>
+    <input type="hidden" id="r-edit-id"/>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fas fa-id-card" style="color:var(--purple);"></i> Identity</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Custom Reseller Code <span style="color:var(--amber);font-size:9px;">(blank = auto-generate)</span></label>
+          <input id="r-customcode" placeholder="e.g. MMT-DELHI or leave blank"/>
+          <div class="hint">⚠ Immutable once activated. Follows pattern in Coding Rules.</div>
+        </div>
+        <div class="form-group"><label>Tier</label>
+          <select id="r-tier">
+            <option value="bronze">🥉 Bronze (1–499 tickets, 8%)</option>
+            <option value="silver">🥈 Silver (500–1,999, 10%)</option>
+            <option value="gold">🥇 Gold (2,000–4,999, 12%)</option>
+            <option value="platinum">💎 Platinum (5,000+, 15%)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fas fa-building" style="color:var(--blue);"></i> Company Profile</div>
+      <div class="form-grid">
+        <div class="form-group full"><label>Legal Company Name *</label><input id="r-name" placeholder="e.g. TravelMart India Pvt Ltd"/></div>
+        <div class="form-group"><label>Trade / Display Name</label><input id="r-tradename" placeholder="TravelMart India"/></div>
+        <div class="form-group"><label>Type</label>
+          <select id="r-type"><option value="company">Company</option><option value="agency">Agency</option><option value="individual">Individual</option><option value="platform">OTA / Platform</option></select></div>
+        <div class="form-group"><label>Category</label>
+          <select id="r-category"><option value="travel_agent">Travel Agent</option><option value="tour_operator">Tour Operator</option><option value="ota">OTA</option><option value="hotel">Hotel</option><option value="corporate">Corporate</option><option value="school">School</option></select></div>
+        <div class="form-group"><label>Contact Person *</label><input id="r-contact" placeholder="Rajesh Kumar"/></div>
+        <div class="form-group"><label>Mobile *</label><input id="r-mobile" placeholder="9876543210"/></div>
+        <div class="form-group"><label>Email</label><input id="r-email" placeholder="contact@company.com"/></div>
+        <div class="form-group"><label>City</label><input id="r-city" placeholder="New Delhi"/></div>
+        <div class="form-group"><label>State</label><input id="r-state" placeholder="Delhi"/></div>
+        <div class="form-group"><label>Pincode</label><input id="r-pin" placeholder="110001"/></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fas fa-rupee-sign" style="color:var(--green);"></i> Commercial</div>
+      <div class="form-grid">
+        <div class="form-group"><label>GST Number</label><input id="r-gst" placeholder="07AABCT1234Z1ZG"/></div>
+        <div class="form-group"><label>PAN Number</label><input id="r-pan" placeholder="AABCT1234Z"/></div>
+        <div class="form-group"><label>Commission Rate %</label><input id="r-commission" type="number" value="8" min="0" max="50"/></div>
+        <div class="form-group"><label>Payment Terms</label>
+          <select id="r-payment-terms"><option value="advance">Advance</option><option value="credit_7">Credit 7 Days</option><option value="credit_15">Credit 15 Days</option><option value="credit_30">Credit 30 Days</option></select></div>
+        <div class="form-group"><label>Credit Limit (₹)</label><input id="r-credit-limit" type="number" value="0"/></div>
+        <div class="form-group"><label>Max Batch Size</label><input id="r-max-batch" type="number" value="1000"/></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fas fa-boxes" style="color:var(--amber);"></i> Allowed Products</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-WP_ADULT" value="WP_ADULT" checked/> Water Park Adult</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-WP_CHILD" value="WP_CHILD" checked/> Water Park Child</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-AP_ADULT" value="AP_ADULT" checked/> Amusement Adult</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-AP_CHILD" value="AP_CHILD" checked/> Amusement Child</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-CB_ADULT" value="CB_ADULT" checked/> Combo Adult</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" id="prd-CB_CHILD" value="CB_CHILD" checked/> Combo Child</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Internal Notes</label>
+      <textarea id="r-notes" rows="2" placeholder="Any internal notes about this reseller…" style="resize:vertical;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;outline:none;"></textarea>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-reseller')">Cancel</button>
+    <button class="btn btn-green" onclick="saveReseller()"><i class="fas fa-save"></i> Save Reseller</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: BATCH ══ -->
+<div class="modal-overlay" id="modal-batch">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-title" id="modal-batch-title">Push New Batch</div>
+    <button class="modal-close" onclick="closeModal('modal-batch')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="imm-warn"><i class="fas fa-lock"></i> Batch Code is auto-generated from the pattern: <strong id="batch-code-preview" style="font-family:monospace;">{RCODE}-{SEASON}-B{SEQ}</strong> and is immutable once created.</div>
+    <input type="hidden" id="b-edit-id"/>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fas fa-building" style="color:var(--purple);"></i> Reseller & Product</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Reseller *</label>
+          <select id="b-reseller" onchange="updateBatchCodePreview()"><option value="">— Select Reseller —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Product *</label>
+          <select id="b-product" onchange="updateBatchProductInfo()">
+            <option value="">— Select Product —</option>
+            <option value="WP_ADULT">Water Park — Adult (₹1,299)</option>
+            <option value="WP_CHILD">Water Park — Child (₹899)</option>
+            <option value="AP_ADULT">Amusement Park — Adult (₹1,199)</option>
+            <option value="AP_CHILD">Amusement Park — Child (₹799)</option>
+            <option value="CB_ADULT">Combo — Adult (₹1,999)</option>
+            <option value="CB_CHILD">Combo — Child (₹1,399)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Quantity *</label><input id="b-qty" type="number" value="100" min="1"/></div>
+        <div class="form-group"><label>Purchase Rate (₹ per ticket)</label><input id="b-purchase-rate" type="number" value="1100" min="0"/></div>
+        <div class="form-group"><label>Face Value (₹ per ticket)</label><input id="b-face-value" type="number" value="1299" min="0"/></div>
+        <div class="form-group"><label>Payment Status</label>
+          <select id="b-payment-status"><option value="unpaid">Unpaid</option><option value="partial">Partial</option><option value="paid">Paid</option></select></div>
+        <div class="form-group"><label>Payment Reference</label><input id="b-payment-ref" placeholder="PAY-20260101-001"/></div>
+        <div class="form-group"><label>Delivery Method</label>
+          <select id="b-delivery"><option value="digital">Digital / Email</option><option value="csv_export">CSV Export</option><option value="api">API Push</option><option value="printed">Printed Vouchers</option></select></div>
+        <div class="form-group"><label>Valid From</label><input id="b-valid-from" type="date"/></div>
+        <div class="form-group"><label>Valid To</label><input id="b-valid-to" type="date"/></div>
+        <div class="form-group full"><label>Internal Notes</label><input id="b-notes" placeholder="e.g. Summer season batch, corporate booking…"/></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-batch')">Cancel</button>
+    <button class="btn btn-green" onclick="saveBatch()"><i class="fas fa-layer-group"></i> Create Batch</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: EMPLOYEE ══ -->
+<div class="modal-overlay" id="modal-employee">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-title" id="modal-employee-title">Add Salesperson</div>
+    <button class="modal-close" onclick="closeModal('modal-employee')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="imm-warn"><i class="fas fa-link"></i> Salesperson code is auto-generated as {RCODE}-SP{SEQ} and permanently linked to the reseller code.</div>
+    <input type="hidden" id="e-edit-id"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Reseller *</label>
+        <select id="e-reseller"><option value="">— Select Reseller —</option></select>
+      </div>
+      <div class="form-group"><label>Full Name *</label><input id="e-name" placeholder="Suresh Kumar"/></div>
+      <div class="form-group"><label>Mobile *</label><input id="e-mobile" placeholder="9811111111"/></div>
+      <div class="form-group"><label>Email</label><input id="e-email" placeholder="suresh@company.in"/></div>
+      <div class="form-group"><label>Role</label>
+        <select id="e-role"><option value="salesperson">Salesperson</option><option value="manager">Manager</option><option value="admin">Admin</option></select></div>
+      <div class="form-group"><label>Channel</label>
+        <select id="e-channel"><option value="all">All Channels</option><option value="counter">Counter</option><option value="online">Online</option><option value="field">Field</option><option value="hotel">Hotel</option></select></div>
+      <div class="form-group"><label>Designation</label><input id="e-designation" placeholder="Sales Executive"/></div>
+      <div class="form-group"><label>Login PIN (4-6 digits)</label><input id="e-pin" type="password" placeholder="e.g. 1234" maxlength="6"/></div>
+      <div class="form-group full"><label>Personal Commission Rate % (override — leave blank to use reseller rate)</label><input id="e-commission" type="number" placeholder="Leave blank to use reseller rate"/></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-employee')">Cancel</button>
+    <button class="btn btn-green" onclick="saveEmployee()"><i class="fas fa-user-plus"></i> Add Salesperson</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: ALLOCATION ══ -->
+<div class="modal-overlay" id="modal-alloc">
+<div class="modal" style="max-width:520px;">
+  <div class="modal-head">
+    <div class="modal-title">New Sub-Allocation</div>
+    <button class="modal-close" onclick="closeModal('modal-alloc')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:8px;padding:12px;font-size:12px;color:#3730a3;margin-bottom:16px;">
+      <i class="fas fa-info-circle"></i> Allocation code will embed: <strong>Reseller Code → Batch Code → Employee Code → Sequence</strong>
+    </div>
+    <div class="form-group"><label>Reseller *</label><select id="al-reseller" onchange="loadAllocReseller()"><option value="">— Select Reseller —</option></select></div>
+    <div class="form-group" style="margin-top:12px;"><label>Batch *</label><select id="al-batch"><option value="">— Select Batch —</option></select></div>
+    <div class="form-group" style="margin-top:12px;"><label>Salesperson *</label><select id="al-employee"><option value="">— Select Salesperson —</option></select></div>
+    <div class="form-group" style="margin-top:12px;"><label>Quantity *</label><input id="al-qty" type="number" value="10" min="1"/></div>
+    <div class="form-group" style="margin-top:12px;"><label>Notes</label><input id="al-notes" placeholder="e.g. Counter sales Q2"/></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-alloc')">Cancel</button>
+    <button class="btn btn-green" onclick="saveAllocation()"><i class="fas fa-sitemap"></i> Create Allocation</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: ISSUE TICKET ══ -->
+<div class="modal-overlay" id="modal-issue-ticket">
+<div class="modal" style="max-width:560px;">
+  <div class="modal-head">
+    <div class="modal-title">Issue Ticket to Customer</div>
+    <button class="modal-close" onclick="closeModal('modal-issue-ticket')">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group"><label>Allocation *</label><select id="it-alloc"><option value="">— Select Allocation —</option></select></div>
+    <div id="it-alloc-info" style="display:none;margin:12px 0;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);font-size:12px;"></div>
+    <div class="form-grid" style="margin-top:12px;">
+      <div class="form-group full"><label>Customer Name *</label><input id="it-name" placeholder="Ravi Shankar"/></div>
+      <div class="form-group"><label>Mobile *</label><input id="it-mobile" placeholder="9700000001"/></div>
+      <div class="form-group"><label>Email</label><input id="it-email" placeholder="ravi@email.com"/></div>
+      <div class="form-group"><label>Visit Date *</label><input id="it-visit-date" type="date"/></div>
+      <div class="form-group"><label>Sale Price (₹)</label><input id="it-price" type="number" value="1299"/></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-issue-ticket')">Cancel</button>
+    <button class="btn btn-green" onclick="saveIssueTicket()"><i class="fas fa-ticket-alt"></i> Issue Ticket</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: TICKET DETAIL ══ -->
+<div class="modal-overlay" id="modal-ticket-detail">
+<div class="modal" style="max-width:600px;">
+  <div class="modal-head">
+    <div class="modal-title">Ticket Detail</div>
+    <button class="modal-close" onclick="closeModal('modal-ticket-detail')">&times;</button>
+  </div>
+  <div class="modal-body" id="ticket-detail-body"></div>
+  <div class="modal-foot">
+    <button class="btn btn-outline" onclick="closeModal('modal-ticket-detail')">Close</button>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<script>
+'use strict';
+
+// ─── Wait for engine ───────────────────────────────────────────────────────
+var _RE = window.ResellerEngine;
+
+// ─── Sidebar tab navigation ────────────────────────────────────────────────
+var _currentTab = 'overview';
+function showTab(tab) {
+  _currentTab = tab;
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + tab);
+  if (panel) panel.classList.add('active');
+  // Mark sidebar item
+  document.querySelectorAll('.sb-item').forEach(function(i){
+    if (i.getAttribute('onclick') && i.getAttribute('onclick').indexOf("'" + tab + "'") !== -1) i.classList.add('active');
+  });
+  // Lazy render
+  var renders = { overview: renderOverview, resellers: renderResellers, batches: renderBatches,
+    employees: renderEmployees, allocations: renderAllocations, tickets: renderTickets,
+    reports: renderReport, audit: renderAudit, 'coding-rules': loadCodingRulesUI, settings: renderSettings };
+  if (renders[tab]) renders[tab]();
+}
+
+// ─── Toast ─────────────────────────────────────────────────────────────────
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  var icon = type === 'error' ? 'fa-times-circle' : type === 'warn' ? 'fa-exclamation-triangle' : 'fa-check-circle';
+  t.style.background = type === 'error' ? '#dc2626' : type === 'warn' ? '#d97706' : '#1e293b';
+  t.querySelector('i').className = 'fas ' + icon;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
+// ─── Modal helpers ─────────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+
+// ─── Format helpers ────────────────────────────────────────────────────────
+function inr(v) { return '₹' + (v||0).toLocaleString('en-IN'); }
+function dtFmt(ts) { if (!ts) return '—'; return new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function dFmt(d)  { if (!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+
+// ─── Badge helpers ─────────────────────────────────────────────────────────
+function statusBadge(s) {
+  var map = { active:'badge-green', draft:'badge-gray', pending_approval:'badge-amber', paused:'badge-blue', suspended:'badge-red', expired:'badge-red', archived:'badge-gray', depleted:'badge-orange', recalled:'badge-red', issued:'badge-blue', redeemed:'badge-green', cancelled:'badge-red' };
+  return '<span class="badge ' + (map[s]||'badge-gray') + '">' + (s||'—').replace(/_/g,' ') + '</span>';
+}
+function tierBadge(t) {
+  var map = { platinum:'badge-purple', gold:'badge-amber', silver:'badge-gray', bronze:'badge-orange' };
+  var icons = { platinum:'💎', gold:'🥇', silver:'🥈', bronze:'🥉' };
+  return '<span class="badge ' + (map[t]||'badge-gray') + '">' + (icons[t]||'') + ' ' + (t||'').charAt(0).toUpperCase()+(t||'').slice(1) + '</span>';
+}
+
+// ─── OVERVIEW ──────────────────────────────────────────────────────────────
+var _charts = {};
+function renderOverview() {
+  var s = _RE.dashboardSummary();
+  var resellers = _RE.loadResellers();
+  var activeR   = resellers.filter(function(r){ return r.status === 'active'; });
+
+  document.getElementById('m-resellers').textContent     = activeR.length;
+  document.getElementById('m-resellers-sub').textContent = resellers.length + ' total resellers';
+  document.getElementById('m-batches').textContent       = s.totalBatches;
+  document.getElementById('m-batches-sub').textContent   = s.totalAllocated.toLocaleString() + ' tickets allocated';
+  document.getElementById('m-issued').textContent        = s.totalIssued.toLocaleString();
+  document.getElementById('m-issued-sub').textContent    = s.totalRedeemed.toLocaleString() + ' redeemed';
+  document.getElementById('m-balance').textContent       = s.totalBalance.toLocaleString();
+  document.getElementById('m-revenue').textContent       = inr(s.totalRevenue);
+  document.getElementById('sb-reseller-cnt').textContent = resellers.length;
+  document.getElementById('sb-batch-cnt').textContent    = _RE.loadBatches().length;
+
+  // Identity chain demo
+  var tickets = _RE.loadTickets();
+  if (tickets.length > 0) {
+    var t = tickets[0];
+    document.getElementById('chain-demo').innerHTML =
+      '<div class="id-chain">' +
+        '<span class="id-chain-node"><i class="fas fa-building" style="margin-right:4px;"></i>' + t.resellerCode + '</span>' +
+        '<span class="id-chain-arrow">→</span>' +
+        '<span class="id-chain-node" style="background:#fffbeb;border-color:#fde68a;color:#92400e;"><i class="fas fa-boxes" style="margin-right:4px;"></i>' + t.batchCode + '</span>' +
+        '<span class="id-chain-arrow">→</span>' +
+        '<span class="id-chain-node" style="background:#ecfeff;border-color:#a5f3fc;color:#155e75;"><i class="fas fa-user" style="margin-right:4px;"></i>' + t.employeeCode + '</span>' +
+        '<span class="id-chain-arrow">→</span>' +
+        '<span class="id-chain-node" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d;"><i class="fas fa-ticket-alt" style="margin-right:4px;"></i>' + t.ticketCode + '</span>' +
+        '<span class="id-chain-arrow">→</span>' +
+        '<span class="id-chain-node" style="background:#fef2f2;border-color:#fecaca;color:#991b1b;"><i class="fas fa-qrcode" style="margin-right:4px;"></i>QR: ' + t.allocationCode + '</span>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:6px;">Customer: ' + (t.customerName||'—') + ' &nbsp;|&nbsp; Product: ' + (t.productName||'—') + ' &nbsp;|&nbsp; Visit: ' + (t.visitDate||'—') + ' &nbsp;|&nbsp; Status: ' + t.status + '</div>';
+  } else {
+    document.getElementById('chain-demo').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No tickets issued yet. Push a batch, allocate to salesperson, then issue tickets to see the live identity chain.</div>';
+  }
+
+  // Charts
+  var rpt = _RE.reportByReseller().slice(0,8);
+  if (_charts['perf']) { _charts['perf'].destroy(); }
+  _charts['perf'] = new Chart(document.getElementById('chart-reseller-perf'), {
+    type:'bar',
+    data:{ labels: rpt.map(function(r){ return r.resellerCode; }),
+           datasets:[{ label:'Issued', data: rpt.map(function(r){ return r.issued; }), backgroundColor:'#7c3aed' },
+                     { label:'Redeemed', data: rpt.map(function(r){ return r.redeemed; }), backgroundColor:'#059669' }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  if (_charts['inv']) { _charts['inv'].destroy(); }
+  _charts['inv'] = new Chart(document.getElementById('chart-inventory'), {
+    type:'doughnut',
+    data:{ labels:['Issued','Redeemed','Balance'],
+           datasets:[{ data:[s.totalIssued - s.totalRedeemed, s.totalRedeemed, s.totalBalance], backgroundColor:['#1a56db','#059669','#d97706'] }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } } }
+  });
+
+  // Recent audit
+  var logs = _RE.readAudit({ limit: 10 });
+  var tbody = document.getElementById('overview-audit-body');
+  tbody.innerHTML = logs.length === 0 ? '<tr><td colspan="6" class="empty-state"><i class="fas fa-history"></i>No audit events yet</td></tr>' :
+    logs.map(function(l){
+      return '<tr><td style="font-size:11px;color:var(--muted);">' + dtFmt(l.ts) + '</td>' +
+        '<td><span class="badge badge-blue" style="font-size:10px;">' + (l.action||'').replace(/_/g,' ') + '</span></td>' +
+        '<td>' + (l.resellerCode ? '<span class="code">' + l.resellerCode + '</span>' : '—') + '</td>' +
+        '<td>' + (l.batchCode ? '<span class="code amber">' + l.batchCode + '</span>' : '—') + '</td>' +
+        '<td>' + (l.employeeCode ? '<span class="code teal">' + l.employeeCode + '</span>' : '—') + '</td>' +
+        '<td>' + (l.ticketCode ? '<span class="code green">' + l.ticketCode + '</span>' : '—') + '</td></tr>';
+    }).join('');
+}
+
+// ─── RESELLERS ─────────────────────────────────────────────────────────────
+function renderResellers() {
+  var q      = (document.getElementById('res-search')||{}).value || '';
+  var status = (document.getElementById('res-status-filter')||{}).value || '';
+  var tier   = (document.getElementById('res-tier-filter')||{}).value || '';
+  var list   = _RE.loadResellers();
+
+  if (q)      list = list.filter(function(r){ var s=(r.name+r.tradeName+r.resellerCode+r.city+r.state).toLowerCase(); return s.indexOf(q.toLowerCase())>-1; });
+  if (status) list = list.filter(function(r){ return r.status === status; });
+  if (tier)   list = list.filter(function(r){ return r.tier === tier; });
+
+  var batches = _RE.loadBatches();
+  var tickets = _RE.loadTickets();
+  var allocs  = _RE.loadAllocations();
+
+  var tbody = document.getElementById('reseller-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><i class="fas fa-building"></i><p>No resellers found</p><small>Create your first reseller to get started</small></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(r) {
+    var rb = batches.filter(function(b){ return b.resellerId === r.id; }).length;
+    var ri = tickets.filter(function(t){ return t.resellerId === r.id; }).length;
+    var rr = tickets.filter(function(t){ return t.resellerId === r.id && t.status === 'redeemed'; }).length;
+    var ra = allocs.filter(function(a){ return a.resellerId === r.id; }).reduce(function(s,a){ return s+a.balance; },0);
+    var rev = tickets.filter(function(t){ return t.resellerId === r.id; }).reduce(function(s,t){ return s+(t.salePrice||0); },0);
+    return '<tr>' +
+      '<td><span class="code">' + r.resellerCode + '</span>' + (r.codeLockedAt ? ' <i class="fas fa-lock" style="color:var(--amber);font-size:9px;" title="Code locked"></i>' : '') + '</td>' +
+      '<td><div style="font-weight:600;font-size:13px;">' + (r.tradeName||r.name) + '</div><div style="font-size:11px;color:var(--muted);">' + (r.type||'') + '</div></td>' +
+      '<td>' + tierBadge(r.tier) + '</td>' +
+      '<td style="font-size:12px;">' + (r.city||'—') + ', ' + (r.state||'') + '</td>' +
+      '<td style="font-weight:700;color:var(--green);">' + r.commissionRate + '%</td>' +
+      '<td>' + rb + '</td>' +
+      '<td style="font-weight:600;">' + ri + '</td>' +
+      '<td style="color:var(--green);font-weight:600;">' + rr + '</td>' +
+      '<td style="color:var(--amber);font-weight:600;">' + ra + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(rev) + '</td>' +
+      '<td>' + statusBadge(r.status) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="btn btn-outline btn-xs" onclick="openResellerModal(\'' + r.id + '\')"><i class="fas fa-edit"></i></button> ' +
+        (r.status === 'draft' || r.status === 'pending_approval' ? '<button class="btn btn-green btn-xs" onclick="activateR(\'' + r.id + '\')">Activate</button> ' : '') +
+        (r.status === 'active' ? '<button class="btn btn-amber btn-xs" onclick="setRStatus(\'' + r.id + '\',\'paused\')">Pause</button> ' : '') +
+        (r.status === 'paused' ? '<button class="btn btn-green btn-xs" onclick="setRStatus(\'' + r.id + '\',\'active\')">Resume</button> ' : '') +
+        '<button class="btn btn-outline btn-xs" onclick="openBatchModal(null,\'' + r.id + '\')"><i class="fas fa-plus"></i> Batch</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function activateR(id) {
+  if (!confirm('Activate this reseller? The code will be permanently locked.')) return;
+  try { _RE.activateReseller(id); renderResellers(); renderOverview(); toast('Reseller activated — code locked'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+function setRStatus(id, status) {
+  try { _RE.setResellerStatus(id, status); renderResellers(); toast('Status updated to ' + status); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+function openResellerModal(id) {
+  var f = {
+    r_edit_id: '', r_customcode: '', r_tier: 'bronze', r_name: '', r_tradename: '', r_type: 'company',
+    r_category: 'travel_agent', r_contact: '', r_mobile: '', r_email: '', r_city: '', r_state: '', r_pin: '',
+    r_gst: '', r_pan: '', r_commission: 8, r_payment_terms: 'advance', r_credit_limit: 0, r_max_batch: 1000,
+    r_notes: '', prd: ['WP_ADULT','WP_CHILD','AP_ADULT','AP_CHILD','CB_ADULT','CB_CHILD']
+  };
+  document.getElementById('modal-reseller-title').textContent = id ? 'Edit Reseller' : 'New Reseller';
+  document.getElementById('reseller-code-display').style.display = 'none';
+
+  if (id) {
+    var r = _RE.getReseller(id);
+    if (r) {
+      f.r_edit_id = r.id; f.r_tier = r.tier; f.r_name = r.name; f.r_tradename = r.tradeName;
+      f.r_type = r.type; f.r_category = r.category; f.r_contact = r.contactPerson;
+      f.r_mobile = r.mobile; f.r_email = r.email; f.r_city = r.city; f.r_state = r.state;
+      f.r_pin = r.pincode; f.r_gst = r.gstNumber; f.r_pan = r.panNumber;
+      f.r_commission = r.commissionRate; f.r_payment_terms = r.paymentTerms;
+      f.r_credit_limit = r.creditLimit; f.r_max_batch = r.maxBatchSize; f.r_notes = r.internalNotes;
+      f.prd = r.allowedProducts || [];
+      // Show code if locked
+      if (r.resellerCode) {
+        document.getElementById('reseller-code-display').style.display = 'block';
+        document.getElementById('reseller-code-display').innerHTML =
+          '<div class="id-box"><div class="id-box-icon"><i class="fas fa-fingerprint"></i></div><div>' +
+          '<div class="id-box-label">Assigned Reseller Code' + (r.codeLockedAt ? ' 🔒 LOCKED' : '') + '</div>' +
+          '<div class="id-box-code">' + r.resellerCode + '</div>' +
+          '<div class="id-box-sub">Assigned: ' + dtFmt(r.codeAssignedAt) + (r.codeLockedAt ? ' · Locked: ' + dtFmt(r.codeLockedAt) : '') + '</div></div></div>';
+        document.getElementById('r-customcode').disabled = !!r.codeLockedAt;
+        document.getElementById('r-customcode').value = r.codeLockedAt ? r.resellerCode : r.resellerCode;
+      }
+    }
+  } else {
+    document.getElementById('r-customcode').disabled = false;
+  }
+
+  ['r_edit_id','r_customcode','r_tier','r_name','r_tradename','r_type','r_category','r_contact','r_mobile','r_email','r_city','r_state','r_pin','r_gst','r_pan','r_commission','r_payment_terms','r_credit_limit','r_max_batch','r_notes'].forEach(function(k){
+    var el = document.getElementById(k.replace(/_/g,'-'));
+    if (el) el.value = f[k];
+  });
+  ['WP_ADULT','WP_CHILD','AP_ADULT','AP_CHILD','CB_ADULT','CB_CHILD'].forEach(function(p){
+    var el = document.getElementById('prd-' + p);
+    if (el) el.checked = f.prd.indexOf(p) !== -1;
+  });
+  openModal('modal-reseller');
+}
+
+function saveReseller() {
+  var editId = document.getElementById('r-edit-id').value;
+  var name = document.getElementById('r-name').value.trim();
+  if (!name) { toast('Company name is required', 'error'); return; }
+  var prd = ['WP_ADULT','WP_CHILD','AP_ADULT','AP_CHILD','CB_ADULT','CB_CHILD'].filter(function(p){ return document.getElementById('prd-'+p).checked; });
+  var data = {
+    customCode: document.getElementById('r-customcode').value.trim() || null,
+    tier: document.getElementById('r-tier').value,
+    name: name,
+    tradeName: document.getElementById('r-tradename').value.trim() || name,
+    type: document.getElementById('r-type').value,
+    category: document.getElementById('r-category').value,
+    contactPerson: document.getElementById('r-contact').value.trim(),
+    mobile: document.getElementById('r-mobile').value.trim(),
+    email: document.getElementById('r-email').value.trim(),
+    city: document.getElementById('r-city').value.trim(),
+    state: document.getElementById('r-state').value.trim(),
+    pincode: document.getElementById('r-pin').value.trim(),
+    gstNumber: document.getElementById('r-gst').value.trim(),
+    panNumber: document.getElementById('r-pan').value.trim(),
+    commissionRate: parseFloat(document.getElementById('r-commission').value) || 0,
+    paymentTerms: document.getElementById('r-payment-terms').value,
+    creditLimit: parseInt(document.getElementById('r-credit-limit').value) || 0,
+    maxBatchSize: parseInt(document.getElementById('r-max-batch').value) || 1000,
+    internalNotes: document.getElementById('r-notes').value.trim(),
+    allowedProducts: prd,
+  };
+  try {
+    if (editId) { _RE.updateReseller(editId, data); toast('Reseller updated'); }
+    else { var r = _RE.createReseller(data); toast('Reseller created: ' + r.resellerCode); }
+    closeModal('modal-reseller');
+    renderResellers();
+    if (_currentTab === 'overview') renderOverview();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── BATCHES ───────────────────────────────────────────────────────────────
+function renderBatches() {
+  var q       = (document.getElementById('bat-search')||{}).value || '';
+  var resId   = (document.getElementById('bat-res-filter')||{}).value || '';
+  var prod    = (document.getElementById('bat-product-filter')||{}).value || '';
+  var status  = (document.getElementById('bat-status-filter')||{}).value || '';
+  var list    = _RE.loadBatches();
+
+  if (q)       list = list.filter(function(b){ return (b.batchCode+b.resellerCode+(b.productName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (resId)   list = list.filter(function(b){ return b.resellerId === resId; });
+  if (prod)    list = list.filter(function(b){ return b.productId === prod; });
+  if (status)  list = list.filter(function(b){ return b.status === status; });
+
+  var tbody = document.getElementById('batch-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><i class="fas fa-layer-group"></i><p>No batches found</p><small>Push a new batch to a reseller</small></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(b) {
+    var pct = b.quantity > 0 ? Math.round(b.issued / b.quantity * 100) : 0;
+    return '<tr>' +
+      '<td><span class="code amber">' + b.batchCode + '</span></td>' +
+      '<td><span class="code">' + b.resellerCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (b.productName||b.productId||'—') + '</td>' +
+      '<td style="font-weight:700;">' + b.quantity + '</td>' +
+      '<td>' + b.allocated + '</td>' +
+      '<td style="color:var(--blue);font-weight:600;">' + b.issued + '</td>' +
+      '<td style="color:var(--green);font-weight:600;">' + b.redeemed + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + b.balance + '</td>' +
+      '<td style="font-size:12px;">' + (b.validTo ? dFmt(b.validTo) : '—') + '</td>' +
+      '<td>' + statusBadge(b.paymentStatus) + '</td>' +
+      '<td>' + statusBadge(b.status) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button class="btn btn-outline btn-xs" onclick="viewBatchDetail(\'' + b.id + '\')"><i class="fas fa-eye"></i></button> ' +
+        (b.status === 'pending_approval' ? '<button class="btn btn-green btn-xs" onclick="approveBatch(\'' + b.id + '\')">Approve</button>' : '') +
+      '</td></tr>';
+  }).join('');
+}
+
+function approveBatch(id) {
+  try { _RE.approveBatch(id, 'admin'); renderBatches(); toast('Batch approved'); }
+  catch(e) { toast(e.message, 'error'); }
+}
+
+function viewBatchDetail(id) {
+  var b = _RE.getBatch(id);
+  if (!b) return;
+  var allocs = _RE.getAllocationsByBatch(id);
+  var html = '<div class="id-box"><div class="id-box-icon"><i class="fas fa-boxes"></i></div><div>' +
+    '<div class="id-box-label">Batch Code (Immutable)</div><div class="id-box-code">' + b.batchCode + '</div>' +
+    '<div class="id-box-sub">Reseller: ' + b.resellerCode + ' &nbsp;|&nbsp; Season: ' + (b.season||'—') + '</div></div></div>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">' +
+    ['Qty:'+b.quantity, 'Allocated:'+b.allocated, 'Issued:'+b.issued, 'Redeemed:'+b.redeemed, 'Balance:'+b.balance, 'Payment:'+b.paymentStatus].map(function(s){
+      var p = s.split(':'); return '<div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--muted);">' + p[0] + '</div><div style="font-size:18px;font-weight:800;">' + p[1] + '</div></div>';
+    }).join('') + '</div>' +
+    '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">Employee Allocations:</div>' +
+    (allocs.length === 0 ? '<div style="color:var(--muted);font-size:13px;">No allocations yet</div>' :
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:700;">Alloc Code</th><th>Employee</th><th>Qty</th><th>Issued</th><th>Balance</th><th>Status</th></tr></thead><tbody>' +
+    allocs.map(function(a){
+      return '<tr><td style="padding:6px;border-bottom:1px solid #f1f5f9;"><span class="code purple" style="font-size:10px;">' + a.allocationCode + '</span></td>' +
+        '<td><span class="code teal" style="font-size:10px;">' + a.employeeCode + '</span><br><span style="font-size:11px;color:var(--muted);">' + a.employeeName + '</span></td>' +
+        '<td style="font-weight:700;">' + a.quantity + '</td><td>' + a.issued + '</td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + a.balance + '</td>' +
+        '<td>' + statusBadge(a.status) + '</td></tr>';
+    }).join('') + '</tbody></table>');
+
+  document.getElementById('ticket-detail-body').innerHTML = html;
+  openModal('modal-ticket-detail');
+}
+
+function openBatchModal(id, defaultResId) {
+  document.getElementById('modal-batch-title').textContent = id ? 'Edit Batch' : 'Push New Batch';
+  document.getElementById('b-edit-id').value = id || '';
+  // Populate reseller dropdown
+  var sel = document.getElementById('b-reseller');
+  sel.innerHTML = '<option value="">— Select Reseller —</option>';
+  _RE.loadResellers().filter(function(r){ return r.status === 'active'; }).forEach(function(r){
+    sel.innerHTML += '<option value="' + r.id + '" ' + (defaultResId === r.id ? 'selected' : '') + '>' + r.resellerCode + ' — ' + (r.tradeName||r.name) + '</option>';
+  });
+  // Set today as default validFrom
+  var today = new Date().toISOString().slice(0,10);
+  var validTo = new Date(Date.now() + 180*86400000).toISOString().slice(0,10);
+  document.getElementById('b-valid-from').value = today;
+  document.getElementById('b-valid-to').value = validTo;
+  updateBatchCodePreview();
+  openModal('modal-batch');
+}
+
+function updateBatchCodePreview() {
+  var sel = document.getElementById('b-reseller');
+  var opt = sel.options[sel.selectedIndex];
+  var rcode = opt && opt.value ? opt.text.split(' — ')[0] : '{RCODE}';
+  var cfg = _RE.loadConfig();
+  document.getElementById('batch-code-preview').textContent = rcode + '-' + (cfg.currentSeason||'FY26') + '-B001';
+}
+
+function updateBatchProductInfo() {
+  var prices = { WP_ADULT:[1150,1299], WP_CHILD:[799,899], AP_ADULT:[1079,1199], AP_CHILD:[719,799], CB_ADULT:[1799,1999], CB_CHILD:[1259,1399] };
+  var p = document.getElementById('b-product').value;
+  if (prices[p]) {
+    document.getElementById('b-purchase-rate').value = prices[p][0];
+    document.getElementById('b-face-value').value = prices[p][1];
+  }
+}
+
+function saveBatch() {
+  var resId   = document.getElementById('b-reseller').value;
+  var prodId  = document.getElementById('b-product').value;
+  if (!resId) { toast('Select a reseller', 'error'); return; }
+  if (!prodId) { toast('Select a product', 'error'); return; }
+  var prodNames = { WP_ADULT:'Water Park — Adult', WP_CHILD:'Water Park — Child', AP_ADULT:'Amusement Park — Adult', AP_CHILD:'Amusement Park — Child', CB_ADULT:'Combo — Adult', CB_CHILD:'Combo — Child' };
+  var parkKeys  = { WP_ADULT:'WATER_DAY', WP_CHILD:'WATER_DAY', AP_ADULT:'AMUSEMENT_DAY', AP_CHILD:'AMUSEMENT_DAY', CB_ADULT:'COMBO_DAY', CB_CHILD:'COMBO_DAY' };
+  var cats      = { WP_ADULT:'adult', WP_CHILD:'child', AP_ADULT:'adult', AP_CHILD:'child', CB_ADULT:'adult', CB_CHILD:'child' };
+  try {
+    var b = _RE.createBatch(resId, {
+      productId: prodId, productName: prodNames[prodId], parkKey: parkKeys[prodId], category: cats[prodId],
+      quantity: parseInt(document.getElementById('b-qty').value) || 100,
+      purchaseRate: parseInt(document.getElementById('b-purchase-rate').value) || 0,
+      faceValue: parseInt(document.getElementById('b-face-value').value) || 0,
+      paymentStatus: document.getElementById('b-payment-status').value,
+      paymentRef: document.getElementById('b-payment-ref').value.trim(),
+      deliveryMethod: document.getElementById('b-delivery').value,
+      validFrom: document.getElementById('b-valid-from').value,
+      validTo: document.getElementById('b-valid-to').value,
+      internalNotes: document.getElementById('b-notes').value.trim(),
+    });
+    toast('Batch created: ' + b.batchCode);
+    closeModal('modal-batch');
+    renderBatches();
+    if (_currentTab === 'overview') renderOverview();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── EMPLOYEES ─────────────────────────────────────────────────────────────
+function renderEmployees() {
+  var q       = (document.getElementById('emp-search')||{}).value || '';
+  var resId   = (document.getElementById('emp-res-filter')||{}).value || '';
+  var status  = (document.getElementById('emp-status-filter')||{}).value || '';
+  var channel = (document.getElementById('emp-channel-filter')||{}).value || '';
+  var list    = _RE.loadEmployees();
+
+  if (q)       list = list.filter(function(e){ return (e.name+e.employeeCode+e.email).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (resId)   list = list.filter(function(e){ return e.resellerId === resId; });
+  if (status)  list = list.filter(function(e){ return e.status === status; });
+  if (channel) list = list.filter(function(e){ return e.channel === channel; });
+
+  var allocs  = _RE.loadAllocations();
+  var tickets = _RE.loadTickets();
+
+  var tbody = document.getElementById('emp-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state"><i class="fas fa-users"></i><p>No salespersons found</p><small>Add salespersons to active resellers</small></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(e) {
+    var ea = allocs.filter(function(a){ return a.employeeId === e.id; });
+    var allocated = ea.reduce(function(s,a){ return s+a.quantity; },0);
+    var balance   = ea.reduce(function(s,a){ return s+a.balance; },0);
+    var et = tickets.filter(function(t){ return t.employeeId === e.id; });
+    var issued   = et.length;
+    var redeemed = et.filter(function(t){ return t.status==='redeemed'; }).length;
+    var rdRate   = issued > 0 ? Math.round(redeemed/issued*100) : 0;
+    var lastSale = e._analytics && e._analytics.lastIssuance ? e._analytics.lastIssuance : '—';
+    return '<tr>' +
+      '<td><span class="code teal">' + e.employeeCode + '</span></td>' +
+      '<td><div style="font-weight:600;">' + (e.name||'—') + '</div><div style="font-size:11px;color:var(--muted);">' + (e.email||'') + '</div></td>' +
+      '<td><span class="code">' + e.resellerCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (e.role||'—') + '</td>' +
+      '<td><span class="badge badge-blue">' + (e.channel||'all') + '</span></td>' +
+      '<td style="font-weight:700;">' + allocated + '</td>' +
+      '<td style="color:var(--blue);font-weight:600;">' + issued + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + balance + '</td>' +
+      '<td>' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div class="prog-bar" style="width:60px;"><div class="prog-fill" style="width:' + rdRate + '%;background:' + (rdRate>70?'#059669':rdRate>40?'#d97706':'#dc2626') + ';"></div></div>' +
+          '<span style="font-size:11px;font-weight:700;">' + rdRate + '%</span>' +
+        '</div>' +
+      '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + lastSale + '</td>' +
+      '<td>' + statusBadge(e.status) + '</td>' +
+      '<td>' +
+        '<button class="btn btn-outline btn-xs" onclick="openEmployeeModal(\'' + e.id + '\')"><i class="fas fa-edit"></i></button> ' +
+        '<button class="btn btn-purple btn-xs" onclick="openAllocModalForEmp(\'' + e.resellerId + '\',\'' + e.id + '\')">+ Alloc</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+function openEmployeeModal(id) {
+  var sel = document.getElementById('e-reseller');
+  sel.innerHTML = '<option value="">— Select Reseller —</option>';
+  _RE.loadResellers().filter(function(r){ return r.status === 'active'; }).forEach(function(r){
+    sel.innerHTML += '<option value="' + r.id + '">' + r.resellerCode + ' — ' + (r.tradeName||r.name) + '</option>';
+  });
+  document.getElementById('modal-employee-title').textContent = id ? 'Edit Salesperson' : 'Add Salesperson';
+  document.getElementById('e-edit-id').value = id || '';
+  if (id) {
+    var e = _RE.getEmployee(id);
+    if (e) {
+      document.getElementById('e-reseller').value = e.resellerId;
+      document.getElementById('e-name').value = e.name;
+      document.getElementById('e-mobile').value = e.mobile;
+      document.getElementById('e-email').value = e.email;
+      document.getElementById('e-role').value = e.role;
+      document.getElementById('e-channel').value = e.channel;
+      document.getElementById('e-designation').value = e.designation;
+      document.getElementById('e-commission').value = e.personalCommissionRate || '';
+    }
+  } else {
+    ['e-name','e-mobile','e-email','e-pin','e-commission'].forEach(function(id){ document.getElementById(id).value = ''; });
+  }
+  openModal('modal-employee');
+}
+
+function saveEmployee() {
+  var editId  = document.getElementById('e-edit-id').value;
+  var resId   = document.getElementById('e-reseller').value;
+  var name    = document.getElementById('e-name').value.trim();
+  if (!resId) { toast('Select a reseller', 'error'); return; }
+  if (!name)  { toast('Employee name is required', 'error'); return; }
+  var data = {
+    name: name, mobile: document.getElementById('e-mobile').value.trim(),
+    email: document.getElementById('e-email').value.trim(),
+    role: document.getElementById('e-role').value,
+    channel: document.getElementById('e-channel').value,
+    designation: document.getElementById('e-designation').value.trim() || 'Sales Executive',
+    loginPin: document.getElementById('e-pin').value || null,
+    personalCommissionRate: document.getElementById('e-commission').value ? parseFloat(document.getElementById('e-commission').value) : null,
+  };
+  try {
+    if (editId) { _RE.updateEmployee(editId, data); toast('Salesperson updated'); }
+    else { var e = _RE.createEmployee(resId, data); toast('Salesperson created: ' + e.employeeCode); }
+    closeModal('modal-employee');
+    renderEmployees();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── ALLOCATIONS ───────────────────────────────────────────────────────────
+function renderAllocations() {
+  var q      = (document.getElementById('alloc-search')||{}).value || '';
+  var resId  = (document.getElementById('alloc-res-filter')||{}).value || '';
+  var empId  = (document.getElementById('alloc-emp-filter')||{}).value || '';
+  var status = (document.getElementById('alloc-status-filter')||{}).value || '';
+  var list   = _RE.loadAllocations();
+
+  if (q)      list = list.filter(function(a){ return (a.allocationCode+a.batchCode+a.employeeCode+a.resellerCode+(a.employeeName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (resId)  list = list.filter(function(a){ return a.resellerId === resId; });
+  if (empId)  list = list.filter(function(a){ return a.employeeId === empId; });
+  if (status) list = list.filter(function(a){ return a.status === status; });
+
+  var tbody = document.getElementById('alloc-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><i class="fas fa-sitemap"></i><p>No allocations found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.map(function(a) {
+    return '<tr>' +
+      '<td><span class="code purple">' + a.allocationCode + '</span></td>' +
+      '<td><span class="code">' + a.resellerCode + '</span></td>' +
+      '<td><span class="code amber">' + a.batchCode + '</span></td>' +
+      '<td><span class="code teal">' + a.employeeCode + '</span></td>' +
+      '<td style="font-size:12px;">' + (a.employeeName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (a.productName||a.productId||'—') + '</td>' +
+      '<td style="font-weight:700;">' + a.quantity + '</td>' +
+      '<td style="color:var(--blue);">' + a.issued + '</td>' +
+      '<td style="color:var(--green);">' + a.redeemed + '</td>' +
+      '<td style="color:var(--amber);font-weight:700;">' + a.balance + '</td>' +
+      '<td>' + statusBadge(a.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + (a.allocatedAt ? new Date(a.allocatedAt).toLocaleDateString('en-IN') : '—') + '</td>' +
+      '<td>' +
+        (a.status === 'active' && a.balance > 0 ? '<button class="btn btn-red btn-xs" onclick="recallAlloc(\'' + a.id + '\')"><i class="fas fa-undo"></i> Recall</button>' : '') +
+      '</td></tr>';
+  }).join('');
+}
+
+function openAllocModal() {
+  var resSel = document.getElementById('al-reseller');
+  resSel.innerHTML = '<option value="">— Select Reseller —</option>';
+  _RE.loadResellers().filter(function(r){ return r.status === 'active'; }).forEach(function(r){
+    resSel.innerHTML += '<option value="' + r.id + '">' + r.resellerCode + ' — ' + (r.tradeName||r.name) + '</option>';
+  });
+  document.getElementById('al-batch').innerHTML = '<option value="">— Select Batch —</option>';
+  document.getElementById('al-employee').innerHTML = '<option value="">— Select Salesperson —</option>';
+  openModal('modal-alloc');
+}
+
+function openAllocModalForEmp(resId, empId) {
+  openAllocModal();
+  if (resId) {
+    document.getElementById('al-reseller').value = resId;
+    loadAllocReseller();
+    // After loading, try to select the employee
+    setTimeout(function(){
+      document.getElementById('al-employee').value = empId;
+    }, 100);
+  }
+}
+
+function loadAllocReseller() {
+  var resId = document.getElementById('al-reseller').value;
+  var batSel = document.getElementById('al-batch');
+  var empSel = document.getElementById('al-employee');
+  batSel.innerHTML = '<option value="">— Select Batch —</option>';
+  empSel.innerHTML = '<option value="">— Select Salesperson —</option>';
+  if (!resId) return;
+  _RE.loadBatches().filter(function(b){ return b.resellerId === resId && b.status === 'active' && b.balance > 0; }).forEach(function(b){
+    batSel.innerHTML += '<option value="' + b.id + '">' + b.batchCode + ' — ' + (b.productName||b.productId) + ' (Bal: ' + b.balance + ')</option>';
+  });
+  _RE.getEmployeesByReseller(resId).filter(function(e){ return e.status === 'active'; }).forEach(function(e){
+    empSel.innerHTML += '<option value="' + e.id + '">' + e.employeeCode + ' — ' + e.name + '</option>';
+  });
+}
+
+function saveAllocation() {
+  var resId  = document.getElementById('al-reseller').value;
+  var batId  = document.getElementById('al-batch').value;
+  var empId  = document.getElementById('al-employee').value;
+  var qty    = parseInt(document.getElementById('al-qty').value) || 0;
+  var notes  = document.getElementById('al-notes').value.trim();
+  if (!resId || !batId || !empId) { toast('Select reseller, batch, and salesperson', 'error'); return; }
+  if (qty < 1) { toast('Quantity must be at least 1', 'error'); return; }
+  try {
+    var a = _RE.allocateToEmployee(resId, empId, batId, qty, notes);
+    toast('Allocation created: ' + a.allocationCode);
+    closeModal('modal-alloc');
+    renderAllocations();
+    renderBatches();
+    renderEmployees();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function recallAlloc(id) {
+  var qty = prompt('Quantity to recall (leave blank for full balance):');
+  if (qty === null) return;
+  var q = parseInt(qty) || 0;
+  try {
+    _RE.recallAllocation(id, q || undefined, 'Admin recall');
+    toast('Allocation recalled');
+    renderAllocations();
+    renderBatches();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── TICKETS ───────────────────────────────────────────────────────────────
+function renderTickets() {
+  var q      = (document.getElementById('tkt-search')||{}).value || '';
+  var resId  = (document.getElementById('tkt-res-filter')||{}).value || '';
+  var batId  = (document.getElementById('tkt-batch-filter')||{}).value || '';
+  var empId  = (document.getElementById('tkt-emp-filter')||{}).value || '';
+  var status = (document.getElementById('tkt-status-filter')||{}).value || '';
+  var list   = _RE.loadTickets();
+
+  if (q)      list = list.filter(function(t){ return (t.ticketCode+t.resellerCode+t.batchCode+t.employeeCode+(t.customerName||'')).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  if (resId)  list = list.filter(function(t){ return t.resellerId === resId; });
+  if (batId)  list = list.filter(function(t){ return t.batchId   === batId; });
+  if (empId)  list = list.filter(function(t){ return t.employeeId === empId; });
+  if (status) list = list.filter(function(t){ return t.status === status; });
+
+  var tbody = document.getElementById('tkt-tbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><i class="fas fa-ticket-alt"></i><p>No tickets found</p></div></td></tr>'; return; }
+
+  tbody.innerHTML = list.slice(0,200).map(function(t) {
+    return '<tr>' +
+      '<td><span class="code green">' + t.ticketCode + '</span></td>' +
+      '<td><span class="code">' + t.resellerCode + '</span></td>' +
+      '<td><span class="code amber">' + t.batchCode + '</span></td>' +
+      '<td><span class="code teal">' + t.employeeCode + '</span></td>' +
+      '<td><div style="font-weight:600;font-size:12px;">' + (t.customerName||'—') + '</div><div style="font-size:11px;color:var(--muted);">' + (t.customerMobile||'') + '</div></td>' +
+      '<td style="font-size:12px;">' + (t.productName||'—') + '</td>' +
+      '<td style="font-size:12px;">' + (t.visitDate||'—') + '</td>' +
+      '<td style="font-weight:700;color:var(--teal);">' + inr(t.salePrice) + '</td>' +
+      '<td>' + statusBadge(t.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + dtFmt(t.issuedAt) + '</td>' +
+      '<td><button class="btn btn-outline btn-xs" onclick="viewTicketDetail(\'' + t.id + '\')"><i class="fas fa-eye"></i></button></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function openIssueTicketModal() {
+  var sel = document.getElementById('it-alloc');
+  sel.innerHTML = '<option value="">— Select Allocation —</option>';
+  _RE.loadAllocations().filter(function(a){ return a.status === 'active' && a.balance > 0; }).forEach(function(a){
+    sel.innerHTML += '<option value="' + a.id + '">' + a.allocationCode + ' (' + a.resellerCode + ' / ' + a.employeeCode + ' / Bal:' + a.balance + ')</option>';
+  });
+  document.getElementById('it-visit-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('it-alloc-info').style.display = 'none';
+  openModal('modal-issue-ticket');
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var sel = document.getElementById('it-alloc');
+  if (sel) sel.addEventListener('change', function(){
+    var aId = this.value;
+    var info = document.getElementById('it-alloc-info');
+    if (!aId) { info.style.display = 'none'; return; }
+    var a = _RE.loadAllocations().find(function(x){ return x.id === aId; });
+    if (a) {
+      info.style.display = 'block';
+      info.innerHTML = '<strong>Chain:</strong> <span class="code" style="font-size:10px;">' + a.resellerCode + '</span> → <span class="code amber" style="font-size:10px;">' + a.batchCode + '</span> → <span class="code teal" style="font-size:10px;">' + a.employeeCode + '</span> &nbsp;|&nbsp; Product: ' + (a.productName||a.productId||'—') + ' &nbsp;|&nbsp; Balance: <strong>' + a.balance + '</strong>';
+      document.getElementById('it-price').value = _RE.loadBatches().find(function(b){ return b.id === a.batchId; }) ? _RE.loadBatches().find(function(b){ return b.id === a.batchId; }).faceValue : 1299;
+    }
+  });
+});
+
+function saveIssueTicket() {
+  var aId   = document.getElementById('it-alloc').value;
+  var name  = document.getElementById('it-name').value.trim();
+  var mob   = document.getElementById('it-mobile').value.trim();
+  if (!aId)  { toast('Select an allocation', 'error'); return; }
+  if (!name) { toast('Customer name is required', 'error'); return; }
+  try {
+    var tkt = _RE.issueTicket(aId, {
+      name: name, mobile: mob,
+      email: document.getElementById('it-email').value.trim(),
+      visitDate: document.getElementById('it-visit-date').value,
+      salePrice: parseInt(document.getElementById('it-price').value) || 0,
+    });
+    toast('Ticket issued: ' + tkt.ticketCode);
+    closeModal('modal-issue-ticket');
+    renderTickets();
+    renderAllocations();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function viewTicketDetail(id) {
+  var t = _RE.loadTickets().find(function(x){ return x.id === id; });
+  if (!t) return;
+  var html = '<div class="id-box" style="background:linear-gradient(135deg,#052e16,#166534);">' +
+    '<div class="id-box-icon"><i class="fas fa-ticket-alt"></i></div>' +
+    '<div><div class="id-box-label">Ticket Code (Immutable)</div><div class="id-box-code">' + t.ticketCode + '</div>' +
+    '<div class="id-box-sub">Status: ' + t.status + (t.redeemedAt ? ' · Redeemed: ' + dtFmt(t.redeemedAt) : '') + '</div></div></div>' +
+    '<div class="id-chain"><span class="id-chain-node"><i class="fas fa-building" style="margin-right:4px;"></i>' + t.resellerCode + '</span><span class="id-chain-arrow">→</span>' +
+    '<span class="id-chain-node" style="background:#fffbeb;border-color:#fde68a;color:#92400e;"><i class="fas fa-boxes" style="margin-right:4px;"></i>' + t.batchCode + '</span><span class="id-chain-arrow">→</span>' +
+    '<span class="id-chain-node" style="background:#ecfeff;border-color:#a5f3fc;color:#155e75;"><i class="fas fa-user" style="margin-right:4px;"></i>' + t.employeeCode + '</span><span class="id-chain-arrow">→</span>' +
+    '<span class="id-chain-node" style="background:#faf5ff;border-color:#e9d5ff;color:#6d28d9;"><i class="fas fa-sitemap" style="margin-right:4px;"></i>' + t.allocationCode + '</span></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">CUSTOMER</div><div style="font-weight:600;">' + (t.customerName||'—') + '</div><div style="font-size:12px;color:var(--muted);">' + (t.customerMobile||'') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">PRODUCT</div><div style="font-weight:600;">' + (t.productName||'—') + '</div><div style="font-size:12px;color:var(--muted);">Category: ' + (t.category||'—') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">VISIT DATE</div><div style="font-weight:600;">' + (t.visitDate||'—') + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">SALE PRICE</div><div style="font-weight:700;color:var(--teal);font-size:16px;">' + inr(t.salePrice) + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">ISSUED AT</div><div style="font-size:12px;">' + dtFmt(t.issuedAt) + '</div></div>' +
+    '<div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:2px;">RESELLER NAME</div><div style="font-size:12px;">' + (t.resellerId_name||'—') + '</div></div>' +
+    '</div>' +
+    '<div style="margin-top:16px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;">QR PAYLOAD</div><pre style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text);word-break:break-all;white-space:pre-wrap;">' + (t.qrToken ? JSON.stringify(JSON.parse(atob(t.qrToken)), null, 2) : '—') + '</pre></div>';
+
+  document.getElementById('ticket-detail-body').innerHTML = html;
+  openModal('modal-ticket-detail');
+}
+
+// ─── REPORTS ───────────────────────────────────────────────────────────────
+function renderReport() {
+  var type     = document.getElementById('rpt-type').value;
+  var resId    = document.getElementById('rpt-res').value;
+  var batchCode= document.getElementById('rpt-batch').value;
+  var empCode  = document.getElementById('rpt-emp').value;
+  var status   = document.getElementById('rpt-status').value;
+  var fromDate = document.getElementById('rpt-from').value;
+  var toDate   = document.getElementById('rpt-to').value;
+
+  // Find reseller code from ID if needed
+  var resellerCode = resId ? (_RE.getReseller(resId)||{}).resellerCode : '';
+
+  var data = [], thead = '', rows = '', title = '';
+  var filters = { resellerId: resId||undefined, resellerCode: resellerCode||undefined, batchCode: batchCode||undefined, fromDate: fromDate||undefined, toDate: toDate||undefined, status: status||undefined };
+
+  if (type === 'by_reseller') {
+    title = 'Central Report — By Reseller Code';
+    data  = _RE.reportByReseller(filters);
+    thead = '<tr><th>Reseller Code</th><th>Company</th><th>Tier</th><th>Commission %</th><th>Batches</th><th>Total Qty</th><th>Issued</th><th>Redeemed</th><th>Expired</th><th>Balance</th><th>Revenue</th><th>Commission Earned</th><th>Redemption %</th></tr>';
+    rows  = data.map(function(r){
+      return '<tr>' +
+        '<td><span class="code">' + r.resellerCode + '</span></td>' +
+        '<td style="font-weight:600;">' + (r.resellerName||'—') + '</td>' +
+        '<td>' + tierBadge(r.tier) + '</td>' +
+        '<td style="font-weight:700;color:var(--green);">' + r.commissionRate + '%</td>' +
+        '<td>' + r.totalBatches + '</td><td>' + r.totalQty + '</td>' +
+        '<td style="color:var(--blue);font-weight:600;">' + r.issued + '</td>' +
+        '<td style="color:var(--green);font-weight:600;">' + r.redeemed + '</td>' +
+        '<td style="color:var(--red);">' + r.expired + '</td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + r.remaining + '</td>' +
+        '<td style="font-weight:700;color:var(--teal);">' + inr(r.revenue) + '</td>' +
+        '<td style="font-weight:700;color:var(--purple);">' + inr(r.commission) + '</td>' +
+        '<td>' +
+          '<div style="display:flex;align-items:center;gap:6px;"><div class="prog-bar" style="width:60px;"><div class="prog-fill" style="width:' + r.redemptionRate + '%;background:#059669;"></div></div>' +
+          '<span style="font-size:11px;font-weight:700;">' + r.redemptionRate + '%</span></div>' +
+        '</td></tr>';
+    }).join('');
+    renderKPIs([
+      { val: data.length, lbl: 'Resellers', sub: '' },
+      { val: data.reduce(function(s,r){ return s+r.issued; },0), lbl: 'Total Issued', sub: '' },
+      { val: data.reduce(function(s,r){ return s+r.redeemed; },0), lbl: 'Total Redeemed', sub: '' },
+      { val: inr(data.reduce(function(s,r){ return s+r.revenue; },0)), lbl: 'Total Revenue', sub: '' },
+    ]);
+  } else if (type === 'by_batch') {
+    title = 'Central Report — By Batch Code';
+    data  = _RE.reportByBatch(filters);
+    thead = '<tr><th>Batch Code</th><th>Reseller Code</th><th>Product</th><th>Park</th><th>Total Qty</th><th>Allocated</th><th>Issued</th><th>Redeemed</th><th>Expired</th><th>Balance</th><th>Valid To</th><th>Payment</th><th>Status</th></tr>';
+    rows  = data.map(function(b){
+      return '<tr>' +
+        '<td><span class="code amber">' + b.batchCode + '</span></td>' +
+        '<td><span class="code">' + b.resellerCode + '</span></td>' +
+        '<td style="font-size:12px;">' + (b.productName||b.productId||'—') + '</td>' +
+        '<td style="font-size:12px;color:var(--blue);">' + (b.parkKey||'—') + '</td>' +
+        '<td style="font-weight:700;">' + b.quantity + '</td>' +
+        '<td>' + b.allocated + '</td>' +
+        '<td style="color:var(--blue);font-weight:600;">' + b.issued + '</td>' +
+        '<td style="color:var(--green);font-weight:600;">' + b.redeemed + '</td>' +
+        '<td style="color:var(--red);">' + b.expired + '</td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + b.balance + '</td>' +
+        '<td style="font-size:12px;">' + (b.validTo ? dFmt(b.validTo) : '—') + '</td>' +
+        '<td>' + statusBadge(b.paymentStatus) + '</td>' +
+        '<td>' + statusBadge(b.status) + '</td></tr>';
+    }).join('');
+    renderKPIs([
+      { val: data.length, lbl: 'Batches', sub: '' },
+      { val: data.reduce(function(s,b){ return s+b.quantity; },0), lbl: 'Total Qty', sub: '' },
+      { val: data.reduce(function(s,b){ return s+b.issued; },0), lbl: 'Total Issued', sub: '' },
+      { val: data.reduce(function(s,b){ return s+b.balance; },0), lbl: 'Balance Remaining', sub: '' },
+    ]);
+  } else if (type === 'by_employee') {
+    title = 'Central Report — Salesperson Performance (§61)';
+    var empFilters = Object.assign({}, filters);
+    if (empCode) empFilters.employeeCode = empCode;
+    data  = _RE.reportByEmployee(empFilters);
+    thead = '<tr><th>Employee Code</th><th>Name</th><th>Reseller Code</th><th>Role</th><th>Channel</th><th>Allocated</th><th>Issued</th><th>Redeemed</th><th>Expired</th><th>Balance</th><th>Revenue</th><th>Redemption %</th><th>Utilization %</th><th>Last Sale</th></tr>';
+    rows  = data.map(function(e){
+      return '<tr>' +
+        '<td><span class="code teal">' + e.employeeCode + '</span></td>' +
+        '<td style="font-weight:600;">' + (e.employeeName||'—') + '</td>' +
+        '<td><span class="code">' + e.resellerCode + '</span></td>' +
+        '<td style="font-size:12px;">' + (e.role||'—') + '</td>' +
+        '<td><span class="badge badge-blue">' + (e.channel||'all') + '</span></td>' +
+        '<td>' + e.allocated + '</td>' +
+        '<td style="color:var(--blue);font-weight:600;">' + e.issued + '</td>' +
+        '<td style="color:var(--green);font-weight:600;">' + e.redeemed + '</td>' +
+        '<td style="color:var(--red);">' + e.expired + '</td>' +
+        '<td style="color:var(--amber);font-weight:700;">' + e.balance + '</td>' +
+        '<td style="font-weight:700;color:var(--teal);">' + inr(e.revenue) + '</td>' +
+        '<td style="font-weight:700;color:' + (e.redemptionRate>70?'#059669':e.redemptionRate>40?'#d97706':'#dc2626') + ';">' + e.redemptionRate + '%</td>' +
+        '<td style="font-weight:700;">' + e.utilizationRate + '%</td>' +
+        '<td style="font-size:11px;color:var(--muted);">' + (e.lastIssuance||'—') + '</td></tr>';
+    }).join('');
+    renderKPIs([
+      { val: data.length, lbl: 'Salespersons', sub: '' },
+      { val: data.reduce(function(s,e){ return s+e.issued; },0), lbl: 'Total Issued', sub: '' },
+      { val: (data.reduce(function(s,e){ return s+e.issued; },0) > 0 ? Math.round(data.reduce(function(s,e){ return s+e.redeemed; },0) / data.reduce(function(s,e){ return s+e.issued; },0) * 100) : 0) + '%', lbl: 'Avg Redemption Rate', sub: '' },
+      { val: inr(data.reduce(function(s,e){ return s+e.revenue; },0)), lbl: 'Total Revenue', sub: '' },
+    ]);
+  } else if (type === 'provenance') {
+    title = 'Ticket Provenance — Full Identity Chain (§57)';
+    var channel = document.getElementById('rpt-channel').value;
+    var empFilters2 = Object.assign({}, filters);
+    if (empCode) empFilters2.employeeCode = empCode;
+    data = _RE.reportTicketProvenance(empFilters2).slice(0,500);
+    thead = '<tr><th>Ticket Code</th><th>Reseller Code</th><th>Batch Code</th><th>Employee Code</th><th>Alloc Code</th><th>Customer</th><th>Product</th><th>Visit Date</th><th>Sale Price</th><th>Status</th><th>Issued At</th></tr>';
+    rows  = data.map(function(t){
+      return '<tr>' +
+        '<td><span class="code green">' + t.ticketCode + '</span></td>' +
+        '<td><span class="code">' + t.resellerCode + '</span></td>' +
+        '<td><span class="code amber">' + t.batchCode + '</span></td>' +
+        '<td><span class="code teal">' + t.employeeCode + '</span></td>' +
+        '<td><span class="code purple" style="font-size:10px;">' + (t.allocationCode||'—') + '</span></td>' +
+        '<td style="font-size:12px;">' + (t.customerName||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (t.productName||'—') + '</td>' +
+        '<td style="font-size:12px;">' + (t.visitDate||'—') + '</td>' +
+        '<td style="font-weight:700;color:var(--teal);">' + inr(t.salePrice) + '</td>' +
+        '<td>' + statusBadge(t.status) + '</td>' +
+        '<td style="font-size:11px;color:var(--muted);">' + dtFmt(t.issuedAt) + '</td></tr>';
+    }).join('');
+    renderKPIs([
+      { val: data.length, lbl: 'Tickets in View', sub: '' },
+      { val: data.filter(function(t){ return t.status==='issued'; }).length, lbl: 'Issued', sub: '' },
+      { val: data.filter(function(t){ return t.status==='redeemed'; }).length, lbl: 'Redeemed', sub: '' },
+      { val: inr(data.reduce(function(s,t){ return s+(t.salePrice||0); },0)), lbl: 'Revenue in View', sub: '' },
+    ]);
+  }
+
+  document.getElementById('report-title').textContent = title;
+  document.getElementById('report-row-count').textContent = data.length + ' records';
+  document.getElementById('report-thead').innerHTML = thead;
+  document.getElementById('report-tbody').innerHTML = rows || '<tr><td colspan="20" class="empty-state">No data for the selected filters</td></tr>';
+}
+
+function renderKPIs(kpis) {
+  document.getElementById('report-kpis').innerHTML = kpis.map(function(k){
+    return '<div class="report-kpi"><div class="report-kpi-val">' + k.val + '</div><div class="report-kpi-lbl">' + k.lbl + '</div>' + (k.sub ? '<div class="report-kpi-sub">' + k.sub + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+function exportReport() {
+  var rows = document.querySelectorAll('#report-tbody tr');
+  var head = document.querySelector('#report-thead tr');
+  if (!head || !rows.length) { toast('No data to export', 'warn'); return; }
+  var headers = Array.from(head.querySelectorAll('th')).map(function(th){ return th.textContent.replace(/[\n\r]/g,' ').trim(); });
+  var csv = headers.join(',') + '\n';
+  rows.forEach(function(row){
+    var cells = Array.from(row.querySelectorAll('td')).map(function(td){ return '"' + td.textContent.replace(/"/g,'""').replace(/[\n\r]/g,' ').trim() + '"'; });
+    csv += cells.join(',') + '\n';
+  });
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wow_reseller_report_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('Report exported');
+}
+
+// ─── AUDIT ─────────────────────────────────────────────────────────────────
+function renderAudit() {
+  var q       = (document.getElementById('audit-search')||{}).value || '';
+  var resId   = (document.getElementById('audit-res-filter')||{}).value || '';
+  var action  = (document.getElementById('audit-action-filter')||{}).value || '';
+  var resCode = resId ? (_RE.getReseller(resId)||{}).resellerCode : '';
+  var filters = {};
+  if (resCode) filters.resellerCode = resCode;
+  if (action)  filters.action = action;
+  var logs = _RE.readAudit(filters);
+  if (q) logs = logs.filter(function(l){ return (JSON.stringify(l)).toLowerCase().indexOf(q.toLowerCase())>-1; });
+  var tbody = document.getElementById('audit-tbody');
+  if (!logs.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-history"></i>No audit events</td></tr>'; return; }
+  tbody.innerHTML = logs.map(function(l){
+    return '<tr>' +
+      '<td style="font-size:11px;color:var(--muted);white-space:nowrap;">' + dtFmt(l.ts) + '</td>' +
+      '<td><span class="badge badge-blue" style="font-size:10px;">' + (l.action||'').replace(/_/g,' ') + '</span></td>' +
+      '<td>' + (l.resellerCode ? '<span class="code">' + l.resellerCode + '</span>' : '—') + '</td>' +
+      '<td>' + (l.batchCode ? '<span class="code amber">' + l.batchCode + '</span>' : '—') + '</td>' +
+      '<td>' + (l.employeeCode ? '<span class="code teal">' + l.employeeCode + '</span>' : '—') + '</td>' +
+      '<td>' + (l.ticketCode ? '<span class="code green">' + l.ticketCode + '</span>' : '—') + '</td>' +
+      '<td style="font-size:11px;color:var(--muted);">' + (l.meta && l.meta.name ? l.meta.name : '') + (l.meta && l.meta.qty ? ' qty:'+l.meta.qty : '') + (l.meta && l.meta.reason ? ' reason:'+l.meta.reason : '') + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ─── CODING RULES ──────────────────────────────────────────────────────────
+function loadCodingRulesUI() {
+  var cfg = _RE.loadConfig();
+  document.getElementById('cfg-res-pattern').value  = cfg.resellerCodePattern || 'RS-{YEAR}-{SEQ4}';
+  document.getElementById('cfg-res-prefix').value   = cfg.resellerCodePrefix  || 'RS';
+  document.getElementById('cfg-emp-pattern').value  = cfg.employeeCodePattern || '{RCODE}-SP{SEQ3}';
+  document.getElementById('cfg-bat-pattern').value  = cfg.batchCodePattern    || '{RCODE}-{SEASON}-B{BSEQ3}';
+  document.getElementById('cfg-season').value       = cfg.currentSeason       || 'FY26';
+  document.getElementById('cfg-tkt-pattern').value  = cfg.ticketCodePattern   || '{RCODE}-{ECODE_SHORT}-TKT-{TSEQ5}';
+  previewPatterns();
+}
+
+function previewPatterns() {
+  var rp = document.getElementById('cfg-res-pattern').value;
+  var ep = document.getElementById('cfg-emp-pattern').value;
+  var bp = document.getElementById('cfg-bat-pattern').value;
+  var tp = document.getElementById('cfg-tkt-pattern').value;
+  var s  = document.getElementById('cfg-season').value || 'FY26';
+  document.getElementById('pat-reseller').textContent = rp;
+  document.getElementById('pat-employee').textContent = ep;
+  document.getElementById('pat-batch').textContent    = bp.replace('{SEASON}', s);
+  document.getElementById('pat-ticket').textContent   = tp;
+}
+
+function saveCodingRules() {
+  var cfg = _RE.loadConfig();
+  cfg.resellerCodePattern = document.getElementById('cfg-res-pattern').value;
+  cfg.resellerCodePrefix  = document.getElementById('cfg-res-prefix').value;
+  cfg.employeeCodePattern = document.getElementById('cfg-emp-pattern').value;
+  cfg.batchCodePattern    = document.getElementById('cfg-bat-pattern').value;
+  cfg.currentSeason       = document.getElementById('cfg-season').value;
+  cfg.ticketCodePattern   = document.getElementById('cfg-tkt-pattern').value;
+  _RE.saveConfig(cfg);
+  toast('Coding rules saved ✓');
+  previewPatterns();
+}
+
+// ─── SETTINGS ──────────────────────────────────────────────────────────────
+function renderSettings() {
+  var cfg = _RE.loadConfig();
+  document.getElementById('cfg-max-batch').value      = cfg.maxBatchQtyPerRequest || 10000;
+  document.getElementById('cfg-max-emp').value        = cfg.maxEmployeesPerReseller || 50;
+  document.getElementById('cfg-validity').value       = cfg.ticketValidityDays || 365;
+  document.getElementById('cfg-batch-approval').value = cfg.requireApprovalForBatch ? 'true' : 'false';
+  // Tier slabs
+  var html = '<table style="width:100%;font-size:12px;border-collapse:collapse;">' +
+    '<thead><tr><th style="padding:6px;border-bottom:1px solid var(--border);">Tier</th><th>Min Qty</th><th>Max Qty</th><th>Commission %</th></tr></thead><tbody>';
+  (cfg.tiers||[]).forEach(function(t){
+    html += '<tr><td style="padding:6px;border-bottom:1px solid #f1f5f9;">' + tierBadge(t.id) + '</td>' +
+      '<td>' + t.minQty + '</td><td>' + (t.maxQty||'∞') + '</td>' +
+      '<td style="font-weight:700;color:var(--green);">' + t.commission + '%</td></tr>';
+  });
+  document.getElementById('tier-slabs-display').innerHTML = html + '</tbody></table>';
+}
+
+function saveEngineSettings() {
+  var cfg = _RE.loadConfig();
+  cfg.maxBatchQtyPerRequest   = parseInt(document.getElementById('cfg-max-batch').value) || 10000;
+  cfg.maxEmployeesPerReseller = parseInt(document.getElementById('cfg-max-emp').value) || 50;
+  cfg.ticketValidityDays      = parseInt(document.getElementById('cfg-validity').value) || 365;
+  cfg.requireApprovalForBatch = document.getElementById('cfg-batch-approval').value === 'true';
+  _RE.saveConfig(cfg);
+  toast('Settings saved ✓');
+}
+
+// ─── CSV EXPORT ────────────────────────────────────────────────────────────
+function exportCSV(type) {
+  var data = [], headers = [], rows = [];
+  if (type === 'resellers') {
+    data = _RE.loadResellers();
+    headers = ['Reseller Code','Company Name','Trade Name','Tier','Type','City','State','Commission %','GST','PAN','Status'];
+    rows = data.map(function(r){ return [r.resellerCode, r.name, r.tradeName, r.tier, r.type, r.city, r.state, r.commissionRate, r.gstNumber, r.panNumber, r.status]; });
+  } else if (type === 'batches') {
+    data = _RE.loadBatches();
+    headers = ['Batch Code','Reseller Code','Product','Qty','Allocated','Issued','Redeemed','Balance','Payment Status','Valid From','Valid To','Status'];
+    rows = data.map(function(b){ return [b.batchCode, b.resellerCode, b.productName, b.quantity, b.allocated, b.issued, b.redeemed, b.balance, b.paymentStatus, b.validFrom, b.validTo, b.status]; });
+  } else if (type === 'employees') {
+    data = _RE.loadEmployees();
+    headers = ['Employee Code','Name','Reseller Code','Role','Channel','Status','Email','Mobile'];
+    rows = data.map(function(e){ return [e.employeeCode, e.name, e.resellerCode, e.role, e.channel, e.status, e.email, e.mobile]; });
+  } else if (type === 'tickets') {
+    data = _RE.loadTickets();
+    headers = ['Ticket Code','Reseller Code','Batch Code','Employee Code','Alloc Code','Customer','Mobile','Product','Visit Date','Sale Price','Status','Issued At'];
+    rows = data.map(function(t){ return [t.ticketCode, t.resellerCode, t.batchCode, t.employeeCode, t.allocationCode, t.customerName, t.customerMobile, t.productName, t.visitDate, t.salePrice, t.status, new Date(t.issuedAt).toISOString()]; });
+  } else if (type === 'audit') {
+    data = _RE.readAudit({});
+    headers = ['Timestamp','Event','Reseller Code','Batch Code','Employee Code','Ticket Code'];
+    rows = data.map(function(l){ return [new Date(l.ts).toISOString(), l.action, l.resellerCode||'', l.batchCode||'', l.employeeCode||'', l.ticketCode||'']; });
+  }
+  var csv = headers.join(',') + '\n' + rows.map(function(r){ return r.map(function(c){ return '"'+(c||'').toString().replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type:'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'wow_' + type + '_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('CSV exported');
+}
+
+// ─── DROPDOWN POPULATION ───────────────────────────────────────────────────
+function populateDropdowns() {
+  var resellers = _RE.loadResellers();
+  var batches   = _RE.loadBatches();
+  var employees = _RE.loadEmployees();
+
+  // Reseller selects in filters
+  ['bat-res-filter','emp-res-filter','alloc-res-filter','audit-res-filter','rpt-res','tkt-res-filter'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    var cur = el.value;
+    el.innerHTML = '<option value="">All Resellers</option>';
+    resellers.forEach(function(r){ el.innerHTML += '<option value="' + r.id + '" ' + (cur===r.id?'selected':'') + '>' + r.resellerCode + ' — ' + (r.tradeName||r.name) + '</option>'; });
+  });
+
+  // Batch select in ticket filter
+  var tktBat = document.getElementById('tkt-batch-filter');
+  if (tktBat) {
+    tktBat.innerHTML = '<option value="">All Batches</option>';
+    batches.forEach(function(b){ tktBat.innerHTML += '<option value="' + b.id + '">' + b.batchCode + '</option>'; });
+  }
+
+  // Employee selects
+  ['alloc-emp-filter','tkt-emp-filter','rpt-emp'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = '<option value="">All Employees</option>';
+    employees.forEach(function(e){ el.innerHTML += '<option value="' + e.id + '">' + e.employeeCode + ' — ' + e.name + '</option>'; });
+  });
+
+  // Report batch filter
+  var rptBat = document.getElementById('rpt-batch');
+  if (rptBat) {
+    rptBat.innerHTML = '<option value="">All Batches</option>';
+    batches.forEach(function(b){ rptBat.innerHTML += '<option value="' + b.batchCode + '">' + b.batchCode + '</option>'; });
+  }
+}
+
+// ─── SEED DEMO DATA ────────────────────────────────────────────────────────
+function seedAndRefresh() {
+  _RE.seedDemoData();
+  populateDropdowns();
+  renderOverview();
+  toast('Demo data seeded ✓');
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.WOWAuth) WOWAuth.renderTopbarWidget('topbar-auth');
+  _RE.seedDemoData();
+  populateDropdowns();
+  renderOverview();
+  loadCodingRulesUI();
+});
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

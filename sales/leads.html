@@ -100,7 +100,7 @@
     <a href="leads.html" class="sidebar-item active">📋 Leads</a>
     <a href="quote-builder.html" class="sidebar-item">📄 Quote Builder</a>
     <div class="sidebar-section">Admin</div>
-    <a href="../admin/crm.html" class="sidebar-item">🤝 CRM Pipeline</a>
+    <a href="../admin/call-center.html" class="sidebar-item">🤝 CRM &amp; Call Centre</a>
     <a href="../admin/index.html" class="sidebar-item">📊 Admin Dashboard</a>
     <a href="../admin/finance.html" class="sidebar-item">💰 Finance</a>
     <div class="sidebar-section">Site</div>
@@ -450,7 +450,7 @@ function pushToSF(id){ alert(`Pushing lead ${id} to Salesforce...\nAPI: POST /ap
 function importLeads(){ alert('Import leads from CSV\nSupports: CSV, Salesforce export, Excel'); }
 function exportLeads(){ alert('Exporting leads as CSV...'); }
 function sfSyncNow(){ alert('Salesforce sync initiated...\nPushing 5 pending leads'); }
-function sfConfig(){ window.location.href='../admin/settings.html'; }
+function sfConfig(){ window.location.href='../admin/config.html'; }
 function switchTab(tab,btn){ document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); btn.classList.add('active'); document.getElementById('tab-'+tab).classList.add('active'); }
 
 new Chart('stageChart',{type:'bar',data:{labels:['New','Contacted','Qualified','Proposal','Won','Lost'],datasets:[{label:'Leads',data:[42,58,89,62,23,10],backgroundColor:['#60a5fa','#F5A800','#10b981','#a78bfa','#10b981','#ef4444']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'rgba(255,255,255,.5)'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'rgba(255,255,255,.5)'},grid:{color:'rgba(255,255,255,.05)'}}}}});
@@ -460,5 +460,5 @@ new Chart('sourceChart',{type:'doughnut',data:{labels:['Website Form','Referral'
 renderLeads(); renderHotLeads(); renderTasks();
 </script>
 <script src="../js/wow-auth-guard.js" data-portal="sales"></script>
-<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</body>
 </html>

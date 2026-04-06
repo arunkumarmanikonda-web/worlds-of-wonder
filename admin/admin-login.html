@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Sign In — Worlds of Wonder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="../js/wow-auth.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#080a0f;--card:#0e1117;--border:rgba(255,255,255,.07);
+  --gold:#C9A84C;--gold2:#F0D080;
+  --text:#e4e8f0;--muted:rgba(255,255,255,.45);
+  --red:#ef4444;--green:#22c55e;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);}
+.page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+/* LEFT HERO */
+.hero{
+  background:linear-gradient(145deg,#0a0c12 0%,#0e1520 50%,#080a0f 100%);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(239,68,68,.06) 0%,transparent 60%);
+}
+.hero-grid{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.015) 40px,rgba(255,255,255,.015) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(255,255,255,.015) 40px,rgba(255,255,255,.015) 41px);
+}
+.hero-logo{z-index:2;margin-bottom:24px;text-align:center;}
+.hero-logo img{height:72px;width:auto;object-fit:contain;}
+.hero-title{font-family:'Cinzel',serif;font-size:clamp(18px,2.5vw,26px);font-weight:700;text-align:center;z-index:2;color:#fff;margin-bottom:8px;line-height:1.3;}
+.hero-sub{font-size:12.5px;color:rgba(255,255,255,.4);text-align:center;z-index:2;max-width:300px;line-height:1.6;margin-bottom:28px;}
+
+.feature-list{z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;gap:8px;}
+.feature{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 14px;}
+.feature-icon{font-size:16px;flex-shrink:0;width:28px;text-align:center;}
+.feature-text{font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.4;}
+.feature-text strong{display:block;font-size:12px;color:#fff;margin-bottom:1px;}
+
+/* CORNER SA BYPASS (extreme top-right) */
+.sa-corner{position:fixed;top:14px;right:16px;z-index:1000;}
+
+/* RIGHT FORM */
+.form-side{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 32px;background:var(--bg);overflow-y:auto;
+}
+.form-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:36px;width:100%;max-width:400px;
+}
+.fc-logo{text-align:center;margin-bottom:20px;}
+.fc-logo span{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:52px;height:52px;border-radius:16px;
+  background:linear-gradient(135deg,rgba(239,68,68,.2),rgba(239,68,68,.05));
+  border:1px solid rgba(239,68,68,.2);
+  font-size:22px;
+}
+.fc-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
+.fc-sub{font-size:12.5px;color:var(--muted);margin-bottom:22px;line-height:1.5;}
+
+/* Role tabs */
+.role-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.role-tab{
+  padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  color:var(--muted);cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:5px;
+}
+.role-tab:hover{background:rgba(255,255,255,.08);color:#fff;}
+.role-tab.sel{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.1);color:#fca5a5;}
+
+/* Fields */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.fg label{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.fg-wrap{position:relative;}
+.fg-wrap input{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  color:#fff;padding:12px 14px;border-radius:9px;font-size:13.5px;
+  font-family:'Inter',sans-serif;transition:all .2s;
+}
+.fg-wrap input:focus{outline:none;border-color:rgba(239,68,68,.4);background:rgba(255,255,255,.07);box-shadow:0 0 0 3px rgba(239,68,68,.06);}
+.fg-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;}
+.has-icon{padding-left:42px!important;}
+.fg-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:rgba(239,68,68,.7);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;}
+
+/* Error */
+.msg{padding:10px 14px;border-radius:9px;font-size:12.5px;margin-bottom:14px;display:none;line-height:1.5;}
+.msg.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.msg.success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#4ade80;}
+
+/* CTA */
+.btn-signin{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#7f1d1d,#dc2626);
+  color:#fff;font-size:14px;font-weight:800;border:none;border-radius:10px;
+  cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:14px;
+  box-shadow:0 4px 16px rgba(220,38,38,.25);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-signin:hover{box-shadow:0 6px 24px rgba(220,38,38,.4);transform:translateY(-1px);}
+.btn-signin:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.form-footer{text-align:center;font-size:12px;color:var(--muted);}
+.form-footer a{color:var(--gold);text-decoration:none;font-weight:700;}
+.form-footer a:hover{text-decoration:underline;}
+
+/* Demo hints */
+.demo-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:12px 14px;margin-bottom:16px;}
+.demo-box-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.demo-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11.5px;cursor:pointer;padding:3px 4px;border-radius:5px;transition:background .15s;}
+.demo-row:hover{background:rgba(255,255,255,.04);}
+.demo-row span:first-child{color:var(--muted);min-width:80px;}
+.demo-row span:last-child{color:#fff;font-family:'Courier New',monospace;}
+
+@media(max-width:768px){.page{grid-template-columns:1fr;}.hero{display:none;}.form-side{padding:20px 16px;justify-content:flex-start;padding-top:40px;}.form-card{padding:24px 20px;}}
+</style>
+</head>
+<body>
+
+<!-- Super Admin bypass — extreme top-right corner (always visible) -->
+<div class="sa-corner">
+  <button onclick="WOWAuth.openBypassModal()"
+    title="Super Admin — enter any portal without standard login"
+    style="
+      background:linear-gradient(135deg,#7f1d1d,#991b1b);
+      border:1px solid rgba(239,68,68,.4);color:#fca5a5;
+      font-size:10.5px;font-weight:800;padding:6px 12px;
+      border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;
+      font-family:'Inter',sans-serif;box-shadow:0 0 16px rgba(239,68,68,.25);
+      letter-spacing:.5px;text-transform:uppercase;
+    "
+  ><i class="fas fa-user-shield"></i> SA Bypass</button>
+</div>
+
+<div class="page">
+  <!-- LEFT HERO -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-logo">
+      <img src="../images/logo.png" alt="Worlds of Wonder"/>
+    </div>
+    <h1 class="hero-title">WOW Admin Portal</h1>
+    <p class="hero-sub">Secure access for authorised staff, admins, and super administrators only.</p>
+    <div class="feature-list">
+      <div class="feature">
+        <span class="feature-icon" style="color:#ef4444;">🛡️</span>
+        <div class="feature-text">
+          <strong>Role-Based Access</strong>
+          Admin, Finance, OPS, CRM, Gate — each gets only what they need.
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon" style="color:#fbbf24;">⚡</span>
+        <div class="feature-text">
+          <strong>Super Admin Bypass</strong>
+          SA can enter any portal instantly with a 4-digit PIN.
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon" style="color:#4ade80;">🔒</span>
+        <div class="feature-text">
+          <strong>Session Security</strong>
+          8-hour auto-expire with full audit trail.
+        </div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon" style="color:#60a5fa;">📋</span>
+        <div class="feature-text">
+          <strong>AuthGate Manager</strong>
+          Configure portal access rules from Super Admin panel.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT FORM -->
+  <div class="form-side">
+    <div class="form-card">
+      <div class="fc-logo">
+        <span>🔐</span>
+      </div>
+      <div class="fc-title">Admin Sign In</div>
+      <div class="fc-sub">Enter your credentials to access the WOW Admin portal.</div>
+
+      <!-- Role quick-select -->
+      <div class="role-tabs" id="role-tabs">
+        <button class="role-tab sel" id="rt-admin"   onclick="setRoleHint('admin')"><i class="fas fa-user-cog"></i> Admin</button>
+        <button class="role-tab" id="rt-finance"     onclick="setRoleHint('finance')"><i class="fas fa-coins"></i> Finance</button>
+        <button class="role-tab" id="rt-ops"         onclick="setRoleHint('ops')"><i class="fas fa-wrench"></i> Ops</button>
+        <button class="role-tab" id="rt-crm"         onclick="setRoleHint('crm')"><i class="fas fa-headset"></i> CRM</button>
+        <button class="role-tab" id="rt-gate"        onclick="setRoleHint('gate')"><i class="fas fa-qrcode"></i> Gate</button>
+      </div>
+
+      <div class="msg" id="login-msg"></div>
+
+      <div class="fg">
+        <label>Email Address</label>
+        <div class="fg-wrap">
+          <span class="fg-icon"><i class="fas fa-envelope"></i></span>
+          <input type="email" id="adm-email" class="has-icon" placeholder="staff@wow.in" autocomplete="username" id="adm-email"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>PIN / Password</label>
+        <div class="fg-wrap">
+          <span class="fg-icon"><i class="fas fa-lock"></i></span>
+          <input type="password" id="adm-pin" class="has-icon" placeholder="4-digit PIN" maxlength="8"
+            onkeydown="if(event.key==='Enter')doLogin()"/>
+          <button class="fg-suffix" type="button" onclick="togglePin()">Show</button>
+        </div>
+      </div>
+
+      <button class="btn-signin" id="login-btn" onclick="doLogin()">
+        <i class="fas fa-sign-in-alt"></i> Sign In to Admin Portal
+      </button>
+
+      <!-- Demo credentials -->
+      <div class="demo-box">
+        <div class="demo-box-title">🔑 Demo Credentials (click to auto-fill)</div>
+        <div class="demo-row" onclick="autofill('rajesh@wow.in','2345')">
+          <span>Admin</span><span>rajesh@wow.in / 2345</span>
+        </div>
+        <div class="demo-row" onclick="autofill('priya.fin@wow.in','3456')">
+          <span>Finance</span><span>priya.fin@wow.in / 3456</span>
+        </div>
+        <div class="demo-row" onclick="autofill('vikram.ops@wow.in','4567')">
+          <span>Ops</span><span>vikram.ops@wow.in / 4567</span>
+        </div>
+        <div class="demo-row" onclick="autofill('sneha.crm@wow.in','5678')">
+          <span>CRM</span><span>sneha.crm@wow.in / 5678</span>
+        </div>
+        <div class="demo-row" onclick="autofill('ravi.gate@wow.in','6789')">
+          <span>Gate</span><span>ravi.gate@wow.in / 6789</span>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        <a href="../internal/index.html"><i class="fas fa-arrow-left"></i> Staff Gateway</a>
+        &nbsp;|&nbsp;
+        <a href="../index.html">Public Site</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Check if already logged in with admin access
+window.addEventListener('DOMContentLoaded', function() {
+  // Init bypass modal early
+  WOWAuth.renderTopbarWidget('__dummy__'); // triggers modal injection
+
+  const params = new URLSearchParams(window.location.search);
+  const errType = params.get('error');
+  if (errType === 'access_denied') {
+    showMsg('error', 'Access denied — your role is not authorised for this portal.');
+  }
+
+  const session = WOWAuth.getSession();
+  if (session && (session.role === 'SUPER_ADMIN' ||
+    ['ADMIN','FINANCE','OPS','CRM_AGENT','GATE_AGENT'].includes(session.role))) {
+    const redirect = params.get('redirect') || 'index.html';
+    window.location.href = redirect.startsWith('/') ? redirect : redirect;
+  }
+});
+
+function doLogin() {
+  const email = document.getElementById('adm-email').value.trim();
+  const pin   = document.getElementById('adm-pin').value.trim();
+  if (!email || !pin) { showMsg('error', 'Please enter email and PIN.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+
+  setTimeout(function() {
+    const result = WOWAuth.login(email, pin, 'admin');
+    if (result.ok) {
+      showMsg('success', 'Welcome, ' + (result.user.name || result.user.email) + '! Redirecting…');
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get('redirect') || 'index.html';
+      setTimeout(function() {
+        window.location.href = redirect.startsWith('/') ? redirect : redirect;
+      }, 900);
+    } else {
+      showMsg('error', result.error || 'Login failed. Please check your credentials.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Admin Portal';
+    }
+  }, 500);
+}
+
+function showMsg(type, text) {
+  const el = document.getElementById('login-msg');
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+}
+
+function togglePin() {
+  const inp = document.getElementById('adm-pin');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function autofill(email, pin) {
+  document.getElementById('adm-email').value = email;
+  document.getElementById('adm-pin').value   = pin;
+}
+
+function setRoleHint(role) {
+  document.querySelectorAll('.role-tab').forEach(function(t){ t.classList.remove('sel'); });
+  const map = { admin:'rt-admin', finance:'rt-finance', ops:'rt-ops', crm:'rt-crm', gate:'rt-gate' };
+  const el = document.getElementById(map[role]);
+  if (el) el.classList.add('sel');
+  const hints = {
+    admin:   ['rajesh@wow.in','2345'],
+    finance: ['priya.fin@wow.in','3456'],
+    ops:     ['vikram.ops@wow.in','4567'],
+    crm:     ['sneha.crm@wow.in','5678'],
+    gate:    ['ravi.gate@wow.in','6789'],
+  };
+  if (hints[role]) { autofill(hints[role][0], hints[role][1]); }
+}
+</script>
+</body>
+</html>

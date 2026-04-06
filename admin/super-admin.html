@@ -6,7 +6,7 @@
 <title>Super Admin — WOW Control Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
-<script src="../js/wow-auth.js"><\/script>
+<script src="../js/wow-auth.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -407,10 +407,10 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
       <div class="sb-group">
         <div class="sb-group-label">Portals</div>
         <a class="sb-link" href="index.html"><i class="fas fa-tachometer-alt"></i> Admin ERP</a>
-        <a class="sb-link" href="crm.html"><i class="fas fa-comments"></i> CRM</a>
+        <a class="sb-link" href="call-center.html"><i class="fas fa-comments"></i> CRM &amp; Call Centre</a>
         <a class="sb-link" href="finance.html"><i class="fas fa-rupee-sign"></i> Finance</a>
-        <a class="sb-link" href="reporting.html"><i class="fas fa-chart-bar"></i> Reports</a>
-        <a class="sb-link" href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a class="sb-link" href="reports.html"><i class="fas fa-chart-bar"></i> All Reports</a>
+        <a class="sb-link" href="config.html"><i class="fas fa-cog"></i> System Config</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-label">Navigate</div>
@@ -494,8 +494,8 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
             <button class="btn-sm btn-view" style="padding:10px;font-size:12px;" onclick="showPanel('create')"><i class="fas fa-user-plus"></i> Create New User</button>
             <button class="btn-sm btn-view" style="padding:10px;font-size:12px;" onclick="showPanel('modules')"><i class="fas fa-toggle-on"></i> Module Control</button>
             <button class="btn-sm btn-view" style="padding:10px;font-size:12px;" onclick="showPanel('audit')"><i class="fas fa-history"></i> View Audit Logs</button>
-            <a class="btn-sm btn-view" href="crm.html" style="padding:10px;font-size:12px;text-align:center;text-decoration:none;display:block;"><i class="fas fa-comments"></i> Open CRM</a>
-            <a class="btn-sm btn-view" href="reporting.html" style="padding:10px;font-size:12px;text-align:center;text-decoration:none;display:block;"><i class="fas fa-chart-bar"></i> Reports</a>
+            <a class="btn-sm btn-view" href="call-center.html" style="padding:10px;font-size:12px;text-align:center;text-decoration:none;display:block;"><i class="fas fa-comments"></i> Open CRM</a>
+            <a class="btn-sm btn-view" href="reports.html" style="padding:10px;font-size:12px;text-align:center;text-decoration:none;display:block;"><i class="fas fa-chart-bar"></i> Reports</a>
           </div>
         </div>
 
@@ -973,7 +973,6 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
   </div><!-- /main -->
 </div><!-- /app -->
 
-<script src="../js/wow-auth.js"></script>
 <script>
 // ── AUTO-LOGIN: ensure Super Admin session exists for this panel ──────────
 // If no active session, auto-create a demo Super Admin session so the page
@@ -1367,7 +1366,8 @@ const BM = (() => {
       cfg[sec].slides = Array.from(cards).map(card => readCard(card));
     });
     localStorage.setItem(SK, JSON.stringify(cfg, null, 2));
-    // Also save to localStorage key used by banner-engine.js
+    // Also write to the key that banner-engine.js reads (wow_banners_v3)
+    localStorage.setItem('wow_banners_v3', JSON.stringify(cfg, null, 2));
     toast2('✅ Banners saved & published! Reload public pages to see changes.', '#22c55e');
   }
 
@@ -2599,5 +2599,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script src="../js/wow-auth-guard.js" data-portal="admin"></script>
-<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</body>
 </html>

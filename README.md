@@ -1,401 +1,342 @@
-# 🎡 Worlds of Wonder — Full-Stack Ticketing & Booking Ecosystem
+# Worlds of Wonder — Static Web Platform
 
-> **Enterprise-grade, fully dynamic, real-time ticketing, booking, and revenue optimization platform** built as a static-site SPA with a RESTful data layer and modular JavaScript engines.
+**Last Updated:** 2026-04-06 (Stress Test Engine v4 — Real API + Architecture Truth + Deep Concurrency)
 
 ---
 
-## 🏗 Architecture Overview
+## ⚠️ Architecture Truth — Read This First
 
+This is a **100% static website**. There is **no backend server**, no Node.js, no Express, no Python Flask, no PHP — only HTML/CSS/JS files served statically. There is no "master API code" to find because there is none.
+
+### What acts as the "backend"?
+The only real HTTP endpoints are the **platform's built-in Tables REST API**:
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Public-Facing Frontend                      │
-│  index.html · water-park.html · amusement-park.html · combo.html│
-│  passport.html · offers.html · contact.html + group pages       │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│                     Booking Engine Layer                        │
-│  book/water-park.html  book/amusement-park.html  book/combo.html│
-│  book/passport.html    book/payment.html          book/group.html│
-│  book/confirmation.html                                         │
-│                                                                 │
-│  JS: booking.js · wow-offer-engine-v4.js · wow-offer-cart.js   │
-│      wow-terms.js · wow-session-prefill.js · wow-modules.js    │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│                    Revenue & Offer Engines                      │
-│  admin/offer-engine.html       (Offer CRUD & rule builder)      │
-│  admin/offer-analytics.html    (Offer KPIs & A/B testing)      │
-│  admin/engine-hub.html         (Unified engine monitoring hub)  │
-│  js/wow-offer-engine-v4.js     (Core evaluation engine)        │
-│  js/wow-offer-cart.js          (Cart-side offer integration)   │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│              Passport Engine                                    │
-│  admin/passport-engine.html    (Full issuance & KYC console)   │
-│  admin/passport-kyc-review.html (KYC approval workflow)        │
-│  admin/passport-scanner.html   (QR gate entry scanner)         │
-│  admin/passport-redemptions.html (Redemption log)             │
-│  sales/passport-login.html     (Passport Sales Portal)        │
-│  js/wow-passport-engine.js     (Core passport engine)         │
-│  portal/wow-passport.html      (Customer passport view)       │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│              Reseller & Salesperson Engine                      │
-│  reseller/index.html           (Reseller ERP)                  │
-│  reseller/salesperson.html     (Salesperson dashboard)        │
-│  reseller/salesperson-performance.html (Analytics)            │
-│  admin/reseller-engine.html    (Admin reseller config)        │
-│  js/reseller-engine.js         (Core reseller engine)        │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│              Call Center CRM Engine                             │
-│  admin/call-center.html        (Full CRM with case management)  │
-│  admin/crm-analytics.html      (CRM KPIs & agent performance)  │
-│  admin/crm-live.html           (Live agent dashboard)          │
-│  js/crm-engine.js              (Core CRM engine)               │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│         Customer Portal                                         │
-│  portal/login.html · portal/register.html                      │
-│  portal/dashboard.html · portal/my-bookings.html               │
-│  portal/profile.html · portal/tickets.html                     │
-│  portal/loyalty.html · portal/wallet.html                      │
-│  portal/offers.html · portal/notifications.html                │
-│  portal/referral.html · portal/wow-passport.html               │
-│  js/wow-auth.js (auth engine) · js/wow-auth-guard.js           │
-└──────────────┬──────────────────────────────────────────────────┘
-               │
-┌──────────────▼──────────────────────────────────────────────────┐
-│         Admin / Ops / Finance Portals                           │
-│  admin/super-admin.html  (Super Admin — all controls)          │
-│  admin/index.html        (Admin ERP home)                      │
-│  admin/bookings.html     (Booking management)                  │
-│  admin/inventory.html    (Inventory & capacity management)     │
-│  admin/dynamic-pricing.html (Demand-based pricing engine)      │
-│  admin/gst-engine.html   (GST computation & invoicing)        │
-│  admin/finance.html      (Financial reporting)                 │
-│  admin/notifications.html (Push notification management)      │
-│  admin/users.html / user-management.html                       │
-│  admin/loyalty-engine.html  admin/reporting.html               │
-└─────────────────────────────────────────────────────────────────┘
+POST   tables/{table_name}        → Create record  (HTTP 201)
+GET    tables/{table_name}        → List records   (HTTP 200, paginated)
+PATCH  tables/{table_name}/{id}   → Update record  (HTTP 200)
+DELETE tables/{table_name}/{id}   → Delete record  (HTTP 204)
 ```
+All data persistence — bookings, passport holders, CRM cases, stress test results — flows through this API. There is no SQL database, no ORM, no migrations to run.
+
+### What the stress test actually tests
+| Layer | What happens | Real HTTP? |
+|---|---|---|
+| Park selection | Random pick from JS constants | ❌ No |
+| Date picking | Random future date in JS | ❌ No |
+| Pricing / GST calc | `booking.js` TICKET_CATEGORIES engine | ❌ No |
+| Offer / promo code | Rate lookup in JS | ❌ No |
+| Payment gateway | Simulated Razorpay (no real charge) | ❌ No |
+| **API write** | **POST `tables/stress_bookings`** | **✅ YES** |
+| **Run metadata** | **POST/PATCH `tables/stress_test_runs`** | **✅ YES** |
+
+---
+**Client:** Entertainment & Amusement, EALCPL | Worlds of Wonder, Sector 38A, Noida
 
 ---
 
 ## ✅ Completed Features
 
-### 🎟 Booking Engine
-- **3 booking flows**: Water Park, Amusement Park, Combo (both parks)
-- **Dynamic pricing** per category (Adult, Child, Senior, Armed Forces, Specially Abled)
-- **Group discount** engine: auto-applied at 10+ tickets
-- **Buffet add-on** integration
-- **Offer/promo widget** (WOWOfferCart) — real-time evaluation, live savings display
-- **T&C consent** gating before checkout (WOWTerms)
-- **Session prefill** for logged-in customers
-- **Booking confirmation** page with QR ticket display
-- **Payment page** with UPI/card/wallet/net banking options
+### Public-Facing Website
+- Hero video carousel (YouTube IFrame API + fallback photos)
+- Mega-nav with dropdowns, weather chip, cheeky comms ticker
+- Water Park, Amusement Park, Combo ticket pages
+- WOW Passport landing page (annual membership)
+- Offers & Deals engine
+- Plan Your Visit, Safety Guidelines, FAQ, Contact Us
+- Rides & Attractions catalogue
+- Groups pages: Corporate, Schools, Birthdays
 
-### 🏷 Offer Configuration & Execution Engine (v4.0)
-- **`js/wow-offer-engine-v4.js`** — 77KB core engine
-- **Offer types**: percent, flat, per_ticket, free_tickets, slab_percent, slab_flat, credit, fnb_credit, fee_waiver, price_override, percent_cap, hybrid
-- **Conditions**: date_range, day_of_week, hour_range, cart_value, qty_total, qty_category, park, category, promo_code, coupon_code, channel, segment, first_booking, ab_variant, demand_level, inventory
-- **Lifecycle**: draft → scheduled → active → paused → expired → archived → superseded
-- **A/B Testing**: variant assignment, holdout groups, conversion tracking
-- **Stacking & Conflict Resolution**: priority-based best-deal selection
-- **Budget caps**: per-offer spend and usage limits
-- **Audit logging**: full immutable trail (localStorage, max 500 entries)
-- **Admin UI**: `admin/offer-engine.html` — complete CRUD, rule builder, simulation, version history
-- **Analytics**: `admin/offer-analytics.html` — revenue impact, redemption funnels, A/B results
-- **Cart Integration**: `js/wow-offer-cart.js` wired into all 3 booking pages
-- **CSS**: `css/offer-widget.css` — standalone, responsive offer panel
+### Booking Engine (`/book/`)
+- `water-park.html`, `amusement-park.html`, `combo.html` — ticket selection & quantity
+- `passport.html` — annual passport purchase flow
+- `group.html` — group booking request form
+- `payment.html` — Razorpay-ready payment gateway stub
+- `confirmation.html` — QR ticket generation, T&C modal, upsell
 
-### 🪪 WOW Passport Engine
-- **`js/wow-passport-engine.js`** — 41KB engine
-- **Tiers**: Explore (single), Together (family 4), Legacy (legacy 6)
-- **Digital issuance** with QR code generation
-- **KYC workflow**: photo + ID proof upload, admin review (`admin/passport-kyc-review.html`)
-- **Entry rights**: unlimited multi-entry, park-specific entitlements
-- **Voucher management**: FnB, locker, birthday upgrade vouchers
-- **Guest passes**: tier-based guest pass allocation
-- **Renewal/upgrade flow** with pricing logic
-- **Admin scanner**: `admin/passport-scanner.html` — QR scan, live validity check
-- **Redemption log**: `admin/passport-redemptions.html`
-- **Sales portal**: `sales/passport-login.html` + `sales/passport-dashboard.html`
-- **KYC review console**: `admin/passport-kyc-review.html`
+### Customer Portal (`/portal/`)
+- `login.html`, `register.html`, `forgot-password.html`
+- `dashboard.html`, `profile.html`, `my-bookings.html`
+- `tickets.html`, `wallet.html`, `loyalty.html`
+- `notifications.html`, `offers.html`, `referral.html`
+- `guest-details.html` — pre-visit check-in
+- `passport-card.html` — digital passport card
+- `wow-passport.html` — full passport management hub
+- `passport.html` — stub redirect → wow-passport.html
 
-### 🏪 Reseller Engine
-- **`js/reseller-engine.js`** — 63KB engine
-- **Unique reseller identity codes** (WOW-RS-xxxx format, tier-prefixed)
-- **Salesperson identity codes** (WOW-SA-xxxx + WOW-SM-xxxx)
-- **Coded batch & ticket IDs** (batch: WOW-BT-{year}-{seq}, tickets: {resellerId}-{batchSeq}-{ticketSeq})
-- **Traceable allocation**: batch → ticket → redemption chain
-- **Tier system**: Platinum, Gold, Silver, Bronze
-- **Commission engine**: tier-based commission rates
-- **Reseller ERP**: `reseller/index.html` — dashboard, allocations, issued tickets, statements
-- **Salesperson dashboard**: `reseller/salesperson.html`
-- **Salesperson analytics**: `reseller/salesperson-performance.html` — full performance charts
-- **Admin engine**: `admin/reseller-engine.html` — reseller CRUD, code generation, audit
+### Admin & Ops ERP (`/admin/`)
+42 pages across: Core, Commerce, Passport, Loyalty, Offers, B2B/Partner,
+CRM, Operations, Finance, Ticketing/F&B, System, Auth.
 
-### 📞 Call Center CRM Engine
-- **`js/crm-engine.js`** — 44KB engine
-- **Structured case capture**: caller info, issue type, priority, booking reference
-- **Case lifecycle**: NEW → RECORDED → ASSIGNED → IN_PROGRESS → RESOLVED → CLOSED
-- **Escalation matrix**: SLA-based auto-escalation (CRITICAL: 2h, URGENT: 4h, HIGH: 8h, NORMAL: 24h, LOW: 72h)
-- **Business lead forms**: corporate, group, birthday, school, travel agent
-- **Agent assignment & routing**: skill-based routing, round-robin
-- **Timeline/worklog**: full audit trail per case
-- **Follow-up management**: scheduled callbacks, reminder flags
-- **Full CRM UI**: `admin/call-center.html` — 113KB comprehensive module
-- **Live agent dashboard**: `admin/crm-live.html`
-- **Analytics dashboard**: `admin/crm-analytics.html` — KPIs, SLA gauges, agent leaderboard, heatmaps
+### Sales ERP (`/sales/`)
+`erp-dashboard.html`, `erp-agents.html`, `erp-crm.html`, `erp-reports.html`,
+`erp-products.html`, `leads.html`, `pipeline.html`, `quote-builder.html`,
+`passport-login.html`, `passport-dashboard.html`, `passport-payment.html`,
+`passport-issued.html`, `gate-scanner.html`
 
-### 👤 Customer Portal
-- **Authentication**: email OTP (PIN: 1234), social login stubs, business sign-in
-- **My Bookings**: QR ticket view, cancel/reschedule
-- **My Rewards**: loyalty points, redemption history
-- **My Wallet**: WOW Wallet balance, top-up, transaction history
-- **WOW Passport**: digital passport card view
-- **Notifications**: push notification preferences
-- **Referral**: referral code sharing, earnings track
-- **Profile**: personal info, KYC, preferences
+### Partner Portal (`/partner/`)
+`login.html`, `dashboard.html`, `onboarding.html`, `onboarding-kyc.html`,
+`buy-tickets.html`, `ticket-batches.html`, `quote-builder.html`,
+`bulk-tickets.html`, `invoice-gst.html`, `invoices.html`,
+`statements.html`, `reports.html`, `support.html`
 
-### 🛡 Admin & Operations
-- **Super Admin**: `admin/super-admin.html` — 145KB master control panel
-- **Engine Hub**: `admin/engine-hub.html` — unified status monitoring for all engines
-- **Dynamic Pricing**: `admin/dynamic-pricing.html` — demand-based price rules
-- **GST Engine**: `admin/gst-engine.html` — tax computation, invoicing
-- **Inventory**: `admin/inventory.html` — capacity management per park & date
-- **Ops Dashboard**: `admin/ops-dashboard.html` — gate counts, queue status
-- **Revenue Analytics**: `admin/revenue-analytics.html`
-- **Audit Logs**: `admin/audit-logs.html`
+### Reseller ERP (`/reseller/`)
+`login.html`, `index.html`, `salesperson.html`, `salesperson-performance.html`
 
-### 🤝 Partner Portals
-- **Travel Agent Portal**: `ta/index.html` — bookings, commissions, approvals
-- **Partner Portal**: `partner/login.html` — B2B partner access
-- **B2B Approvals**: `admin/b2b-approvals.html`
-- **TA Approvals**: `admin/ta-approvals.html`
+### Travel Agent Portal (`/ta/`)
+`index.html` (single-page ERP with tabbed UI)
+
+### Groups (`/groups/`)
+`index.html`, `corporate.html`, `schools.html`, `birthdays.html`
+
+### Internal Staff Gateway (`/internal/`)
+`index.html` — login router for all staff portals
+
+### Passport Stubs (`/passport/`)
+`login.html` → redirects to `portal/login.html`
+`my-passport.html` → redirects to `portal/wow-passport.html`
+`register.html` — full KYC registration page
 
 ---
 
 ## 🗺 URI Reference Map
 
-### Public Pages
-| Path | Description |
-|------|-------------|
-| `/index.html` | Home page |
-| `/water-park.html` | Water Park info |
-| `/amusement-park.html` | Amusement Park info |
-| `/passport.html` | WOW Passport product page |
-| `/offers.html` | Current offers listing |
-| `/contact.html` | Contact page |
+### Public Pages (root)
+| Page | URL |
+|------|-----|
+| Homepage | `/` or `/index.html` |
+| Water Park | `/water-park.html` |
+| Amusement Park | `/amusement-park.html` |
+| Combo | `/combo.html` |
+| WOW Passport | `/passport.html` |
+| Offers | `/offers.html` |
+| Plan Your Visit | `/plan-your-visit.html` |
+| Safety Guidelines | `/safety-guidelines.html` |
+| Rides & Attractions | `/rides-attractions.html` |
+| FAQ | `/faq.html` |
+| Contact | `/contact.html` |
 
-### Booking Flows
-| Path | Park Key | Description |
-|------|----------|-------------|
-| `/book/water-park.html` | `WATER_DAY` | Water Park ticket booking |
-| `/book/amusement-park.html` | `AMUSEMENT_DAY` | Amusement Park ticket booking |
-| `/book/combo.html` | `COMBO_DAY` | Combo (both parks) booking |
-| `/book/passport.html` | — | Passport purchase flow |
-| `/book/group.html` | — | Group booking form |
-| `/book/payment.html` | — | Payment gateway |
-| `/book/confirmation.html` | — | Booking confirmation + QR |
+### Booking Flow
+| Step | URL |
+|------|-----|
+| Book Water Park | `/book/water-park.html` |
+| Book Amusement | `/book/amusement-park.html` |
+| Book Combo | `/book/combo.html` |
+| Book Passport | `/book/passport.html` |
+| Group Booking | `/book/group.html` |
+| Payment | `/book/payment.html` |
+| Confirmation | `/book/confirmation.html` |
+
+### Staff Portals (login credentials)
+| Portal | URL | Email | PIN/Pass |
+|--------|-----|-------|----------|
+| Super Admin | `/admin/super-admin.html` | akm@indiagully.com | 1234 |
+| Admin ERP | `/admin/index.html` | rajesh@wow.in | 2345 |
+| Finance | `/admin/finance.html` | priya.fin@wow.in | 3456 |
+| Ops | `/admin/ops-dashboard.html` | vikram.ops@wow.in | 4567 |
+| CRM Agent | `/admin/call-center.html` | sneha.crm@wow.in | 5678 |
+| Gate Agent | `/admin/gate.html` | ravi.gate@wow.in | 6789 |
+| Sales Agent | `/sales/erp-dashboard.html` | sanjay@wow.in | 7890 |
+| Partner | `/partner/dashboard.html` | partner@mmt.in | 8901 |
+| Reseller | `/reseller/index.html` | resell@wow.in | 9012 |
+| Travel Agent | `/ta/index.html` | ta@travelease.in | 0123 |
+| Internal Gateway | `/internal/index.html` | (role selector) | — |
+
+---
+
+## 🧰 JavaScript Engines (`/js/`)
+| File | Size | Purpose |
+|------|------|---------|
+| `main.js` | 9 KB | Global namespace, utilities, bootstrap |
+| `shell.js` | 24 KB | Mega-nav, footer, weather chip, ticker |
+| `booking.js` | 37 KB | Ticket selection, pricing, cart, QR gen |
+| `wow-auth.js` | 37 KB | Auth engine, role mgmt, session, bypass |
+| `wow-auth-guard.js` | 3 KB | Portal-specific guard wrapper |
+| `wow-content-control.js` | 19 KB | Admin content toggles (public pages) |
+| `wow-modules.js` | 9 KB | Module gate system (enable/disable features) |
+| `wow-offer-engine-v4.js` | 77 KB | Offer & campaign engine (v4, current) |
+| `wow-offer-cart.js` | 28 KB | Cart, coupon, offer application |
+| `wow-passport-engine.js` | 41 KB | Passport plans, KYC, redemption |
+| `wow-passport-api.js` | 15 KB | Passport API integration helpers |
+| `wow-loyalty-engine.js` | 62 KB | Loyalty points, tiers, redemption |
+| `reseller-engine.js` | 63 KB | Reseller identity, KYC, commissions |
+| `crm-engine.js` | 44 KB | Call centre CRM, tickets, live agent |
+| `wow-terms.js` | 23 KB | T&C modal renderer |
+| `wow-session-prefill.js` | 6 KB | Auto-fill booking forms for logged-in users |
+| `banner-engine.js` | 12 KB | Hero banner slider (config: /data/banners.json) |
+| `firebase-config.js` | 2 KB | Firebase config stub (ES module export) |
+
+---
+
+## 🎨 CSS Files (`/css/`)
+| File | Size | Purpose |
+|------|------|---------|
+| `style.css` | 70 KB | Global public site styles |
+| `booking-page.css` | 30 KB | Booking flow styles |
+| `portal.css` | 18 KB | Customer portal styles |
+| `wow-design-system.css` | 34 KB | Admin/ERP design system |
+| `forms.css` | 37 KB | Form components |
+| `offer-widget.css` | 7 KB | Offer widget styles |
+
+---
+
+## 🔒 Authentication Architecture
+
+### Staff Portals (admin, sales, internal)
+- **Engine:** `wow-auth.js` + `wow-auth-guard.js`
+- **Session key:** `wow_auth_session` (localStorage/sessionStorage)
+- **Super Admin bypass:** Red "SA" button (top-right, all admin pages)
+- **Login page:** `/admin/admin-login.html`
 
 ### Customer Portal
-| Path | Description |
-|------|-------------|
-| `/portal/login.html` | Customer sign-in (OTP: 1234) |
-| `/portal/login.html?type=business` | Business sign-in |
-| `/portal/register.html` | Registration |
-| `/portal/dashboard.html` | Customer dashboard |
-| `/portal/my-bookings.html` | Booking history + QR tickets |
-| `/portal/profile.html` | Profile & KYC |
-| `/portal/loyalty.html` | Rewards & points |
-| `/portal/wallet.html` | WOW Wallet |
-| `/portal/tickets.html` | Active tickets |
-| `/portal/offers.html` | Customer offers |
-| `/portal/notifications.html` | Notification preferences |
-| `/portal/referral.html` | Referral program |
-| `/portal/wow-passport.html` | Digital passport view |
+- **Engine:** `wow-auth.js` + `wow-auth-guard.js` (data-portal="portal")
+- **Session key:** `wow_auth_session` (role = CUSTOMER)
+- **Login page:** `/portal/login.html`
 
-### Staff Portals
-| Path | Role | Credentials |
-|------|------|-------------|
-| `/admin/admin-login.html` | All Admin | PIN-based |
-| `/admin/super-admin.html` | SUPER_ADMIN | akm@indiagully.com / 1234 |
-| `/admin/index.html` | Admin ERP | rajesh@wow.in / 2345 |
-| `/admin/call-center.html` | CRM_AGENT | sneha.crm@wow.in / 5678 |
-| `/admin/crm-analytics.html` | ADMIN+ | Full analytics |
-| `/admin/crm-live.html` | CRM_AGENT | Live dashboard |
-| `/admin/engine-hub.html` | ADMIN+ | All engine status |
-| `/admin/offer-engine.html` | ADMIN+ | Offer CRUD |
-| `/admin/offer-analytics.html` | ADMIN+ | Offer KPIs |
-| `/admin/passport-engine.html` | ADMIN+ | Passport management |
-| `/admin/reseller-engine.html` | ADMIN+ | Reseller management |
-| `/admin/dynamic-pricing.html` | ADMIN+ | Pricing rules |
-| `/admin/inventory.html` | OPS | Capacity management |
-| `/admin/gate.html` | GATE_AGENT | Gate entry scanner |
-| `/admin/finance.html` | FINANCE | Financial reports |
-| `/internal/index.html` | All Staff | Staff gateway |
+### Partner Portal
+- **Engine:** Self-contained Firebase Auth + `wow-auth-guard.js`
+- **Login page:** `/partner/login.html`
 
-### Partner / Reseller
-| Path | Role | Credentials |
-|------|------|-------------|
-| `/reseller/login.html` | RESELLER | resell@wow.in / 901200 |
-| `/reseller/index.html` | RESELLER | Reseller ERP |
-| `/reseller/salesperson.html` | RESELLER | Salesperson dashboard |
-| `/reseller/salesperson-performance.html` | RESELLER | Analytics |
-| `/ta/index.html` | TRAVEL_AGENT | ta@travelease.in / 0123 |
-| `/partner/login.html` | PARTNER | partner@mmt.in / 8901 |
-| `/sales/passport-login.html` | SALES_AGENT | WOW-SA-2401 |
-| `/sales/erp-dashboard.html` | SALES_AGENT | Sales ERP |
+### Reseller Portal
+- **Engine:** Inline guard reading `wow_reseller_session`
+- **Login page:** `/reseller/login.html`
+
+### Travel Agent Portal
+- **Engine:** `wow-auth-guard.js` (data-portal="ta")
+- **Login page:** `/ta/index.html` (single page, auto-guarded)
 
 ---
 
-## 🔑 Test Credentials
+## 🧹 Post-Audit Cleanup Log (v2 — 2026-03-30)
 
-| Portal | Email / Code | PIN | Role |
-|--------|-------------|-----|------|
-| Super Admin | akm@indiagully.com | 1234 | SUPER_ADMIN |
-| Admin | rajesh@wow.in | 2345 | ADMIN |
-| Finance | priya.fin@wow.in | 3456 | FINANCE |
-| Ops | vikram.ops@wow.in | 4567 | OPS |
-| CRM Agent | sneha.crm@wow.in | 5678 | CRM_AGENT |
-| Gate Agent | ravi.gate@wow.in | 6789 | GATE_AGENT |
-| Sales Agent | sanjay@wow.in | 7890 | SALES_AGENT |
-| Passport Sales | WOW-SA-2401 | (demo button) | SALES_AGENT |
-| Partner | partner@mmt.in | 8901 | PARTNER |
-| Reseller Platinum | resell@wow.in | 901200 | RESELLER |
-| Reseller Gold | delhi@trips.in | 654321 | RESELLER |
-| Travel Agent | ta@travelease.in | 0123 | TRAVEL_AGENT |
-| Customer | any email | OTP: 1234 | CUSTOMER |
+### Broken Links Fixed
+| File | Old Target | New Target | Fix |
+|------|-----------|------------|-----|
+| `reseller/login.html` | `onboarding.html` | `../partner/onboarding.html` | Fixed |
+| `book/confirmation.html` | `../terms.html` (missing) | `../faq.html` | Fixed |
+| `js/shell.js` nav dropdown | `reseller/onboarding.html` (missing) | `partner/onboarding.html` | Fixed |
+| `js/shell.js` footer | `reseller/onboarding.html` (missing) | `partner/onboarding.html` | Fixed |
 
----
+### Auth Script Fixes Applied
+| File | Fix |
+|------|-----|
+| `admin/call-center.html` | Added `wow-auth-guard.js` |
+| `admin/crm-live.html` | Added `wow-auth-guard.js` |
+| `admin/crm-analytics.html` | Added `wow-auth.js` + `wow-auth-guard.js` |
+| `admin/passport-kyc-review.html` | Added `wow-auth-guard.js` |
+| `admin/passport-scanner.html` | Added `wow-auth-guard.js` |
+| `admin/passport-engine.html` | Added `wow-auth-guard.js` |
+| `admin/reseller-engine.html` | Added `wow-auth-guard.js` |
+| `admin/engine-hub.html` | Added `wow-auth-guard.js` |
+| `passport.html` | Removed duplicate `wow-content-control.js` load |
 
-## 📦 JavaScript Engine Library
-
-| File | Size | Description |
-|------|------|-------------|
-| `js/wow-offer-engine-v4.js` | 77KB | Core offer evaluation engine |
-| `js/wow-offer-cart.js` | 28KB | Cart-side offer integration layer |
-| `js/wow-passport-engine.js` | 41KB | Passport issuance & management |
-| `js/reseller-engine.js` | 63KB | Reseller & salesperson identity engine |
-| `js/crm-engine.js` | 44KB | CRM case management engine |
-| `js/wow-auth.js` | 37KB | Authentication & session management |
-| `js/booking.js` | 37KB | Core booking flow engine |
-| `js/shell.js` | 24KB | Site shell (nav, footer, topbar) |
-| `js/wow-content-control.js` | 19KB | Module-level feature flags |
-| `js/wow-terms.js` | 23KB | T&C consent management |
-| `js/wow-modules.js` | 9KB | Module registry |
-| `js/wow-auth-guard.js` | 3KB | Route-level auth guard |
-| `js/wow-session-prefill.js` | 6KB | Session-based form prefill |
-| `js/main.js` | 9KB | Global init & utilities |
-| `js/banner-engine.js` | 12KB | Promotional banner management |
-| `js/firebase-config.js` | 2KB | Firebase stub config |
+### Files Removed (Unused / Duplicate)
+| File | Reason |
+|------|--------|
+| `js/wow-offer-engine.js` | Legacy v1, superseded by wow-offer-engine-v4.js |
+| `images/wow-logo-real.png` | Unused (no HTML/JS reference) |
+| `images/wow-logo-new.png` | Unused |
+| `images/wow-logo-white.png` | Unused |
+| `images/wow-logo.svg` | Unused |
+| `images/wow-logo-badge.svg` | Unused |
 
 ---
 
-## 🗃 Data Storage Model
+## ✅ Full Audit Status (2026-03-30)
 
-All data is persisted in **browser localStorage** using structured JSON arrays keyed by engine namespace:
-
-### Offer Engine (wow_offer_engine-v4.js)
-| Key | Description |
-|-----|-------------|
-| `wow_offers_v4` | All offer definitions |
-| `wow_offer_audit` | Immutable audit trail (max 500) |
-| `wow_exec_log` | Execution log (max 2000) |
-| `wow_ab_assignments` | A/B variant assignments |
-| `wow_usage_v4` | Per-offer usage counters |
-| `wow_budget_v4` | Per-offer budget spend |
-| `wow_offer_versions` | Version history |
-
-### Passport Engine
-| Key | Description |
-|-----|-------------|
-| `wpe_config` | Engine meta config |
-| `wpe_passports` | All passport records |
-| `wpe_kyc` | KYC submissions |
-| `wpe_redemptions` | Entry redemption log |
-| `wpe_voucher_lib` | Voucher library |
-| `wpe_customers` | Customer passport profiles |
-| `wpe_audit` | Audit trail |
-
-### Reseller Engine
-| Key | Description |
-|-----|-------------|
-| `wow_resellers` | Reseller master records |
-| `wow_reseller_batches` | Ticket batch allocations |
-| `wow_reseller_tickets` | Individual ticket records |
-| `wow_salespersons` | Salesperson records |
-| `wow_reseller_audit` | Audit log |
-
-### CRM Engine
-| Key | Description |
-|-----|-------------|
-| `wow_crm_cases` | All CRM cases |
-| `wow_crm_timeline` | Per-case timeline events |
-| `wow_crm_users` | Agent user records |
-| `wow_crm_escalation_rules` | SLA escalation matrix |
-
-### Booking
-| Key | Description |
-|-----|-------------|
-| `wow_bookings` | All booking records |
-| `wow_cart_coupon` | Active coupon in session |
-| `wow_auth_session` | Staff auth session |
-| `wow_portal_session` | Customer auth session |
-| `wow_reseller_session` | Reseller auth session |
+| Area | Pages | Auth Guard | Links | JS Engines | Status |
+|------|-------|-----------|-------|-----------|--------|
+| Admin ERP | 42 | ✅ All guarded | ✅ Clean | ✅ | ✅ |
+| Customer Portal | 16 | ✅ All guarded | ✅ Clean | ✅ | ✅ |
+| Sales ERP | 13 | ✅ All guarded | ✅ Clean | ✅ | ✅ |
+| Partner Portal | 13 | ✅ All guarded | ✅ Clean | ✅ | ✅ |
+| Reseller ERP | 4 | ✅ Own guard | ✅ Clean | ✅ | ✅ |
+| Travel Agent | 1 | ✅ Guarded | ✅ Clean | ✅ | ✅ |
+| Booking Engine | 7 | N/A (public) | ✅ Clean | ✅ | ✅ |
+| Public Site | 11 | N/A (public) | ✅ Clean | ✅ | ✅ |
+| Groups | 4 | N/A (public) | ✅ Clean | ✅ | ✅ |
+| Internal Gateway | 1 | ✅ Guarded | ✅ Clean | ✅ | ✅ |
+| JS Engines | 18 | — | — | ✅ | ✅ |
+| CSS Files | 6 | — | — | — | ✅ |
 
 ---
 
-## 🚦 RESTful Table API Endpoints
+## 🐛 Bug Fixes Applied (2026-04-06)
 
-Uses relative `/tables/{tableName}` endpoints:
+### Hero Banner Fix (index.html + css/style.css)
+**Root cause:** YouTube IFrame API (`youtube.com/iframe_api`) never fires `onYouTubeIframeAPIReady` on preview/restricted domains (Error 150/153/5). The `#yt-bg-container` stayed empty (no iframe injected) but the poster fallback `#hc-poster-0` was not properly styled independently of `hc-photo` class.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `tables/{table}?page=1&limit=100` | List records |
-| GET | `tables/{table}/{id}` | Get single record |
-| POST | `tables/{table}` | Create record |
-| PUT | `tables/{table}/{id}` | Full update |
-| PATCH | `tables/{table}/{id}` | Partial update |
-| DELETE | `tables/{table}/{id}` | Soft delete |
+**Fix applied:**
+- `css/style.css`: `.hc-video-poster` now has its own `position:absolute; inset:0; background-size:cover; background-position:center; z-index:1; animation: hcKenBurns; transition: opacity 2s ease` — ensuring it's self-contained and always covers the slide.
+- `index.html`: Added 8-second safety timeout — if `onYouTubeIframeAPIReady` never fires, `#yt-bg-container` is set to `display:none` removing it from the stacking context entirely.
+- `index.html`: Cleaned up comments in slide 0 HTML explaining the 3-layer structure (poster z:1, YT z:2, overlay z:3, content z:4).
+- **Result:** `hero-water.jpg` poster with Ken Burns animation is ALWAYS visible. YouTube video overlays only when confirmed `PLAYING`. On preview/restricted domains the image hero banner shows perfectly.
 
----
+### Stress Test Schema Fixes (Tables API)
+**Root cause:** `stress_bookings` table was missing `cgst` and `sgst` fields that the simulator writes. `stress_test_runs` was missing `total_gst_collected` and `config_json`.
 
-## 🔮 Pending / Future Enhancements
+**Fix applied:**
+- `tables/stress_bookings`: Added `cgst` (number), `sgst` (number). Updated `step_reached` options to include all 7 steps (ticket_select, date_select, price_calc, offer_apply, summary, payment, confirmation).
+- `tables/stress_test_runs`: Added `total_gst_collected` (number), `config_json` (text). Schema now matches exactly what `simulateBooking()` and `startTest()` write.
+- `stress-test.html`: Updated health check POST body and write benchmark to include `cgst`/`sgst`/`step_reached`.
 
-- [ ] **Real payment gateway** integration (Razorpay / PayU)
-- [ ] **Firebase Realtime Database** sync for live inventory counts
-- [ ] **Push notifications** via Firebase Cloud Messaging
-- [ ] **Email/SMS delivery** via SendGrid / Twilio API
-- [ ] **PDF ticket generation** (jsPDF) on confirmation page
-- [ ] **Dynamic QR scanning** with camera API on gate pages
-- [ ] **AI-powered demand forecasting** in dynamic pricing engine
-- [ ] **Multi-language support** (Hindi, Tamil, Telugu)
-- [ ] **Accessibility audit** (WCAG 2.1 AA compliance)
-- [ ] **Service Worker** for offline booking capability
-
----
-
-## 🌐 Navigation & Shell
-
-The shared shell (`js/shell.js`) injects:
-- **Topbar**: Logo, weather chip, session-aware auth widget
-- **Ticker**: Rotating promotional messages
-- **Mega-nav**: Parks, Tickets, Groups, Offers, Visit dropdowns
-- **Footer**: All portal links including Staff/Partner sections
-
-Footer "My Account" links: Sign In, Business Sign In, My Bookings, My Rewards  
-Staff portals: Internal Gateway, Super Admin, Admin ERP, Sales ERP, Passport Sales, Call Centre CRM, CRM Analytics, Engine Hub
+### Auth Guards (2026-04-06 session)
+**Verified complete:**
+- `admin/loyalty-engine.html` — confirmed auth guard present ✅
+- `portal/wow-passport.html` — confirmed `wow-auth.js` + `wow-auth-guard.js` present ✅  
+- `sales/passport-kyc.html` — verified auth guards present ✅
+- All 39 admin pages, 11 portal pages, 12 sales pages, 13 partner pages: ✅ auth guarded
+- Reseller portal: inline `resellerGuard()` + `wow_reseller_session` (intentional, no wow-auth) ✅
 
 ---
 
-*Built for Worlds of Wonder (A-2, Sector 38A, Noida — 201301) · Part of Entertainment City Ltd.*  
-*Last updated: 2026-03-30*
+## 🧪 Stress Test Engine (`/stress-test.html`)
+
+A complete full-flow booking stress test dashboard. Open directly at `/stress-test.html`.
+
+### Features
+- **7-step booking flow simulation** matching real `book/*.html` → `payment.html` → `confirmation.html` journey
+- **Real Tables API writes** — every successful booking POSTs to `tables/stress_bookings`
+- **Run metadata** — test run stats written to `tables/stress_test_runs`, updated on completion
+- **6 scenario presets**: Smoke (5×3), Load (25×5), Stress (75×8), Spike (200×2), Soak (10×30), Custom
+- **7 fault injection modes**: network timeout, payment declined, sold out, API 500, user abandons, GST error, duplicate
+- **Park traffic mix sliders**: Water / Amusement / Combo %
+- **Live charts** (7 charts): Latency, Throughput, Success/Fail, Park Mix, Percentiles, Revenue, Active VUs
+- **Live log terminal** with per-VU slot tracking
+- **Results table** with park/status filters, export to CSV
+- **Booking Flow diagram tab** — exact steps with code snippets
+- **Source Code viewer** — 8 annotated source code panels (Pricing, GST, Offers, Booking, Payment, API, Errors, Shell)
+- **API Health Check** — tests all relevant tables + external APIs
+- **Benchmarks** — 50 concurrent GETs + 20 concurrent POSTs
+- **Past Runs history** — loads from Tables API with success rate bars
+
+### Tables API used
+| Table | Purpose |
+|-------|---------|
+| `tables/stress_bookings` | Individual booking records |
+| `tables/stress_test_runs` | Run-level metadata |
+| `tables/crm_bookings_cache` | Health check target |
+| `tables/passport_holders` | Health check target |
+
+---
+
+## 🚧 Pending / Future Enhancements
+
+1. **Firebase integration** — `firebase-config.js` contains placeholder values. Real Firebase project credentials needed for partner onboarding, customer auth, forgot-password flows
+2. **Razorpay integration** — `book/payment.html` is a stub; needs real Razorpay key and order creation API
+3. **WhatsApp QR tickets** — `wow-modules.js` has `twilio_whatsapp: true` but no backend endpoint
+4. **Real-time capacity** — `admin/inventory.html` uses localStorage; needs API integration
+5. **GST invoice PDF generation** — `partner/invoice-gst.html` generates UI only
+6. **SMS OTP** — Loyalty OTP redemption uses msg91 stub, not wired
+
+---
+
+## 🌐 Key URLs
+
+- **Public Site:** `/index.html`
+- **Customer Login:** `/portal/login.html`
+- **Admin ERP:** `/admin/index.html`
+- **Internal Staff Gateway:** `/internal/index.html`
+- **Partner Portal:** `/partner/login.html`
+- **Reseller ERP:** `/reseller/login.html`
+- **Helpline:** 080-6909-0000
+- **Location:** Worlds of Wonder, Sector 38A, Noida, UP 201301

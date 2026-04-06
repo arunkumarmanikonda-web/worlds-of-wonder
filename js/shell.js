@@ -64,7 +64,7 @@ const NAV_ITEMS = [
     label: 'Partners',
     children: [
       { label: '✈️ Travel Agent Onboarding', href: 'partner/onboarding.html',  desc: 'Apply as a travel agent partner' },
-      { label: '🏪 Reseller Onboarding',      href: 'reseller/onboarding.html', desc: 'Apply as a reseller partner' },
+      { label: '🏪 Reseller Onboarding',      href: 'partner/onboarding.html',  desc: 'Apply as a reseller partner' },
       { label: '🏢 Corporate Sales',          href: 'groups/corporate.html',    desc: 'Bulk & B2B bookings' },
       { label: '🤝 Travel Agent Login',       href: 'partner/login.html',       desc: 'Sign in to partner portal' },
       { label: '🏬 Reseller Login',           href: 'reseller/login.html',      desc: 'Sign in to reseller ERP' },
@@ -169,7 +169,7 @@ function buildTopbar() {
     </div>
     <div class="topbar-right">
       <span class="topbar-badge">🟢 Booking Open</span>
-      <a href="${BASE}admin/banners.html" style="color:rgba(255,255,255,.3);font-size:11px;margin-left:10px;">⚙ Admin</a>
+      <a href="${BASE}admin/cms.html" style="color:rgba(255,255,255,.3);font-size:11px;margin-left:10px;">⚙ Admin</a>
     </div>
   </div>
 </div>`;
@@ -304,7 +304,7 @@ function buildFooter() {
         <a href="${BASE}partner/login.html">Travel Agent / Partner Login</a>
         <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
           <div style="font-size:10px;color:rgba(255,255,255,.28);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Resellers</div>
-          <a href="${BASE}reseller/onboarding.html">Reseller Onboarding</a>
+          <a href="${BASE}partner/onboarding.html">Reseller Onboarding</a>
           <a href="${BASE}reseller/login.html">Reseller Portal Login</a>
         </div>
       </div>

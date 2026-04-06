@@ -3,7 +3,7 @@
 //  Full-size cinematic hero slider
 //  Supports: gradient, image, video slide types
 //  Config:   /data/banners.json  (override via localStorage)
-//  Admin:    /admin/banners.html
+//  Admin:    /admin/cms.html
 // ============================================================
 'use strict';
 
@@ -35,7 +35,9 @@ const WOWBanners = (function () {
   /* ── Load config ───────────────────────────────────────── */
   async function loadConfig(key) {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      // Priority: wow_banners_v3 → wow_banners_override → data/banners.json
+      const stored = localStorage.getItem(STORAGE_KEY)
+                  || localStorage.getItem('wow_banners_override');
       if (stored) { _cfg = JSON.parse(stored); }
       else {
         const r = await fetch(CONFIG_URL + '?t=' + Date.now());

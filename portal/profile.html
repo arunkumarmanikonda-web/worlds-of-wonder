@@ -187,7 +187,7 @@
                 <div class="avatar-edit-btn" onclick="changeAvatar()">✏️</div>
               </div>
               <div class="avatar-name">Ravi Choudhary</div>
-              <div class="avatar-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="473526312e69242f2832232f26353e07202a262e2b6924282a">[email&#160;protected]</a></div>
+              <div class="avatar-email">ravi.choudhary@gmail.com</div>
               <div class="avatar-badge">⭐ WOW Gold Member</div>
             </div>
             <div class="mini-stats">
@@ -330,7 +330,7 @@
             <div class="toggle-wrap">
               <div class="toggle-info">
                 <div class="toggle-title">Email OTP</div>
-                <div class="toggle-desc">Get OTP on <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="295b485f40074a41465c4d41485b50694e44484045074a4644">[email&#160;protected]</a></div>
+                <div class="toggle-desc">Get OTP on ravi.choudhary@gmail.com</div>
               </div>
               <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
             </div>
@@ -438,7 +438,7 @@
             <div class="section-sub">Link accounts for quick one-tap sign-in</div>
             <div id="linkedAccounts">
               ${[
-                {icon:'🔵',name:'Google',email:'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c4b6a5b2adeaa7acabb1a0aca5b6bd84a3a9a5ada8eaa7aba9">[email&#160;protected]</a>',linked:true,color:'rgba(66,133,244,.2)'},
+                {icon:'🔵',name:'Google',email:'ravi.choudhary@gmail.com',linked:true,color:'rgba(66,133,244,.2)'},
                 {icon:'🔷',name:'Facebook',email:'Not linked',linked:false,color:'rgba(66,103,178,.2)'},
                 {icon:'📱',name:'Phone / OTP',email:'+91 98765 43210',linked:true,color:'rgba(16,185,129,.2)'},
               ].map(a=>`
@@ -573,7 +573,7 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 function switchTab(id){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.page-tab').forEach(t=>t.classList.remove('active'));
@@ -656,5 +656,5 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 document.getElementById('kycModal').addEventListener('click',e=>{ if(e.target===document.getElementById('kycModal')) document.getElementById('kycModal').classList.remove('show'); });
 </script>
 <script src="../js/wow-auth-guard.js" data-portal="portal"></script>
-<script src="https://www.genspark.ai/sandbox_inspect.js"></script></body>
+</body>
 </html>

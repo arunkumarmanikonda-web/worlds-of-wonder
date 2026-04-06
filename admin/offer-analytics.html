@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Offer Analytics — WOW CFO Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/wow-auth.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07090f;--sidebar:#0c0e16;--card:#111520;--card2:#161b28;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#8B6914;
+  --text:#e2e8f0;--muted:rgba(255,255,255,.45);--muted2:rgba(255,255,255,.2);
+  --red:#ef4444;--green:#22c55e;--blue:#3b82f6;--purple:#a855f7;
+  --orange:#f97316;--teal:#14b8a6;
+}
+html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);overflow-x:hidden;}
+.app{display:flex;height:100vh;}
+
+.sidebar{width:210px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.sb-logo{padding:16px;border-bottom:1px solid var(--border);}
+.sb-logo-title{font-size:11.5px;font-weight:800;color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;}
+.sb-logo-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.sb-nav{padding:10px 6px;flex:1;overflow-y:auto;}
+.sb-group{margin-bottom:16px;}
+.sb-group-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);padding:0 8px;margin-bottom:4px;}
+.sb-link{width:100%;text-align:left;background:transparent;border:none;color:var(--muted);font-size:11.5px;font-weight:500;padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;transition:all .15s;}
+.sb-link:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.sb-link.active{background:rgba(201,168,76,.12);color:var(--gold2);font-weight:700;}
+.sb-link i{width:14px;text-align:center;font-size:11px;}
+
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 22px;height:52px;background:var(--sidebar);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-clock{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.content{padding:20px 22px;flex:1;}
+
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.section-hdr h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:16px;}
+.kpi{background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;}
+.kpi-val{font-size:22px;font-weight:800;line-height:1;}
+.kpi-label{font-size:9.5px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.8px;}
+.kpi-trend{font-size:10px;margin-top:3px;display:flex;align-items:center;gap:3px;}
+.kpi-trend.up{color:#4ade80;} .kpi-trend.down{color:#f87171;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+.card-title{font-size:10.5px;font-weight:700;color:var(--gold2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+.chart-wrap{position:relative;width:100%;}
+
+.offer-table{width:100%;border-collapse:collapse;}
+.offer-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.offer-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.03);font-size:11.5px;vertical-align:middle;}
+.offer-table tr:hover td{background:rgba(255,255,255,.02);}
+.offer-table tr:last-child td{border-bottom:none;}
+
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;border:1px solid;}
+.badge-active{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25);}
+.badge-paused{background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.2);}
+.badge-expired{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.15);}
+.badge-draft{background:rgba(255,255,255,.06);color:var(--muted);border-color:rgba(255,255,255,.12);}
+.badge-scheduled{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2);}
+.badge-archived{background:rgba(255,255,255,.04);color:var(--muted2);border-color:rgba(255,255,255,.08);}
+
+.inp{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;transition:border .15s;}
+.inp:focus{outline:none;border-color:rgba(201,168,76,.4);}
+select.inp option{background:#1a1e2e;color:var(--text);}
+
+.btn{padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-sm{padding:4px 9px;font-size:10.5px;border-radius:6px;}
+
+.tab-bar{display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--border);}
+.tab{padding:7px 14px;font-size:11.5px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold);}
+
+.panel{display:none;}
+.panel.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+@media(max-width:900px){
+  .sidebar{width:44px;}
+  .sb-link span,.sb-logo-title,.sb-logo-sub,.sb-group-label{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div style="font-size:18px;margin-bottom:4px;">📊</div>
+    <div class="sb-logo-title">Offer Analytics</div>
+    <div class="sb-logo-sub">CFO Grade Dashboard</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-group">
+      <div class="sb-group-label">Views</div>
+      <button class="sb-link active" onclick="showSection('overview',this)"><i class="fas fa-chart-pie"></i><span>Overview</span></button>
+      <button class="sb-link" onclick="showSection('revenue',this)"><i class="fas fa-rupee-sign"></i><span>Revenue Impact</span></button>
+      <button class="sb-link" onclick="showSection('offers',this)"><i class="fas fa-tags"></i><span>Offer Performance</span></button>
+      <button class="sb-link" onclick="showSection('leakage',this)"><i class="fas fa-exclamation-triangle"></i><span>Leakage Analysis</span></button>
+      <button class="sb-link" onclick="showSection('coupon',this)"><i class="fas fa-ticket-alt"></i><span>Coupon Trends</span></button>
+      <button class="sb-link" onclick="showSection('heatmap',this)"><i class="fas fa-th"></i><span>Time Heatmap</span></button>
+      <button class="sb-link" onclick="showSection('ab',this)"><i class="fas fa-random"></i><span>A/B Results</span></button>
+      <button class="sb-link" onclick="showSection('maker',this)"><i class="fas fa-check-double"></i><span>Approvals Queue</span></button>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Navigate</div>
+      <button class="sb-link" onclick="location.href='offer-engine.html'"><i class="fas fa-cog"></i><span>Offer Engine</span></button>
+      <button class="sb-link" onclick="location.href='super-admin.html'"><i class="fas fa-crown"></i><span>Super Admin</span></button>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title"><i class="fas fa-chart-bar" style="color:var(--blue)"></i><span id="section-title">Overview</span></div>
+    <div class="topbar-right">
+      <select class="inp" id="global-days" onchange="refreshAll()" style="width:110px;">
+        <option value="7">7 days</option>
+        <option value="30" selected>30 days</option>
+        <option value="90">90 days</option>
+        <option value="365">1 year</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()"><i class="fas fa-sync"></i></button>
+      <span class="topbar-clock" id="clock"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="section-overview">
+      <div class="section-hdr">
+        <h2><i class="fas fa-chart-pie" style="color:var(--gold)"></i> Commercial Performance Overview</h2>
+        <button class="btn btn-ghost btn-sm" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
+      </div>
+
+      <div class="stats-row" id="ov-kpis"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-area"></i> Gross Sales vs Net Revenue</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="c-ov-revenue"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-line"></i> Daily Redemption Volume</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="c-ov-redemptions"></canvas></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-trophy"></i> Top Performing Offers</div>
+          <table class="offer-table">
+            <thead><tr><th>#</th><th>Offer</th><th>Uses</th><th>Discount Rs.</th><th>Share</th><th>Status</th></tr></thead>
+            <tbody id="ov-top-table"></tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-pie-chart"></i> Discount Mix by Offer</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="c-ov-mix"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE IMPACT -->
+    <div class="panel" id="section-revenue">
+      <div class="section-hdr">
+        <h2><i class="fas fa-rupee-sign" style="color:var(--green)"></i> Revenue Impact Analysis</h2>
+      </div>
+
+      <div class="stats-row" id="rev-kpis"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-chart-bar"></i> Revenue Waterfall (Gross → Discounts → Net)</div>
+        <div class="chart-wrap" style="height:240px;"><canvas id="c-rev-waterfall"></canvas></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-compress-arrows-alt"></i> AOV Lift Analysis</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="c-rev-aov"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-percent"></i> Discount Rate Trend</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="c-rev-rate"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFER PERFORMANCE -->
+    <div class="panel" id="section-offers">
+      <div class="section-hdr">
+        <h2><i class="fas fa-tags" style="color:var(--purple)"></i> Per-Offer Performance</h2>
+      </div>
+      <div class="card">
+        <table class="offer-table" id="perf-table">
+          <thead><tr>
+            <th>Offer</th><th>ID</th><th>Type</th><th>Status</th><th>Uses</th>
+            <th>Discount Rs.</th><th>Avg Rs./Use</th><th>Budget %</th><th>Priority</th>
+          </tr></thead>
+          <tbody id="perf-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LEAKAGE ANALYSIS -->
+    <div class="panel" id="section-leakage">
+      <div class="section-hdr">
+        <h2><i class="fas fa-exclamation-triangle" style="color:var(--orange)"></i> Discount Leakage Analysis</h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-shield-alt"></i> Usage Cap Status</div>
+          <div id="leakage-cap-list"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-exclamation-circle"></i> Risk Exposure</div>
+          <div id="leakage-risk-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-balance-scale"></i> Stackability Exposure (Active Exclusive vs Stackable)</div>
+        <div class="chart-wrap" style="height:180px;"><canvas id="c-leak-stack"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TIME HEATMAP -->
+    <div class="panel" id="section-heatmap">
+      <div class="section-hdr">
+        <h2><i class="fas fa-th" style="color:var(--teal)"></i> Booking Time Heatmap &amp; Demand Patterns</h2>
+      </div>
+      <div class="stats-row" id="heatmap-kpis"></div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-calendar-alt"></i> Hour × Day Redemption Heatmap</div>
+        <div id="heatmap-grid" style="overflow-x:auto;padding:8px 0;"><!-- JS renders grid --></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-clock"></i> Redemptions by Hour of Day</div>
+          <div class="chart-wrap" style="height:190px;"><canvas id="c-hm-hour"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-calendar-week"></i> Redemptions by Day of Week</div>
+          <div class="chart-wrap" style="height:190px;"><canvas id="c-hm-dow"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A/B RESULTS -->
+    <div class="panel" id="section-ab">
+      <div class="section-hdr">
+        <h2><i class="fas fa-random" style="color:var(--purple)"></i> A/B Test Results</h2>
+      </div>
+      <div class="stats-row" id="ab-res-kpis"></div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-flask"></i> Test Summaries</div>
+        <div id="ab-results-list"><!-- JS --></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-title"><i class="fas fa-chart-bar"></i> Variant Discount Performance</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c-ab-perf"></canvas></div>
+      </div>
+    </div>
+
+    <!-- APPROVALS QUEUE -->
+    <div class="panel" id="section-maker">
+      <div class="section-hdr">
+        <h2><i class="fas fa-check-double" style="color:var(--teal)"></i> Maker-Checker Approvals Queue</h2>
+        <button class="btn btn-ghost btn-sm" onclick="buildMakerPanel()"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="stats-row" id="maker-kpis"></div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-clock"></i> Pending Approvals</div>
+        <div id="maker-pending-list"><!-- JS --></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-title"><i class="fas fa-history"></i> Approval History</div>
+        <table class="offer-table">
+          <thead><tr><th>Request ID</th><th>Action</th><th>Offer</th><th>Submitted By</th><th>Submitted At</th><th>Status</th><th>Processed By</th></tr></thead>
+          <tbody id="maker-history-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COUPON TRENDS -->
+    <div class="panel" id="section-coupon">
+      <div class="section-hdr">
+        <h2><i class="fas fa-ticket-alt" style="color:var(--teal)"></i> Coupon Code Intelligence</h2>
+      </div>
+      <div class="stats-row" id="coupon-kpis"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-table"></i> Active Coupon Codes</div>
+        <table class="offer-table">
+          <thead><tr><th>Code</th><th>Offer Name</th><th>Discount</th><th>Global Limit</th><th>Uses</th><th>Remaining</th><th>Status</th><th>Expires</th></tr></thead>
+          <tbody id="coupon-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script src="../js/wow-offer-engine-v4.js"></script>
+<script>
+'use strict';
+
+// Clock
+function updateClock() {
+  try {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:true,hour:'2-digit',minute:'2-digit'});
+  } catch(_) {}
+}
+setInterval(updateClock,1000); updateClock();
+
+function inr(n) { return 'Rs.' + Number(Math.round(n||0)).toLocaleString('en-IN'); }
+function dt(ts) { return new Date(ts).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric'}); }
+function pct(v) { return (v||0).toFixed(1) + '%'; }
+
+var _charts = {};
+
+function destroyChart(id) { if (_charts[id]) { try{ _charts[id].destroy(); }catch(_){} _charts[id]=null; } }
+
+function showSection(id, el) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.sb-link').forEach(function(l){ l.classList.remove('active'); });
+  var p = document.getElementById('section-' + id);
+  if (p) p.classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('section-title').textContent = (_sectionTitles||{})[id] || id;
+  refreshSection(id);
+}
+
+function getDays() { return parseInt(document.getElementById('global-days').value) || 30; }
+
+function refreshAll() {
+  var active = document.querySelector('.panel.active');
+  if (active) refreshSection(active.id.replace('section-',''));
+}
+
+function refreshSection(id) {
+  if (id === 'overview') buildOverview();
+  if (id === 'revenue')  buildRevenue();
+  if (id === 'offers')   buildOfferPerf();
+  if (id === 'leakage')  buildLeakage();
+  if (id === 'coupon')   buildCoupon();
+  if (id === 'heatmap')  buildHeatmap();
+  if (id === 'ab')       buildABResults();
+  if (id === 'maker')    buildMakerPanel();
+}
+
+var _sectionTitles = {
+  overview:'Overview', revenue:'Revenue Impact', offers:'Offer Performance',
+  leakage:'Leakage Analysis', coupon:'Coupon Trends',
+  heatmap:'Time Heatmap', ab:'A/B Test Results', maker:'Approvals Queue'
+};
+
+function mkKPI(val, label, color, trend, trendUp) {
+  return '<div class="kpi"><div class="kpi-val" style="color:' + color + '">' + val + '</div>' +
+    '<div class="kpi-label">' + label + '</div>' +
+    (trend ? '<div class="kpi-trend ' + (trendUp?'up':'down') + '"><i class="fas fa-arrow-' + (trendUp?'up':'down') + '" style="font-size:8px;"></i>' + trend + '</div>' : '') +
+  '</div>';
+}
+
+function statusBadge(s) {
+  var map = { active:'active', draft:'draft', paused:'paused', scheduled:'scheduled', expired:'expired', archived:'archived' };
+  return '<span class="badge badge-' + (map[s]||'draft') + '">' + s.toUpperCase() + '</span>';
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────
+function buildOverview() {
+  var days   = getDays();
+  var eng    = window.WOWOfferEngine;
+  var stats  = eng.Analytics.summary(days);
+  var offers = eng.adminListOffers();
+
+  document.getElementById('ov-kpis').innerHTML = [
+    mkKPI(stats.totalTxn, 'Total Redemptions', '#60a5fa', null, true),
+    mkKPI(inr(stats.grossSales), 'Gross Sales', '#fbbf24', null, true),
+    mkKPI(inr(stats.savings), 'Discount Issued', '#f87171', pct(stats.discountRate) + ' of gross', false),
+    mkKPI(inr(stats.netSales), 'Net Revenue', '#4ade80', null, true),
+    mkKPI(inr(stats.aovBefore), 'AOV Gross', '#c084fc', null, true),
+    mkKPI(inr(stats.aovAfter), 'AOV Net', '#f97316', null, false),
+    mkKPI(offers.filter(function(o){return o.effectiveStatus==='active';}).length, 'Active Offers', '#14b8a6', null, true),
+    mkKPI(pct(stats.discountRate), 'Discount Rate', stats.discountRate>15?'#f87171':'#4ade80', null, false),
+  ].join('');
+
+  var dl = stats.dailyTrend;
+  var lbs = Object.keys(dl).sort().slice(-Math.min(days,30));
+  var grArr = lbs.map(function(d){ return dl[d]?dl[d].gross:0; });
+  var netArr= lbs.map(function(d){ return dl[d]?dl[d].gross-(dl[d].savings||0):0; });
+  var lShort= lbs.map(function(d){ return d.slice(5); });
+  var redArr= lbs.map(function(d){ return dl[d]?dl[d].txn:0; });
+
+  destroyChart('ov-rev');
+  _charts['ov-rev'] = new Chart(document.getElementById('c-ov-revenue').getContext('2d'),{
+    type:'bar', data:{labels:lShort, datasets:[
+      {label:'Gross',data:grArr,backgroundColor:'rgba(96,165,250,.4)',borderColor:'#60a5fa',borderWidth:1,borderRadius:3},
+      {label:'Net',  data:netArr,backgroundColor:'rgba(34,197,94,.5)',borderColor:'#4ade80',borderWidth:1,borderRadius:3},
+    ]},
+    options:_chartOpts(false)
+  });
+
+  destroyChart('ov-red');
+  _charts['ov-red'] = new Chart(document.getElementById('c-ov-redemptions').getContext('2d'),{
+    type:'line', data:{labels:lShort, datasets:[
+      {label:'Redemptions',data:redArr,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.15)',tension:.3,fill:true,borderWidth:2}
+    ]},
+    options:_chartOpts(true)
+  });
+
+  // Top table
+  var perOffer = stats.perOffer;
+  var totalD   = Object.values(perOffer).reduce(function(s,o){return s+(o.discount||0);},0);
+  var topKeys  = Object.keys(perOffer).sort(function(a,b){return (perOffer[b].discount||0)-(perOffer[a].discount||0);}).slice(0,8);
+  document.getElementById('ov-top-table').innerHTML = topKeys.map(function(k,i) {
+    var p  = perOffer[k];
+    var off = offers.find(function(o){return o.id===k;}) || {};
+    var share= totalD>0 ? Math.round(p.discount/totalD*100) : 0;
+    return '<tr><td style="font-size:11px;color:var(--muted);">#'+(i+1)+'</td>' +
+      '<td style="font-weight:600;">'+(p.name||k).slice(0,30)+'</td>' +
+      '<td>'+p.uses+'</td>' +
+      '<td>'+inr(p.discount)+'</td>' +
+      '<td><div style="display:flex;align-items:center;gap:5px;">' +
+        '<div style="width:40px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;">' +
+          '<div style="width:'+share+'%;height:100%;background:#60a5fa;border-radius:2px;"></div></div>' +
+        share+'%</div></td>' +
+      '<td>'+statusBadge(off.effectiveStatus||'draft')+'</td>' +
+    '</tr>';
+  }).join('');
+
+  // Mix pie
+  var pKeys = Object.keys(perOffer).slice(0,6);
+  destroyChart('ov-mix');
+  _charts['ov-mix'] = new Chart(document.getElementById('c-ov-mix').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:pKeys.map(function(k){return (perOffer[k].name||k).slice(0,16);}),
+      datasets:[{data:pKeys.map(function(k){return perOffer[k].discount;}),
+        backgroundColor:['rgba(201,168,76,.9)','rgba(168,85,247,.9)','rgba(34,197,94,.9)','rgba(239,68,68,.9)','rgba(59,130,246,.9)','rgba(249,115,22,.9)'],
+        borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{color:'rgba(255,255,255,.5)',font:{size:9},boxWidth:10}}}}
+  });
+}
+
+// ── REVENUE ───────────────────────────────────────────────────────
+function buildRevenue() {
+  var days  = getDays();
+  var stats = WOWOfferEngine.Analytics.summary(days);
+  var dl    = stats.dailyTrend;
+  var lbs   = Object.keys(dl).sort().slice(-Math.min(days,30));
+  var lShort= lbs.map(function(d){return d.slice(5);});
+
+  document.getElementById('rev-kpis').innerHTML = [
+    mkKPI(inr(stats.grossSales), 'Gross Sales', '#fbbf24'),
+    mkKPI(inr(stats.savings), 'Total Discount', '#f87171'),
+    mkKPI(inr(stats.netSales), 'Net Revenue', '#4ade80'),
+    mkKPI(pct(stats.discountRate), 'Discount Rate', stats.discountRate>20?'#f87171':'#fbbf24'),
+    mkKPI(inr(stats.aovBefore), 'AOV (Before)', '#c084fc'),
+    mkKPI(inr(stats.aovAfter), 'AOV (After)', '#f97316'),
+  ].join('');
+
+  // Waterfall
+  var gross   = stats.grossSales;
+  var disc    = stats.savings;
+  var net     = stats.netSales;
+  destroyChart('rev-wf');
+  _charts['rev-wf'] = new Chart(document.getElementById('c-rev-waterfall').getContext('2d'),{
+    type:'bar',
+    data:{labels:['Gross Sales','Discount Issued','Net Revenue'],
+      datasets:[{data:[gross, -disc, net],
+        backgroundColor:['rgba(96,165,250,.7)','rgba(239,68,68,.7)','rgba(34,197,94,.7)'],
+        borderRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'rgba(255,255,255,.45)',font:{size:11}},grid:{display:false}},
+        y:{ticks:{color:'rgba(255,255,255,.35)',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}
+  });
+
+  // AOV
+  var aovB = lbs.map(function(d){ var t=dl[d]; return t&&t.txn>0?Math.round(t.gross/t.txn):0; });
+  var aovN = lbs.map(function(d){ var t=dl[d]; return t&&t.txn>0?Math.round((t.gross-(t.savings||0))/t.txn):0; });
+  destroyChart('rev-aov');
+  _charts['rev-aov'] = new Chart(document.getElementById('c-rev-aov').getContext('2d'),{
+    type:'line',
+    data:{labels:lShort, datasets:[
+      {label:'AOV Before',data:aovB,borderColor:'#c084fc',tension:.3,borderWidth:2},
+      {label:'AOV After', data:aovN,borderColor:'#f97316',tension:.3,borderWidth:2},
+    ]},
+    options:_chartOpts(true)
+  });
+
+  // Discount rate trend
+  var drArr = lbs.map(function(d){ var t=dl[d]; return t&&t.gross>0 ? Math.round((t.savings||0)/t.gross*100) : 0; });
+  destroyChart('rev-rate');
+  _charts['rev-rate'] = new Chart(document.getElementById('c-rev-rate').getContext('2d'),{
+    type:'line',
+    data:{labels:lShort, datasets:[
+      {label:'Discount Rate %',data:drArr,borderColor:'#f87171',backgroundColor:'rgba(239,68,68,.1)',tension:.3,fill:true,borderWidth:2}
+    ]},
+    options:_chartOpts(true)
+  });
+}
+
+// ── OFFER PERFORMANCE ────────────────────────────────────────────
+function buildOfferPerf() {
+  var days   = getDays();
+  var stats  = WOWOfferEngine.Analytics.summary(days);
+  var offers = WOWOfferEngine.adminListOffers();
+  var perOffer = stats.perOffer;
+  var totalD   = Object.values(perOffer).reduce(function(s,o){return s+(o.discount||0);},0);
+
+  document.getElementById('perf-table-body').innerHTML = offers.map(function(o) {
+    var p   = perOffer[o.id] || { uses:0, discount:0 };
+    var avg = p.uses > 0 ? Math.round(p.discount/p.uses) : 0;
+    var lim = o.usageLimits || {};
+    var budgetPct = lim.budget ? Math.round((o.usedBudget||0)/lim.budget*100) : null;
+    var globalPct = lim.global ? Math.round((o.usedCount||0)/lim.global*100) : null;
+    var typeStr   = o.autoApply ? 'Auto' : (o.promoCode ? 'Coupon' : '—');
+    if (o.tags && o.tags.indexOf('slab') !== -1) typeStr = 'Slab';
+    if (o.tags && o.tags.indexOf('flash') !== -1) typeStr = 'Flash';
+    if (o.tags && o.tags.indexOf('bogo') !== -1) typeStr = 'BOGO';
+
+    var budgetBar = budgetPct !== null ? ('<div style="display:flex;align-items:center;gap:5px;">' +
+      '<div style="width:50px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;"><div style="width:'+Math.min(100,budgetPct)+'%;height:100%;background:'+(budgetPct>80?'#f87171':'#4ade80')+';border-radius:2px;"></div></div>' +
+      budgetPct+'%</div>') : '<span style="color:var(--muted2);">∞</span>';
+
+    return '<tr>' +
+      '<td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+o.name+'</td>' +
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:9.5px;color:var(--muted2);">'+o.id.slice(0,14)+'</td>' +
+      '<td><span style="font-size:9px;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;">'+typeStr+'</span></td>' +
+      '<td>'+statusBadge(o.effectiveStatus)+'</td>' +
+      '<td style="font-weight:600;">'+p.uses+'</td>' +
+      '<td style="color:#f87171;">'+inr(p.discount)+'</td>' +
+      '<td>'+inr(avg)+'</td>' +
+      '<td>'+budgetBar+'</td>' +
+      '<td style="color:'+(o.priority>=80?'#f87171':o.priority>=60?'#fbbf24':'#4ade80')+'">'+o.priority+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── LEAKAGE ───────────────────────────────────────────────────────
+function buildLeakage() {
+  var offers = WOWOfferEngine.adminListOffers();
+  var active  = offers.filter(function(o){ return o.effectiveStatus === 'active'; });
+
+  // Cap status
+  var capHtml = active.map(function(o) {
+    var lim = o.usageLimits || {};
+    var pct  = lim.global ? Math.round((o.usedCount||0)/lim.global*100) : null;
+    var budPct = lim.budget ? Math.round((o.usedBudget||0)/lim.budget*100) : null;
+    var hasAnyCap = lim.global || lim.perUser || lim.budget;
+    var color = !hasAnyCap ? '#f87171' : (pct>80||budPct>80) ? '#fbbf24' : '#4ade80';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
+      '<div>' +
+        '<div style="font-size:11.5px;font-weight:600;">'+o.name.slice(0,28)+'</div>' +
+        '<div style="font-size:10px;color:var(--muted);">' +
+          (!hasAnyCap ? 'No caps set — unlimited' :
+            [(lim.global?'Global: '+(o.usedCount||0)+'/'+lim.global:''),
+             (lim.perUser?'Per-user: '+lim.perUser:''),
+             (lim.budget?'Budget: Rs.'+(o.usedBudget||0)+'/'+lim.budget:'')].filter(Boolean).join(' | '))+
+        '</div>' +
+      '</div>' +
+      '<i class="fas fa-circle" style="color:'+color+';font-size:8px;"></i>' +
+    '</div>';
+  }).join('');
+  document.getElementById('leakage-cap-list').innerHTML = capHtml ||
+    '<div style="color:var(--muted);padding:20px;text-align:center;">No active offers.</div>';
+
+  // Risk
+  var riskHtml = '';
+  active.forEach(function(o) {
+    var risks = WOWOfferEngine.checkRisks(o);
+    risks.forEach(function(r) {
+      var cl = r.level==='danger' ? '#f87171' : r.level==='warn' ? '#fbbf24' : '#60a5fa';
+      riskHtml += '<div style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
+        '<div style="font-size:11px;font-weight:600;color:'+cl+';">'+o.name.slice(0,25)+'</div>' +
+        '<div style="font-size:10.5px;color:var(--muted);margin-top:1px;">'+r.msg+'</div>' +
+      '</div>';
+    });
+  });
+  document.getElementById('leakage-risk-list').innerHTML = riskHtml ||
+    '<div style="color:#4ade80;padding:20px;text-align:center;"><i class="fas fa-shield-check"></i> No risks detected.</div>';
+
+  // Stackability
+  var excl  = active.filter(function(o){ return o.stackMode==='exclusive'; }).length;
+  var stack = active.filter(function(o){ return o.stackMode==='stackable'; }).length;
+  var best  = active.filter(function(o){ return o.stackMode==='best_only'; }).length;
+  destroyChart('leak-stack');
+  _charts['leak-stack'] = new Chart(document.getElementById('c-leak-stack').getContext('2d'),{
+    type:'bar',
+    data:{labels:['Exclusive (blocks others)','Stackable (combines)','Best-Only (per family)'],
+      datasets:[{data:[excl,stack,best],
+        backgroundColor:['rgba(239,68,68,.6)','rgba(34,197,94,.6)','rgba(251,191,36,.6)'],borderRadius:5}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},
+        y:{ticks:{color:'rgba(255,255,255,.45)',font:{size:10}},grid:{display:false}}}}
+  });
+}
+
+// ── COUPON ────────────────────────────────────────────────────────
+function buildCoupon() {
+  var days   = getDays();
+  var stats  = WOWOfferEngine.Analytics.summary(days);
+  var offers = WOWOfferEngine.adminListOffers();
+  var coupons = offers.filter(function(o){ return o.promoCode; });
+  var activeCoupons = coupons.filter(function(o){ return o.effectiveStatus==='active'; });
+  var perOffer = stats.perOffer;
+  var totalCouponDisc = activeCoupons.reduce(function(s,o){ return s+(perOffer[o.id]?perOffer[o.id].discount:0); },0);
+
+  document.getElementById('coupon-kpis').innerHTML = [
+    mkKPI(coupons.length, 'Total Coupon Codes', '#60a5fa'),
+    mkKPI(activeCoupons.length, 'Active Codes', '#4ade80'),
+    mkKPI(inr(totalCouponDisc), 'Discount via Coupons', '#f87171'),
+    mkKPI(activeCoupons.filter(function(o){ return o.usageLimits && !o.usageLimits.global; }).length, 'Uncapped Codes', '#fbbf24'),
+  ].join('');
+
+  document.getElementById('coupon-table-body').innerHTML = coupons.map(function(o) {
+    var p   = perOffer[o.id] || { uses:0, discount:0 };
+    var lim = o.usageLimits || {};
+    var rem = lim.global ? Math.max(0, lim.global - (o.usedCount||0)) : '∞';
+    var expiry = (o.schedule && o.schedule.endDate) ? o.schedule.endDate : '—';
+    return '<tr>' +
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:var(--gold2);">'+o.promoCode+'</td>' +
+      '<td style="font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+o.name+'</td>' +
+      '<td>'+(o.actions&&o.actions[0]?o.actions[0].value+(o.actions[0].type==='percent'?'%':' flat'):'—')+'</td>' +
+      '<td>'+(lim.global||'Unlimited')+'</td>' +
+      '<td>'+p.uses+'</td>' +
+      '<td style="color:'+(rem!=='∞'&&rem<20?'#f87171':'#4ade80')+'">'+(typeof rem==='number'?rem.toLocaleString('en-IN'):rem)+'</td>' +
+      '<td>'+statusBadge(o.effectiveStatus)+'</td>' +
+      '<td style="font-size:10.5px;color:var(--muted);">'+expiry+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── CHART SHARED OPTIONS ─────────────────────────────────────────
+function _chartOpts(showLegend) {
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:!!showLegend, labels:{ color:'rgba(255,255,255,.45)', font:{size:10} } } },
+    scales:{
+      x:{ ticks:{color:'rgba(255,255,255,.35)',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} },
+      y:{ ticks:{color:'rgba(255,255,255,.35)',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} }
+    }
+  };
+}
+
+// ── TIME HEATMAP ────────────────────────────────────────────────
+function buildHeatmap() {
+  var days  = getDays();
+  var logs  = WOWOfferEngine.readExecLog({ limit: 2000 });
+  var cutoff= Date.now() - days*86400000;
+  logs = logs.filter(function(l){return l.ts>=cutoff;});
+
+  var hourCounts = new Array(24).fill(0);
+  var dowCounts  = new Array(7).fill(0);
+  var hourDow    = {};
+  logs.forEach(function(l){
+    var d  = new Date(l.ts);
+    var h  = d.getHours();
+    var dw = d.getDay();
+    hourCounts[h]++;
+    dowCounts[dw]++;
+    var key = h+'_'+dw;
+    hourDow[key] = (hourDow[key]||0)+1;
+  });
+
+  var peakHour = hourCounts.indexOf(Math.max.apply(null,hourCounts));
+  var peakDow  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dowCounts.indexOf(Math.max.apply(null,dowCounts))];
+  document.getElementById('heatmap-kpis').innerHTML = [
+    mkKPI(logs.length, 'Transactions Analysed', '#60a5fa'),
+    mkKPI(peakHour+':00–'+(peakHour+1)+':00', 'Peak Hour', '#fbbf24'),
+    mkKPI(peakDow||'—', 'Peak Day', '#4ade80'),
+    mkKPI(Math.max.apply(null,hourCounts), 'Max Hourly Volume', '#c084fc'),
+  ].join('');
+
+  var days7 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var maxVal = Math.max.apply(null, Object.values(hourDow).concat([1]));
+  var gridHtml = '<div style="display:flex;gap:2px;">';
+  gridHtml += '<div style="display:flex;flex-direction:column;gap:1px;padding-top:16px;">';
+  for(var h=0;h<24;h++){
+    gridHtml += '<div style="height:14px;font-size:8px;color:rgba(255,255,255,.3);line-height:14px;padding-right:4px;white-space:nowrap;">'+String(h).padStart(2,'0')+'h</div>';
+  }
+  gridHtml += '</div>';
+  for(var di=0;di<7;di++){
+    gridHtml += '<div style="display:flex;flex-direction:column;gap:1px;">';
+    gridHtml += '<div style="font-size:8px;color:rgba(255,255,255,.4);text-align:center;height:14px;line-height:14px;">'+days7[di]+'</div>';
+    for(var hi=0;hi<24;hi++){
+      var val  = hourDow[hi+'_'+di]||0;
+      var alph = maxVal>0?val/maxVal:0;
+      var bg   = 'rgba(201,168,76,'+Math.max(0.04,alph.toFixed(2))+')';
+      gridHtml += '<div title="'+days7[di]+' '+String(hi).padStart(2,'0')+'h: '+val+'" style="width:20px;height:14px;background:'+bg+';border-radius:2px;font-size:7px;color:'+(alph>0.5?'rgba(0,0,0,.7)':'rgba(255,255,255,.25)')+';text-align:center;line-height:14px;">'+(val>0?val:'')+'</div>';
+    }
+    gridHtml += '</div>';
+  }
+  gridHtml += '</div>';
+  document.getElementById('heatmap-grid').innerHTML = gridHtml;
+
+  destroyChart('hm-hour');
+  _charts['hm-hour'] = new Chart(document.getElementById('c-hm-hour').getContext('2d'),{
+    type:'bar',
+    data:{labels:Array.from({length:24},function(_,i){return String(i).padStart(2,'0')+'h';}),
+      datasets:[{label:'Redemptions',data:hourCounts,backgroundColor:'rgba(201,168,76,.5)',borderRadius:3}]},
+    options:_chartOpts(false)
+  });
+
+  destroyChart('hm-dow');
+  _charts['hm-dow'] = new Chart(document.getElementById('c-hm-dow').getContext('2d'),{
+    type:'bar',
+    data:{labels:days7,
+      datasets:[{label:'Redemptions',data:dowCounts,
+        backgroundColor:['rgba(59,130,246,.5)','rgba(34,197,94,.5)','rgba(34,197,94,.5)','rgba(34,197,94,.5)','rgba(34,197,94,.5)','rgba(201,168,76,.5)','rgba(201,168,76,.5)'],
+        borderRadius:4}]},
+    options:_chartOpts(false)
+  });
+}
+
+// ── A/B RESULTS ──────────────────────────────────────────────────
+function buildABResults() {
+  var tests = [];
+  try { tests = JSON.parse(localStorage.getItem('wow_ab_tests')||'[]'); } catch(_){}
+  var assignments = {};
+  try { assignments = JSON.parse(localStorage.getItem('wow_ab_assignments')||'{}'); } catch(_){}
+  var totalAssign  = Object.keys(assignments).length;
+  var runningTests = tests.filter(function(t){return t.status==='running';}).length;
+
+  document.getElementById('ab-res-kpis').innerHTML = [
+    mkKPI(tests.length,    'Total Tests',  '#60a5fa'),
+    mkKPI(runningTests,    'Running',      '#4ade80'),
+    mkKPI(totalAssign,     'Assignments',  '#c084fc'),
+    mkKPI(tests.filter(function(t){return t.status==='completed';}).length, 'Completed', '#fbbf24'),
+  ].join('');
+
+  var listHtml = tests.length ? tests.map(function(t){
+    var varStats = (t.variants||[]).map(function(v){
+      var ac = Object.keys(assignments).filter(function(k){
+        return k.endsWith('_'+t.id) && assignments[k]===v.id;
+      }).length;
+      return {id:v.id, label:v.label||v.id, weight:v.weight, offerId:v.offerId, assignCount:ac};
+    });
+    var sc = {running:'#4ade80',completed:'#60a5fa',paused:'#fbbf24',draft:'rgba(255,255,255,.3)'};
+    return '<div class="card-sm" style="margin-bottom:10px;">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:6px;">' +
+        '<div style="font-size:13px;font-weight:700;">'+t.name+'</div>' +
+        '<span style="font-size:10px;font-weight:700;color:'+(sc[t.status||'draft'])+';">'+(t.status||'draft').toUpperCase()+'</span>' +
+      '</div>' +
+      '<div style="font-size:10.5px;color:var(--muted);margin-bottom:8px;">'+(t.description||'No description')+'</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        varStats.map(function(v){
+          return '<div style="flex:1;min-width:110px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:7px;padding:8px 12px;">' +
+            '<div style="font-size:10px;font-weight:700;color:var(--gold2);">'+v.id+' ('+v.weight+'%)</div>' +
+            '<div style="font-size:10.5px;margin-top:2px;">'+(v.label||v.id)+'</div>' +
+            '<div style="font-size:10px;color:var(--muted);margin-top:3px;">'+v.assignCount+' assigned</div>' +
+          '</div>';
+        }).join('') +
+      '</div></div>';
+  }).join('') : '<div style="text-align:center;padding:40px;color:var(--muted);"><i class="fas fa-random" style="font-size:24px;opacity:.3;display:block;margin-bottom:8px;"></i>No A/B tests configured yet. Go to Offer Engine to create tests.</div>';
+  document.getElementById('ab-results-list').innerHTML = listHtml;
+
+  var varLabels=[], varData=[];
+  tests.forEach(function(t){
+    (t.variants||[]).forEach(function(v){
+      if(v.offerId){
+        var detail = WOWOfferEngine.Analytics.offerDetail(v.offerId, getDays());
+        varLabels.push(t.name.slice(0,10)+':'+v.id);
+        varData.push(detail.discount||0);
+      }
+    });
+  });
+  destroyChart('ab-perf');
+  _charts['ab-perf'] = new Chart(document.getElementById('c-ab-perf').getContext('2d'),{
+    type:'bar',
+    data:{labels:varLabels.length?varLabels:['No Variants with Offers'],
+      datasets:[{label:'Discount Given (Rs.)',data:varData.length?varData:[0],
+        backgroundColor:['rgba(96,165,250,.6)','rgba(168,85,247,.6)','rgba(34,197,94,.6)','rgba(249,115,22,.6)'],borderRadius:4}]},
+    options:_chartOpts(true)
+  });
+}
+
+// ── MAKER-CHECKER PANEL ───────────────────────────────────────────
+function buildMakerPanel() {
+  var pending=[], history=[];
+  try {
+    if(WOWOfferEngine.MakerChecker){
+      pending = WOWOfferEngine.MakerChecker.getPending();
+      history = WOWOfferEngine.MakerChecker.getHistory();
+    }
+  } catch(_){}
+
+  document.getElementById('maker-kpis').innerHTML = [
+    mkKPI(pending.length, 'Pending Approvals', pending.length>0?'#fbbf24':'#4ade80'),
+    mkKPI(history.filter(function(r){return r.status==='approved';}).length, 'Approved', '#4ade80'),
+    mkKPI(history.filter(function(r){return r.status==='rejected';}).length, 'Rejected', '#f87171'),
+    mkKPI(history.length, 'Total Requests', '#60a5fa'),
+  ].join('');
+
+  var pendHtml = pending.length ? pending.map(function(r){
+    return '<div class="card-sm" style="margin-bottom:10px;border-color:rgba(251,191,36,.25);">' +
+      '<div style="display:flex;justify-content:space-between;">' +
+        '<div>' +
+          '<div style="font-size:12.5px;font-weight:700;">'+r.action.toUpperCase()+': '+(r.offerData?r.offerData.name:r.offerId)+'</div>' +
+          '<div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;margin-top:2px;">'+r.id+'</div>' +
+          '<div style="font-size:10.5px;color:var(--muted);margin-top:3px;">By: '+r.submittedBy+' &bull; '+dt(r.submittedAt)+'</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="btn btn-sm" style="background:rgba(34,197,94,.15);color:#4ade80;border-color:rgba(34,197,94,.3);" onclick="approveRequest(\''+r.id+'\')"><i class="fas fa-check"></i> Approve</button>' +
+          '<button class="btn btn-sm" style="background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.2);" onclick="rejectRequest(\''+r.id+'\')"><i class="fas fa-times"></i> Reject</button>' +
+        '</div>' +
+      '</div></div>';
+  }).join('') : '<div style="text-align:center;padding:30px;color:var(--muted);"><i class="fas fa-check-circle" style="font-size:22px;color:#4ade80;opacity:.5;display:block;margin-bottom:8px;"></i>No pending approvals. All clear!</div>';
+  document.getElementById('maker-pending-list').innerHTML = pendHtml;
+
+  document.getElementById('maker-history-body').innerHTML = history.slice(0,50).map(function(r){
+    var sc={pending:'#fbbf24',approved:'#4ade80',rejected:'#f87171'};
+    return '<tr>' +
+      '<td style="font-family:JetBrains Mono,monospace;font-size:9.5px;color:var(--muted);">'+r.id.slice(0,16)+'</td>' +
+      '<td><span style="font-size:9.5px;background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;">'+r.action+'</span></td>' +
+      '<td style="font-weight:600;">'+(r.offerData?r.offerData.name:r.offerId||'—').slice(0,25)+'</td>' +
+      '<td style="font-size:10.5px;color:var(--muted);">'+r.submittedBy+'</td>' +
+      '<td style="font-size:10px;color:var(--muted);">'+dt(r.submittedAt)+'</td>' +
+      '<td><span style="font-size:10px;font-weight:700;color:'+(sc[r.status]||'var(--muted)')+';">'+(r.status||'?').toUpperCase()+'</span></td>' +
+      '<td style="font-size:10.5px;color:var(--muted);">'+(r.approvedBy||r.rejectedBy||'—')+'</td>' +
+    '</tr>';
+  }).join('') || '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">No history yet.</td></tr>';
+}
+
+function approveRequest(id) {
+  var comments = prompt('Approval comment (optional):') || '';
+  var result   = WOWOfferEngine.MakerChecker.approve(id, null, comments);
+  if (result.ok) { alert('Request approved and applied!'); buildMakerPanel(); }
+  else alert('Error: ' + (result.error||'Unknown'));
+}
+function rejectRequest(id) {
+  var reason = prompt('Rejection reason:') || 'Rejected by checker';
+  WOWOfferEngine.MakerChecker.reject(id, null, reason);
+  alert('Request rejected.');
+  buildMakerPanel();
+}
+
+// ── EXPORT ───────────────────────────────────────────────────────
+function exportData() {
+  var days   = getDays();
+  var stats  = WOWOfferEngine.Analytics.summary(days);
+  var offers = WOWOfferEngine.adminListOffers();
+  var perOffer = stats.perOffer;
+
+  var rows = [['Offer ID','Offer Name','Status','Type','Uses','Discount Rs.','Avg Rs.']];
+  offers.forEach(function(o) {
+    var p   = perOffer[o.id] || { uses:0, discount:0 };
+    var avg = p.uses > 0 ? Math.round(p.discount/p.uses) : 0;
+    rows.push([o.id, o.name, o.effectiveStatus, o.autoApply?'Auto':'Coupon', p.uses, p.discount, avg]);
+  });
+
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob = new Blob([csv], { type:'text/csv' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href  = url; a.download = 'wow-offer-analytics.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() { buildOverview(); });
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

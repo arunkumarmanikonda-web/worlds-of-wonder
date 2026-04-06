@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Gate Scanner — WOW Admin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"/>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="../js/wow-auth.js"></script>
+<script src="../js/wow-passport-engine.js"></script>
+<style>
+:root{
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#9A6F2A;
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;--blue:#3b82f6;--purple:#7c3aed;
+  --navy:#0a1628;--dark:#060c18;--slate:#1e293b;--muted:#64748b;
+  --border:#e2e8f0;--bg:#0d1526;--white:#fff;
+  --sidebar:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+
+/* LAYOUT */
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);background:#060e1e;border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
+.sb-logo{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;}
+.sb-logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--gold3),var(--gold));border-radius:9px;display:grid;place-items:center;font-size:18px;flex-shrink:0;}
+.sb-logo-text span{font-weight:800;font-size:12px;color:#fff;display:block;}
+.sb-logo-text small{font-size:10px;color:rgba(255,255,255,.35);}
+.sb-section{font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.25);padding:10px 14px 4px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:11.5px;color:rgba(255,255,255,.5);cursor:pointer;transition:.15s;border-left:3px solid transparent;text-decoration:none;}
+.sb-item:hover,.sb-item.active{background:rgba(255,255,255,.06);color:#fff;border-left-color:var(--gold);}
+.sb-item i{width:14px;text-align:center;font-size:11px;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;min-width:0;padding:24px;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.topbar-title{font-size:18px;font-weight:800;display:flex;align-items:center;gap:10px;}
+.topbar-right{display:flex;gap:10px;align-items:center;}
+
+/* GATE SELECTOR */
+.gate-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px;}
+.gate-btn{padding:12px;border-radius:12px;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;transition:.2s;}
+.gate-btn:hover{border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.05);}
+.gate-btn.active{border-color:var(--gold);background:rgba(201,168,76,.12);}
+.gate-btn-icon{font-size:24px;margin-bottom:6px;}
+.gate-btn-name{font-size:12px;font-weight:700;}
+.gate-btn-type{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;}
+
+/* SCAN AREA */
+.scan-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.scan-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;}
+.scan-card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* QR INPUT */
+.qr-input-wrap{position:relative;margin-bottom:16px;}
+.qr-input{width:100%;padding:14px 16px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;font-size:13px;color:#fff;font-family:'Courier New',monospace;transition:.2s;}
+.qr-input:focus{outline:none;border-color:var(--gold);background:rgba(201,168,76,.05);}
+.qr-input::placeholder{color:rgba(255,255,255,.3);}
+.qr-input-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;color:rgba(255,255,255,.3);}
+
+/* SIMULATED CAMERA */
+.camera-sim{background:#000;border-radius:12px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;border:2px solid rgba(255,255,255,.08);}
+.camera-sim.scanning{border-color:var(--gold);animation:scan-border 1.5s infinite;}
+@keyframes scan-border{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}50%{box-shadow:0 0 20px 4px rgba(201,168,76,.3);}}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scan-move 2s linear infinite;display:none;}
+.camera-sim.scanning .scan-line{display:block;}
+@keyframes scan-move{0%{top:10%;}100%{top:90%;};}
+.scan-corner{position:absolute;width:30px;height:30px;border-color:var(--gold);border-style:solid;}
+.sc-tl{top:16px;left:16px;border-width:3px 0 0 3px;}
+.sc-tr{top:16px;right:16px;border-width:3px 3px 0 0;}
+.sc-bl{bottom:16px;left:16px;border-width:0 0 3px 3px;}
+.sc-br{bottom:16px;right:16px;border-width:0 3px 3px 0;}
+.camera-text{font-size:12px;color:rgba(255,255,255,.4);text-align:center;margin-top:12px;}
+.camera-btn{margin-top:12px;padding:8px 20px;background:var(--gold);color:#0a0a14;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* SCAN MODES */
+.mode-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.mode-tab{padding:7px 14px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);transition:.15s;}
+.mode-tab.active{background:var(--gold);color:#0a0a14;border-color:var(--gold);}
+
+/* RESULT CARD */
+.result-card{border-radius:16px;padding:20px;margin-bottom:20px;animation:result-in .3s ease;}
+@keyframes result-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.result-card.success{background:linear-gradient(135deg,#052e16,#065f46);border:1.5px solid #22c55e;}
+.result-card.error{background:linear-gradient(135deg,#450a0a,#7f1d1d);border:1.5px solid #ef4444;}
+.result-card.warning{background:linear-gradient(135deg,#431407,#78350f);border:1.5px solid var(--amber);}
+.result-card.info{background:rgba(59,130,246,.12);border:1.5px solid rgba(59,130,246,.3);}
+.result-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.result-icon{font-size:36px;}
+.result-title{font-size:18px;font-weight:800;}
+.result-subtitle{font-size:12px;opacity:.7;margin-top:2px;}
+
+/* PASSPORT PREVIEW */
+.pp-preview{background:rgba(0,0,0,.3);border-radius:12px;padding:16px;display:flex;gap:16px;align-items:center;margin-bottom:14px;}
+.pp-preview-photo{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,255,255,.2);}
+.pp-preview-photo img{width:100%;height:100%;object-fit:cover;}
+.pp-preview-info h3{font-size:15px;font-weight:700;font-family:'Cinzel',serif;}
+.pp-preview-info small{font-size:11px;opacity:.6;display:block;margin-top:2px;}
+.pp-preview-tier{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(201,168,76,.2);color:var(--gold2);border:1px solid rgba(201,168,76,.3);margin-top:6px;}
+.pp-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.pp-field{background:rgba(0,0,0,.2);border-radius:8px;padding:8px 12px;}
+.pp-field-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;opacity:.5;margin-bottom:2px;}
+.pp-field-value{font-size:12px;font-weight:700;}
+
+/* VIP LANE */
+.vip-indicator{background:linear-gradient(135deg,#78350f,var(--gold));border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.vip-indicator-text{font-size:13px;font-weight:700;color:#fff;}
+
+/* VOUCHER LIST */
+.voucher-quick-list{display:flex;flex-direction:column;gap:6px;}
+.vql-item{background:rgba(0,0,0,.2);border-radius:8px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;}
+.vql-name{font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.vql-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.vql-redeemed{background:rgba(239,68,68,.2);color:#f87171;}
+.vql-active{background:rgba(34,197,94,.2);color:#4ade80;}
+
+/* OVERRIDE PANEL */
+.override-panel{background:rgba(255,152,0,.08);border:1.5px solid rgba(255,152,0,.3);border-radius:12px;padding:16px;margin-top:12px;}
+.override-panel-title{font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.override-input{width:100%;padding:8px 12px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:8px;font-size:12px;color:#fff;margin-bottom:10px;}
+.override-input::placeholder{color:rgba(255,255,255,.3);}
+
+/* LOG FEED */
+.log-feed{background:rgba(0,0,0,.3);border-radius:12px;padding:14px;max-height:320px;overflow-y:auto;}
+.log-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:12px;align-items:flex-start;}
+.log-item:last-child{border:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.log-dot-green{background:var(--green);}
+.log-dot-red{background:var(--red);}
+.log-dot-amber{background:var(--amber);}
+.log-dot-blue{background:var(--blue);}
+.log-content{flex:1;}
+.log-title{font-size:12px;font-weight:600;}
+.log-meta{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.sc-green::before{background:var(--green);}
+.sc-red::before{background:var(--red);}
+.sc-amber::before{background:var(--amber);}
+.sc-gold::before{background:linear-gradient(90deg,var(--gold3),var(--gold));}
+.sc-label{font-size:9px;color:rgba(255,255,255,.4);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.sc-val{font-size:24px;font-weight:800;margin:4px 0 2px;}
+.sc-sub{font-size:10px;color:rgba(255,255,255,.35);}
+.sc-icon{position:absolute;top:12px;right:14px;font-size:24px;opacity:.08;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:9px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
+.btn-gold{background:var(--gold);color:#0a0a14;}
+.btn-gold:hover{background:var(--gold3);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+.btn-danger:hover{background:rgba(239,68,68,.35);}
+.btn-success{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
+.btn-success:hover{background:rgba(34,197,94,.35);}
+.btn-amber{background:rgba(245,158,11,.2);color:#fbbf24;border:1px solid rgba(245,158,11,.3);}
+.btn-amber:hover{background:rgba(245,158,11,.3);}
+.btn-sm{padding:6px 14px;font-size:11px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;display:none;place-items:center;padding:20px;}
+.modal-overlay.show{display:grid;}
+.modal{background:#0d1526;border:1px solid rgba(255,255,255,.1);border-radius:16px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:rgba(255,255,255,.4);}
+.modal-close:hover{color:var(--red);}
+.form-field{margin-bottom:14px;}
+.form-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.5);margin-bottom:5px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;font-size:12px;color:#fff;transition:.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--gold);background:rgba(201,168,76,.05);}
+.form-input::placeholder,.form-textarea::placeholder{color:rgba(255,255,255,.3);}
+.form-select option{background:#0d1526;color:#fff;}
+.form-textarea{resize:vertical;min-height:70px;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
+.b-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
+.b-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);}
+.b-amber{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25);}
+.b-gold{background:rgba(201,168,76,.15);color:var(--gold2);border:1px solid rgba(201,168,76,.25);}
+.b-blue{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25);}
+.b-gray{background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid var(--gold);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;z-index:9999;display:none;max-width:320px;}
+#toast.danger{background:#7f1d1d;border-color:#ef4444;}
+#toast.success{background:#052e16;border-color:#22c55e;}
+
+/* MANUAL LOOKUP */
+.lookup-result{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:14px;margin-top:12px;}
+
+/* CLOCK */
+.gate-clock{font-family:'Courier New',monospace;font-size:12px;color:rgba(255,255,255,.4);background:rgba(255,255,255,.04);padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.08);}
+
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%);}.main{margin-left:0;}
+  .scan-area{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .pp-fields{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">🔍</div>
+    <div class="sb-logo-text"><span>WOW Gate Scanner</span><small>Passport Validation</small></div>
+  </div>
+  <div class="sb-section">Scanner</div>
+  <a class="sb-item active" href="passport-scanner.html"><i class="fas fa-qrcode"></i> Gate Scanner</a>
+  <a class="sb-item" href="passport-redemptions.html"><i class="fas fa-ticket-alt"></i> Redemptions</a>
+  <div class="sb-section">Passport</div>
+  <a class="sb-item" href="passport-engine.html"><i class="fas fa-passport"></i> Passport Engine</a>
+  <a class="sb-item" href="passport-kyc-review.html"><i class="fas fa-id-card"></i> KYC Review</a>
+  <div class="sb-section">Sales</div>
+  <a class="sb-item" href="../sales/erp-dashboard.html"><i class="fas fa-chart-bar"></i> Sales ERP</a>
+  <a class="sb-item" href="../sales/gate-scanner.html"><i class="fas fa-sign-in-alt"></i> Sales Gate</a>
+  <div class="sb-section">Admin</div>
+  <a class="sb-item" href="index.html"><i class="fas fa-th-large"></i> ERP Dashboard</a>
+  <a class="sb-item" href="super-admin.html"><i class="fas fa-shield-alt"></i> Super Admin</a>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-title">
+      <span>🔍</span>
+      Gate & Voucher Scanner
+    </div>
+    <span class="badge b-green" id="scanner-status">● ONLINE</span>
+  </div>
+  <div class="topbar-right">
+    <div class="gate-clock" id="gate-clock">--:--:--</div>
+    <select id="mode-select" class="form-select" style="width:140px;padding:6px 10px;font-size:11px;" onchange="updateMode()">
+      <option value="park_entry">🚪 Park Entry</option>
+      <option value="voucher">🎟 Voucher Redeem</option>
+      <option value="lookup">🔎 Lookup Only</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="openModal('modal-settings')"><i class="fas fa-cog"></i></button>
+    <div id="auth-widget"></div>
+  </div>
+</div>
+
+<!-- SESSION STATS -->
+<div class="stats-row">
+  <div class="stat-card sc-green">
+    <div class="sc-label">Entries Today</div>
+    <div class="sc-val" id="stat-entries">0</div>
+    <div class="sc-sub">Successful scans</div>
+    <div class="sc-icon">✅</div>
+  </div>
+  <div class="stat-card sc-red">
+    <div class="sc-label">Rejections</div>
+    <div class="sc-val" id="stat-rejected">0</div>
+    <div class="sc-sub">Blocked or invalid</div>
+    <div class="sc-icon">❌</div>
+  </div>
+  <div class="stat-card sc-amber">
+    <div class="sc-label">Vouchers Redeemed</div>
+    <div class="sc-val" id="stat-vouchers">0</div>
+    <div class="sc-sub">This session</div>
+    <div class="sc-icon">🎟</div>
+  </div>
+  <div class="stat-card sc-gold">
+    <div class="sc-label">Gate</div>
+    <div class="sc-val" id="stat-gate-name" style="font-size:14px;">—</div>
+    <div class="sc-sub" id="stat-gate-park">No gate selected</div>
+    <div class="sc-icon">🚪</div>
+  </div>
+</div>
+
+<!-- GATE SELECTOR -->
+<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:10px;">Select Active Gate / Counter</div>
+<div class="gate-selector">
+  <div class="gate-btn active" onclick="selectGate(this,'MAIN_ENTRY','Main Entry','WATER_DAY')">
+    <div class="gate-btn-icon">🚪</div>
+    <div class="gate-btn-name">Main Entry</div>
+    <div class="gate-btn-type">Water Park</div>
+  </div>
+  <div class="gate-btn" onclick="selectGate(this,'AMUSE_MAIN','Amusement Entry','AMUSEMENT_DAY')">
+    <div class="gate-btn-icon">🎢</div>
+    <div class="gate-btn-name">Amusement Gate</div>
+    <div class="gate-btn-type">Amusement Park</div>
+  </div>
+  <div class="gate-btn" onclick="selectGate(this,'FNB_MAIN','F&amp;B Counter','ALL')">
+    <div class="gate-btn-icon">🍽</div>
+    <div class="gate-btn-name">F&amp;B Counter</div>
+    <div class="gate-btn-type">Voucher Counter</div>
+  </div>
+  <div class="gate-btn" onclick="selectGate(this,'LOCKER_CTR','Locker Counter','ALL')">
+    <div class="gate-btn-icon">🔐</div>
+    <div class="gate-btn-name">Locker Counter</div>
+    <div class="gate-btn-type">Voucher Counter</div>
+  </div>
+  <div class="gate-btn" onclick="selectGate(this,'VIP_LOUNGE','VIP Lounge','ALL')">
+    <div class="gate-btn-icon">🏆</div>
+    <div class="gate-btn-name">VIP Lounge</div>
+    <div class="gate-btn-type">Access Point</div>
+  </div>
+  <div class="gate-btn" onclick="selectGate(this,'MERCH_STORE','Merch Store','ALL')">
+    <div class="gate-btn-icon">🛍</div>
+    <div class="gate-btn-name">Merch Store</div>
+    <div class="gate-btn-type">Credit Counter</div>
+  </div>
+</div>
+
+<!-- SCAN AREA -->
+<div class="scan-area">
+
+  <!-- QR INPUT PANEL -->
+  <div class="scan-card">
+    <div class="scan-card-title"><i class="fas fa-qrcode"></i> Scan QR / Enter Code</div>
+
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="setInputMode('qr')">QR Token</div>
+      <div class="mode-tab" onclick="setInputMode('passport')">Passport No.</div>
+      <div class="mode-tab" onclick="setInputMode('manual')">Manual Lookup</div>
+    </div>
+
+    <!-- QR INPUT -->
+    <div id="input-qr">
+      <div class="qr-input-wrap">
+        <input class="qr-input" id="qr-input" type="text" placeholder="Scan or paste WOW-QR.… token here"
+               autofocus autocomplete="off" onkeydown="if(event.key==='Enter')processScan()"/>
+        <div class="qr-input-icon"><i class="fas fa-qrcode"></i></div>
+      </div>
+      <button class="btn btn-gold" style="width:100%;" onclick="processScan()">
+        <i class="fas fa-bolt"></i> Process Scan
+      </button>
+
+      <!-- SIMULATED CAMERA -->
+      <div style="margin-top:14px;">
+        <div class="camera-sim" id="camera-sim" onclick="toggleCamera()">
+          <div class="scan-line"></div>
+          <div class="scan-corner sc-tl"></div>
+          <div class="scan-corner sc-tr"></div>
+          <div class="scan-corner sc-bl"></div>
+          <div class="scan-corner sc-br"></div>
+          <div id="camera-content" style="text-align:center;padding:20px;">
+            <i class="fas fa-camera" style="font-size:32px;color:rgba(255,255,255,.2);display:block;margin-bottom:10px;"></i>
+            <div class="camera-text">Tap to start camera simulation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSPORT NUMBER INPUT -->
+    <div id="input-passport" style="display:none;">
+      <div class="qr-input-wrap">
+        <input class="qr-input" id="pp-input" type="text" placeholder="e.g. WOW-PAX-2025-000001"
+               autocomplete="off" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')lookupPassport()"/>
+        <div class="qr-input-icon"><i class="fas fa-passport"></i></div>
+      </div>
+      <button class="btn btn-gold" style="width:100%;" onclick="lookupPassport()">
+        <i class="fas fa-search"></i> Lookup Passport
+      </button>
+    </div>
+
+    <!-- MANUAL LOOKUP -->
+    <div id="input-manual" style="display:none;">
+      <input class="form-input" id="manual-search" placeholder="Name, email or mobile…" style="margin-bottom:10px;"
+             oninput="doManualSearch()"/>
+      <div id="manual-results"></div>
+    </div>
+
+    <!-- QUICK DEMO SCANS -->
+    <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.3);margin-bottom:8px;">Demo / Test Scans</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="demo-scan-btns"></div>
+    </div>
+  </div>
+
+  <!-- RESULT PANEL -->
+  <div class="scan-card">
+    <div class="scan-card-title"><i class="fas fa-receipt"></i> Scan Result</div>
+    <div id="result-area">
+      <div style="text-align:center;padding:40px 20px;">
+        <i class="fas fa-qrcode" style="font-size:48px;opacity:.1;display:block;margin-bottom:16px;"></i>
+        <div style="font-size:14px;font-weight:600;opacity:.3;">Waiting for scan…</div>
+        <div style="font-size:11px;opacity:.2;margin-top:6px;">Select a gate and scan a QR code or passport number</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SESSION LOG -->
+<div class="scan-card">
+  <div class="scan-card-title"><i class="fas fa-list"></i> Session Log <span class="badge b-gray" id="log-count" style="margin-left:6px;">0</span></div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+    <select id="log-filter" onchange="renderLog()" style="padding:5px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;font-size:11px;color:#fff;">
+      <option value="">All Events</option>
+      <option value="ENTRY">Park Entries</option>
+      <option value="VOUCHER">Voucher Redeems</option>
+      <option value="DENIED">Denied</option>
+      <option value="OVERRIDE">Overrides</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="clearSessionLog()"><i class="fas fa-trash"></i> Clear</button>
+    <button class="btn btn-outline btn-sm" onclick="exportSessionLog()"><i class="fas fa-download"></i> Export</button>
+  </div>
+  <div class="log-feed" id="log-feed">
+    <div style="text-align:center;padding:30px;color:rgba(255,255,255,.25);font-size:12px;">No events this session</div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title"><i class="fas fa-cog"></i> Scanner Settings</div>
+      <button class="modal-close" onclick="closeModal('modal-settings')">×</button>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Staff ID / Username</label>
+      <input class="form-input" id="cfg-staff-id" placeholder="e.g. GATE-STAFF-01"/>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Default Park</label>
+      <select class="form-select" id="cfg-default-park">
+        <option value="WATER_DAY">Water Park</option>
+        <option value="AMUSEMENT_DAY">Amusement Park</option>
+        <option value="ALL">Both Parks / Counter</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Sound Alerts</label>
+      <select class="form-select" id="cfg-sound">
+        <option value="on">Enabled</option>
+        <option value="off">Disabled</option>
+      </select>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-settings')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveSettings()"><i class="fas fa-save"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERRIDE CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-override">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" style="color:var(--amber);">⚠️ Manual Override</div>
+      <button class="modal-close" onclick="closeModal('modal-override')">×</button>
+    </div>
+    <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#fbbf24;">
+      You are about to manually override a scan denial. This action is fully audited and cannot be undone. Supervisor authorisation may be required.
+    </div>
+    <div class="form-field">
+      <label class="form-label">Override Reason <span style="color:var(--red);">*</span></label>
+      <select class="form-select" id="override-reason-select">
+        <option value="">Select reason…</option>
+        <option value="Technical fault — QR not scanning">Technical fault — QR not scanning</option>
+        <option value="Manager approved exception">Manager approved exception</option>
+        <option value="Passport renewal in progress">Passport renewal in progress</option>
+        <option value="System error reported">System error reported</option>
+        <option value="Customer verified by staff manually">Customer verified by staff manually</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Additional Note</label>
+      <textarea class="form-textarea" id="override-note-input" placeholder="Additional details…" rows="3"></textarea>
+    </div>
+    <div class="form-field">
+      <label class="form-label">Supervisor PIN (if required)</label>
+      <form onsubmit="return false;">
+        <input class="form-input" id="override-pin" type="password" placeholder="Enter PIN" autocomplete="current-password"/>
+      </form>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+      <button class="btn btn-outline" onclick="closeModal('modal-override')">Cancel</button>
+      <button class="btn btn-amber" onclick="executeOverride()"><i class="fas fa-bolt"></i> Apply Override</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   WOW GATE SCANNER v2.0
+   ══════════════════════════════════════════════════ */
+
+let activeGate = { id: 'MAIN_ENTRY', name: 'Main Entry', park: 'WATER_DAY' };
+let scanMode = 'park_entry';
+let inputMode = 'qr';
+let sessionLog = [];
+let sessionStats = { entries: 0, rejected: 0, vouchers: 0 };
+let lastScanResult = null;
+let cameraActive = false;
+let cameraInterval = null;
+
+const SCANNER_SETTINGS_KEY = 'wow_scanner_settings';
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof WPE === 'undefined') {
+    showToast('⚠️ Passport Engine not loaded', 'danger');
+    return;
+  }
+  loadSettings();
+  startClock();
+  buildDemoButtons();
+  updateGateDisplay();
+
+  // Auth widget
+  if (typeof WOWAuth !== 'undefined' && WOWAuth.renderTopbarWidget) {
+    const w = document.getElementById('auth-widget');
+    if (w) w.innerHTML = WOWAuth.renderTopbarWidget();
+  }
+
+  // Auto-focus QR input
+  setTimeout(() => {
+    const inp = document.getElementById('qr-input');
+    if (inp) inp.focus();
+  }, 200);
+});
+
+/* ─── CLOCK ─── */
+function startClock() {
+  function tick() {
+    const el = document.getElementById('gate-clock');
+    if (el) el.textContent = new Date().toLocaleTimeString('en-IN', { hour12: false, timeZone: 'Asia/Kolkata' }) + ' IST';
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ─── GATE SELECTION ─── */
+function selectGate(el, gateId, gateName, park) {
+  document.querySelectorAll('.gate-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  activeGate = { id: gateId, name: gateName, park };
+  updateGateDisplay();
+  showToast(`🚪 Gate: ${gateName}`);
+}
+
+function updateGateDisplay() {
+  document.getElementById('stat-gate-name').textContent = activeGate.name;
+  document.getElementById('stat-gate-park').textContent = activeGate.park === 'ALL' ? 'All parks' : activeGate.park.replace('_DAY','');
+}
+
+/* ─── MODE ─── */
+function updateMode() {
+  scanMode = document.getElementById('mode-select').value;
+}
+
+function setInputMode(mode) {
+  inputMode = mode;
+  document.getElementById('input-qr').style.display = mode === 'qr' ? 'block' : 'none';
+  document.getElementById('input-passport').style.display = mode === 'passport' ? 'block' : 'none';
+  document.getElementById('input-manual').style.display = mode === 'manual' ? 'block' : 'none';
+  document.querySelectorAll('.mode-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['qr','passport','manual'][i] === mode);
+  });
+  setTimeout(() => {
+    const inp = document.getElementById({qr:'qr-input',passport:'pp-input',manual:'manual-search'}[mode]);
+    if (inp) inp.focus();
+  }, 50);
+}
+
+/* ─── MAIN SCAN PROCESSOR ─── */
+function processScan() {
+  const token = document.getElementById('qr-input').value.trim();
+  if (!token) { showToast('Enter or scan a QR token', 'danger'); return; }
+  document.getElementById('qr-input').value = '';
+
+  if (scanMode === 'park_entry') {
+    processEntryQR(token);
+  } else if (scanMode === 'voucher') {
+    processVoucherQR(token);
+  } else {
+    processLookupQR(token);
+  }
+
+  // Re-focus input
+  setTimeout(() => document.getElementById('qr-input').focus(), 100);
+}
+
+/* ─── PARK ENTRY ─── */
+function processEntryQR(token) {
+  const payload = WPE.parseQRToken(token);
+  if (!payload) {
+    // Try as passport number
+    const pp = WPE.getPassportById(token);
+    if (pp) { handlePassportEntry(pp); return; }
+    showResult('error', '❌ Invalid QR Code', 'The scanned token is not a valid WOW QR code. Try scanning again or use manual lookup.', null, token);
+    logEvent('DENIED', 'INVALID_TOKEN', token.slice(0, 20) + '…', null);
+    return;
+  }
+
+  const passportId = payload.p;
+  const result = WPE.validateParkEntry(passportId, activeGate.park === 'ALL' ? 'WATER_DAY' : activeGate.park);
+
+  if (result.valid) {
+    const entryResult = WPE.recordParkEntry(passportId, activeGate.park === 'ALL' ? 'WATER_DAY' : activeGate.park, {
+      gate: activeGate.id, staffId: staffId()
+    });
+    if (entryResult.success) {
+      sessionStats.entries++;
+      updateStats();
+      showPassportResult('success', result.passport, result.vipLane, null);
+      logEvent('ENTRY', 'APPROVED', `${result.passport.customerName} — ${activeGate.name}`, result.passport);
+      playSound('success');
+    }
+  } else {
+    showPassportResult('error', result.passport, false, result.reason);
+    logEvent('DENIED', result.reason, result.passport ? result.passport.customerName : 'Unknown', result.passport);
+    sessionStats.rejected++;
+    updateStats();
+    playSound('error');
+  }
+  lastScanResult = { token, result, passportId };
+}
+
+/* ─── VOUCHER REDEEM ─── */
+function processVoucherQR(token) {
+  const counter = activeGate.park === 'ALL' ? guessCounterFromGate(activeGate.id) : null;
+  const ctx = { counter, park: activeGate.park, staffId: staffId(), channel: 'gate_scan' };
+
+  const validation = WPE.validateQR(token, ctx);
+  if (!validation.valid) {
+    showVoucherResult('error', validation, token);
+    logEvent('DENIED', validation.reason, token.slice(0, 30), validation.passport);
+    sessionStats.rejected++;
+    updateStats();
+    playSound('error');
+    lastScanResult = { token, validation };
+    return;
+  }
+
+  const redeemResult = WPE.redeemVoucher(token, ctx);
+  if (redeemResult.success) {
+    sessionStats.vouchers++;
+    updateStats();
+    showVoucherResult('success', { passport: redeemResult.passport, voucherInstance: redeemResult.voucherInstance }, token);
+    logEvent('VOUCHER', 'REDEEMED', `${redeemResult.voucherInstance.name} — ${redeemResult.passport.customerName}`, redeemResult.passport);
+    playSound('success');
+  } else {
+    showVoucherResult('error', redeemResult, token);
+    sessionStats.rejected++;
+    updateStats();
+    playSound('error');
+  }
+  lastScanResult = { token, redeemResult };
+}
+
+/* ─── LOOKUP QR ─── */
+function processLookupQR(token) {
+  const payload = WPE.parseQRToken(token);
+  if (!payload) { showToast('Invalid QR token', 'danger'); return; }
+  const passport = WPE.getPassportById(payload.p);
+  if (!passport) { showResult('error', '❌ Passport Not Found', 'No passport found for this QR code.', null, token); return; }
+  showFullPassportInfo(passport, 'info');
+}
+
+/* ─── PASSPORT ENTRY (direct lookup) ─── */
+function handlePassportEntry(passport) {
+  const result = WPE.validateParkEntry(passport.id, activeGate.park === 'ALL' ? 'WATER_DAY' : activeGate.park);
+  showPassportResult(result.valid ? 'success' : 'error', passport, result.vipLane, result.reason);
+  if (result.valid) {
+    WPE.recordParkEntry(passport.id, activeGate.park === 'ALL' ? 'WATER_DAY' : activeGate.park, { gate: activeGate.id, staffId: staffId() });
+    sessionStats.entries++; updateStats();
+    logEvent('ENTRY', 'APPROVED', `${passport.customerName} — ${activeGate.name}`, passport);
+    playSound('success');
+  } else {
+    sessionStats.rejected++; updateStats();
+    logEvent('DENIED', result.reason, passport.customerName, passport);
+    playSound('error');
+  }
+}
+
+/* ─── PASSPORT NUMBER LOOKUP ─── */
+function lookupPassport() {
+  const num = document.getElementById('pp-input').value.trim();
+  if (!num) { showToast('Enter a passport number', 'danger'); return; }
+  const passport = WPE.getPassportById(num);
+  if (!passport) { showResult('error', '❌ Not Found', `No passport found with number: ${num}`, null, num); return; }
+  if (scanMode === 'park_entry') {
+    handlePassportEntry(passport);
+  } else {
+    showFullPassportInfo(passport, 'info');
+  }
+  document.getElementById('pp-input').value = '';
+}
+
+/* ─── MANUAL SEARCH ─── */
+function doManualSearch() {
+  const q = document.getElementById('manual-search').value.trim();
+  if (q.length < 2) { document.getElementById('manual-results').innerHTML = ''; return; }
+  const customers = WPE.findCustomer(q);
+  const passports = WPE.getPassports().filter(p =>
+    (p.customerName || '').toLowerCase().includes(q.toLowerCase()) ||
+    (p.customerEmail || '').toLowerCase().includes(q.toLowerCase()) ||
+    (p.customerMobile || '').includes(q) ||
+    (p.id || '').toUpperCase().includes(q.toUpperCase())
+  );
+
+  const cont = document.getElementById('manual-results');
+  if (!passports.length) { cont.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.3);text-align:center;padding:16px;">No passports found</div>'; return; }
+
+  cont.innerHTML = passports.slice(0, 6).map(p => `
+    <div class="lookup-result" style="cursor:pointer;margin-bottom:8px;" onclick="selectPassportFromSearch('${p.id}')">
+      <div style="font-size:12px;font-weight:700;">${escHtml(p.customerName)} <span class="badge b-${p.status==='active'?'green':'red'}" style="font-size:9px;">${p.status}</span></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;">${p.id} · ${p.tierName} · Exp: ${p.expiryDate}</div>
+    </div>`).join('');
+}
+
+function selectPassportFromSearch(id) {
+  const passport = WPE.getPassportById(id);
+  if (!passport) return;
+  if (scanMode === 'park_entry') handlePassportEntry(passport);
+  else showFullPassportInfo(passport, 'info');
+  document.getElementById('manual-search').value = '';
+  document.getElementById('manual-results').innerHTML = '';
+}
+
+/* ─── RESULT RENDERERS ─── */
+function showResult(type, title, message, passport, token) {
+  const area = document.getElementById('result-area');
+  area.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-header">
+        <div class="result-icon">${type==='success'?'✅':type==='warning'?'⚠️':type==='info'?'ℹ️':'❌'}</div>
+        <div>
+          <div class="result-title">${title}</div>
+          <div class="result-subtitle">${message}</div>
+        </div>
+      </div>
+      ${passport ? renderPassportPreview(passport) : ''}
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${type === 'error' ? `<button class="btn btn-amber btn-sm" onclick="openOverrideModal()"><i class="fas fa-bolt"></i> Manual Override</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="clearResult()"><i class="fas fa-times"></i> Clear</button>
+      </div>
+    </div>`;
+}
+
+function showPassportResult(type, passport, vipLane, reason) {
+  if (!passport) { showResult('error', '❌ Passport Not Found', reason || 'PASSPORT_NOT_FOUND', null, null); return; }
+
+  const reasonMsg = {
+    PASSPORT_EXPIRED: '⏳ This passport has expired',
+    PASSPORT_SUSPENDED: '🔒 This passport is suspended',
+    PASSPORT_REVOKED: '🚫 This passport has been revoked',
+    PARK_NOT_COVERED: '🚫 This park is not included in this passport',
+    DAILY_LIMIT_REACHED: '⚡ Daily entry limit reached for this passport',
+    BLACKOUT_DATE: '📅 Today is a blackout date for this passport',
+  }[reason] || reason || '';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayEntries = (passport.entryLog || []).filter(e => e.date === today).length;
+  const daysLeft = Math.max(0, Math.ceil((new Date(passport.expiryDate) - new Date()) / 86400000));
+
+  const area = document.getElementById('result-area');
+  area.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-header">
+        <div class="result-icon">${type==='success'?(vipLane?'👑':'✅'):'❌'}</div>
+        <div>
+          <div class="result-title">${type==='success'?(vipLane?'VIP ENTRY GRANTED':'ENTRY GRANTED'):'ENTRY DENIED'}</div>
+          <div class="result-subtitle">${type==='success'?`Welcome, ${passport.customerName}!`:reasonMsg}</div>
+        </div>
+      </div>
+      ${vipLane ? '<div class="vip-indicator"><span style="font-size:20px;">👑</span><span class="vip-indicator-text">VIP LANE — Priority Access</span></div>' : ''}
+      ${renderPassportPreview(passport)}
+      <div class="pp-fields">
+        <div class="pp-field"><div class="pp-field-label">Passport No.</div><div class="pp-field-value" style="font-family:monospace;font-size:11px;">${passport.id}</div></div>
+        <div class="pp-field"><div class="pp-field-label">Tier</div><div class="pp-field-value">${passport.tierEmblem||''} ${passport.tierName}</div></div>
+        <div class="pp-field"><div class="pp-field-label">Expires</div><div class="pp-field-value">${passport.expiryDate} <span style="font-size:10px;opacity:.6;">(${daysLeft}d left)</span></div></div>
+        <div class="pp-field"><div class="pp-field-label">Entries Today</div><div class="pp-field-value">${todayEntries + (type==='success'?1:0)}</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${type === 'error' ? `<button class="btn btn-amber btn-sm" onclick="openOverrideModal()"><i class="fas fa-bolt"></i> Override</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="showFullPassportInfo(WPE.getPassportById('${passport.id}'),'info')"><i class="fas fa-id-card"></i> View Passport</button>
+        <button class="btn btn-outline btn-sm" onclick="clearResult()">Clear</button>
+      </div>
+    </div>`;
+}
+
+function showVoucherResult(type, data, token) {
+  const passport = data.passport;
+  const vi = data.voucherInstance;
+  const reason = data.reason || data.error || '';
+
+  const reasonMsg = {
+    VOUCHER_ALREADY_REDEEMED: '🔁 This voucher has already been redeemed',
+    VOUCHER_FREQ_LIMIT_MONTHLY: '📅 Monthly limit already used this month',
+    VOUCHER_ALREADY_USED_TODAY: '⏰ Already used today — come back tomorrow',
+    VOUCHER_QUANTITY_EXHAUSTED: '📭 Voucher quantity exhausted',
+    VOUCHER_INACTIVE: '🚫 Voucher is inactive',
+    WRONG_COUNTER: '🚫 Wrong counter for this voucher',
+    PASSPORT_EXPIRED: '⏳ Passport has expired',
+    PASSPORT_SUSPENDED: '🔒 Passport is suspended',
+    VOUCHER_INSTANCE_NOT_FOUND: '❓ Voucher instance not found',
+  }[reason] || reason || '';
+
+  const area = document.getElementById('result-area');
+  area.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-header">
+        <div class="result-icon">${type==='success'?'🎟'+(vi?.icon||''):'❌'}</div>
+        <div>
+          <div class="result-title">${type==='success'?'VOUCHER REDEEMED':'REDEMPTION DENIED'}</div>
+          <div class="result-subtitle">${type==='success'?vi?.name:reasonMsg}</div>
+        </div>
+      </div>
+      ${passport ? renderPassportPreview(passport) : ''}
+      ${type === 'success' && vi ? `
+        <div style="background:rgba(0,0,0,.25);border-radius:10px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px;">${vi.icon} ${vi.name}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);">${vi.description||''}</div>
+          ${vi.discountValue ? `<div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:6px;">${vi.discountValue}${vi.discountType==='pct'?'%':'₹'} discount applied</div>` : ''}
+          ${vi.creditValue ? `<div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:6px;">₹${vi.creditValue.toLocaleString('en-IN')} credit applied</div>` : ''}
+          <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:6px;">Used: ${vi.usedCount} · Status: ${vi.status}</div>
+        </div>` : ''}
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${type === 'error' ? `<button class="btn btn-amber btn-sm" onclick="openOverrideModal()"><i class="fas fa-bolt"></i> Override</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="clearResult()">Clear</button>
+      </div>
+    </div>`;
+}
+
+function showFullPassportInfo(passport, type) {
+  if (!passport) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const daysLeft = Math.max(0, Math.ceil((new Date(passport.expiryDate) - new Date()) / 86400000));
+  const todayEntries = (passport.entryLog || []).filter(e => e.date === today).length;
+  const activeVouchers = (passport.voucherInstances || []).filter(vi => vi.status === 'active');
+  const redeemedVouchers = (passport.voucherInstances || []).filter(vi => vi.status === 'redeemed');
+
+  const area = document.getElementById('result-area');
+  area.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-header">
+        <div class="result-icon">🪪</div>
+        <div>
+          <div class="result-title">Passport Details</div>
+          <div class="result-subtitle">${passport.id}</div>
+        </div>
+        <span class="badge b-${passport.status==='active'?'green':passport.status==='expired'?'red':'amber'}" style="margin-left:auto;">${passport.status}</span>
+      </div>
+      ${renderPassportPreview(passport)}
+      <div class="pp-fields">
+        <div class="pp-field"><div class="pp-field-label">Valid From</div><div class="pp-field-value">${passport.startDate}</div></div>
+        <div class="pp-field"><div class="pp-field-label">Expires</div><div class="pp-field-value">${passport.expiryDate} (${daysLeft}d)</div></div>
+        <div class="pp-field"><div class="pp-field-label">Entries Today</div><div class="pp-field-value">${todayEntries}</div></div>
+        <div class="pp-field"><div class="pp-field-label">Total Entries</div><div class="pp-field-value">${(passport.entryLog||[]).length}</div></div>
+      </div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:8px;">Vouchers</div>
+      <div class="voucher-quick-list">
+        ${(passport.voucherInstances||[]).map(vi => `
+          <div class="vql-item">
+            <div class="vql-name">${vi.icon||'🎟'} ${vi.name}</div>
+            <span class="vql-status ${vi.status==='active'?'vql-active':'vql-redeemed'}">${vi.status} (${vi.usedCount} used)</span>
+          </div>`).join('') || '<div style="font-size:12px;color:rgba(255,255,255,.3);padding:8px;">No vouchers</div>'}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        ${passport.status==='active' ? `<button class="btn btn-gold btn-sm" onclick="handlePassportEntry(WPE.getPassportById('${passport.id}'))"><i class="fas fa-door-open"></i> Grant Entry</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="clearResult()">Clear</button>
+      </div>
+    </div>`;
+}
+
+function renderPassportPreview(passport) {
+  if (!passport) return '';
+  const photoHtml = passport.customerPhoto && passport.customerPhoto.startsWith('data:')
+    ? `<img src="${passport.customerPhoto}" alt="photo" style="width:100%;height:100%;object-fit:cover;"/>`
+    : `<span style="font-size:28px;">${passport.customerPhoto||'👤'}</span>`;
+
+  return `<div class="pp-preview">
+    <div class="pp-preview-photo">${photoHtml}</div>
+    <div class="pp-preview-info">
+      <h3>${escHtml(passport.customerName||'—')}</h3>
+      <small>${passport.customerEmail||''}</small>
+      <small>${passport.customerMobile||''}</small>
+      <div class="pp-preview-tier">${passport.tierEmblem||'🌟'} ${passport.tierName||'—'}</div>
+    </div>
+  </div>`;
+}
+
+function clearResult() {
+  document.getElementById('result-area').innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <i class="fas fa-qrcode" style="font-size:48px;opacity:.1;display:block;margin-bottom:16px;"></i>
+      <div style="font-size:14px;font-weight:600;opacity:.3;">Waiting for scan…</div>
+    </div>`;
+}
+
+/* ─── SESSION LOG ─── */
+function logEvent(type, status, description, passport) {
+  const event = {
+    id: Date.now(),
+    type,
+    status,
+    description,
+    passportId: passport ? passport.id : null,
+    gate: activeGate.name,
+    ts: new Date().toLocaleTimeString('en-IN', { hour12: false, timeZone: 'Asia/Kolkata' }),
+  };
+  sessionLog.unshift(event);
+  document.getElementById('log-count').textContent = sessionLog.length;
+  renderLog();
+}
+
+function renderLog() {
+  const filter = document.getElementById('log-filter').value;
+  const feed = document.getElementById('log-feed');
+  let logs = sessionLog;
+  if (filter) logs = logs.filter(e => e.type === filter || (filter === 'DENIED' && e.status !== 'APPROVED' && e.status !== 'REDEEMED') || e.type === filter);
+
+  if (!logs.length) {
+    feed.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,.25);font-size:12px;">No events this session</div>';
+    return;
+  }
+  feed.innerHTML = logs.map(e => {
+    const dotClass = e.type === 'ENTRY' ? 'log-dot-green' : e.type === 'VOUCHER' ? 'log-dot-blue' : e.type === 'OVERRIDE' ? 'log-dot-amber' : 'log-dot-red';
+    const icon = e.type === 'ENTRY' ? '🚪' : e.type === 'VOUCHER' ? '🎟' : e.type === 'OVERRIDE' ? '⚠️' : '❌';
+    return `<div class="log-item">
+      <div class="log-dot ${dotClass}"></div>
+      <div class="log-content">
+        <div class="log-title">${icon} ${escHtml(e.description)}</div>
+        <div class="log-meta">${e.ts} · ${e.gate} · ${e.type}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearSessionLog() {
+  if (!confirm('Clear session log?')) return;
+  sessionLog = [];
+  document.getElementById('log-count').textContent = '0';
+  renderLog();
+}
+
+function exportSessionLog() {
+  if (!sessionLog.length) { showToast('No events to export', 'danger'); return; }
+  const headers = ['Time', 'Type', 'Status', 'Description', 'Gate', 'Passport ID'];
+  const rows = sessionLog.map(e => [e.ts, e.type, e.status, `"${e.description}"`, e.gate, e.passportId || ''].join(','));
+  const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'session_log_' + Date.now() + '.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 Log exported');
+}
+
+/* ─── OVERRIDE ─── */
+function openOverrideModal() {
+  document.getElementById('override-reason-select').value = '';
+  document.getElementById('override-note-input').value = '';
+  document.getElementById('override-pin').value = '';
+  openModal('modal-override');
+}
+
+function executeOverride() {
+  const reason = document.getElementById('override-reason-select').value;
+  const note = document.getElementById('override-note-input').value.trim();
+  const pin = document.getElementById('override-pin').value;
+
+  if (!reason) { showToast('Select an override reason', 'danger'); return; }
+
+  // Check supervisor PIN if entered (config PIN is 1234)
+  if (pin && pin !== '1234') { showToast('Invalid supervisor PIN', 'danger'); return; }
+
+  const fullReason = [reason, note].filter(Boolean).join(' — ');
+
+  if (lastScanResult) {
+    const token = lastScanResult.token;
+    if (token && scanMode === 'voucher') {
+      const result = WPE.redeemVoucher(token, { counter: guessCounterFromGate(activeGate.id), park: activeGate.park, staffId: staffId(), channel: 'manual_override' }, fullReason);
+      if (result.success) {
+        sessionStats.vouchers++;
+        updateStats();
+        showVoucherResult('success', result, token);
+        logEvent('OVERRIDE', 'VOUCHER_OVERRIDE', `Override: ${result.voucherInstance?.name||'unknown'} — ${fullReason}`, result.passport);
+        showToast('⚠️ Override applied & logged', '');
+      } else {
+        showToast('Override failed: ' + (result.error || ''), 'danger');
+      }
+    } else if (lastScanResult.passportId) {
+      const pp = WPE.getPassportById(lastScanResult.passportId);
+      if (pp) {
+        WPE.recordParkEntry(pp.id, activeGate.park === 'ALL' ? 'WATER_DAY' : activeGate.park, { gate: activeGate.id, staffId: staffId(), override: true });
+        sessionStats.entries++;
+        updateStats();
+        showPassportResult('success', pp, false, null);
+        logEvent('OVERRIDE', 'ENTRY_OVERRIDE', `Override entry: ${pp.customerName} — ${fullReason}`, pp);
+        showToast('⚠️ Override entry logged', '');
+      }
+    }
+  }
+
+  closeModal('modal-override');
+}
+
+/* ─── CAMERA SIMULATION ─── */
+function toggleCamera() {
+  cameraActive = !cameraActive;
+  const sim = document.getElementById('camera-sim');
+  sim.classList.toggle('scanning', cameraActive);
+
+  if (cameraActive) {
+    document.getElementById('camera-content').innerHTML = `
+      <div style="font-size:12px;font-weight:700;color:var(--gold);animation:pulse 1s infinite;">📷 SCANNING…</div>
+      <div class="camera-text">Point camera at QR code</div>
+      <button class="camera-btn" onclick="event.stopPropagation();toggleCamera()">Stop Camera</button>`;
+    // Simulate scan after random delay
+    cameraInterval = setTimeout(() => {
+      const passports = WPE.getPassports().filter(p => p.status === 'active');
+      if (passports.length && Math.random() > 0.3) {
+        const pp = passports[Math.floor(Math.random() * passports.length)];
+        const vi = pp.voucherInstances.find(v => v.status === 'active');
+        if (vi && scanMode === 'voucher') {
+          document.getElementById('qr-input').value = vi.qrToken;
+        } else {
+          document.getElementById('qr-input').value = pp.id;
+        }
+        showToast('📷 QR detected!');
+      } else {
+        // Generate a test token
+        const token = 'WOW-QR.dGVzdC10b2tlbg.ABC123';
+        document.getElementById('qr-input').value = token;
+        showToast('📷 QR detected (test)');
+      }
+      cameraActive = false;
+      sim.classList.remove('scanning');
+      document.getElementById('camera-content').innerHTML = `
+        <i class="fas fa-camera" style="font-size:32px;color:rgba(255,255,255,.2);display:block;margin-bottom:10px;"></i>
+        <div class="camera-text">Tap to scan again</div>`;
+    }, 2500 + Math.random() * 1500);
+  } else {
+    clearTimeout(cameraInterval);
+    document.getElementById('camera-content').innerHTML = `
+      <i class="fas fa-camera" style="font-size:32px;color:rgba(255,255,255,.2);display:block;margin-bottom:10px;"></i>
+      <div class="camera-text">Tap to start camera simulation</div>`;
+  }
+}
+
+/* ─── DEMO BUTTONS ─── */
+function buildDemoButtons() {
+  const cont = document.getElementById('demo-scan-btns');
+  const passports = WPE.getPassports().filter(p => p.status === 'active').slice(0, 4);
+
+  // Seed if empty
+  if (!passports.length) {
+    cont.innerHTML = `<button class="btn btn-outline btn-sm" onclick="seedDemoPassports()"><i class="fas fa-seedling"></i> Seed Demo Passports</button>`;
+    return;
+  }
+
+  passports.forEach(pp => {
+    const vi = pp.voucherInstances.find(v => v.status === 'active');
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline btn-sm';
+    btn.textContent = pp.tierEmblem + ' ' + pp.customerName.split(' ')[0];
+    btn.title = `Scan as ${pp.customerName}`;
+    btn.onclick = () => {
+      if (scanMode === 'voucher' && vi) {
+        document.getElementById('qr-input').value = vi.qrToken;
+      } else {
+        document.getElementById('qr-input').value = pp.id;
+      }
+      processScan();
+    };
+    cont.appendChild(btn);
+  });
+}
+
+function seedDemoPassports() {
+  const products = WPE.getProducts().filter(p => p.status === 'active');
+  const names = ['Aditya Roy', 'Nisha Kapoor', 'Sahil Mehta'];
+  names.forEach((name, i) => {
+    const prod = products[i % products.length];
+    const cust = WPE.upsertCustomer({
+      name, email: name.toLowerCase().replace(/\s/g, '') + '@demo.com',
+      mobile: '+91' + (9100000001 + i)
+    });
+    const kycResult = WPE.submitKYC({
+      customerId: cust.id, productId: prod.id, customerName: name,
+      customerEmail: cust.email, customerMobile: cust.mobile,
+      photoData: ['👦', '👩', '🧑'][i],
+      submittedBy: 'demo', channel: 'direct',
+    });
+    if (kycResult.success) {
+      WPE.updateKYCStatus(kycResult.kycId, 'approved', 'Auto-approved demo', 'system');
+    }
+    WPE.issuePassport({
+      productId: prod.id, customerId: cust.id, customerName: name,
+      customerEmail: cust.email, customerMobile: cust.mobile,
+      kycId: kycResult?.kycId, channel: 'direct',
+      soldBy: 'demo-agent', customerPhoto: ['👦', '👩', '🧑'][i],
+    });
+  });
+  showToast('🌱 Demo passports seeded!', 'success');
+  buildDemoButtons();
+}
+
+/* ─── STATS ─── */
+function updateStats() {
+  document.getElementById('stat-entries').textContent = sessionStats.entries;
+  document.getElementById('stat-rejected').textContent = sessionStats.rejected;
+  document.getElementById('stat-vouchers').textContent = sessionStats.vouchers;
+}
+
+/* ─── SETTINGS ─── */
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SCANNER_SETTINGS_KEY) || '{}');
+    if (s.staffId) document.getElementById('cfg-staff-id').value = s.staffId;
+    if (s.defaultPark) document.getElementById('cfg-default-park').value = s.defaultPark;
+    if (s.sound) document.getElementById('cfg-sound').value = s.sound;
+  } catch(e) {}
+}
+
+function saveSettings() {
+  const s = {
+    staffId: document.getElementById('cfg-staff-id').value,
+    defaultPark: document.getElementById('cfg-default-park').value,
+    sound: document.getElementById('cfg-sound').value,
+  };
+  localStorage.setItem(SCANNER_SETTINGS_KEY, JSON.stringify(s));
+  closeModal('modal-settings');
+  showToast('⚙️ Settings saved', 'success');
+}
+
+/* ─── SOUND ─── */
+function playSound(type) {
+  try {
+    const s = JSON.parse(localStorage.getItem(SCANNER_SETTINGS_KEY) || '{}');
+    if (s.sound === 'off') return;
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'success') { osc.frequency.value = 880; gain.gain.value = 0.1; osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.stop(ctx.currentTime + 0.3); }
+    else { osc.frequency.value = 220; gain.gain.value = 0.15; osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5); osc.stop(ctx.currentTime + 0.5); }
+  } catch(e) {}
+}
+
+/* ─── HELPERS ─── */
+function staffId() {
+  try { const s = JSON.parse(localStorage.getItem(SCANNER_SETTINGS_KEY) || '{}'); return s.staffId || 'GATE-STAFF'; } catch(e) { return 'GATE-STAFF'; }
+}
+
+function guessCounterFromGate(gateId) {
+  const map = { FNB_MAIN: 'fnb', LOCKER_CTR: 'locker', VIP_LOUNGE: 'vip_lounge', MERCH_STORE: 'merch' };
+  return map[gateId] || 'any';
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = type || '';
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display = 'none', 3000);
+}
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>

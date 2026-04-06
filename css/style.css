@@ -66,6 +66,13 @@ body {
   font-size: 16px;
   overflow-x: hidden;
 }
+
+/* Shell.js wraps #app content inside #page-content.
+   Ensure it doesn't create stacking contexts or interfere with layout. */
+#page-content {
+  position: relative;
+  z-index: 0;
+}
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 ul { list-style: none; }
@@ -485,7 +492,9 @@ ul { list-style: none; }
 .hero-carousel-section {
   position: relative;
   height: 100vh; min-height: 620px;
-  overflow: hidden; background: var(--ink2);
+  overflow: hidden;
+  /* Fallback gradient if images fail to load */
+  background: linear-gradient(135deg, #001845 0%, #003180 40%, #00468B 70%, #001845 100%);
   display: flex; flex-direction: column;
   justify-content: flex-end;
 }
@@ -513,6 +522,9 @@ ul { list-style: none; }
 /* Media layer (video or photo) */
 .hc-media {
   position: absolute; inset: 0; overflow: hidden;
+  /* background-image fallback set inline per-slide for resilience */
+  background-size: cover;
+  background-position: center;
 }
 .hc-video {
   position: absolute; inset: 0;
@@ -521,8 +533,16 @@ ul { list-style: none; }
   /* Hidden by default; shown by JS when canplay fires */
 }
 .hc-video-poster {
-  /* Poster photo layer — shows before video loads */
+  /* Poster photo layer — shows before video loads.
+     Always fills slide, always above .hc-media bg, below YT container. */
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
   z-index: 1;
+  /* Ken Burns on slide 0 only when active */
+  transform: scale(1.04);
+  animation: hcKenBurns 10s ease-in-out infinite alternate;
+  transition: opacity 2s ease;
 }
 .hc-photo, .hc-photo-fallback {
   position: absolute; inset: 0;
@@ -681,21 +701,215 @@ ul { list-style: none; }
   display: block;
 }
 
-/* YouTube BG container + injected iframe — covers full slide */
-#yt-bg-container,
-#yt-bg-container iframe {
+/* YouTube BG container — sits above poster, below overlay
+   Hidden until JS confirms video is PLAYING (adds .yt-playing class).
+   When hidden: transparent, doesn't block poster below.
+   YouTube Error 150/153/5 (preview domains) → poster stays forever. */
+#yt-bg-container {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  /* Scale up so 16:9 video always covers any viewport */
-  width:  177.78vh;   /* 16/9 × 100vh */
+  top: 50%; left: 50%;
+  width: 177.78vh;   /* 16/9 × 100vh — always covers viewport */
   height: 100vh;
-  min-width:  100%;
-  min-height: 56.25vw; /* 9/16 × 100vw */
+  min-width: 100%; min-height: 56.25vw;
   transform: translate(-50%, -50%);
   z-index: 2;
   pointer-events: none;
-  border: none;
+  background: transparent;
+  /* Hidden until video confirmed playing */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+#yt-bg-container.yt-playing {
+  visibility: visible;
+  opacity: 1;
+}
+#yt-bg-container iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: none; pointer-events: none;
+}
+
+/* ============================================================
+   BANNER ENGINE v3 — CSS classes for WOWBanners.init() output
+   These complement the existing .hc-* classes.
+   ============================================================ */
+
+/* Wrapper — applied by engine to the target section */
+.hero-slider {
+  position: relative;
+  height: 100vh; min-height: 620px;
+  overflow: hidden;
+  background: var(--ink2);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* Individual slide */
+.hero-slide {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  isolation: isolate;
+}
+.hero-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Background layer (image / gradient / video wrapper) */
+.hero-slide-bg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.04);
+  animation: hcKenBurns 10s ease-in-out infinite alternate;
+}
+.hero-slide.active .hero-slide-bg { animation-play-state: running; }
+.hero-slide:not(.active) .hero-slide-bg { animation-play-state: paused; }
+
+/* Overlay */
+.hero-slide-overlay {
+  position: absolute; inset: 0; z-index: 3;
+  background: rgba(0,5,20,.6);
+}
+
+/* YouTube BG iframe (injected by engine for youtube slide type) */
+.yt-bg-wrap {
+  position: absolute; inset: 0; overflow: hidden; z-index: 2;
+}
+.yt-bg-iframe {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 177.78vh; height: 100vh;
+  min-width: 100%; min-height: 56.25vw;
+  transform: translate(-50%,-50%);
+  pointer-events: none; border: none;
+}
+
+/* Content block */
+.hero-slide-content {
+  position: absolute; inset: 0; z-index: 4;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: 120px 64px 160px;
+}
+.hero-slide-content--left  { align-items: flex-start; text-align: left; }
+.hero-slide-content--center{ align-items: center; text-align: center; }
+
+/* Eyebrow / badge */
+.hero-eyebrow {
+  display: inline-block;
+  background: rgba(245,168,0,.2); color: var(--accent);
+  border: 1px solid rgba(245,168,0,.4);
+  border-radius: 30px; padding: 7px 22px;
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 22px;
+  backdrop-filter: blur(6px);
+}
+
+/* Headline */
+.hero-slide-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(42px, 7vw, 84px);
+  font-weight: 900; color: #fff;
+  line-height: 1.08; letter-spacing: -.03em;
+  margin-bottom: 18px;
+  text-shadow: 0 4px 32px rgba(0,0,0,.55);
+}
+
+/* Subtitle */
+.hero-slide-sub {
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: rgba(255,255,255,.82);
+  line-height: 1.7; margin-bottom: 36px;
+  text-shadow: 0 2px 12px rgba(0,0,0,.45);
+  max-width: 620px;
+}
+
+/* CTA row */
+.hero-slide-cta {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  align-items: center;
+}
+
+/* Scroll cue (engine-generated) */
+.hero-scroll-cue {
+  position: absolute; bottom: 72px; left: 50%; z-index: 7;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: rgba(255,255,255,.45); font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  animation: heroScrollBounce 2s ease-in-out infinite;
+}
+@keyframes heroScrollBounce {
+  0%,100% { transform: translateX(-50%) translateY(0); }
+  50%      { transform: translateX(-50%) translateY(6px); }
+}
+
+/* Progress bar animation (engine-generated via inline style) */
+@keyframes heroProg { 0%{width:0%} 100%{width:100%} }
+
+/* Arrow controls (engine-generated) */
+.hero-arrow {
+  position: absolute; top: 50%; z-index: 7;
+  transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(255,255,255,.18); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.3);
+  color: white; cursor: pointer; font-size: 28px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, transform .2s;
+}
+.hero-arrow:hover { background: rgba(255,255,255,.32); transform: translateY(-50%) scale(1.08); }
+.hero-arrow--prev { left: 24px; }
+.hero-arrow--next { right: 24px; }
+
+/* Controls wrapper */
+.hero-controls { position: absolute; inset: 0; z-index: 7; pointer-events: none; }
+.hero-controls .hero-arrow { pointer-events: auto; }
+
+/* Dot navigation */
+.hero-dots {
+  position: absolute; bottom: 32px; left: 50%; z-index: 8;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; align-items: center;
+  pointer-events: auto;
+}
+.hero-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,.4); border: none; cursor: pointer;
+  transition: all .25s; padding: 0;
+}
+.hero-dot.active {
+  background: var(--accent); width: 28px; border-radius: 6px;
+}
+
+/* Floating bubble particles */
+.hero-bubbles {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+}
+.bubble {
+  position: absolute; bottom: -80px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.18), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.07);
+  animation: bubbleRise linear infinite;
+}
+@keyframes bubbleRise {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: .6; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* Widget slot injected by engine */
+#hero-widget-slot {
+  position: absolute; bottom: 100px; left: 50%; z-index: 8;
+  transform: translateX(-50%);
+  width: 100%; max-width: 900px; padding: 0 24px;
+  pointer-events: auto;
 }
 
 /* ============================================================
@@ -894,7 +1108,12 @@ ul { list-style: none; }
   background: var(--primary-lt); color: var(--primary);
   border: 1.5px solid var(--border2); border-radius: 8px;
   padding: 9px 16px; font-size: 13.5px; font-weight: 700;
-  cursor: pointer; transition: all .18s; font-family: inherit;
+  cursor: pointer;
+  /* FIX: never transition 'all' — it causes display-change flicker when
+     wow-content-control.js sets style.display='' on these tabs.
+     Only transition the visual properties we actually animate. */
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+  font-family: inherit;
   white-space: nowrap;
 }
 .qbb-tab strong { color: var(--primary-dk); }

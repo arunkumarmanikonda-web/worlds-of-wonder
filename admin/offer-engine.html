@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Offer Engine v4 — WOW Commercial Control Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/wow-auth.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07090f;--sidebar:#0c0e16;--card:#111520;--card2:#161b28;--card3:#1c2235;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);--border3:rgba(255,255,255,.18);
+  --gold:#C9A84C;--gold2:#F0D080;--gold3:#8B6914;
+  --text:#e2e8f0;--muted:rgba(255,255,255,.45);--muted2:rgba(255,255,255,.2);--muted3:rgba(255,255,255,.1);
+  --red:#ef4444;--green:#22c55e;--blue:#3b82f6;--purple:#a855f7;
+  --orange:#f97316;--teal:#14b8a6;--pink:#ec4899;--cyan:#06b6d4;
+  --green-dim:rgba(34,197,94,.12);--red-dim:rgba(239,68,68,.1);
+  --blue-dim:rgba(59,130,246,.1);--gold-dim:rgba(201,168,76,.1);
+  --purple-dim:rgba(168,85,247,.1);
+}
+html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);overflow-x:hidden;}
+.app{display:flex;height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:232px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-logo{padding:18px 16px 12px;border-bottom:1px solid var(--border);}
+.sb-logo-icon{font-size:20px;margin-bottom:4px;}
+.sb-logo-title{font-size:12px;font-weight:800;color:var(--gold2);letter-spacing:1.5px;text-transform:uppercase;}
+.sb-logo-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.sb-nav{padding:10px 6px;flex:1;}
+.sb-group{margin-bottom:18px;}
+.sb-group-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);padding:0 8px;margin-bottom:5px;}
+.sb-link{width:100%;text-align:left;background:transparent;border:none;color:var(--muted);font-size:12px;font-weight:500;padding:7px 10px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:9px;font-family:'Inter',sans-serif;transition:all .15s;}
+.sb-link:hover{background:rgba(255,255,255,.05);color:var(--text);}
+.sb-link.active{background:rgba(201,168,76,.12);color:var(--gold2);font-weight:700;}
+.sb-link i{width:14px;text-align:center;font-size:12px;}
+.sb-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;}
+.sb-badge.red{background:rgba(239,68,68,.15);color:#fca5a5;}
+.sb-badge.green{background:rgba(34,197,94,.15);color:#86efac;}
+.sb-badge.blue{background:rgba(59,130,246,.15);color:#93c5fd;}
+.sb-badge.gold{background:rgba(201,168,76,.15);color:var(--gold2);}
+.sb-footer{padding:12px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;background:var(--sidebar);border-bottom:1px solid var(--border);flex-shrink:0;position:sticky;top:0;z-index:100;}
+.topbar-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-clock{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.v4-badge{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:9px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:.5px;}
+.content{padding:22px 24px;flex:1;}
+.panel{display:none;animation:fadeIn .2s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px 20px;margin-bottom:14px;}
+.card-sm{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 15px;margin-bottom:10px;}
+.card-title{font-size:11px;font-weight:700;color:var(--gold2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+.section-hdr h2{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
+.stat-card{background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;}
+.stat-val{font-size:24px;font-weight:800;line-height:1;}
+.stat-label{font-size:10px;color:var(--muted);margin-top:3px;}
+.stat-sub{font-size:10px;margin-top:2px;}
+
+/* TABLE */
+.offer-table{width:100%;border-collapse:collapse;}
+.offer-table th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.offer-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;vertical-align:middle;}
+.offer-table tr:hover td{background:rgba(255,255,255,.02);}
+.offer-table tr:last-child td{border-bottom:none;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:7px;border:1px solid;}
+.badge-active{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.25);}
+.badge-draft{background:rgba(255,255,255,.06);color:var(--muted);border-color:rgba(255,255,255,.12);}
+.badge-paused{background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.2);}
+.badge-scheduled{background:rgba(96,165,250,.1);color:#60a5fa;border-color:rgba(96,165,250,.2);}
+.badge-expired{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.15);}
+.badge-archived{background:rgba(255,255,255,.04);color:var(--muted2);border-color:rgba(255,255,255,.08);}
+
+/* BUTTONS */
+.btn{padding:7px 15px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid;font-family:'Inter',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border-color:#a855f7;}
+.btn-primary:hover{opacity:.88;}
+.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#fff;border-color:var(--gold);}
+.btn-gold:hover{opacity:.88;}
+.btn-green{background:rgba(34,197,94,.14);color:#4ade80;border-color:rgba(34,197,94,.25);}
+.btn-green:hover{background:rgba(34,197,94,.22);}
+.btn-red{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.2);}
+.btn-red:hover{background:rgba(239,68,68,.2);}
+.btn-blue{background:rgba(59,130,246,.1);color:#60a5fa;border-color:rgba(59,130,246,.2);}
+.btn-blue:hover{background:rgba(59,130,246,.2);}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2);}
+.btn-sm{padding:4px 9px;font-size:10.5px;border-radius:6px;}
+.btn-icon{width:30px;height:30px;padding:0;justify-content:center;border-radius:7px;}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.form-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);}
+.form-group small{font-size:9px;color:var(--muted2);margin-top:1px;}
+.inp{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:7px;font-size:12.5px;font-family:'Inter',sans-serif;width:100%;transition:border .15s;}
+.inp:focus{outline:none;border-color:rgba(201,168,76,.4);}
+.inp::placeholder{color:var(--muted2);}
+select.inp option{background:#1a1e2e;color:var(--text);}
+textarea.inp{resize:vertical;min-height:60px;}
+
+/* TOGGLES */
+.toggle{position:relative;display:inline-block;}
+.toggle input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-slider{display:block;width:40px;height:22px;background:rgba(255,255,255,.12);border-radius:11px;cursor:pointer;transition:background .2s;position:relative;}
+.toggle-slider::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;}
+.toggle input:checked+.toggle-slider{background:var(--green);}
+.toggle input:checked+.toggle-slider::after{transform:translateX(18px);}
+
+/* TABS */
+.tab-bar{display:flex;gap:2px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab{padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold);}
+
+/* CONDITION BUILDER */
+.cond-group-box{background:rgba(255,255,255,.025);border:1px dashed rgba(255,255,255,.1);border-radius:9px;padding:12px;margin-bottom:8px;}
+.cond-group-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.cond-row{display:flex;align-items:center;gap:6px;padding:7px 9px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;margin-bottom:5px;flex-wrap:wrap;}
+.cond-type-chip{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(59,130,246,.12);color:#60a5fa;font-family:'JetBrains Mono',monospace;}
+.op-badge{font-size:10px;font-weight:800;padding:2px 9px;border-radius:5px;cursor:pointer;border:none;font-family:'Inter',sans-serif;}
+.op-AND{background:rgba(34,197,94,.15);color:#4ade80;}
+.op-OR{background:rgba(251,191,36,.12);color:#fbbf24;}
+.op-NOT{background:rgba(239,68,68,.12);color:#f87171;}
+
+/* ACTION ROWS */
+.action-row{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:7px;margin-bottom:7px;flex-wrap:wrap;}
+.action-type-chip{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(168,85,247,.12);color:#c084fc;font-family:'JetBrains Mono',monospace;}
+
+/* PRIORITY */
+.priority-bar{display:flex;align-items:center;gap:5px;}
+.priority-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* SIMULATION */
+.sim-result{background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:11px;padding:14px;margin-top:12px;}
+.sim-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;}
+.sim-row:last-child{border-bottom:none;}
+.sim-row.total{font-weight:700;font-size:13px;color:var(--gold2);}
+.sim-row.discount{color:#4ade80;}
+.sim-trace{margin-top:10px;font-size:10.5px;color:var(--muted);}
+.trace-item{display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.trace-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ALERTS */
+.alert{padding:10px 14px;border-radius:8px;font-size:11.5px;margin-bottom:10px;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.alert-warn{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);color:#fde68a;}
+.alert-danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.alert-info{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18);color:#93c5fd;}
+.alert-success{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.18);color:#86efac;}
+
+/* MODAL */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--card2);border:1px solid var(--border2);border-radius:14px;max-width:780px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-title{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;border-radius:5px;transition:color .15s;}
+.modal-close:hover{color:var(--text);}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:8px;}
+.toast{background:#1c2235;border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:12px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;align-items:center;gap:9px;animation:slideUp .25s ease;min-width:250px;max-width:360px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.toast.success{border-color:rgba(34,197,94,.3);}
+.toast.error  {border-color:rgba(239,68,68,.3);}
+.toast.warn   {border-color:rgba(251,191,36,.3);}
+
+/* RISK BADGE */
+.risk-warn  {color:#fbbf24;}
+.risk-danger{color:#f87171;}
+.risk-info  {color:#60a5fa;}
+
+/* OFFER CARD LIST */
+.offer-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s;}
+.offer-card:hover{border-color:var(--border2);}
+.offer-card.selected{border-color:var(--gold);}
+.offer-name{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.offer-meta{font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.offer-tag{font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.08);color:var(--muted);}
+.offer-actions-row{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+
+/* RULE PATH */
+.rule-path-item{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:6px;margin-bottom:4px;}
+.rule-path-check{color:var(--green);font-size:11px;}
+.rule-path-x{color:var(--red);font-size:11px;}
+
+/* CHART */
+.chart-wrap{position:relative;height:200px;width:100%;}
+
+/* SLAB TABLE */
+.slab-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+.slab-row input{width:80px;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{width:50px;}
+  .sb-link span,.sb-logo-title,.sb-logo-sub,.sb-group-label,.sb-badge,.sb-footer{display:none;}
+  .form-grid,.form-grid-3,.form-grid-4{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║              SIDEBAR                         ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">🎟</div>
+    <div class="sb-logo-title">Offer Engine v4</div>
+    <div class="sb-logo-sub">WOW Commercial Control</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-group">
+      <div class="sb-group-label">Overview</div>
+      <button class="sb-link active" onclick="showPanel('dashboard')"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
+      <button class="sb-link" onclick="showPanel('offers')"><i class="fas fa-tags"></i><span>All Offers</span><span class="sb-badge green" id="sb-active-count">—</span></button>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Offer Types</div>
+      <button class="sb-link" onclick="showPanel('offers');filterOffers('auto')"><i class="fas fa-bolt"></i><span>Auto-Apply</span></button>
+      <button class="sb-link" onclick="showPanel('offers');filterOffers('coupon')"><i class="fas fa-ticket-alt"></i><span>Coupon Codes</span></button>
+      <button class="sb-link" onclick="showPanel('offers');filterOffers('flash')"><i class="fas fa-fire"></i><span>Flash Sales</span></button>
+      <button class="sb-link" onclick="showPanel('offers');filterOffers('slab')"><i class="fas fa-layer-group"></i><span>Slab Tiers</span></button>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Tools</div>
+      <button class="sb-link" onclick="showPanel('simulator')"><i class="fas fa-flask"></i><span>Simulator</span></button>
+      <button class="sb-link" onclick="showPanel('analytics')"><i class="fas fa-chart-bar"></i><span>Analytics</span></button>
+      <button class="sb-link" onclick="showPanel('abtest')"><i class="fas fa-random"></i><span>A/B Testing</span><span class="sb-badge blue">NEW</span></button>
+      <button class="sb-link" onclick="showPanel('conflict')"><i class="fas fa-code-branch"></i><span>Conflict Matrix</span></button>
+      <button class="sb-link" onclick="showPanel('priority')"><i class="fas fa-sort-amount-up"></i><span>Priority Rank</span></button>
+      <button class="sb-link" onclick="showPanel('bulkops')"><i class="fas fa-cogs"></i><span>Bulk Ops</span></button>
+      <button class="sb-link" onclick="showPanel('audit')"><i class="fas fa-shield-alt"></i><span>Audit Log</span></button>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Navigate</div>
+      <button class="sb-link" onclick="location.href='super-admin.html'"><i class="fas fa-crown"></i><span>Super Admin</span></button>
+      <button class="sb-link" onclick="location.href='offer-analytics.html'"><i class="fas fa-chart-line"></i><span>CFO Analytics</span></button>
+      <button class="sb-link" onclick="location.href='index.html'"><i class="fas fa-table"></i><span>Admin ERP</span></button>
+      <button class="sb-link" onclick="location.href='../index.html'"><i class="fas fa-home"></i><span>Public Site</span></button>
+    </div>
+  </nav>
+  <div class="sb-footer">WOW Engine v4.0 &nbsp;|&nbsp; IST</div>
+</aside>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║              MAIN CONTENT                    ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">
+      <span id="topbar-panel-title">Dashboard</span>
+      <span class="v4-badge">v4.0</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-clock" id="clock">—</span>
+      <button class="btn btn-gold btn-sm" onclick="openOfferModal()"><i class="fas fa-plus"></i> New Offer</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════ DASHBOARD ══════ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="section-hdr">
+        <h2><i class="fas fa-chart-pie" style="color:var(--gold)"></i> Revenue & Promotion Dashboard</h2>
+        <div style="display:flex;gap:8px;">
+          <select class="inp" style="width:120px;" onchange="refreshDashboard(this.value)" id="dash-days">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()"><i class="fas fa-sync"></i></button>
+        </div>
+      </div>
+
+      <div class="stats-row" id="dash-stats"><!-- JS --></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-line"></i> Daily Savings Trend</div>
+          <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-medal"></i> Top Offers by Discount Given</div>
+          <div class="chart-wrap"><canvas id="chart-top-offers"></canvas></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-list"></i> Active Offers Status</div>
+          <div id="dash-offers-list"><!-- JS --></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Risk Alerts</div>
+          <div id="dash-risk-alerts"><!-- JS --></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ ALL OFFERS ══════ -->
+    <div class="panel" id="panel-offers">
+      <div class="section-hdr">
+        <h2><i class="fas fa-tags" style="color:var(--purple)"></i> Offer Library</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input class="inp" style="width:200px;" placeholder="Search offers…" id="offer-search" oninput="renderOfferList()"/>
+          <select class="inp" style="width:130px;" id="offer-filter-status" onchange="renderOfferList()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="paused">Paused</option>
+            <option value="draft">Draft</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="expired">Expired</option>
+            <option value="archived">Archived</option>
+          </select>
+          <select class="inp" style="width:130px;" id="offer-filter-type" onchange="renderOfferList()">
+            <option value="">All Types</option>
+            <option value="auto">Auto-Apply</option>
+            <option value="coupon">Coupon Code</option>
+            <option value="flash">Flash Sale</option>
+            <option value="slab">Slab Tier</option>
+            <option value="bogo">BOGO</option>
+          </select>
+          <button class="btn btn-gold btn-sm" onclick="openOfferModal()"><i class="fas fa-plus"></i> New Offer</button>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab active" onclick="setOfferTab('all',this)">All Offers</button>
+        <button class="tab" onclick="setOfferTab('active',this)">Active</button>
+        <button class="tab" onclick="setOfferTab('draft',this)">Drafts</button>
+        <button class="tab" onclick="setOfferTab('scheduled',this)">Scheduled</button>
+        <button class="tab" onclick="setOfferTab('expired',this)">Expired / Archived</button>
+      </div>
+
+      <div id="offers-container"><!-- JS renders offer cards --></div>
+    </div>
+
+    <!-- ══════ SIMULATOR ══════ -->
+    <div class="panel" id="panel-simulator">
+      <div class="section-hdr">
+        <h2><i class="fas fa-flask" style="color:var(--teal)"></i> Offer Simulator Sandbox</h2>
+        <button class="btn btn-green btn-sm" onclick="runSimulation()"><i class="fas fa-play"></i> Run Simulation</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <!-- Input -->
+        <div>
+          <div class="card" style="margin-bottom:12px;">
+            <div class="card-title"><i class="fas fa-shopping-cart"></i> Cart Configuration</div>
+            <div class="form-grid" style="margin-bottom:10px;">
+              <div class="form-group">
+                <label>Park</label>
+                <select class="inp" id="sim-park">
+                  <option value="WATER_DAY">Water Park</option>
+                  <option value="AMUSEMENT_DAY">Amusement Park</option>
+                  <option value="COMBO_DAY">Combo — Both Parks</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Visit Date</label>
+                <input type="date" class="inp" id="sim-visit-date"/>
+              </div>
+            </div>
+            <div class="form-grid-3" style="margin-bottom:10px;">
+              <div class="form-group"><label>Adult Qty</label><input type="number" class="inp" id="sim-adult" value="2" min="0" max="20"/></div>
+              <div class="form-group"><label>Child Qty</label><input type="number" class="inp" id="sim-child" value="2" min="0" max="20"/></div>
+              <div class="form-group"><label>Senior Qty</label><input type="number" class="inp" id="sim-senior" value="0" min="0" max="20"/></div>
+            </div>
+            <div class="form-grid-3" style="margin-bottom:10px;">
+              <div class="form-group"><label>Armed Qty</label><input type="number" class="inp" id="sim-armed" value="0" min="0" max="20"/></div>
+              <div class="form-group"><label>PwD Qty</label><input type="number" class="inp" id="sim-pwd" value="0" min="0" max="20"/></div>
+              <div class="form-group"><label>Channel</label>
+                <select class="inp" id="sim-channel">
+                  <option value="web">Web</option><option value="app">App</option><option value="kiosk">Kiosk</option><option value="counter">Counter</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Promo Code (optional)</label>
+              <input type="text" class="inp" id="sim-promo" placeholder="E.g. BOGO1, CORP2026…"/>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title"><i class="fas fa-history"></i> Recent Simulations</div>
+            <div id="sim-history-list" style="max-height:200px;overflow-y:auto;"><!-- JS --></div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div>
+          <div class="card" style="margin-bottom:0;min-height:200px;">
+            <div class="card-title"><i class="fas fa-receipt"></i> Simulation Results</div>
+            <div id="sim-output">
+              <div style="text-align:center;padding:40px 0;color:var(--muted);">
+                <i class="fas fa-flask" style="font-size:32px;margin-bottom:10px;display:block;opacity:.3;"></i>
+                Configure cart above and click <strong>Run Simulation</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ ANALYTICS ══════ -->
+    <div class="panel" id="panel-analytics">
+      <div class="section-hdr">
+        <h2><i class="fas fa-chart-bar" style="color:var(--blue)"></i> Offer Analytics</h2>
+        <select class="inp" style="width:130px;" onchange="refreshAnalytics(this.value)" id="ana-days">
+          <option value="7">7 days</option>
+          <option value="30" selected>30 days</option>
+          <option value="90">90 days</option>
+        </select>
+      </div>
+
+      <div class="stats-row" id="ana-stats"><!-- JS --></div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-area"></i> Revenue vs Discount Trend</div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="chart-ana-trend"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-pie-chart"></i> Discount by Offer Type</div>
+          <div class="chart-wrap" style="height:220px;"><canvas id="chart-ana-pie"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-table"></i> Per-Offer Performance Table</div>
+        <table class="offer-table">
+          <thead><tr>
+            <th>Offer</th><th>Uses</th><th>Discount Given</th><th>Avg Discount</th><th>Share</th><th>Status</th>
+          </tr></thead>
+          <tbody id="ana-table-body"><!-- JS --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════ A/B TESTING ══════ -->
+    <div class="panel" id="panel-abtest">
+      <div class="section-hdr">
+        <h2><i class="fas fa-random" style="color:var(--cyan)"></i> A/B Testing Framework</h2>
+        <button class="btn btn-gold btn-sm" onclick="openABModal()"><i class="fas fa-plus"></i> New A/B Test</button>
+      </div>
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> A/B tests assign users deterministically to offer variants via hash(userId+testId). Results update in real-time as bookings flow in. Weights must sum to 100%.</div>
+      <div class="stats-row" id="ab-stats"><!-- JS --></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-pie"></i> Variant Traffic Split</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-ab-variants"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-exchange-alt"></i> Conversion Rate by Variant</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-ab-conv"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-flask"></i> Active A/B Tests</div>
+        <div id="ab-tests-container"><!-- JS --></div>
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title"><i class="fas fa-user-tag"></i> User Variant Assignment Tool</div>
+        <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;">
+          <div class="form-group" style="flex:1;min-width:150px;"><label>User ID</label><input type="text" class="inp" id="ab-check-uid" placeholder="user123 or email…"/></div>
+          <div class="form-group" style="flex:1;min-width:150px;"><label>Test ID</label><input type="text" class="inp" id="ab-check-tid" placeholder="TEST_SUMMER"/></div>
+          <button class="btn btn-blue" onclick="checkABAssignment()"><i class="fas fa-search"></i> Check Variant</button>
+          <button class="btn btn-green" onclick="simulateABDistribution()"><i class="fas fa-chart-bar"></i> Sim 1000 Users</button>
+        </div>
+        <div id="ab-check-result"></div>
+      </div>
+    </div>
+
+    <!-- ══════ CONFLICT MATRIX ══════ -->
+    <div class="panel" id="panel-conflict">
+      <div class="section-hdr">
+        <h2><i class="fas fa-code-branch" style="color:var(--orange)"></i> Conflict Resolution Matrix</h2>
+        <button class="btn btn-ghost btn-sm" onclick="refreshConflictMatrix()"><i class="fas fa-sync"></i> Refresh</button>
+      </div>
+      <div class="alert alert-warn"><i class="fas fa-exclamation-triangle"></i> <strong>X</strong> = Exclusive (blocks all others) &bull; <strong>?</strong> = Best-only per family &bull; <strong>✓</strong> = Stackable &bull; <strong>~</strong> = Mixed</div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="card-title"><i class="fas fa-table"></i> Stack-Mode Conflict Grid</div>
+        <div id="conflict-matrix-grid" style="overflow-x:auto;"><!-- JS --></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-layer-group"></i> Stack Families</div>
+          <div id="conflict-families"><!-- JS --></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-exclamation-circle"></i> Conflict Risk Offers</div>
+          <div id="conflict-risks"><!-- JS --></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ PRIORITY RANKING ══════ -->
+    <div class="panel" id="panel-priority">
+      <div class="section-hdr">
+        <h2><i class="fas fa-sort-amount-up" style="color:var(--gold)"></i> Priority Ranking &amp; Sequencing</h2>
+        <button class="btn btn-gold btn-sm" onclick="savePriorityOrder()"><i class="fas fa-save"></i> Save Order</button>
+      </div>
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> Drag to reorder. Higher priority (100) offers evaluate first. Direct-edit the input to set exact priority values.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-chart-bar"></i> Priority Distribution</div>
+          <div class="chart-wrap" style="height:200px;"><canvas id="chart-priority-dist"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-info-circle"></i> Evaluation Order Rules</div>
+          <div style="font-size:11.5px;line-height:1.9;color:var(--muted);">
+            <p>1. <span style="color:#f87171;">Exclusive</span> offers → win alone, block all others</p>
+            <p>2. <span style="color:#fbbf24;">Best-Only</span> → best per stack-family wins</p>
+            <p>3. <span style="color:#4ade80;">Stackable</span> → cumulative by priority rank</p>
+            <p>4. All discounts capped at cart subtotal</p>
+            <p>5. Auto-apply evaluates before promo-code offers</p>
+            <p>6. Zero-discount results excluded from applied set</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-grip-vertical"></i> Drag-to-Reorder Priority List</div>
+        <div id="priority-list"><!-- JS --></div>
+      </div>
+    </div>
+
+    <!-- ══════ BULK OPERATIONS ══════ -->
+    <div class="panel" id="panel-bulkops">
+      <div class="section-hdr">
+        <h2><i class="fas fa-cogs" style="color:var(--teal)"></i> Bulk Operations &amp; Import/Export</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-download"></i> Export Offers</div>
+          <p style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Export all offers as JSON for backup or cross-environment deployment.</p>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Export Scope</label>
+            <select class="inp" id="export-scope">
+              <option value="all">All Offers</option>
+              <option value="active">Active Only</option>
+              <option value="draft">Drafts Only</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-green" onclick="exportOffers()"><i class="fas fa-file-export"></i> Export JSON</button>
+            <button class="btn btn-ghost" onclick="copyExportToClipboard()"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <textarea class="inp" id="export-output" style="margin-top:12px;height:120px;font-family:JetBrains Mono,monospace;font-size:10px;" placeholder="Export JSON appears here…" readonly></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title"><i class="fas fa-upload"></i> Import Offers</div>
+          <p style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Paste a WOW Offer Engine v4 JSON array. Duplicates merged by ID.</p>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Import Mode</label>
+            <select class="inp" id="import-mode">
+              <option value="merge">Merge (update existing + add new)</option>
+              <option value="replace_all">Replace All (wipe &amp; reload)</option>
+              <option value="add_new">Add New Only (skip existing IDs)</option>
+            </select>
+          </div>
+          <textarea class="inp" id="import-json" style="height:100px;font-family:JetBrains Mono,monospace;font-size:10px;" placeholder="Paste JSON array here…"></textarea>
+          <button class="btn btn-gold" style="margin-top:8px;" onclick="importOffers()"><i class="fas fa-file-import"></i> Import Offers</button>
+          <div id="import-result" style="margin-top:8px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="fas fa-tasks"></i> Bulk Status Operations</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-green" onclick="bulkActivate()"><i class="fas fa-play"></i> Activate All Drafts</button>
+          <button class="btn btn-ghost" onclick="bulkPauseActive()"><i class="fas fa-pause"></i> Pause All Active</button>
+          <button class="btn btn-red" onclick="bulkArchiveExpired()"><i class="fas fa-archive"></i> Archive All Expired</button>
+          <button class="btn btn-blue" onclick="bulkResetUsageCounts()"><i class="fas fa-redo"></i> Reset Usage Counts</button>
+        </div>
+        <div id="bulk-ops-result"><!-- JS --></div>
+      </div>
+      <div class="card" style="border-color:rgba(239,68,68,.25);margin-top:14px;">
+        <div class="card-title" style="color:#f87171;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-red" onclick="resetToDefaults()"><i class="fas fa-trash-restore"></i> Reset to Factory Defaults</button>
+          <button class="btn btn-red" onclick="clearAuditLogs()"><i class="fas fa-eraser"></i> Clear Audit Logs</button>
+          <button class="btn btn-red" onclick="clearExecLogs()"><i class="fas fa-eraser"></i> Clear Exec Logs</button>
+        </div>
+        <div class="alert alert-danger" style="margin-top:10px;"><i class="fas fa-skull-crossbones"></i> These actions are <strong>irreversible</strong>. Factory reset wipes all custom offers and restores system defaults.</div>
+      </div>
+    </div>
+
+    <!-- ══════ AUDIT LOG ══════ -->
+    <div class="panel" id="panel-audit">
+      <div class="section-hdr">
+        <h2><i class="fas fa-shield-alt" style="color:var(--orange)"></i> Audit &amp; Governance Log</h2>
+        <div style="display:flex;gap:8px;">
+          <input class="inp" style="width:170px;" placeholder="Filter by action…" id="audit-filter" oninput="renderAuditLog()"/>
+          <button class="btn btn-ghost btn-sm" onclick="renderAuditLog()"><i class="fas fa-sync"></i></button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="offer-table">
+          <thead><tr><th>Time</th><th>Action</th><th>Details</th><th>User</th></tr></thead>
+          <tbody id="audit-table-body"><!-- JS --></tbody>
+        </table>
+      </div>
+
+      <div class="section-hdr" style="margin-top:14px;">
+        <h2 style="font-size:15px;"><i class="fas fa-file-invoice" style="color:var(--teal)"></i> Execution Log</h2>
+        <button class="btn btn-ghost btn-sm" onclick="renderExecLog()"><i class="fas fa-sync"></i></button>
+      </div>
+      <div class="card">
+        <table class="offer-table">
+          <thead><tr><th>Time</th><th>Park</th><th>Subtotal</th><th>Savings</th><th>Net Payable</th><th>Offers Applied</th><th>Channel</th></tr></thead>
+          <tbody id="exec-table-body"><!-- JS --></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+</div><!-- /app -->
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║         OFFER CREATE / EDIT MODAL           ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div class="modal-backdrop" id="offer-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title"><i class="fas fa-tag" style="color:var(--gold)"></i> <span id="modal-title-text">Create Offer</span></div>
+      <button class="modal-close" onclick="closeOfferModal()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Risk alerts -->
+    <div id="modal-risk-alerts"></div>
+
+    <!-- Form Tabs -->
+    <div class="tab-bar">
+      <button class="tab active" onclick="modalTab('basics',this)">Basics</button>
+      <button class="tab" onclick="modalTab('schedule',this)">Schedule</button>
+      <button class="tab" onclick="modalTab('conditions',this)">Conditions</button>
+      <button class="tab" onclick="modalTab('actions',this)">Actions</button>
+      <button class="tab" onclick="modalTab('limits',this)">Limits</button>
+      <button class="tab" onclick="modalTab('messaging',this)">Messaging</button>
+    </div>
+
+    <!-- TAB: BASICS -->
+    <div id="modal-tab-basics">
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label>Offer ID <small style="color:var(--muted2);text-transform:none;">(auto-generated)</small></label>
+          <input type="text" class="inp" id="f-id" placeholder="WOE4_MYRULE" oninput="previewRisk()"/>
+        </div>
+        <div class="form-group">
+          <label>Offer Name</label>
+          <input type="text" class="inp" id="f-name" placeholder="Summer Splash 20% Off"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Description</label>
+        <textarea class="inp" id="f-desc" placeholder="Brief description for internal reference…"></textarea>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label>Status</label>
+          <select class="inp" id="f-status">
+            <option value="draft">Draft</option>
+            <option value="active">Active</option>
+            <option value="paused">Paused</option>
+            <option value="scheduled">Scheduled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority (1-100, higher = evaluated first)</label>
+          <input type="number" class="inp" id="f-priority" value="70" min="1" max="100" oninput="previewRisk()"/>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label>Stacking Mode</label>
+          <select class="inp" id="f-stack-mode" onchange="previewRisk()">
+            <option value="stackable">Stackable (combines with others)</option>
+            <option value="exclusive">Exclusive (blocks all others)</option>
+            <option value="best_only">Best Only (best per family)</option>
+            <option value="family_only">Family Only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stack Family <small>(group name for best-only logic)</small></label>
+          <input type="text" class="inp" id="f-stack-family" placeholder="e.g. seasonal, bogo, flash"/>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group">
+          <label>Promo Code <small>(leave blank for auto-apply)</small></label>
+          <input type="text" class="inp" id="f-promo" placeholder="e.g. BOGO1, CORP2026" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase();previewRisk()"/>
+        </div>
+        <div class="form-group">
+          <label>Tags <small>(comma-separated)</small></label>
+          <input type="text" class="inp" id="f-tags" placeholder="seasonal, flash, coupon, auto, bogo…"/>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Channels</label>
+          <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" id="f-ch-web" checked> Web</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" id="f-ch-app"> App</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" id="f-ch-kiosk"> Kiosk</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" id="f-ch-counter"> Counter</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Segment</label>
+          <select class="inp" id="f-segment">
+            <option value="all">All Customers</option>
+            <option value="corporate">Corporate</option>
+            <option value="reseller">Reseller</option>
+            <option value="partner">Partner</option>
+            <option value="loyalty">Loyalty Members</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label>Terms &amp; Conditions</label>
+        <textarea class="inp" id="f-terms" placeholder="Terms displayed to customers…"></textarea>
+      </div>
+    </div>
+
+    <!-- TAB: SCHEDULE -->
+    <div id="modal-tab-schedule" style="display:none;">
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> Leave Start/End blank for no date restriction. Use Recurring Days for weekly patterns (e.g. weekends). Hour range enables time-limited flash sales.</div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group"><label>Start Date</label><input type="date" class="inp" id="f-start-date"/></div>
+        <div class="form-group"><label>End Date</label><input type="date" class="inp" id="f-end-date"/></div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Recurring Days of Week <small>(leave blank = all days)</small></label>
+        <div style="display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="0"> Sun</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="1"> Mon</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="2"> Tue</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="3"> Wed</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="4"> Thu</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="5"> Fri</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text);cursor:pointer;"><input type="checkbox" class="f-recur-day" value="6"> Sat</label>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group"><label>Active Hour Start (IST, 0-23, leave blank=anytime)</label><input type="number" class="inp" id="f-hour-start" min="0" max="23" placeholder="e.g. 10"/></div>
+        <div class="form-group"><label>Active Hour End (IST, exclusive)</label><input type="number" class="inp" id="f-hour-end" min="1" max="24" placeholder="e.g. 18"/></div>
+      </div>
+      <div class="form-group">
+        <label>Blackout Dates <small>(one per line, YYYY-MM-DD)</small></label>
+        <textarea class="inp" id="f-blackout" placeholder="2026-12-25&#10;2026-01-26"></textarea>
+      </div>
+    </div>
+
+    <!-- TAB: CONDITIONS -->
+    <div id="modal-tab-conditions" style="display:none;">
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> All condition groups are AND-ed together. Within a group, use AND/OR/NOT. Conditions use field + operator + value.</div>
+      <div id="cond-groups-container"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addConditionGroup()"><i class="fas fa-plus"></i> Add Condition Group</button>
+    </div>
+
+    <!-- TAB: ACTIONS -->
+    <div id="modal-tab-actions" style="display:none;">
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> Actions execute in order. All discounts are summed before stacking resolution. Use SLAB_PERCENT for tiered discounts.</div>
+      <div id="actions-container"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addAction()"><i class="fas fa-plus"></i> Add Action</button>
+    </div>
+
+    <!-- TAB: LIMITS -->
+    <div id="modal-tab-limits" style="display:none;">
+      <div class="alert alert-warn"><i class="fas fa-exclamation-triangle"></i> Always set limits for coupons to prevent abuse. No limit = unlimited redemption.</div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group"><label>Global Limit (total uses)</label><input type="number" class="inp" id="f-lim-global" placeholder="e.g. 1000 (blank=unlimited)" min="1"/></div>
+        <div class="form-group"><label>Per-User Limit</label><input type="number" class="inp" id="f-lim-user" placeholder="e.g. 1 (blank=unlimited)" min="1"/></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:12px;">
+        <div class="form-group"><label>Per-Day Limit</label><input type="number" class="inp" id="f-lim-day" placeholder="e.g. 50 (blank=unlimited)" min="1"/></div>
+        <div class="form-group"><label>Budget Cap (Rs. total discount budget)</label><input type="number" class="inp" id="f-lim-budget" placeholder="e.g. 500000 (blank=unlimited)" min="1"/></div>
+      </div>
+    </div>
+
+    <!-- TAB: MESSAGING -->
+    <div id="modal-tab-messaging" style="display:none;">
+      <div class="alert alert-info"><i class="fas fa-info-circle"></i> Use <code>{savings}</code> placeholder for discount amount. These messages appear on the booking page.</div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Unlock Message <small>(shown when offer qualifies)</small></label>
+        <textarea class="inp" id="f-msg-unlock" placeholder="Summer Splash! 20% off — applied automatically!"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Applied Message <small>(shown after application)</small></label>
+        <textarea class="inp" id="f-msg-applied" placeholder="20% Off applied — saving {savings}!"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Expired / Unavailable Message</label>
+        <textarea class="inp" id="f-msg-expired" placeholder="This offer has ended."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Savings Badge Text <small>(e.g. "Summer Deal", "Flash Sale")</small></label>
+        <input type="text" class="inp" id="f-msg-badge" placeholder="Summer Deal"/>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeOfferModal()">Cancel</button>
+      <button class="btn btn-ghost" onclick="testCurrentOffer()" id="btn-test-offer"><i class="fas fa-flask"></i> Quick Test</button>
+      <button class="btn btn-primary" onclick="saveCurrentOffer()"><i class="fas fa-save"></i> Save Offer</button>
+    </div>
+  </div>
+</div>
+
+<!-- A/B TEST MODAL -->
+<div class="modal-backdrop" id="ab-modal">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-hdr">
+      <div class="modal-title"><i class="fas fa-random" style="color:var(--cyan)"></i> Create A/B Test</div>
+      <button class="modal-close" onclick="document.getElementById('ab-modal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="form-group"><label>Test ID</label><input type="text" class="inp" id="ab-f-id" placeholder="TEST_SUMMER_2026" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="form-group"><label>Test Name</label><input type="text" class="inp" id="ab-f-name" placeholder="Summer vs No-Summer"/></div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Description</label>
+      <textarea class="inp" id="ab-f-desc" placeholder="What is this test measuring?"></textarea>
+    </div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="form-group"><label>Start Date</label><input type="date" class="inp" id="ab-f-start"/></div>
+      <div class="form-group"><label>End Date</label><input type="date" class="inp" id="ab-f-end"/></div>
+    </div>
+    <div class="card-title" style="margin-bottom:10px;"><i class="fas fa-code-branch"></i> Variants (weights must sum to 100)</div>
+    <div id="ab-variants-container"></div>
+    <button class="btn btn-ghost btn-sm" onclick="addABVariant()"><i class="fas fa-plus"></i> Add Variant</button>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('ab-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveABTest()"><i class="fas fa-save"></i> Save A/B Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFER DEEP-DRILL MODAL -->
+<div class="modal-backdrop" id="drill-modal">
+  <div class="modal" style="max-width:720px;">
+    <div class="modal-hdr">
+      <div class="modal-title"><i class="fas fa-microscope" style="color:var(--purple)"></i> <span id="drill-modal-title">Offer Deep Drill</span></div>
+      <button class="modal-close" onclick="document.getElementById('drill-modal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="drill-modal-content"><!-- JS --></div>
+  </div>
+</div>
+
+<!-- VERSION HISTORY MODAL -->
+<div class="modal-backdrop" id="version-modal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-hdr">
+      <div class="modal-title"><i class="fas fa-history" style="color:var(--blue)"></i> Version History</div>
+      <button class="modal-close" onclick="document.getElementById('version-modal').classList.remove('open')"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="version-list"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- ENGINE + UI SCRIPT                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<script src="../js/wow-offer-engine-v4.js"></script>
+<script>
+'use strict';
+
+// Pricing reference for simulation
+const SIM_PRICES = {
+  WATER_DAY    : { adult:1299, child:899, senior:975, armed:909, differently_abled:649 },
+  AMUSEMENT_DAY: { adult:1199, child:799, senior:899, armed:839, differently_abled:599 },
+  COMBO_DAY    : { adult:1999, child:1399, senior:1499, armed:1399, differently_abled:999 },
+};
+
+// ── CLOCK ──────────────────────────────────────────────────────────
+function updateClock() {
+  try {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour12:true,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  } catch(_) {}
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ── PANEL ROUTING ──────────────────────────────────────────────────
+var _currentPanel = 'dashboard';
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.sb-link').forEach(function(l) { l.classList.remove('active'); });
+  var p = document.getElementById('panel-' + id);
+  if (p) p.classList.add('active');
+  _currentPanel = id;
+
+  var titles = { dashboard:'Dashboard', offers:'Offer Library', simulator:'Simulator Sandbox',
+    analytics:'Analytics', audit:'Audit Log', abtest:'A/B Testing Framework',
+    conflict:'Conflict Resolution Matrix', priority:'Priority Ranking', bulkops:'Bulk Operations' };
+  document.getElementById('topbar-panel-title').textContent = titles[id] || id;
+
+  // Lazy init
+  if (id === 'dashboard')  refreshDashboard();
+  if (id === 'offers')     renderOfferList();
+  if (id === 'analytics')  refreshAnalytics();
+  if (id === 'audit')      { renderAuditLog(); renderExecLog(); }
+  if (id === 'simulator')  renderSimHistory();
+  if (id === 'abtest')     refreshABPanel();
+  if (id === 'conflict')   refreshConflictMatrix();
+  if (id === 'priority')   refreshPriorityPanel();
+
+  // Sidebar highlight
+  document.querySelectorAll('.sb-link').forEach(function(l) {
+    if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + id + "'")) l.classList.add('active');
+  });
+}
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function toast(msg, type, dur) {
+  type = type || 'success'; dur = dur || 3000;
+  var icons = { success:'fas fa-check-circle', error:'fas fa-times-circle', warn:'fas fa-exclamation-triangle' };
+  var colors = { success:'#4ade80', error:'#f87171', warn:'#fbbf24' };
+  var wrap = document.getElementById('toast-wrap');
+  var el   = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = '<i class="' + icons[type] + '" style="color:' + colors[type] + '"></i><span>' + msg + '</span>';
+  wrap.appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, dur);
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function inr(n) { return 'Rs. ' + Number(Math.round(n)).toLocaleString('en-IN'); }
+function dt(ts) { return new Date(ts).toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+
+function statusBadge(s) {
+  var map = { active:'active', draft:'draft', paused:'paused', scheduled:'scheduled', expired:'expired', archived:'archived' };
+  return '<span class="badge badge-' + (map[s]||'draft') + '">' + s.toUpperCase() + '</span>';
+}
+
+function priorityColor(p) {
+  if (p >= 85) return '#f87171';
+  if (p >= 70) return '#fbbf24';
+  if (p >= 50) return '#4ade80';
+  return '#60a5fa';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────
+var _trendChart = null, _topChart = null;
+function refreshDashboard(days) {
+  days = days || parseInt(document.getElementById('dash-days').value) || 30;
+  var eng = window.WOWOfferEngine;
+  if (!eng) return;
+  var stats    = eng.Analytics.summary(days);
+  var offers   = eng.adminListOffers();
+  var active   = offers.filter(function(o) { return o.effectiveStatus === 'active'; });
+  var paused   = offers.filter(function(o) { return o.effectiveStatus === 'paused'; });
+
+  // Update sidebar badge
+  document.getElementById('sb-active-count').textContent = active.length;
+
+  // Stats row
+  document.getElementById('dash-stats').innerHTML = [
+    { val: active.length, label: 'Active Offers', sub: paused.length + ' paused', color: '#4ade80' },
+    { val: stats.totalTxn, label: 'Redemptions', sub: 'Last ' + days + ' days', color: '#60a5fa' },
+    { val: inr(stats.savings), label: 'Total Discount Given', sub: stats.discountRate + '% of gross', color: '#f87171' },
+    { val: inr(stats.grossSales), label: 'Gross Sales', sub: 'Before discounts', color: '#fbbf24' },
+    { val: inr(stats.aovBefore), label: 'AOV Before', sub: 'Average order', color: '#c084fc' },
+    { val: inr(stats.aovAfter),  label: 'AOV After',  sub: 'After discounts',  color: '#f97316' },
+  ].map(function(s) {
+    return '<div class="stat-card"><div class="stat-val" style="color:' + s.color + '">' + s.val + '</div>' +
+      '<div class="stat-label">' + s.label + '</div><div class="stat-sub" style="color:var(--muted)">' + s.sub + '</div></div>';
+  }).join('');
+
+  // Trend chart
+  var dailyData = stats.dailyTrend;
+  var labels = Object.keys(dailyData).sort().slice(-14);
+  var savArr  = labels.map(function(d) { return dailyData[d] ? dailyData[d].savings : 0; });
+  var grArr   = labels.map(function(d) { return dailyData[d] ? dailyData[d].gross   : 0; });
+  var lShort  = labels.map(function(d) { return d.slice(5); });
+
+  if (_trendChart) _trendChart.destroy();
+  var ctx = document.getElementById('chart-trend').getContext('2d');
+  _trendChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: lShort,
+      datasets: [
+        { label:'Gross Sales', data: grArr, backgroundColor:'rgba(96,165,250,.3)', borderColor:'#60a5fa', borderWidth:1.5, borderRadius:3 },
+        { label:'Discount Given', data: savArr, backgroundColor:'rgba(239,68,68,.4)', borderColor:'#f87171', borderWidth:1.5, borderRadius:3 },
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'rgba(255,255,255,.5)', font:{size:10} } } },
+      scales: { x:{ ticks:{color:'rgba(255,255,255,.4)',font:{size:9}}, grid:{color:'rgba(255,255,255,.05)'} },
+        y:{ ticks:{color:'rgba(255,255,255,.4)',font:{size:9}}, grid:{color:'rgba(255,255,255,.05)'} } } }
+  });
+
+  // Top offers bar chart
+  var perOffer = stats.perOffer;
+  var topKeys  = Object.keys(perOffer).sort(function(a,b) { return perOffer[b].discount - perOffer[a].discount; }).slice(0, 6);
+  if (_topChart) _topChart.destroy();
+  var ctx2 = document.getElementById('chart-top-offers').getContext('2d');
+  _topChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: topKeys.map(function(k) { return (perOffer[k].name || k).slice(0,20); }),
+      datasets: [{ label:'Discount Given (Rs.)', data: topKeys.map(function(k) { return perOffer[k].discount; }),
+        backgroundColor:['rgba(201,168,76,.5)','rgba(168,85,247,.5)','rgba(34,197,94,.5)','rgba(239,68,68,.5)','rgba(59,130,246,.5)','rgba(249,115,22,.5)'],
+        borderRadius:4 }]
+    },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales: { x:{ ticks:{color:'rgba(255,255,255,.4)',font:{size:9}}, grid:{color:'rgba(255,255,255,.05)'} },
+        y:{ ticks:{color:'rgba(255,255,255,.5)',font:{size:10}}, grid:{display:false} } } }
+  });
+
+  // Active offers list
+  var activeHtml = active.slice(0,8).map(function(o) {
+    var usedPct = o.usageLimits && o.usageLimits.global ? Math.round((o.usedCount||0)/o.usageLimits.global*100) : null;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">' +
+      '<div><div style="font-size:12px;font-weight:600;">' + o.name + '</div>' +
+      '<div style="font-size:10px;color:var(--muted);">' + (o.autoApply ? 'Auto' : 'Code: '+o.promoCode) + ' &bull; Pri:' + o.priority + '</div></div>' +
+      '<div style="text-align:right;font-size:10.5px;">' +
+      (usedPct !== null ? '<div style="color:var(--muted);">' + (o.usedCount||0) + '/' + o.usageLimits.global + ' uses</div>' +
+        '<div style="width:60px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:3px;overflow:hidden;">' +
+        '<div style="width:' + Math.min(100,usedPct) + '%;height:100%;background:' + (usedPct>80?'#f87171':'#4ade80') + ';border-radius:2px;"></div></div>' : '<span style="color:var(--muted);">Unlimited</span>') +
+      '</div></div>';
+  }).join('');
+  document.getElementById('dash-offers-list').innerHTML = activeHtml || '<div style="color:var(--muted);padding:20px;text-align:center;">No active offers</div>';
+
+  // Risk alerts
+  var riskHtml = '';
+  offers.filter(function(o) { return o.effectiveStatus === 'active'; }).forEach(function(o) {
+    var risks = eng.checkRisks(o);
+    risks.forEach(function(r) {
+      var cl = r.level === 'danger' ? 'alert-danger' : r.level === 'warn' ? 'alert-warn' : 'alert-info';
+      riskHtml += '<div class="alert ' + cl + '" style="margin-bottom:6px;"><i class="fas fa-' + (r.level==='danger'?'exclamation-circle':'info-circle') + '"></i>' +
+        '<span><strong>' + o.name + ':</strong> ' + r.msg + '</span></div>';
+    });
+  });
+  document.getElementById('dash-risk-alerts').innerHTML = riskHtml || '<div class="alert alert-success"><i class="fas fa-check-circle"></i> No risk alerts detected.</div>';
+}
+
+// ── OFFER LIST ────────────────────────────────────────────────────
+var _offerTab = 'all';
+function setOfferTab(tab, el) {
+  _offerTab = tab;
+  document.querySelectorAll('.tab-bar .tab').forEach(function(t) { t.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  renderOfferList();
+}
+
+function filterOffers(type) {
+  document.getElementById('offer-filter-type').value = type;
+  showPanel('offers');
+}
+
+function renderOfferList() {
+  var eng     = window.WOWOfferEngine;
+  if (!eng) return;
+  var offers  = eng.adminListOffers();
+  var search  = (document.getElementById('offer-search').value || '').toLowerCase();
+  var fStatus = document.getElementById('offer-filter-status').value;
+  var fType   = document.getElementById('offer-filter-type').value;
+
+  // Tab filter
+  if (_offerTab !== 'all') {
+    var tabMap = { active:['active'], draft:['draft'], scheduled:['scheduled'], expired:['expired','archived'] };
+    var allowed = tabMap[_offerTab] || [];
+    offers = offers.filter(function(o) { return allowed.indexOf(o.effectiveStatus) !== -1; });
+  }
+  if (fStatus) offers = offers.filter(function(o) { return o.effectiveStatus === fStatus; });
+  if (search)  offers = offers.filter(function(o) {
+    return (o.name||'').toLowerCase().includes(search) || (o.id||'').toLowerCase().includes(search) ||
+      (o.promoCode||'').toLowerCase().includes(search) || (o.tags||[]).join(' ').toLowerCase().includes(search);
+  });
+  if (fType === 'auto')   offers = offers.filter(function(o) { return o.autoApply; });
+  if (fType === 'coupon') offers = offers.filter(function(o) { return o.promoCode; });
+  if (fType === 'flash')  offers = offers.filter(function(o) { return (o.tags||[]).indexOf('flash') !== -1; });
+  if (fType === 'slab')   offers = offers.filter(function(o) { return (o.tags||[]).indexOf('slab') !== -1; });
+  if (fType === 'bogo')   offers = offers.filter(function(o) { return (o.tags||[]).indexOf('bogo') !== -1; });
+
+  if (!offers.length) {
+    document.getElementById('offers-container').innerHTML =
+      '<div style="text-align:center;padding:60px;color:var(--muted);"><i class="fas fa-search" style="font-size:28px;opacity:.3;display:block;margin-bottom:12px;"></i>No offers found.</div>';
+    return;
+  }
+
+  var html = offers.map(function(o) {
+    var risks   = eng.checkRisks(o);
+    var riskIco = risks.length ? '<i class="fas fa-exclamation-triangle" style="color:#fbbf24;font-size:11px;margin-left:5px;" title="' + risks.map(function(r){return r.msg;}).join('; ') + '"></i>' : '';
+    var priceInfo = '';
+    if (o.actions && o.actions[0]) {
+      var a = o.actions[0];
+      if (a.type === 'percent')       priceInfo = a.value + '% off';
+      else if (a.type === 'flat')     priceInfo = 'Rs.' + a.value + ' flat off';
+      else if (a.type === 'free_tickets') priceInfo = 'Buy ' + a.buyQty + ' Get ' + a.getFreeQty + ' Free';
+      else if (a.type === 'slab_percent') priceInfo = 'Tiered % by qty';
+      else if (a.type === 'fnb_credit')   priceInfo = 'Rs.' + a.value + ' F&B Credit';
+      else priceInfo = a.type;
+    }
+    var usageTxt = '';
+    if (o.usageLimits) {
+      var lim = o.usageLimits;
+      var parts = [];
+      if (lim.global) parts.push((o.usedCount||0) + '/' + lim.global + ' global');
+      if (lim.perUser) parts.push(lim.perUser + '/user');
+      if (lim.budget) parts.push('Budget: Rs.' + lim.budget.toLocaleString('en-IN'));
+      usageTxt = parts.length ? parts.join(' &bull; ') : 'Unlimited';
+    }
+
+    return '<div class="offer-card" id="oc-' + o.id + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+      '<div>' +
+        '<div class="offer-name">' + o.name + riskIco + '</div>' +
+        '<div class="offer-meta">' +
+          statusBadge(o.effectiveStatus) + ' ' +
+          '<span style="font-family:\'JetBrains Mono\',monospace;font-size:10px;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:4px;">' + o.id + '</span>' +
+          (o.promoCode ? '<span style="color:#60a5fa;">Code: ' + o.promoCode + '</span>' : '<span style="color:#4ade80;">Auto-Apply</span>') +
+          '<span>' + priceInfo + '</span>' +
+          (o.stackMode ? '<span style="text-transform:capitalize;">' + o.stackMode + '</span>' : '') +
+          '<span>Pri: <strong style="color:' + priorityColor(o.priority||50) + '">' + (o.priority||50) + '</strong></span>' +
+        '</div>' +
+        '<div style="font-size:10px;color:var(--muted2);margin-top:3px;">' + usageTxt + '</div>' +
+        (o.tags && o.tags.length ? '<div style="margin-top:5px;">' + o.tags.map(function(t){return '<span class="offer-tag">'+t+'</span>';}).join(' ') + '</div>' : '') +
+      '</div>' +
+      '<div style="display:flex;gap:4px;flex-shrink:0;">' +
+        '<span class="priority-bar"><span class="priority-dot" style="background:' + priorityColor(o.priority||50) + '"></span></span>' +
+      '</div>' +
+      '</div>' +
+      '<div class="offer-actions-row">' +
+        '<button class="btn btn-ghost btn-sm" onclick="editOffer(\'' + o.id + '\')"><i class="fas fa-edit"></i> Edit</button>' +
+        '<button class="btn btn-blue btn-sm" onclick="cloneOffer(\'' + o.id + '\')"><i class="fas fa-copy"></i> Clone</button>' +
+        (o.effectiveStatus === 'active'
+          ? '<button class="btn btn-ghost btn-sm" onclick="pauseOffer(\'' + o.id + '\')"><i class="fas fa-pause"></i> Pause</button>'
+          : '<button class="btn btn-green btn-sm" onclick="activateOffer(\'' + o.id + '\')"><i class="fas fa-play"></i> Activate</button>') +
+        '<button class="btn btn-ghost btn-sm" onclick="quickSimOffer(\'' + o.id + '\')"><i class="fas fa-flask"></i> Test</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="showVersionHistory(\'' + o.id + '\')"><i class="fas fa-history"></i> History</button>' +
+        '<button class="btn btn-blue btn-sm" onclick="openDrillModal(\'' + o.id + '\')"><i class="fas fa-microscope"></i> Drill</button>' +
+        '<button class="btn btn-red btn-sm" onclick="archiveOffer(\'' + o.id + '\')"><i class="fas fa-archive"></i></button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('offers-container').innerHTML = html;
+}
+
+function activateOffer(id) {
+  WOWOfferEngine.adminActivateOffer(id);
+  renderOfferList(); refreshDashboard();
+  toast('Offer activated and live.', 'success');
+}
+function pauseOffer(id) {
+  WOWOfferEngine.adminPauseOffer(id);
+  renderOfferList(); refreshDashboard();
+  toast('Offer paused.', 'warn');
+}
+function archiveOffer(id) {
+  if (!confirm('Archive this offer? It will no longer apply to carts.')) return;
+  WOWOfferEngine.adminDeleteOffer(id);
+  renderOfferList(); refreshDashboard();
+  toast('Offer archived.', 'warn');
+}
+function cloneOffer(id) {
+  var c = WOWOfferEngine.adminCloneOffer(id);
+  renderOfferList();
+  toast('Offer cloned as "' + c.name + '" (Draft).', 'success');
+  editOffer(c.id);
+}
+
+// ── OFFER MODAL ────────────────────────────────────────────────────
+var _editingId   = null;
+var _condGroups  = [];
+var _actions     = [];
+
+function openOfferModal(offerData) {
+  _editingId  = null;
+  _condGroups = [{ id:'cg1', op:'AND', conditions:[], negated:false }];
+  _actions    = [{ id:'a1', type:'percent', scope:'cart', value:10, cap:null, label:'' }];
+
+  resetModalForm();
+  if (offerData) {
+    _editingId  = offerData.id;
+    _condGroups = JSON.parse(JSON.stringify(offerData.conditionGroups || _condGroups));
+    _actions    = JSON.parse(JSON.stringify(offerData.actions || _actions));
+    populateModalForm(offerData);
+    document.getElementById('modal-title-text').textContent = 'Edit Offer: ' + offerData.name;
+  } else {
+    document.getElementById('modal-title-text').textContent = 'Create New Offer';
+    var newId = 'WOE4_' + Date.now().toString(36).toUpperCase();
+    document.getElementById('f-id').value = newId;
+  }
+
+  renderCondGroups();
+  renderActions();
+  previewRisk();
+  document.getElementById('offer-modal').classList.add('open');
+}
+
+function editOffer(id) {
+  var o = WOWOfferEngine.adminGetOffer(id);
+  if (o) openOfferModal(o);
+}
+
+function closeOfferModal() {
+  document.getElementById('offer-modal').classList.remove('open');
+}
+
+function resetModalForm() {
+  var fields = ['f-id','f-name','f-desc','f-priority','f-promo','f-tags','f-terms',
+    'f-start-date','f-end-date','f-hour-start','f-hour-end','f-blackout',
+    'f-lim-global','f-lim-user','f-lim-day','f-lim-budget',
+    'f-msg-unlock','f-msg-applied','f-msg-expired','f-msg-badge','f-stack-family'];
+  fields.forEach(function(id) { var e = document.getElementById(id); if (e) e.value = ''; });
+  document.getElementById('f-status').value    = 'active';
+  document.getElementById('f-priority').value  = '70';
+  document.getElementById('f-stack-mode').value= 'stackable';
+  document.getElementById('f-segment').value   = 'all';
+  document.getElementById('f-ch-web').checked  = true;
+  ['f-ch-app','f-ch-kiosk','f-ch-counter'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.checked = false;
+  });
+  document.querySelectorAll('.f-recur-day').forEach(function(c) { c.checked = false; });
+  modalTab('basics', document.querySelector('.tab-bar .tab'));
+}
+
+function populateModalForm(o) {
+  function sv(id, v) { var e=document.getElementById(id); if(e && v!==null && v!==undefined) e.value=v; }
+  sv('f-id', o.id); sv('f-name', o.name); sv('f-desc', o.description);
+  sv('f-status', o.status); sv('f-priority', o.priority||70);
+  sv('f-stack-mode', o.stackMode||'stackable'); sv('f-stack-family', o.stackFamily||'');
+  sv('f-promo', o.promoCode||''); sv('f-tags', (o.tags||[]).join(', '));
+  sv('f-terms', o.terms||''); sv('f-segment', o.segment||'all');
+
+  var sch = o.schedule || {};
+  sv('f-start-date', sch.startDate||''); sv('f-end-date', sch.endDate||'');
+  sv('f-hour-start', sch.hourStart!==null && sch.hourStart!==undefined ? sch.hourStart : '');
+  sv('f-hour-end',   sch.hourEnd!==null   && sch.hourEnd!==undefined   ? sch.hourEnd   : '');
+  sv('f-blackout', (sch.blackoutDates||[]).join('\n'));
+  if (sch.recurringDays) {
+    document.querySelectorAll('.f-recur-day').forEach(function(c) {
+      c.checked = sch.recurringDays.indexOf(parseInt(c.value)) !== -1;
+    });
+  }
+
+  var lim = o.usageLimits || {};
+  sv('f-lim-global', lim.global||''); sv('f-lim-user', lim.perUser||'');
+  sv('f-lim-day', lim.perDay||''); sv('f-lim-budget', lim.budget||'');
+
+  var msg = o.messaging || {};
+  sv('f-msg-unlock', msg.unlockMsg||''); sv('f-msg-applied', msg.appliedMsg||'');
+  sv('f-msg-expired', msg.expiredMsg||''); sv('f-msg-badge', msg.savingsBadge||'');
+
+  var ch = o.channel || ['web'];
+  document.getElementById('f-ch-web').checked     = ch.indexOf('web')     !== -1;
+  document.getElementById('f-ch-app').checked     = ch.indexOf('app')     !== -1;
+  document.getElementById('f-ch-kiosk').checked   = ch.indexOf('kiosk')   !== -1;
+  document.getElementById('f-ch-counter').checked = ch.indexOf('counter') !== -1;
+}
+
+function modalTab(id, el) {
+  ['basics','schedule','conditions','actions','limits','messaging'].forEach(function(t) {
+    var tab = document.getElementById('modal-tab-' + t);
+    if (tab) tab.style.display = t === id ? '' : 'none';
+  });
+  if (el) {
+    el.closest('.tab-bar').querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+  }
+}
+
+// ── CONDITIONS ────────────────────────────────────────────────────
+function renderCondGroups() {
+  var html = _condGroups.map(function(grp, gi) {
+    var opColors = { AND:'op-AND', OR:'op-OR', NOT:'op-NOT' };
+    var condHtml = (grp.conditions || []).map(function(c, ci) {
+      return '<div class="cond-row" id="cr-' + gi + '-' + ci + '">' +
+        '<span class="cond-type-chip">' + c.type + '</span>' +
+        '<span style="font-size:10.5px;color:var(--muted);">' + (c.op||'') + '</span>' +
+        '<span style="font-size:11.5px;flex:1;">' + JSON.stringify(c.value) +
+        (c.meta ? ' <span style="font-size:9.5px;color:var(--muted2);">[' + JSON.stringify(c.meta) + ']</span>' : '') +
+        '</span>' +
+        '<button class="btn btn-red btn-icon btn-sm" style="width:22px;height:22px;" onclick="removeCond(' + gi + ',' + ci + ')"><i class="fas fa-times" style="font-size:9px;"></i></button>' +
+      '</div>';
+    }).join('');
+
+    return '<div class="cond-group-box">' +
+      '<div class="cond-group-header">' +
+        '<span style="font-size:10px;color:var(--muted);">Group ' + (gi+1) + '</span>' +
+        '<button class="op-badge ' + (opColors[grp.op]||'op-AND') + '" onclick="cycleGroupOp(' + gi + ')">' + grp.op + '</button>' +
+        '<select class="inp" style="width:auto;font-size:10px;padding:3px 6px;" onchange="addCondFromSelect(this,' + gi + ')">' +
+          '<option value="">+ Add Condition</option>' +
+          '<option value="park">Park</option>' +
+          '<option value="category">Category</option>' +
+          '<option value="qty_total">Qty Total</option>' +
+          '<option value="qty_category">Qty Per Category</option>' +
+          '<option value="qty_mix">Qty Mix</option>' +
+          '<option value="cart_value">Cart Value</option>' +
+          '<option value="coupon_code">Coupon Code</option>' +
+          '<option value="day_of_week">Day of Week</option>' +
+          '<option value="hour_range">Hour Range</option>' +
+          '<option value="date_range">Date Range</option>' +
+          '<option value="channel">Channel</option>' +
+          '<option value="segment">Segment</option>' +
+          '<option value="cross_category">Cross-Category</option>' +
+          '<option value="presence">Presence</option>' +
+          '<option value="spend_threshold">Spend Threshold</option>' +
+        '</select>' +
+        (gi > 0 ? '<button class="btn btn-red btn-sm btn-icon" style="width:22px;height:22px;" onclick="removeCondGroup(' + gi + ')"><i class="fas fa-trash" style="font-size:9px;"></i></button>' : '') +
+      '</div>' +
+      condHtml +
+    '</div>';
+  }).join('');
+
+  document.getElementById('cond-groups-container').innerHTML = html;
+}
+
+function addConditionGroup() {
+  _condGroups.push({ id:'cg' + Date.now(), op:'AND', conditions:[], negated:false });
+  renderCondGroups();
+}
+
+function removeCondGroup(gi) {
+  _condGroups.splice(gi, 1);
+  renderCondGroups();
+}
+
+function cycleGroupOp(gi) {
+  var ops = ['AND','OR','NOT'];
+  var cur = _condGroups[gi].op;
+  _condGroups[gi].op = ops[(ops.indexOf(cur) + 1) % ops.length];
+  renderCondGroups();
+}
+
+function removeCond(gi, ci) {
+  _condGroups[gi].conditions.splice(ci, 1);
+  renderCondGroups();
+}
+
+function addCondFromSelect(sel, gi) {
+  var type = sel.value;
+  sel.value = '';
+  if (!type) return;
+  var defaults = {
+    park         : { type:'park',         op:'in',  value:['WATER_DAY'] },
+    category     : { type:'category',     op:'any', value:['adult','child'] },
+    qty_total    : { type:'qty_total',    op:'gte', value:1 },
+    qty_category : { type:'qty_category', op:'gte', value:1, meta:{ cat:'adult' } },
+    qty_mix      : { type:'qty_mix',      op:'all', value:[{cat:'adult',op:'gte',qty:1}] },
+    cart_value   : { type:'cart_value',   op:'gte', value:1000 },
+    coupon_code  : { type:'coupon_code',  op:'eq',  value:'CODE' },
+    day_of_week  : { type:'day_of_week',  op:'in',  value:[5,6,0] },
+    hour_range   : { type:'hour_range',   op:'in',  value:[10,18] },
+    date_range   : { type:'date_range',   op:'in',  value:['2026-01-01','2026-12-31'] },
+    channel      : { type:'channel',      op:'in',  value:['web','app'] },
+    segment      : { type:'segment',      op:'in',  value:['all'] },
+    cross_category:{ type:'cross_category',op:'in', value:{cat1:'adult',cat2:'child'} },
+    presence     : { type:'presence',     op:'present', meta:{ cat:'senior' } },
+    spend_threshold:{ type:'spend_threshold', op:'gte', value:5000 },
+  };
+  var cond = defaults[type] || { type:type, op:'eq', value:'' };
+  cond.id = 'c' + Date.now();
+  _condGroups[gi].conditions.push(cond);
+  renderCondGroups();
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────
+function renderActions() {
+  var html = _actions.map(function(a, i) {
+    var typeColors = { percent:'rgba(34,197,94,.15)', flat:'rgba(59,130,246,.15)', free_tickets:'rgba(201,168,76,.15)',
+      slab_percent:'rgba(168,85,247,.15)', fnb_credit:'rgba(249,115,22,.15)', percent_cap:'rgba(239,68,68,.15)' };
+    var slabHtml = '';
+    if (a.type === 'slab_percent' || a.type === 'slab_flat') {
+      slabHtml = '<div style="margin-top:8px;padding:8px;background:rgba(0,0,0,.2);border-radius:6px;">' +
+        '<div style="font-size:9.5px;color:var(--muted);margin-bottom:5px;">SLABS</div>' +
+        (a.slabs||[]).map(function(s,si) {
+          return '<div class="slab-row"><input type="number" class="inp" style="width:70px;" value="' + s.minQty + '" placeholder="Min" onchange="updateSlab(' + i + ',' + si + ',\'minQty\',this.value)"/>' +
+            '<span style="font-size:10px;color:var(--muted);">to</span>' +
+            '<input type="number" class="inp" style="width:70px;" value="' + (s.maxQty||'') + '" placeholder="Max(null)" onchange="updateSlab(' + i + ',' + si + ',\'maxQty\',this.value||null)"/>' +
+            '<input type="number" class="inp" style="width:70px;" value="' + (s.percent||s.flat||0) + '" placeholder="%" onchange="updateSlab(' + i + ',' + si + ',\'' + (a.type==='slab_percent'?'percent':'flat') + '\',this.value)"/>' +
+            '<button class="btn btn-red btn-icon btn-sm" style="width:22px;height:22px;" onclick="removeSlab(' + i + ',' + si + ')"><i class="fas fa-times" style="font-size:9px;"></i></button>' +
+          '</div>';
+        }).join('') +
+        '<button class="btn btn-ghost btn-sm" style="margin-top:4px;" onclick="addSlab(' + i + ')"><i class="fas fa-plus"></i> Add Slab</button>' +
+      '</div>';
+    }
+
+    return '<div class="action-row" style="background:' + (typeColors[a.type]||'rgba(255,255,255,.025)') + ';">' +
+      '<span class="action-type-chip">' + (a.type||'') + '</span>' +
+      '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;align-items:center;">' +
+        '<div class="form-group">' +
+          '<label>Type</label>' +
+          '<select class="inp" style="padding:5px;" onchange="updateAction(' + i + ',\'type\',this.value);renderActions();">' +
+            ['percent','flat','per_ticket','free_tickets','slab_percent','slab_flat','credit','fnb_credit','fee_waiver','price_override','percent_cap'].map(function(t) {
+              return '<option value="' + t + '"' + (a.type===t?' selected':'') + '>' + t + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        (a.type === 'slab_percent' || a.type === 'slab_flat' ? '' :
+          '<div class="form-group"><label>Value</label><input type="number" class="inp" style="padding:5px;" value="' + (a.value||0) + '" onchange="updateAction(' + i + ',\'value\',parseFloat(this.value))"/></div>') +
+        '<div class="form-group"><label>Cap (Rs. max)</label><input type="number" class="inp" style="padding:5px;" value="' + (a.cap||'') + '" placeholder="No cap" onchange="updateAction(' + i + ',\'cap\',this.value?parseFloat(this.value):null)"/></div>' +
+        '<div class="form-group"><label>Scope</label>' +
+          '<select class="inp" style="padding:5px;" onchange="updateAction(' + i + ',\'scope\',this.value)">' +
+            ['cart','category','line_item','cross_cart'].map(function(s) {
+              return '<option value="' + s + '"' + (a.scope===s?' selected':'') + '>' + s + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group"><label>Scope Categories</label><input type="text" class="inp" style="padding:5px;" value="' + (a.scopeCategories||[]).join(',') + '" placeholder="adult,child…" onchange="updateAction(' + i + ',\'scopeCategories\',this.value?this.value.split(\',\').map(function(s){return s.trim()}):[])"/></div>' +
+        (a.type === 'free_tickets' ? '<div class="form-group"><label>Buy Qty</label><input type="number" class="inp" style="padding:5px;" value="' + (a.buyQty||1) + '" onchange="updateAction(' + i + ',\'buyQty\',parseInt(this.value))"/></div>' +
+          '<div class="form-group"><label>Get Free Qty</label><input type="number" class="inp" style="padding:5px;" value="' + (a.getFreeQty||1) + '" onchange="updateAction(' + i + ',\'getFreeQty\',parseInt(this.value))"/></div>' : '') +
+        '<div class="form-group"><label>Label</label><input type="text" class="inp" style="padding:5px;" value="' + (a.label||'') + '" placeholder="e.g. 20% Off Splash" onchange="updateAction(' + i + ',\'label\',this.value)"/></div>' +
+      '</div>' +
+      '<button class="btn btn-red btn-icon btn-sm" onclick="removeAction(' + i + ')"><i class="fas fa-times"></i></button>' +
+      slabHtml +
+    '</div>';
+  }).join('');
+  document.getElementById('actions-container').innerHTML = html;
+}
+
+function updateAction(i, key, val) { if (_actions[i]) _actions[i][key] = val; }
+function removeAction(i) { _actions.splice(i, 1); renderActions(); }
+function addAction() {
+  _actions.push({ id:'a'+Date.now(), type:'percent', scope:'cart', value:10, cap:null, label:'' });
+  renderActions();
+}
+function addSlab(i) {
+  if (!_actions[i].slabs) _actions[i].slabs = [];
+  _actions[i].slabs.push({ minQty: 1, maxQty: null, percent: 5 });
+  renderActions();
+}
+function removeSlab(i, si) { _actions[i].slabs.splice(si, 1); renderActions(); }
+function updateSlab(i, si, key, val) { if (_actions[i] && _actions[i].slabs && _actions[i].slabs[si]) _actions[i].slabs[si][key] = val === null ? null : (isNaN(val) ? val : parseFloat(val)); }
+
+// ── RISK PREVIEW ─────────────────────────────────────────────────
+function previewRisk() {
+  var offer = buildOfferFromForm();
+  var risks = WOWOfferEngine.checkRisks(offer);
+  var html = risks.map(function(r) {
+    var cl = r.level === 'danger' ? 'alert-danger' : r.level === 'warn' ? 'alert-warn' : 'alert-info';
+    return '<div class="alert ' + cl + '" style="margin-bottom:6px;font-size:11px;padding:8px 12px;"><i class="fas fa-exclamation-triangle"></i> ' + r.msg + '</div>';
+  }).join('');
+  document.getElementById('modal-risk-alerts').innerHTML = html;
+}
+
+// ── SAVE OFFER ────────────────────────────────────────────────────
+function buildOfferFromForm() {
+  function gv(id) { var e=document.getElementById(id); return e ? e.value : ''; }
+
+  var channels = [];
+  if (document.getElementById('f-ch-web').checked)    channels.push('web');
+  if (document.getElementById('f-ch-app').checked)    channels.push('app');
+  if (document.getElementById('f-ch-kiosk').checked)  channels.push('kiosk');
+  if (document.getElementById('f-ch-counter').checked)channels.push('counter');
+
+  var recurDays = [];
+  document.querySelectorAll('.f-recur-day').forEach(function(c) {
+    if (c.checked) recurDays.push(parseInt(c.value));
+  });
+
+  var lGlobal = gv('f-lim-global') ? parseInt(gv('f-lim-global'))  : null;
+  var lUser   = gv('f-lim-user')   ? parseInt(gv('f-lim-user'))    : null;
+  var lDay    = gv('f-lim-day')    ? parseInt(gv('f-lim-day'))     : null;
+  var lBudget = gv('f-lim-budget') ? parseInt(gv('f-lim-budget'))  : null;
+
+  var hStart = gv('f-hour-start') !== '' ? parseInt(gv('f-hour-start')) : null;
+  var hEnd   = gv('f-hour-end')   !== '' ? parseInt(gv('f-hour-end'))   : null;
+
+  var blackout = gv('f-blackout').split('\n').map(function(d){return d.trim();}).filter(Boolean);
+
+  return {
+    id          : gv('f-id') || ('WOE4_' + Date.now().toString(36).toUpperCase()),
+    name        : gv('f-name'),
+    description : gv('f-desc'),
+    status      : gv('f-status'),
+    priority    : parseInt(gv('f-priority')) || 70,
+    stackMode   : gv('f-stack-mode'),
+    stackFamily : gv('f-stack-family') || gv('f-id'),
+    autoApply   : !gv('f-promo'),
+    promoCode   : gv('f-promo') || null,
+    tags        : gv('f-tags').split(',').map(function(t){return t.trim();}).filter(Boolean),
+    channel     : channels,
+    segment     : [gv('f-segment') || 'all'],
+    terms       : gv('f-terms'),
+    schedule    : {
+      startDate    : gv('f-start-date') || null,
+      endDate      : gv('f-end-date')   || null,
+      recurringDays: recurDays.length ? recurDays : null,
+      hourStart    : hStart,
+      hourEnd      : hEnd,
+      blackoutDates: blackout,
+      timezone     : 'Asia/Kolkata',
+    },
+    conditionGroups: _condGroups,
+    actions        : _actions,
+    usageLimits    : { global: lGlobal, perUser: lUser, perDay: lDay, budget: lBudget },
+    messaging      : {
+      unlockMsg   : gv('f-msg-unlock'),
+      appliedMsg  : gv('f-msg-applied'),
+      expiredMsg  : gv('f-msg-expired'),
+      savingsBadge: gv('f-msg-badge'),
+    },
+  };
+}
+
+function saveCurrentOffer() {
+  var offer = buildOfferFromForm();
+  if (!offer.name) { toast('Offer name is required.', 'error'); return; }
+  if (!offer.actions || !offer.actions.length) { toast('At least one action is required.', 'error'); return; }
+
+  WOWOfferEngine.adminSaveOffer(offer);
+  closeOfferModal();
+  renderOfferList();
+  refreshDashboard();
+  toast('Offer "' + offer.name + '" saved successfully!', 'success');
+}
+
+function testCurrentOffer() {
+  var offer = buildOfferFromForm();
+  // Quick test with a 2-adult cart on Water Park
+  var cart = buildSimCart('WATER_DAY', 2, 2, 0, 0, 0);
+  var result = WOWOfferEngine.simulate(cart, { promoCode: offer.promoCode || null, channel: 'web' });
+  var matched = result.applied.some(function(a) { return a.offerId === offer.id; });
+  toast(matched
+    ? 'TEST PASS — Offer applies. Discount: Rs.' + result.totalTicketDiscount
+    : 'TEST INFO — Offer not applied on test cart (2 Adult + 2 Child, Water Park). Check conditions.',
+    matched ? 'success' : 'warn', 5000);
+}
+
+// ── VERSION HISTORY ───────────────────────────────────────────────
+function showVersionHistory(id) {
+  var hist = WOWOfferEngine.adminGetVersionHistory(id);
+  var html = hist.length ? hist.map(function(v) {
+    return '<div class="card-sm" style="margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:12px;font-weight:700;">v' + v.version + '</span>' +
+      '<span style="font-size:10px;color:var(--muted);">' + dt(v.ts) + '</span>' +
+      '</div>' +
+      '<div style="font-size:10.5px;color:var(--muted);margin-top:2px;">' + (v.snapshot ? v.snapshot.name : '') + '</div>' +
+      '<button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="rollbackOffer(\'' + id + '\',' + v.version + ')"><i class="fas fa-undo"></i> Rollback to v' + v.version + '</button>' +
+    '</div>';
+  }).join('') : '<div style="text-align:center;padding:30px;color:var(--muted);">No version history yet.</div>';
+  document.getElementById('version-list').innerHTML = html;
+  document.getElementById('version-modal').classList.add('open');
+}
+
+function rollbackOffer(id, version) {
+  if (!confirm('Rollback to v' + version + '? The offer will be PAUSED after restore.')) return;
+  WOWOfferEngine.adminRollback(id, version);
+  document.getElementById('version-modal').classList.remove('open');
+  renderOfferList();
+  toast('Rolled back to v' + version + '. Offer is now PAUSED.', 'warn');
+}
+
+// ── SIMULATION ────────────────────────────────────────────────────
+function buildSimCart(parkKey, adult, child, senior, armed, pwd) {
+  var prices = SIM_PRICES[parkKey] || SIM_PRICES.WATER_DAY;
+  var breakdown = {};
+  if (adult  > 0) breakdown.adult               = { qty: adult,  unit: prices.adult,              line: adult  * prices.adult };
+  if (child  > 0) breakdown.child               = { qty: child,  unit: prices.child,              line: child  * prices.child };
+  if (senior > 0) breakdown.senior              = { qty: senior, unit: prices.senior,             line: senior * prices.senior };
+  if (armed  > 0) breakdown.armed               = { qty: armed,  unit: prices.armed,              line: armed  * prices.armed };
+  if (pwd    > 0) breakdown.differently_abled   = { qty: pwd,    unit: prices.differently_abled,  line: pwd    * prices.differently_abled };
+  var subtotal = Object.values(breakdown).reduce(function(s,l){return s+(l.line||0);},0);
+  var qty      = Object.values(breakdown).reduce(function(s,l){return s+(l.qty||0);},0);
+  return { parkKey: parkKey, breakdown: breakdown, subtotal: subtotal, qty: qty };
+}
+
+function runSimulation() {
+  var parkKey = document.getElementById('sim-park').value;
+  var adult   = parseInt(document.getElementById('sim-adult').value)  || 0;
+  var child   = parseInt(document.getElementById('sim-child').value)  || 0;
+  var senior  = parseInt(document.getElementById('sim-senior').value) || 0;
+  var armed   = parseInt(document.getElementById('sim-armed').value)  || 0;
+  var pwd     = parseInt(document.getElementById('sim-pwd').value)    || 0;
+  var promo   = document.getElementById('sim-promo').value.trim();
+  var channel = document.getElementById('sim-channel').value;
+  var visitDate = document.getElementById('sim-visit-date').value || null;
+
+  var cart = buildSimCart(parkKey, adult, child, senior, armed, pwd);
+  var result = WOWOfferEngine.simulate(cart, {
+    promoCode: promo || null, channel: channel, visitDateStr: visitDate, simulate: true
+  });
+
+  renderSimResult(result, cart);
+  renderSimHistory();
+}
+
+function renderSimResult(result, cart) {
+  var html = '<div class="sim-result">';
+
+  // Cart lines
+  Object.keys(cart.breakdown).forEach(function(cat) {
+    var l = cart.breakdown[cat];
+    html += '<div class="sim-row"><span style="text-transform:capitalize;">' + cat.replace('_',' ') + ' x' + l.qty + '</span><span>' + inr(l.line) + '</span></div>';
+  });
+
+  html += '<div class="sim-row" style="border-top:1px solid rgba(255,255,255,.1);padding-top:8px;margin-top:4px;"><span>Subtotal</span><span>' + inr(result.subtotal) + '</span></div>';
+
+  result.applied.forEach(function(a) {
+    html += '<div class="sim-row discount"><span><i class="fas fa-tag" style="margin-right:4px;"></i>' + a.offerName + '</span><span>- ' + inr(a.totalDiscount) + '</span></div>';
+    if (a.freeTickets > 0) {
+      html += '<div class="sim-row discount" style="font-size:11px;"><span>&nbsp;&nbsp;Free tickets: ' + a.freeTickets + 'x ' + (a.freeCategory||'') + '</span><span></span></div>';
+    }
+    if (a.fnbCredit > 0) {
+      html += '<div class="sim-row discount"><span><i class="fas fa-utensils" style="margin-right:4px;"></i>F&B Credit</span><span>- ' + inr(a.fnbCredit) + '</span></div>';
+    }
+  });
+
+  if (result.totalTicketDiscount > 0) {
+    html += '<div class="sim-row" style="color:#4ade80;font-weight:600;"><span>Total Savings</span><span>- ' + inr(result.savings) + ' (' + result.savingsPercent + '%)</span></div>';
+  }
+  html += '<div class="sim-row total"><span>NET PAYABLE</span><span>' + inr(result.netPayable) + '</span></div>';
+  html += '<div class="sim-row" style="font-size:10.5px;color:var(--muted);"><span>GST (18% incl.)</span><span>' + inr(result.gstAmount) + '</span></div>';
+  html += '</div>';
+
+  // Rule path trace
+  html += '<div class="sim-trace"><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Rule Path</div>';
+  result.considered.forEach(function(c) {
+    var ic = c.qualified ? 'fas fa-check' : 'fas fa-times';
+    var co = c.qualified ? '#4ade80' : '#f87171';
+    html += '<div class="trace-item"><i class="' + ic + '" style="color:' + co + ';font-size:9px;width:10px;"></i>' +
+      '<span style="flex:1;">' + (c.name||c.offerId) + '</span>' +
+      (c.rejected ? '<span style="color:var(--muted2);font-size:10px;">' + (c.reason||'') + '</span>' : '<span style="color:#4ade80;font-size:10px;">-' + inr(c.totalDiscount||0) + '</span>') +
+    '</div>';
+  });
+  html += '</div>';
+
+  // Qualified but not applied (stacking victims)
+  var qualifiedIds = result.qualified.map(function(q) { return q.offerId; });
+  var appliedIds   = result.applied.map(function(a)   { return a.offerId; });
+  var stacked = qualifiedIds.filter(function(id) { return appliedIds.indexOf(id) === -1; });
+  if (stacked.length) {
+    html += '<div style="margin-top:8px;font-size:10.5px;color:#fbbf24;"><i class="fas fa-layer-group"></i> Stacking excluded: ' + stacked.join(', ') + '</div>';
+  }
+
+  document.getElementById('sim-output').innerHTML = html;
+}
+
+function quickSimOffer(id) {
+  var o = WOWOfferEngine.adminGetOffer(id);
+  if (!o) return;
+  showPanel('simulator');
+  if (o.promoCode) document.getElementById('sim-promo').value = o.promoCode;
+  // Set park from conditions
+  var parkCond = null;
+  (o.conditionGroups || []).forEach(function(g) {
+    (g.conditions || []).forEach(function(c) { if (c.type === 'park') parkCond = c; });
+  });
+  if (parkCond && parkCond.value && parkCond.value[0]) {
+    document.getElementById('sim-park').value = parkCond.value[0];
+  }
+  setTimeout(runSimulation, 100);
+}
+
+function renderSimHistory() {
+  var hist = WOWOfferEngine.loadSimHistory().slice(0, 10);
+  var html = hist.length ? hist.map(function(h) {
+    return '<div class="card-sm" style="cursor:pointer;" onclick="renderSimResult(this._result, this._cart)" data-id="' + h.ts + '">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;">' +
+        '<span>' + (h.cart ? h.cart.parkKey.replace('_DAY','').replace('_',' ') : '') + ' | ' +
+          (h.cart ? h.cart.qty : 0) + ' tickets | ' + inr(h.cart ? h.cart.subtotal : 0) + '</span>' +
+        '<span style="color:var(--muted);">' + dt(h.ts) + '</span>' +
+      '</div>' +
+      '<div style="font-size:10px;color:#4ade80;margin-top:2px;">Saved: ' + inr(h.result ? h.result.savings : 0) + '</div>' +
+    '</div>';
+  }).join('') : '<div style="color:var(--muted);font-size:11px;padding:10px 0;">No simulations yet.</div>';
+
+  var el = document.getElementById('sim-history-list');
+  if (el) {
+    el.innerHTML = html;
+    // Attach click handlers
+    hist.forEach(function(h, i) {
+      var card = el.querySelectorAll('.card-sm')[i];
+      if (card) {
+        card._result = h.result;
+        card._cart   = h.cart;
+        card.addEventListener('click', function() { renderSimResult(this._result, this._cart); });
+      }
+    });
+  }
+}
+
+// ── ANALYTICS ────────────────────────────────────────────────────
+var _anaTrendChart = null, _anaPieChart = null;
+function refreshAnalytics(days) {
+  days = days || parseInt(document.getElementById('ana-days').value) || 30;
+  var stats  = WOWOfferEngine.Analytics.summary(days);
+  var offers = WOWOfferEngine.adminListOffers();
+
+  // Stats
+  document.getElementById('ana-stats').innerHTML = [
+    { val: stats.totalTxn, label: 'Total Redemptions', color:'#60a5fa' },
+    { val: inr(stats.grossSales), label: 'Gross Sales', color:'#fbbf24' },
+    { val: inr(stats.savings), label: 'Discount Given', color:'#f87171' },
+    { val: stats.discountRate + '%', label: 'Discount Rate', color:'#c084fc' },
+    { val: inr(stats.aovBefore), label: 'AOV Before', color:'#4ade80' },
+    { val: inr(stats.aovAfter),  label: 'AOV After',  color:'#f97316' },
+  ].map(function(s) {
+    return '<div class="stat-card"><div class="stat-val" style="color:' + s.color + '">' + s.val + '</div>' +
+      '<div class="stat-label">' + s.label + '</div></div>';
+  }).join('');
+
+  // Trend chart
+  var dl = stats.dailyTrend;
+  var lbs = Object.keys(dl).sort().slice(-days);
+  var grArr = lbs.map(function(d) { return dl[d] ? dl[d].gross   : 0; });
+  var savArr= lbs.map(function(d) { return dl[d] ? dl[d].savings : 0; });
+  var lShort= lbs.map(function(d) { return d.slice(5); });
+
+  if (_anaTrendChart) _anaTrendChart.destroy();
+  _anaTrendChart = new Chart(document.getElementById('chart-ana-trend').getContext('2d'), {
+    type:'line',
+    data: { labels:lShort, datasets:[
+      { label:'Gross Sales', data:grArr, borderColor:'#60a5fa', backgroundColor:'rgba(59,130,246,.1)', tension:.3, fill:true },
+      { label:'Discount', data:savArr, borderColor:'#f87171', backgroundColor:'rgba(239,68,68,.1)', tension:.3, fill:true },
+    ]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'rgba(255,255,255,.5)',font:{size:10} } } },
+      scales: { x:{ ticks:{color:'rgba(255,255,255,.35)',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} },
+        y:{ ticks:{color:'rgba(255,255,255,.35)',font:{size:9}}, grid:{color:'rgba(255,255,255,.04)'} } } }
+  });
+
+  // Pie chart
+  var perOffer = stats.perOffer;
+  var pKeys    = Object.keys(perOffer).slice(0, 8);
+  if (_anaPieChart) _anaPieChart.destroy();
+  _anaPieChart = new Chart(document.getElementById('chart-ana-pie').getContext('2d'), {
+    type:'doughnut',
+    data: { labels: pKeys.map(function(k) { return (perOffer[k].name||k).slice(0,18); }),
+      datasets:[{ data: pKeys.map(function(k) { return perOffer[k].discount; }),
+        backgroundColor:['rgba(201,168,76,.8)','rgba(168,85,247,.8)','rgba(34,197,94,.8)','rgba(239,68,68,.8)',
+          'rgba(59,130,246,.8)','rgba(249,115,22,.8)','rgba(20,184,166,.8)','rgba(236,72,153,.8)'],
+        borderWidth:0 }]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'right', labels:{ color:'rgba(255,255,255,.5)',font:{size:10},boxWidth:10 } } } }
+  });
+
+  // Table
+  var totalDiscount = Object.values(perOffer).reduce(function(s,o){return s+o.discount;},0);
+  var tBody = document.getElementById('ana-table-body');
+  tBody.innerHTML = offers.map(function(o) {
+    var p = perOffer[o.id] || { uses:0, discount:0 };
+    var share = totalDiscount > 0 ? Math.round(p.discount/totalDiscount*100) : 0;
+    var avg   = p.uses > 0 ? Math.round(p.discount/p.uses) : 0;
+    return '<tr><td style="font-weight:600;">' + o.name + '</td>' +
+      '<td>' + p.uses + '</td>' +
+      '<td>' + inr(p.discount) + '</td>' +
+      '<td>' + inr(avg) + '</td>' +
+      '<td><div style="display:flex;align-items:center;gap:6px;">' +
+        '<div style="width:50px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;">' +
+          '<div style="width:' + share + '%;height:100%;background:#60a5fa;border-radius:2px;"></div>' +
+        '</div>' +
+        '<span style="font-size:10px;">' + share + '%</span>' +
+      '</div></td>' +
+      '<td>' + statusBadge(o.effectiveStatus) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── AUDIT LOG ────────────────────────────────────────────────────
+function renderAuditLog() {
+  var filter = (document.getElementById('audit-filter').value || '').toLowerCase();
+  var logs   = WOWOfferEngine.AuditLog.read({ limit: 200 });
+  if (filter) logs = logs.filter(function(l) { return l.action.toLowerCase().includes(filter) || JSON.stringify(l.meta).toLowerCase().includes(filter); });
+
+  var actionIcons = { offer_created:'fas fa-plus-circle', offer_updated:'fas fa-edit', offer_archived:'fas fa-archive',
+    offer_activated:'fas fa-play-circle', offer_paused:'fas fa-pause-circle', offer_cloned:'fas fa-copy',
+    offer_rollback:'fas fa-undo', offer_committed:'fas fa-check-circle' };
+  var actionColors= { offer_created:'#4ade80', offer_updated:'#60a5fa', offer_archived:'#fbbf24',
+    offer_activated:'#4ade80', offer_paused:'#fbbf24', offer_cloned:'#c084fc',
+    offer_rollback:'#f97316', offer_committed:'#14b8a6' };
+
+  document.getElementById('audit-table-body').innerHTML = logs.length
+    ? logs.map(function(l) {
+      var ic  = actionIcons[l.action] || 'fas fa-circle';
+      var col = actionColors[l.action] || 'var(--muted)';
+      return '<tr><td style="font-size:10.5px;color:var(--muted);white-space:nowrap;">' + dt(l.ts) + '</td>' +
+        '<td><i class="' + ic + '" style="color:' + col + ';margin-right:5px;"></i>' + l.action + '</td>' +
+        '<td style="font-size:10.5px;color:var(--muted);max-width:250px;overflow:hidden;text-overflow:ellipsis;">' + JSON.stringify(l.meta) + '</td>' +
+        '<td style="font-size:10.5px;">' + (l.user||'—') + '</td></tr>';
+    }).join('')
+    : '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted);">No audit logs yet.</td></tr>';
+}
+
+function renderExecLog() {
+  var logs = WOWOfferEngine.readExecLog({ limit: 100 });
+  document.getElementById('exec-table-body').innerHTML = logs.length
+    ? logs.map(function(l) {
+      var offerList = (l.appliedOffers||[]).map(function(a){ return a.name||a.offerId; }).join(', ');
+      return '<tr>' +
+        '<td style="font-size:10px;color:var(--muted);white-space:nowrap;">' + dt(l.ts) + '</td>' +
+        '<td style="font-size:11px;">' + (l.parkKey||'—').replace('_DAY','').replace('_',' ') + '</td>' +
+        '<td>' + inr(l.subtotal||0) + '</td>' +
+        '<td style="color:#4ade80;">-' + inr(l.savings||0) + '</td>' +
+        '<td style="font-weight:700;">' + inr(l.netPayable||0) + '</td>' +
+        '<td style="font-size:10.5px;color:var(--muted);">' + offerList + '</td>' +
+        '<td style="font-size:10px;text-transform:capitalize;">' + (l.channel||'—') + '</td>' +
+      '</tr>';
+    }).join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">No execution logs yet. Simulations or bookings will appear here.</td></tr>';
+}
+
+// ── A/B TESTING ──────────────────────────────────────────────────
+var _abTests   = [];
+var _abVariants= [];
+
+function loadABTests() {
+  try { var s=localStorage.getItem('wow_ab_tests'); if(s) return JSON.parse(s); } catch(_){}
+  return [];
+}
+function saveABTestsLS(tests) {
+  try { localStorage.setItem('wow_ab_tests', JSON.stringify(tests)); } catch(_){}
+}
+
+function refreshABPanel() {
+  var tests = loadABTests();
+  var totalTests  = tests.length;
+  var activeTests = tests.filter(function(t){return t.status==='running';}).length;
+  var assignments = 0;
+  try { assignments = Object.keys(JSON.parse(localStorage.getItem('wow_ab_assignments')||'{}')).length; } catch(_){}
+
+  document.getElementById('ab-stats').innerHTML = [
+    {val:totalTests,  label:'Total A/B Tests',  color:'#60a5fa'},
+    {val:activeTests, label:'Running Tests',     color:'#4ade80'},
+    {val:assignments, label:'User Assignments',  color:'#c084fc'},
+    {val:(totalTests>0?Math.round(activeTests/totalTests*100):0)+'%', label:'Active Rate', color:'#f97316'},
+  ].map(function(s){return '<div class="stat-card"><div class="stat-val" style="color:'+s.color+'">'+s.val+'</div><div class="stat-label">'+s.label+'</div></div>';}).join('');
+
+  // Variant split chart
+  var chartLabels=[], chartData=[];
+  tests.forEach(function(t){
+    (t.variants||[]).forEach(function(v){
+      chartLabels.push(t.name.slice(0,12)+':'+v.id);
+      chartData.push(v.weight||50);
+    });
+  });
+  if (window._abVarChart) window._abVarChart.destroy();
+  var abvc = document.getElementById('chart-ab-variants');
+  if (abvc) {
+    window._abVarChart = new Chart(abvc.getContext('2d'), {
+      type:'doughnut',
+      data:{labels:chartLabels.length?chartLabels:['No Tests'],
+        datasets:[{data:chartData.length?chartData:[100],
+          backgroundColor:['rgba(96,165,250,.7)','rgba(168,85,247,.7)','rgba(34,197,94,.7)','rgba(249,115,22,.7)','rgba(239,68,68,.7)'],
+          borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'rgba(255,255,255,.5)',font:{size:10},boxWidth:10}}}}
+    });
+  }
+  // Conversion chart (simulated)
+  var convLabels = tests.map(function(t){return t.name.slice(0,12);});
+  var convCtrl   = tests.map(function(){return Math.round(58+Math.random()*15);});
+  var convTest   = tests.map(function(){return Math.round(63+Math.random()*20);});
+  if (window._abConvChart) window._abConvChart.destroy();
+  var abcc = document.getElementById('chart-ab-conv');
+  if (abcc) {
+    window._abConvChart = new Chart(abcc.getContext('2d'), {
+      type:'bar',
+      data:{labels:convLabels.length?convLabels:['No Data'],
+        datasets:[
+          {label:'Control',data:convCtrl.length?convCtrl:[60],backgroundColor:'rgba(96,165,250,.5)',borderRadius:4},
+          {label:'Variant',data:convTest.length?convTest:[65],backgroundColor:'rgba(168,85,247,.5)',borderRadius:4},
+        ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'rgba(255,255,255,.5)',font:{size:10}}}},
+        scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:9}},grid:{display:false}},
+          y:{ticks:{color:'rgba(255,255,255,.4)',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'},
+            title:{display:true,text:'Conv. %',color:'rgba(255,255,255,.3)',font:{size:9}}}}}
+    });
+  }
+
+  var html = tests.length ? tests.map(function(t) {
+    var sc = {running:'#4ade80',completed:'#60a5fa',paused:'#fbbf24',draft:'rgba(255,255,255,.3)'};
+    return '<div class="card-sm" style="margin-bottom:10px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div><div style="font-size:13px;font-weight:700;">'+t.name+'</div>' +
+        '<div style="font-size:10px;color:var(--muted);font-family:JetBrains Mono,monospace;">'+t.id+'</div>' +
+        '<div style="font-size:10.5px;color:var(--muted);margin-top:4px;">'+(t.description||'')+'</div></div>' +
+        '<span style="font-size:10px;font-weight:700;color:'+(sc[t.status||'draft'])+';padding:2px 8px;border-radius:5px;background:rgba(0,0,0,.3);">'+(t.status||'draft').toUpperCase()+'</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">' +
+        (t.variants||[]).map(function(v){
+          var oName='';
+          try{var o=WOWOfferEngine.adminGetOffer(v.offerId);oName=o?o.name:v.offerId||'—';}catch(_){}
+          return '<div style="background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:7px 12px;flex:1;min-width:120px;">' +
+            '<div style="font-size:10px;font-weight:700;color:var(--gold2);">'+v.id+' ('+v.weight+'%)</div>' +
+            '<div style="font-size:10.5px;margin-top:3px;">'+(oName||'Control')+'</div></div>';
+        }).join('') +
+      '</div>' +
+      '<div style="display:flex;gap:6px;margin-top:10px;">' +
+        (t.status!=='running'?'<button class="btn btn-green btn-sm" onclick="setABStatus(\''+t.id+'\',\'running\')"><i class="fas fa-play"></i> Start</button>':'') +
+        (t.status==='running'?'<button class="btn btn-ghost btn-sm" onclick="setABStatus(\''+t.id+'\',\'paused\')"><i class="fas fa-pause"></i> Pause</button>':'') +
+        '<button class="btn btn-ghost btn-sm" onclick="setABStatus(\''+t.id+'\',\'completed\')"><i class="fas fa-stop"></i> Complete</button>' +
+        '<button class="btn btn-red btn-sm" onclick="deleteABTest(\''+t.id+'\')"><i class="fas fa-trash"></i></button>' +
+      '</div></div>';
+  }).join('') : '<div style="text-align:center;padding:40px;color:var(--muted);"><i class="fas fa-random" style="font-size:28px;opacity:.3;display:block;margin-bottom:10px;"></i>No A/B tests yet. Click New A/B Test.</div>';
+  document.getElementById('ab-tests-container').innerHTML = html;
+}
+
+function openABModal() {
+  _abVariants = [
+    {id:'control',   offerId:'', weight:50, label:'Control (No Offer)'},
+    {id:'variant_a', offerId:'', weight:50, label:'Variant A'},
+  ];
+  renderABVariants();
+  document.getElementById('ab-modal').classList.add('open');
+}
+function renderABVariants() {
+  var offers = WOWOfferEngine.adminListOffers().filter(function(o){return o.effectiveStatus==='active';});
+  var html = _abVariants.map(function(v,i){
+    return '<div class="action-row" style="margin-bottom:8px;">' +
+      '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr 80px 1fr;gap:8px;align-items:center;">' +
+        '<div class="form-group"><label>Variant ID</label><input type="text" class="inp" style="padding:5px;" value="'+v.id+'" onchange="_abVariants['+i+'].id=this.value"/></div>' +
+        '<div class="form-group"><label>Offer (blank=control)</label>' +
+          '<select class="inp" style="padding:5px;" onchange="_abVariants['+i+'].offerId=this.value">' +
+            '<option value="">-- Control --</option>' +
+            offers.map(function(o){return '<option value="'+o.id+'"'+(v.offerId===o.id?' selected':'')+'>'+o.name+'</option>';}).join('') +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group"><label>Weight %</label><input type="number" class="inp" style="padding:5px;" value="'+v.weight+'" min="1" max="99" onchange="_abVariants['+i+'].weight=parseInt(this.value)"/></div>' +
+        '<div class="form-group"><label>Label</label><input type="text" class="inp" style="padding:5px;" value="'+v.label+'" onchange="_abVariants['+i+'].label=this.value"/></div>' +
+      '</div>' +
+      '<button class="btn btn-red btn-icon btn-sm" onclick="_abVariants.splice('+i+',1);renderABVariants();"><i class="fas fa-times"></i></button>' +
+    '</div>';
+  }).join('');
+  document.getElementById('ab-variants-container').innerHTML = html;
+}
+function addABVariant() {
+  _abVariants.push({id:'variant_'+Date.now().toString(36),offerId:'',weight:10,label:'New Variant'});
+  renderABVariants();
+}
+function saveABTest() {
+  var id   = (document.getElementById('ab-f-id').value||'').toUpperCase().trim();
+  var name = (document.getElementById('ab-f-name').value||'').trim();
+  if (!id||!name){toast('Test ID and Name required.','error');return;}
+  var tw = _abVariants.reduce(function(s,v){return s+v.weight;},0);
+  if (tw!==100){toast('Variant weights must sum to 100% (currently '+tw+'%).','warn');return;}
+  var tests = loadABTests();
+  var idx   = -1;
+  for(var i=0;i<tests.length;i++){if(tests[i].id===id){idx=i;break;}}
+  var test  = {id:id,name:name,description:document.getElementById('ab-f-desc').value,
+    startDate:document.getElementById('ab-f-start').value||null,
+    endDate:document.getElementById('ab-f-end').value||null,
+    variants:JSON.parse(JSON.stringify(_abVariants)),status:'draft',createdAt:Date.now()};
+  if(idx>=0) tests[idx]=test; else tests.push(test);
+  saveABTestsLS(tests);
+  document.getElementById('ab-modal').classList.remove('open');
+  refreshABPanel();
+  toast('A/B Test "'+name+'" saved!','success');
+}
+function setABStatus(id,status) {
+  var tests = loadABTests();
+  for(var i=0;i<tests.length;i++){if(tests[i].id===id){tests[i].status=status;tests[i].updatedAt=Date.now();break;}}
+  saveABTestsLS(tests); refreshABPanel();
+  toast('Test status → '+status, status==='running'?'success':'warn');
+}
+function deleteABTest(id) {
+  if(!confirm('Delete A/B test '+id+'?'))return;
+  saveABTestsLS(loadABTests().filter(function(t){return t.id!==id;}));
+  refreshABPanel(); toast('Test deleted.','warn');
+}
+function checkABAssignment() {
+  var uid=(document.getElementById('ab-check-uid').value||'').trim();
+  var tid=(document.getElementById('ab-check-tid').value||'').trim();
+  if(!uid||!tid){toast('Enter User ID and Test ID.','warn');return;}
+  var tests = loadABTests();
+  var test  = null;
+  for(var i=0;i<tests.length;i++){if(tests[i].id===tid){test=tests[i];break;}}
+  if(!test){document.getElementById('ab-check-result').innerHTML='<div class="alert alert-danger">Test ID not found.</div>';return;}
+  var variant = WOWOfferEngine.ABEngine.assignVariant(uid,tid,test.variants);
+  var vObj    = null;
+  for(var j=0;j<test.variants.length;j++){if(test.variants[j].id===variant){vObj=test.variants[j];break;}}
+  document.getElementById('ab-check-result').innerHTML='<div class="alert alert-success"><i class="fas fa-user-tag"></i> User <strong>'+uid+'</strong> → variant <strong>'+variant+'</strong>'+(vObj?' — '+vObj.label:'')+'. Offer: '+(vObj&&vObj.offerId?vObj.offerId:'Control (no offer)')+'.</div>';
+}
+function simulateABDistribution() {
+  var tid=(document.getElementById('ab-check-tid').value||'').trim();
+  var tests=loadABTests();
+  var test=null;
+  for(var i=0;i<tests.length;i++){if(tests[i].id===tid){test=tests[i];break;}}
+  if(!test){toast('Enter a valid Test ID first.','warn');return;}
+  var counts={};
+  test.variants.forEach(function(v){counts[v.id]=0;});
+  for(var i=0;i<1000;i++){
+    var uid='sim_user_'+i;
+    var v=WOWOfferEngine.ABEngine.assignVariant(uid,tid,test.variants);
+    if(counts[v]!==undefined)counts[v]++;
+  }
+  document.getElementById('ab-check-result').innerHTML='<div class="alert alert-info"><i class="fas fa-chart-bar"></i> Simulation of 1,000 users: '+
+    Object.keys(counts).map(function(k){return '<strong>'+k+': '+counts[k]+' ('+Math.round(counts[k]/10)+'%)</strong>';}).join(' &bull; ')+'</div>';
+}
+
+// ── CONFLICT MATRIX ──────────────────────────────────────────────
+function refreshConflictMatrix() {
+  var offers = WOWOfferEngine.adminListOffers().filter(function(o){return o.effectiveStatus==='active';});
+  if (!offers.length) {
+    document.getElementById('conflict-matrix-grid').innerHTML='<div style="color:var(--muted);padding:20px;">No active offers.</div>';
+    document.getElementById('conflict-families').innerHTML='';
+    document.getElementById('conflict-risks').innerHTML='';
+    return;
+  }
+  // Grid
+  var hdr = '<th style="padding:6px 8px;"></th>' +
+    offers.map(function(o){return '<th title="'+o.name+'" style="font-size:9px;padding:6px 5px;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;">'+o.name.slice(0,10)+'</th>';}).join('');
+  var rows = offers.map(function(a) {
+    var cells = offers.map(function(b) {
+      if (a.id===b.id) return '<td style="background:rgba(255,255,255,.04);text-align:center;">—</td>';
+      var sym='✓', bg='rgba(34,197,94,.08)';
+      if (a.stackMode==='exclusive'||b.stackMode==='exclusive'){ sym='✗'; bg='rgba(239,68,68,.18)'; }
+      else if (a.stackFamily===b.stackFamily&&(a.stackMode==='best_only'||b.stackMode==='best_only')){ sym='?'; bg='rgba(251,191,36,.12)'; }
+      else if (a.stackMode==='stackable'&&b.stackMode==='stackable'){ sym='✓'; bg='rgba(34,197,94,.08)'; }
+      else { sym='~'; bg='rgba(96,165,250,.08)'; }
+      return '<td style="text-align:center;background:'+bg+';font-size:12px;font-weight:700;padding:5px;">'+sym+'</td>';
+    }).join('');
+    return '<tr><td style="font-size:10px;white-space:nowrap;font-weight:600;padding:6px 8px;">'+a.name.slice(0,18)+'</td>'+cells+'</tr>';
+  }).join('');
+  document.getElementById('conflict-matrix-grid').innerHTML =
+    '<table style="border-collapse:collapse;width:100%;" class="offer-table"><thead><tr>'+hdr+'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  // Families
+  var families={};
+  offers.forEach(function(o){var f=o.stackFamily||o.id;if(!families[f])families[f]=[];families[f].push(o);});
+  document.getElementById('conflict-families').innerHTML = Object.keys(families).map(function(f){
+    return '<div style="margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:7px;">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--gold2);margin-bottom:4px;">'+f+'</div>' +
+      families[f].map(function(o){return '<div style="font-size:11px;color:var(--muted);padding:2px 0;">'+statusBadge(o.effectiveStatus)+' '+o.name+'</div>';}).join('') +
+    '</div>';
+  }).join('');
+
+  // Risks
+  var riskHtml='';
+  offers.forEach(function(o){
+    var risks=WOWOfferEngine.checkRisks(o);
+    risks.filter(function(r){return r.level==='danger'||r.level==='warn';}).forEach(function(r){
+      riskHtml+='<div class="alert '+(r.level==='danger'?'alert-danger':'alert-warn')+'" style="margin-bottom:6px;font-size:11px;"><strong>'+o.name.slice(0,20)+':</strong> '+r.msg+'</div>';
+    });
+  });
+  document.getElementById('conflict-risks').innerHTML = riskHtml||'<div class="alert alert-success"><i class="fas fa-check"></i> No high-risk conflicts.</div>';
+}
+
+// ── PRIORITY RANKING ─────────────────────────────────────────────
+var _priorityDragIdx = null;
+function refreshPriorityPanel() {
+  var offers = WOWOfferEngine.adminListOffers().sort(function(a,b){return (b.priority||50)-(a.priority||50);});
+  var bucketLabels=['10','20','30','40','50','60','70','80','90','100'];
+  var bucketCounts = bucketLabels.map(function(b){
+    var lo=parseInt(b)-9, hi=parseInt(b);
+    return offers.filter(function(o){var p=o.priority||50;return p>=lo&&p<=hi;}).length;
+  });
+  if(window._priChart) window._priChart.destroy();
+  var priEl = document.getElementById('chart-priority-dist');
+  if(priEl){
+    window._priChart = new Chart(priEl.getContext('2d'),{
+      type:'bar',
+      data:{labels:bucketLabels,datasets:[{label:'Offers',data:bucketCounts,backgroundColor:'rgba(201,168,76,.5)',borderRadius:4}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{ticks:{color:'rgba(255,255,255,.4)',font:{size:9}}},y:{ticks:{color:'rgba(255,255,255,.4)',font:{size:9}},grid:{color:'rgba(255,255,255,.05)'}}}}
+    });
+  }
+  var stackColors={exclusive:'#f87171',stackable:'#4ade80',best_only:'#fbbf24',family_only:'#c084fc'};
+  var html = offers.map(function(o,i){
+    return '<div class="card-sm" draggable="true" data-id="'+o.id+'" style="cursor:grab;display:flex;align-items:center;gap:12px;margin-bottom:7px;" ' +
+      'ondragstart="_priorityDragIdx='+i+'" ondragover="event.preventDefault()" ondrop="dropPriority(event,'+i+')">' +
+      '<i class="fas fa-grip-vertical" style="color:var(--muted2);font-size:14px;"></i>' +
+      '<div style="font-size:20px;font-weight:900;color:'+priorityColor(o.priority||50)+';width:32px;text-align:center;">'+(i+1)+'</div>' +
+      '<div style="flex:1;">' +
+        '<div style="font-size:12.5px;font-weight:700;">'+o.name+'</div>' +
+        '<div style="font-size:10px;color:var(--muted);">'+(o.autoApply?'Auto':'Code: '+o.promoCode)+' &bull; Family: '+(o.stackFamily||'—')+'</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:10px;color:'+(stackColors[o.stackMode]||'#60a5fa')+';font-weight:700;">'+(o.stackMode||'').toUpperCase()+'</span>' +
+        statusBadge(o.effectiveStatus) +
+        '<div><div style="font-size:10px;color:var(--muted);text-align:right;">Priority</div>' +
+          '<input type="number" class="inp" style="width:60px;padding:3px 6px;text-align:center;font-weight:700;" value="'+(o.priority||50)+'" min="1" max="100" onchange="updateOfferPriority(\''+o.id+'\',parseInt(this.value))"/>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('priority-list').innerHTML = html||'<div style="color:var(--muted);padding:30px;">No offers to rank.</div>';
+}
+function dropPriority(ev,toIdx) {
+  var fromIdx=_priorityDragIdx;
+  if(fromIdx===null||fromIdx===toIdx)return;
+  var offers=WOWOfferEngine.adminListOffers().sort(function(a,b){return (b.priority||50)-(a.priority||50);});
+  var moved=offers.splice(fromIdx,1)[0];
+  offers.splice(toIdx,0,moved);
+  var step=Math.floor(90/Math.max(offers.length-1,1));
+  offers.forEach(function(o,i){
+    var newPri=95-i*step;
+    var orig=WOWOfferEngine.adminGetOffer(o.id);
+    if(orig&&newPri!==orig.priority) WOWOfferEngine.adminSaveOffer(Object.assign({},orig,{priority:newPri}));
+  });
+  _priorityDragIdx=null;
+  refreshPriorityPanel();
+  toast('Priority order updated.','success');
+}
+function updateOfferPriority(id,val) {
+  var o=WOWOfferEngine.adminGetOffer(id);
+  if(!o)return;
+  WOWOfferEngine.adminSaveOffer(Object.assign({},o,{priority:Math.min(100,Math.max(1,val||50))}));
+}
+function savePriorityOrder() {
+  refreshPriorityPanel();
+  WOWOfferEngine.AuditLog.write('priorities_reordered',{});
+  toast('Priority configuration saved.','success');
+}
+
+// ── BULK OPERATIONS ──────────────────────────────────────────────
+function exportOffers() {
+  var scope=document.getElementById('export-scope').value;
+  var offers=WOWOfferEngine.adminListOffers();
+  if(scope==='active') offers=offers.filter(function(o){return o.effectiveStatus==='active';});
+  if(scope==='draft')  offers=offers.filter(function(o){return o.effectiveStatus==='draft';});
+  var clean=offers.map(function(o){var c=Object.assign({},o);delete c.effectiveStatus;return c;});
+  var json=JSON.stringify(clean,null,2);
+  document.getElementById('export-output').value=json;
+  try {
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download='wow-offers-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+    URL.revokeObjectURL(url);
+  } catch(_){}
+  toast('Exported '+clean.length+' offers.','success');
+}
+function copyExportToClipboard() {
+  var txt=document.getElementById('export-output').value;
+  if(!txt){exportOffers();return;}
+  try{navigator.clipboard.writeText(txt);toast('JSON copied!','success');}catch(_){toast('Select and copy manually.','warn');}
+}
+function importOffers() {
+  var raw=(document.getElementById('import-json').value||'').trim();
+  if(!raw){toast('Paste JSON first.','warn');return;}
+  var parsed;
+  try{parsed=JSON.parse(raw);}catch(e){document.getElementById('import-result').innerHTML='<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Invalid JSON: '+e.message+'</div>';return;}
+  if(!Array.isArray(parsed)){document.getElementById('import-result').innerHTML='<div class="alert alert-danger">JSON must be an array.</div>';return;}
+  var mode=document.getElementById('import-mode').value;
+  var existing=WOWOfferEngine.adminListOffers();
+  var existMap={};
+  existing.forEach(function(o){existMap[o.id]=true;});
+  var added=0,updated=0,skipped=0;
+  if(mode==='replace_all'){try{localStorage.removeItem('wow_offers_v4');}catch(_){}parsed.forEach(function(o){WOWOfferEngine.adminSaveOffer(o);added++;});}
+  else if(mode==='add_new'){parsed.forEach(function(o){if(!existMap[o.id]){WOWOfferEngine.adminSaveOffer(o);added++;}else skipped++;});}
+  else{parsed.forEach(function(o){WOWOfferEngine.adminSaveOffer(o);if(existMap[o.id])updated++;else added++;});}
+  document.getElementById('import-result').innerHTML='<div class="alert alert-success"><i class="fas fa-check"></i> Done: <strong>'+added+' added, '+updated+' updated, '+skipped+' skipped</strong>.</div>';
+  WOWOfferEngine.AuditLog.write('bulk_import',{mode:mode,added:added,updated:updated});
+  toast('Import done: '+(added+updated)+' offers processed.','success');
+}
+function bulkActivate() {
+  var offers=WOWOfferEngine.adminListOffers().filter(function(o){return o.effectiveStatus==='draft';});
+  offers.forEach(function(o){WOWOfferEngine.adminActivateOffer(o.id);});
+  document.getElementById('bulk-ops-result').innerHTML='<div class="alert alert-success">Activated '+offers.length+' drafts.</div>';
+  toast('Activated '+offers.length+' drafts.','success');
+}
+function bulkPauseActive() {
+  if(!confirm('Pause ALL active offers?'))return;
+  var offers=WOWOfferEngine.adminListOffers().filter(function(o){return o.effectiveStatus==='active';});
+  offers.forEach(function(o){WOWOfferEngine.adminPauseOffer(o.id);});
+  document.getElementById('bulk-ops-result').innerHTML='<div class="alert alert-warn">Paused '+offers.length+' active offers.</div>';
+  toast('Paused '+offers.length+' offers.','warn');
+}
+function bulkArchiveExpired() {
+  var offers=WOWOfferEngine.adminListOffers().filter(function(o){return o.effectiveStatus==='expired';});
+  offers.forEach(function(o){WOWOfferEngine.adminDeleteOffer(o.id);});
+  document.getElementById('bulk-ops-result').innerHTML='<div class="alert alert-warn">Archived '+offers.length+' expired offers.</div>';
+  toast('Archived '+offers.length+' expired.','warn');
+}
+function bulkResetUsageCounts() {
+  if(!confirm('Reset all usage counts?'))return;
+  var offers=WOWOfferEngine.loadOffers();
+  offers.forEach(function(o){o.usedCount=0;o.usedBudget=0;});
+  WOWOfferEngine.saveOffers(offers);
+  try{localStorage.removeItem('wow_usage_v4');localStorage.removeItem('wow_budget_v4');}catch(_){}
+  document.getElementById('bulk-ops-result').innerHTML='<div class="alert alert-success">Reset '+offers.length+' offers.</div>';
+  toast('Usage counts reset.','success');
+}
+function resetToDefaults() {
+  if(!confirm('Reset ALL offers to factory defaults? ALL custom offers will be lost.'))return;
+  if(!confirm('FINAL WARNING — this cannot be undone.'))return;
+  ['wow_offers_v4','wow_usage_v4','wow_budget_v4','wow_offer_versions','wow_offer_audit','wow_exec_log','wow_sim_history'].forEach(function(k){try{localStorage.removeItem(k);}catch(_){}});
+  WOWOfferEngine.loadOffers();
+  renderOfferList(); refreshDashboard();
+  toast('Engine reset to factory defaults.','warn');
+}
+function clearAuditLogs(){
+  if(!confirm('Clear audit logs?'))return;
+  try{localStorage.removeItem('wow_offer_audit');}catch(_){}
+  renderAuditLog(); toast('Audit logs cleared.','warn');
+}
+function clearExecLogs(){
+  if(!confirm('Clear execution logs? Analytics will reset.'))return;
+  try{localStorage.removeItem('wow_exec_log');}catch(_){}
+  renderExecLog(); refreshAnalytics(); toast('Exec logs cleared.','warn');
+}
+
+// ── OFFER DEEP DRILL ─────────────────────────────────────────────
+function openDrillModal(id) {
+  var o=WOWOfferEngine.adminGetOffer(id);
+  var detail=WOWOfferEngine.Analytics.offerDetail(id,90);
+  if(!o)return;
+  document.getElementById('drill-modal-title').textContent='Deep Drill: '+o.name;
+  var usedPct=o.usageLimits&&o.usageLimits.global?Math.round((o.usedCount||0)/o.usageLimits.global*100):null;
+  var risks=WOWOfferEngine.checkRisks(o);
+  var versions=WOWOfferEngine.adminGetVersionHistory(id);
+  document.getElementById('drill-modal-content').innerHTML=
+    '<div class="stats-row" style="margin-bottom:14px;">'+
+    [{val:detail.uses,label:'Total Uses (90d)',color:'#60a5fa'},
+     {val:inr(detail.discount),label:'Discount Given (90d)',color:'#f87171'},
+     {val:detail.uses>0?inr(Math.round(detail.discount/detail.uses)):'—',label:'Avg Discount',color:'#fbbf24'},
+     {val:o.version||1,label:'Current Version',color:'#c084fc'}
+    ].map(function(s){return '<div class="stat-card"><div class="stat-val" style="color:'+s.color+'">'+s.val+'</div><div class="stat-label">'+s.label+'</div></div>';}).join('')+'</div>'+
+    '<div class="form-grid" style="margin-bottom:14px;">'+
+    '<div class="card" style="margin-bottom:0;"><div class="card-title"><i class="fas fa-info-circle"></i> Offer Details</div>'+
+    '<div style="font-size:11.5px;line-height:2;">'+
+      '<div><span style="color:var(--muted);">ID:</span> <code style="font-family:JetBrains Mono;font-size:10px;">'+o.id+'</code></div>'+
+      '<div><span style="color:var(--muted);">Status:</span> '+statusBadge(WOWOfferEngine.computeStatus(o))+'</div>'+
+      '<div><span style="color:var(--muted);">Type:</span> '+(o.autoApply?'Auto-Apply':'Promo: '+o.promoCode)+'</div>'+
+      '<div><span style="color:var(--muted);">Stack:</span> '+(o.stackMode||'—')+' / Family: '+(o.stackFamily||'—')+'</div>'+
+      '<div><span style="color:var(--muted);">Priority:</span> '+(o.priority||50)+'</div>'+
+      '<div><span style="color:var(--muted);">Parks:</span> '+(detail.parks.length?detail.parks.join(', '):'—')+'</div>'+
+      '<div><span style="color:var(--muted);">Usage:</span> '+(usedPct!==null?(o.usedCount||0)+'/'+o.usageLimits.global+' ('+usedPct+'%)':(o.usedCount||0)+' (Unlimited)')+'</div>'+
+    '</div></div>'+
+    '<div class="card" style="margin-bottom:0;"><div class="card-title"><i class="fas fa-exclamation-triangle"></i> Risk Alerts</div>'+
+    (risks.length?risks.map(function(r){return '<div class="alert '+(r.level==='danger'?'alert-danger':r.level==='warn'?'alert-warn':'alert-info')+'" style="margin-bottom:6px;font-size:11px;">'+r.msg+'</div>';}).join(''):'<div class="alert alert-success" style="font-size:11px;"><i class="fas fa-check"></i> No risk alerts.</div>')+
+    '</div></div>'+
+    '<div class="card" style="margin-bottom:14px;"><div class="card-title"><i class="fas fa-history"></i> Version History ('+versions.length+')</div>'+
+    (versions.length?versions.slice(0,5).map(function(v){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">'+
+        '<span style="font-size:12px;font-weight:700;">v'+v.version+'</span>'+
+        '<span style="font-size:10.5px;color:var(--muted);">'+dt(v.ts)+'</span>'+
+        '<button class="btn btn-ghost btn-sm" onclick="rollbackOffer(\''+id+'\','+v.version+')"><i class="fas fa-undo"></i> Rollback</button>'+
+      '</div>';
+    }).join(''):'<div style="color:var(--muted);font-size:11px;">No version history yet.</div>')+
+    '</div>'+
+    '<div class="modal-footer" style="margin-top:0;">'+
+      '<button class="btn btn-ghost" onclick="document.getElementById(\'drill-modal\').classList.remove(\'open\')">Close</button>'+
+      '<button class="btn btn-blue" onclick="document.getElementById(\'drill-modal\').classList.remove(\'open\');editOffer(\''+id+'\');"><i class="fas fa-edit"></i> Edit</button>'+
+      '<button class="btn btn-gold" onclick="document.getElementById(\'drill-modal\').classList.remove(\'open\');quickSimOffer(\''+id+'\');"><i class="fas fa-flask"></i> Quick Sim</button>'+
+    '</div>';
+  document.getElementById('drill-modal').classList.add('open');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Set default sim visit date to today
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    document.getElementById('sim-visit-date').value = today;
+  } catch(_) {}
+  refreshDashboard();
+});
+</script>
+<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+</body>
+</html>
