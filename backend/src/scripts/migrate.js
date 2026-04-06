@@ -1,41 +1,63 @@
 'use strict';
-// ============================================================
-//  Migration runner — reads all .sql files from /migrations
-//  Run with: npm run migrate
-// ============================================================
 require('dotenv').config();
 const { Pool } = require('pg');
 const fs   = require('fs');
 const path = require('path');
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 8000 });
 
-async function runMigrations() {
-  const migrationsDir = path.join(__dirname, '../../migrations');
-  const files = fs.readdirSync(migrationsDir)
-    .filter(f => f.endsWith('.sql'))
-    .sort(); // runs in filename order: 001, 002, ...
+async function run() {
+  console.log('\n================================================');
+  console.log('  WOW — Database Migration Runner');
+  console.log('================================================\n');
+  console.log('  DATABASE_URL:', (process.env.DATABASE_URL||'NOT SET').replace(/:([^:@]+)@/,':****@'), '\n');
 
-  console.log(`Found ${files.length} migration file(s):\n`);
+  // Connect
+  let client;
+  try {
+    client = await pool.connect();
+    const { rows } = await client.query('SELECT current_database(), current_user');
+    console.log('  Connected to:', rows[0].current_database, 'as', rows[0].current_user);
+    client.release();
+  } catch(e) {
+    console.error('\n  CANNOT CONNECT:', e.message);
+    if (e.message.includes('ECONNREFUSED'))
+      console.error('\n  PostgreSQL not running.\n  Run: npm run setup-db  (after installing PostgreSQL)');
+    else if (e.message.includes('password') || e.code==='28P01')
+      console.error('\n  Wrong password. Run: npm run setup-db');
+    else if (e.message.includes('does not exist') || e.code==='3D000')
+      console.error('\n  Database missing. Run: npm run setup-db');
+    else if (e.message.includes('role') && e.message.includes('does not exist'))
+      console.error('\n  User not found. Run: npm run setup-db');
+    await pool.end().catch(()=>{});
+    process.exit(1);
+  }
+
+  // Run SQL files
+  const dir   = path.join(__dirname, '../../migrations');
+  const files = fs.readdirSync(dir).filter(f => f.endsWith('.sql')).sort();
+  console.log('\n  Found', files.length, 'migration file(s):\n');
 
   for (const file of files) {
-    const filePath = path.join(migrationsDir, file);
-    const sql      = fs.readFileSync(filePath, 'utf8');
-    console.log(`  ▶ Running ${file}...`);
+    const sql = fs.readFileSync(path.join(dir, file), 'utf8');
+    process.stdout.write('  Running ' + file + ' ... ');
     try {
       await pool.query(sql);
-      console.log(`  ✅ ${file} done\n`);
-    } catch (e) {
-      console.error(`  ❌ ${file} FAILED:`, e.message);
+      console.log('OK');
+    } catch(e) {
+      console.log('FAILED');
+      console.error('\n  Error in ' + file + ':');
+      console.error('  Code   :', e.code);
+      console.error('  Message:', e.message);
+      if (e.detail)   console.error('  Detail :', e.detail);
+      if (e.hint)     console.error('  Hint   :', e.hint);
+      await pool.end().catch(()=>{});
       process.exit(1);
     }
   }
 
-  console.log('All migrations complete.');
+  console.log('\n  All migrations done!\n');
   await pool.end();
 }
 
-runMigrations().catch(e => {
-  console.error('Migration error:', e);
-  process.exit(1);
-});
+run().catch(e => { console.error('Fatal:', e.message); process.exit(1); });

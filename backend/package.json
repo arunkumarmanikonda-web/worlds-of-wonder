@@ -1,14 +1,16 @@
 {
   "name": "wow-booking-api",
   "version": "1.0.0",
-  "description": "Worlds of Wonder — Booking Platform Backend API (Node.js + Express + PostgreSQL)",
+  "description": "Worlds of Wonder — Booking Platform Backend API",
   "main": "src/server.js",
   "scripts": {
-    "start":   "node src/server.js",
-    "dev":     "nodemon src/server.js",
-    "migrate": "node src/scripts/migrate.js",
-    "seed":    "node src/scripts/seed.js",
-    "test":    "jest --runInBand --forceExit",
+    "start":      "node src/server.js",
+    "dev":        "nodemon src/server.js",
+    "migrate":    "node src/scripts/migrate.js",
+    "seed":       "node src/scripts/seed.js",
+    "setup-db":   "node src/scripts/setup-db.js",
+    "test-conn":  "node src/scripts/test-connection.js",
+    "test":       "jest --runInBand --forceExit",
     "test:watch": "jest --watch"
   },
   "dependencies": {
@@ -28,17 +30,15 @@
     "uuid":               "^9.0.0"
   },
   "devDependencies": {
-    "jest":       "^29.7.0",
-    "nodemon":    "^3.0.2",
-    "supertest":  "^6.3.3"
+    "jest":      "^29.7.0",
+    "nodemon":   "^3.0.2",
+    "supertest": "^6.3.3"
   },
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/tests/**/*.test.js"]
   },
-  "engines": {
-    "node": ">=18.0.0"
-  },
+  "engines": { "node": ">=18.0.0" },
   "author": "WOW Tech Team",
   "license": "UNLICENSED"
 }
