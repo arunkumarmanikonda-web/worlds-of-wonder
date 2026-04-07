@@ -1,6 +1,6 @@
 // ============================================================
 //  k6 API Write Benchmark — pure POST throughput test
-//  Run: k6 run k6/api-benchmark.js -e API_URL=http://localhost:3000
+//  Run: k6 run k6/api-benchmark.js -e API_URL=https://worlds-of-wonder-production.up.railway.app
 // ============================================================
 import http  from 'k6/http';
 import { check } from 'k6';
@@ -14,7 +14,7 @@ export const options = {
   }
 };
 
-const BASE    = __ENV.API_URL || 'http://localhost:3000';
+const BASE    = __ENV.API_URL || 'https://worlds-of-wonder-production.up.railway.app';
 const PARKS   = ['WATER_DAY','AMUSEMENT_DAY','COMBO_DAY'];
 const HEADERS = { 'Content-Type': 'application/json' };
 
@@ -36,3 +36,4 @@ export default function () {
   );
   check(res, { '201 created': r => r.status === 201 });
 }
+

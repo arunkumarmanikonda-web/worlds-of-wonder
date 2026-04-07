@@ -336,3 +336,4 @@ const WOWContent = {
 global.WOWContent = WOWContent;
 
 })(window);
+

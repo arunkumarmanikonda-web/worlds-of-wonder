@@ -278,3 +278,4 @@ WOWModules.applyGates();
 
 /* ── Export global ── */
 window.WOWModules = WOWModules;
+

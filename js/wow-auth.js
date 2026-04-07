@@ -679,3 +679,4 @@ window.WOWAuth = {
 };
 
 })(window);
+

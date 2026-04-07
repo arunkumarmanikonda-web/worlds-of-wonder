@@ -267,3 +267,4 @@ const WOWBanners = (function () {
   /* ── Public ────────────────────────────────────────────── */
   return { init, goTo, stopAuto, loadConfig };
 })();
+

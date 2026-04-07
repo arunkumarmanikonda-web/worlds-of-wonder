@@ -533,3 +533,4 @@
   global.WOWTerms = WOWTerms;
 
 }(window));
+

@@ -350,3 +350,4 @@ const WOW_API = (() => {
     formatCurrency, formatDate
   };
 })();
+

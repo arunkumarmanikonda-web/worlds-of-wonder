@@ -1,7 +1,7 @@
 // ============================================================
 //  k6 Deep Stress Test — WOW Booking API
 //  Install k6: https://k6.io/docs/getting-started/installation/
-//  Run:  k6 run k6/stress-test.js -e API_URL=http://localhost:3000
+//  Run:  k6 run k6/stress-test.js -e API_URL=https://worlds-of-wonder-production.up.railway.app
 //  HTML report: k6 run --out html=report.html k6/stress-test.js
 // ============================================================
 import http    from 'k6/http';
@@ -72,7 +72,7 @@ export const options = {
 };
 
 // ── Constants ─────────────────────────────────────────────────
-const BASE       = __ENV.API_URL || 'http://localhost:3000';
+const BASE       = __ENV.API_URL || 'https://worlds-of-wonder-production.up.railway.app';
 const PARKS      = ['WATER_DAY', 'AMUSEMENT_DAY', 'COMBO_DAY'];
 const PAY_MODES  = ['UPI', 'Card', 'NetBanking', 'Cash'];
 const OFFER_CODES= ['BOGO20','SUMMER25','COMBO15','FLASH30', null, null, null]; // 3/7 get offer
@@ -199,3 +199,4 @@ export function setup() {
 export function teardown(data) {
   console.log(`Test completed. API base: ${data.base}`);
 }
+

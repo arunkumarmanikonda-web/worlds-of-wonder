@@ -977,3 +977,4 @@ window.WOWBooking = {
   changeBuffet, applyPromoCode, clearPromoCode,
   validateAndCheckout,
 };
+

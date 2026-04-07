@@ -831,3 +831,4 @@ const WOWOfferCart = (function () {
 document.addEventListener('DOMContentLoaded', () => {
   WOWOfferCart.autoAttach();
 });
+

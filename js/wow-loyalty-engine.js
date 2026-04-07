@@ -1583,3 +1583,4 @@
   global.WOWLoyalty = WOWLoyalty;
 
 }(typeof window !== 'undefined' ? window : this));
+
