@@ -769,8 +769,8 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
         <!-- Section tabs -->
         <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;">
           <button class="bm-tab active" data-section="homepage" onclick="BM.switchSection('homepage',this)">ðŸ  Homepage</button>
-          <button class="bm-tab" data-section="water_park" onclick="BM.switchSection('water_park',this)">ðŸŒŠ Water Park</button>
-          <button class="bm-tab" data-section="amusement_park" onclick="BM.switchSection('amusement_park',this)">ðŸŽ¢ Amusement Park</button>
+          <button class="bm-tab" data-section="water_park" onclick="BM.switchSection('water_park',this)">🌊 Water Park</button>
+          <button class="bm-tab" data-section="amusement_park" onclick="BM.switchSection('amusement_park',this)">🎢 Amusement Park</button>
           <button class="bm-tab" data-section="combo" onclick="BM.switchSection('combo',this)">ðŸŽ¡ Combo</button>
         </div>
 
@@ -1126,20 +1126,20 @@ function renderUsers(){
 
 // â”€â”€ MODULES DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const MODULES = [
-  {id:'water_ticketing',name:'Water Park Ticketing Engine',icon:'ðŸŒŠ',iconBg:'rgba(59,130,246,.15)',iconColor:'#60a5fa',desc:'QR tickets, booking, capacity',on:true},
-  {id:'amusement_ticketing',name:'Amusement Park Ticketing',icon:'ðŸŽ¢',iconBg:'rgba(168,85,247,.15)',iconColor:'#c084fc',desc:'QR tickets, booking, capacity',on:true},
-  {id:'combo_ticketing',name:'Combo Ticket Module',icon:'ðŸŽ‰',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Combined park combo pricing',on:true},
+  {id:'water_ticketing',name:'Water Park Ticketing Engine',icon:'🌊',iconBg:'rgba(59,130,246,.15)',iconColor:'#60a5fa',desc:'QR tickets, booking, capacity',on:true},
+  {id:'amusement_ticketing',name:'Amusement Park Ticketing',icon:'🎢',iconBg:'rgba(168,85,247,.15)',iconColor:'#c084fc',desc:'QR tickets, booking, capacity',on:true},
+  {id:'combo_ticketing',name:'Combo Ticket Module',icon:'🎉',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Combined park combo pricing',on:true},
   {id:'passport_system',name:'WOW Passport System',icon:'ðŸªª',iconBg:'rgba(201,168,76,.15)',iconColor:'#fbbf24',desc:'Annual membership + QR book',on:true},
   {id:'loyalty_program',name:'Loyalty Points Program',icon:'â­',iconBg:'rgba(251,191,36,.15)',iconColor:'#fbbf24',desc:'Earn, redeem, tier upgrades',on:true},
   {id:'crm',name:'CRM and Call Centre',icon:'ðŸ“ž',iconBg:'rgba(20,184,166,.15)',iconColor:'#2dd4bf',desc:'Complaints, queries, escalations',on:true},
   {id:'erp_sales',name:'Sales Force ERP',icon:'ðŸ“Š',iconBg:'rgba(59,130,246,.15)',iconColor:'#60a5fa',desc:'Leads, pipeline, quotes, targets',on:true},
-  {id:'gst_engine',name:'GST Auto-Reverse Engine',icon:'ðŸ§¾',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Auto GST calc + reverse charge',on:true},
+  {id:'gst_engine',name:'GST Auto-Reverse Engine',icon:'🧾',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Auto GST calc + reverse charge',on:true},
   {id:'fnb',name:'Food and Beverage Module',icon:'ðŸ”',iconBg:'rgba(249,115,22,.15)',iconColor:'#fb923c',desc:'F&B packages, POS integration',on:true},
   {id:'cms',name:'Content Management System',icon:'ðŸ“',iconBg:'rgba(99,102,241,.15)',iconColor:'#818cf8',desc:'Banners, offers, pages, SEO',on:true},
   {id:'marketing',name:'Marketing and Promotions',icon:'ðŸ“¢',iconBg:'rgba(236,72,153,.15)',iconColor:'#f472b6',desc:'Email, WhatsApp, SMS campaigns',on:true},
-  {id:'weather_alerts',name:'Weather and Traffic Alerts',icon:'ðŸŒ¦',iconBg:'rgba(59,130,246,.15)',iconColor:'#93c5fd',desc:'Real-time weather push alerts',on:true},
+  {id:'weather_alerts',name:'Weather and Traffic Alerts',icon:' 🌦',iconBg:'rgba(59,130,246,.15)',iconColor:'#93c5fd',desc:'Real-time weather push alerts',on:true},
   {id:'reseller_portal',name:'Reseller Partner Portal',icon:'ðŸª',iconBg:'rgba(249,115,22,.15)',iconColor:'#fdba74',desc:'Bulk tickets, inventory, commissions',on:true},
-  {id:'ta_portal',name:'Travel Agent Portal',icon:'âœˆï¸',iconBg:'rgba(236,72,153,.15)',iconColor:'#f9a8d4',desc:'Mini-ERP, leads, bookings',on:true},
+  {id:'ta_portal',name:'Travel Agent Portal',icon:'✈️',iconBg:'rgba(236,72,153,.15)',iconColor:'#f9a8d4',desc:'Mini-ERP, leads, bookings',on:true},
   {id:'b2b_corporate',name:'B2B Corporate Module',icon:'ðŸ¢',iconBg:'rgba(99,102,241,.15)',iconColor:'#a5b4fc',desc:'Group bookings, events, lawn',on:true},
   {id:'gate_ops',name:'Gate Operations and QR Scan',icon:'ðŸšª',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Entry validation, capacity monitor',on:true},
   {id:'finance',name:'Finance and Invoicing',icon:'ðŸ’°',iconBg:'rgba(34,197,94,.15)',iconColor:'#4ade80',desc:'Revenue, invoices, reconciliation',on:true},
@@ -1167,7 +1167,7 @@ function renderModules(){
 }
 function toggleModule(id,val){
   const m = MODULES.find(x=>x.id===id);
-  if(m) m.on = val;
+  if(m){m.on=val;const st={};MODULES.forEach(mod=>st[mod.id]=mod.on);localStorage.setItem('wow_module_state',JSON.stringify(st));
 }
 
 // Rights matrix render
@@ -2232,7 +2232,7 @@ const CC = (() => {
       ]
     },
     offer_strip: {
-      label: 'Offer Ticker Strip', emoji: 'ðŸŽ‰', page: 'homepage',
+      label: 'Offer Ticker Strip', emoji: '🎉', page: 'homepage',
       fields: [
         { id: 'offer1', label: 'Offer Text 1', selector: '.offer-strip-item:nth-child(1)', type: 'text' },
         { id: 'offer2', label: 'Offer Text 2', selector: '.offer-strip-item:nth-child(3)', type: 'text' },
