@@ -1148,7 +1148,7 @@ const MODULES = [
   {id:'dynamic_pricing',name:'Dynamic Pricing Engine',icon:'ðŸ’¸',iconBg:'rgba(239,68,68,.15)',iconColor:'#f87171',desc:'Peak/off-peak auto pricing rules',on:false},
   {id:'api_marketplace',name:'API Marketplace',icon:'ðŸ”Œ',iconBg:'rgba(99,102,241,.15)',iconColor:'#818cf8',desc:'Third-party integrations + webhooks',on:false},
 ];
-function renderModules(){
+function renderModules(){try{const sv=JSON.parse(localStorage.getItem('wow_module_state')||'{}');MODULES.forEach(m=>{if(sv.hasO
   const grid = document.getElementById('moduleGrid');
   if (!grid) return;
   grid.innerHTML = MODULES.map(m=>`
