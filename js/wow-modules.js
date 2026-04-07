@@ -92,34 +92,30 @@ const WOWModules = {
       { module: 'partner_portal',     patterns: ['/partner/', '/travel-agent.html', '/reseller.html'] },
     ];
 
-    for (const gate of routeGates) {
-      if (!s[gate.module]) {
-        const blocked = gate.patterns.some(p => page.includes(p));
-        if (blocked) {
-          document.addEventListener('DOMContentLoaded', () => {
+    const runGates = () => {
+      for (const gate of routeGates) {
+        if (!s[gate.module]) {
+          const blocked = gate.patterns.some(p => page.includes(p));
+          if (blocked) {
             showModuleDisabledBanner(gate.module);
-          });
-          break;
+            return;
+          }
         }
       }
-    }
-
-    // ── data-module-page attribute gate ──
-    document.addEventListener('DOMContentLoaded', () => {
       const pageEl = document.querySelector('[data-module-page]');
       if (pageEl) {
         const mod = pageEl.getAttribute('data-module-page');
-        if (mod && !s[mod]) {
-          showModuleDisabledBanner(mod);
-        }
+        if (mod && !s[mod]) { showModuleDisabledBanner(mod); return; }
       }
-    });
-
-    // ── DOM GATES: hide elements when module is off ──
-    document.addEventListener('DOMContentLoaded', () => {
       this._applyDOMGates(s);
-    });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', runGates);
+    } else {
+      runGates();
+    }
   },
+
 
   _applyDOMGates(s) {
     // Passport nav links + sections
