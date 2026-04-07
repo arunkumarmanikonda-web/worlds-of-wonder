@@ -354,7 +354,7 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 }
 </style>
 </head>
-<body>
+<body data-wow-sa-managed="true">
 <div class="app">
 
   <!-- SIDEBAR -->
@@ -365,9 +365,9 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
       <div class="sb-brand">Super Admin</div>
     </div>
 
-    <div class="sb-user">
-      <div class="sb-user-name">Arun Kumar M.</div>
-      <div style="font-size:10px;color:var(--muted);">akm@indiagully.com</div>
+    <div class="sb-user" id="sb-user-block">
+      <div class="sb-user-name" id="sb-user-name">Super Admin</div>
+      <div id="sb-user-email" style="font-size:10px;color:var(--muted);">akm@indiagully.com</div>
       <span class="sb-user-role"><i class="fas fa-user-shield"></i> SUPER ADMIN</span>
     </div>
 
@@ -974,17 +974,28 @@ html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:
 </div><!-- /app -->
 
 <script>
-// ── AUTO-LOGIN: ensure Super Admin session exists for this panel ──────────
-// If no active session, auto-create a demo Super Admin session so the page
-// renders fully without a redirect. Real auth is enforced by wow-auth-guard.js.
-(function ensureSASession() {
-  try {
-    if (typeof WOWAuth !== 'undefined' && !WOWAuth.isLoggedIn()) {
-      const users = WOWAuth.adminGetAllUsers ? WOWAuth.adminGetAllUsers() : [];
-      const sa = users.find(function(u){ return u.role === 'SUPER_ADMIN' && u.active; });
-      if (sa) { WOWAuth.setSession(sa); }
+// ── AUTH GUARD: Super Admin only ──────────────────────────────────────────
+// Login via: SA Bypass button (top-right corner) → enter your SA PIN.
+// On successful bypass, the page reloads and this guard finds a valid session.
+(function enforceAuth() {
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof WOWAuth === 'undefined') return;
+
+    const session = WOWAuth.currentUser();
+
+    if (!session) {
+      // Not logged in — open the bypass modal immediately (clean UX, no alarming banners)
+      WOWAuth.openBypassModal();
+      return;
     }
-  } catch(e) {}
+
+    if (session.role !== 'SUPER_ADMIN') {
+      // Wrong role — clear stale session and prompt for SA credentials
+      WOWAuth.clearSession ? WOWAuth.clearSession() : sessionStorage.removeItem('wow_auth_session');
+      WOWAuth.openBypassModal();
+    }
+    // Valid SUPER_ADMIN session → page renders normally, no action needed
+  });
 })();
 
 // ── CLOCK ────────────────────────────────────────────────────────────────
@@ -1023,8 +1034,8 @@ function showPanel(id){
   if (id === 'calendar' && typeof OC !== 'undefined') OC.init();
   if (id === 'categories' && typeof CA !== 'undefined') CA.init();
   if (id === 'banners' && typeof BM !== 'undefined') BM.switchSection(BM.activeSection, document.querySelector('.bm-tab.active'));
-  if (id === 'products') PC.init();
-  if (id === 'content')  CC.init();
+  if (id === 'products' && typeof PC !== 'undefined') PC.init();
+  if (id === 'content'  && typeof CC !== 'undefined') CC.init();
 }
 
 // ── KYC DATA ─────────────────────────────────────────────────────────────
@@ -1157,7 +1168,6 @@ function renderModules(){
 function toggleModule(id,val){
   const m = MODULES.find(x=>x.id===id);
   if(m) m.on = val;
-  // Could POST to API here
 }
 
 // Rights matrix render
@@ -1310,13 +1320,28 @@ function changeSAPinSA() {
   alert('Super Admin PIN updated! The SA bypass button will now use the new PIN.');
 }
 
-// ── TOPBAR AUTH WIDGET ─────────────────────────────────────────────────────
-if (typeof WOWAuth !== 'undefined') {
-  WOWAuth.renderTopbarWidget('topbar-auth-widget');
-}
-
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
+  // ── 1. Render topbar auth widget
+  if (typeof WOWAuth !== 'undefined') {
+    WOWAuth.renderTopbarWidget('topbar-auth-widget');
+  }
+
+  // ── 2. Populate sidebar user chip from live session
+  if (typeof WOWAuth !== 'undefined') {
+    const sess = WOWAuth.currentUser();
+    const nameEl  = document.getElementById('sb-user-name');
+    const emailEl = document.getElementById('sb-user-email');
+    if (sess) {
+      if (nameEl)  nameEl.textContent  = sess.name  || sess.email || '—';
+      if (emailEl) emailEl.textContent = sess.email || '';
+    } else {
+      if (nameEl)  nameEl.textContent  = 'Not signed in';
+      if (emailEl) emailEl.textContent  = 'Use SA Bypass above';
+    }
+  }
+
+  // ── 3. Render all panels
   try { renderKYC(); } catch(e) {}
   try { renderUsers(); } catch(e) {}
   try { renderModules(); } catch(e) {}
@@ -1348,7 +1373,6 @@ const BM = (() => {
     if (!cfg) {
       cfg = {};
       SECTIONS.forEach(s => { cfg[s] = { slides:[], autoplay:true, autoplayInterval:6000, showDots:true, showArrows:true }; });
-      // Default slides from banners.json if available
       fetch('../data/banners.json?v='+Date.now())
         .then(r=>r.json()).then(d=>{ cfg=Object.assign(cfg,d); renderSection(activeSection); })
         .catch(()=>{});
@@ -1356,17 +1380,14 @@ const BM = (() => {
   }
 
   function saveCfg() {
-    // Collect all slide data from DOM
     SECTIONS.forEach(sec => {
       const container = document.getElementById('bm-slides-container');
-      if (sec !== activeSection) return; // only save currently visible section
-      // collect from cards
+      if (sec !== activeSection) return;
       const cards = container ? container.querySelectorAll('.bm-slide-card') : [];
       if (!cfg[sec]) cfg[sec] = {slides:[]};
       cfg[sec].slides = Array.from(cards).map(card => readCard(card));
     });
     localStorage.setItem(SK, JSON.stringify(cfg, null, 2));
-    // Also write to the key that banner-engine.js reads (wow_banners_v3)
     localStorage.setItem('wow_banners_v3', JSON.stringify(cfg, null, 2));
     toast2('✅ Banners saved & published! Reload public pages to see changes.', '#22c55e');
   }
@@ -1376,9 +1397,8 @@ const BM = (() => {
   }
 
   function readCard(card) {
-    // Prefer the uploaded data URL (stored in a hidden input) over the text URL
     const imgUrlInput  = card.querySelector('.bm-img-url');
-    const uploadedData = card.dataset.uploadedImg; // base64 data URL from FileReader
+    const uploadedData = card.dataset.uploadedImg;
     const imgUrl = (uploadedData && uploadedData.startsWith('data:'))
       ? uploadedData
       : (imgUrlInput?.value || '');
@@ -1399,7 +1419,6 @@ const BM = (() => {
   }
 
   function switchSection(sec, btn) {
-    // Save current section first
     if (cfg) saveCfgSection(activeSection);
     activeSection = sec;
     document.querySelectorAll('.bm-tab').forEach(t=>t.classList.remove('active'));
@@ -1431,7 +1450,6 @@ const BM = (() => {
     div.className = 'bm-slide-card';
     div.dataset.id = slide.id || ('bm-'+idx);
     div.dataset.sec = sec;
-    // Restore uploaded data URL so readCard() can retrieve it
     if (slide.imageUrl && slide.imageUrl.startsWith('data:')) {
       div.dataset.uploadedImg = slide.imageUrl;
     }
@@ -1456,7 +1474,6 @@ const BM = (() => {
         </div>
       </div>
       <div class="bm-slide-body">
-        <!-- Type -->
         <div class="bm-field">
           <label>Banner Type</label>
           <div class="bm-type-chips">
@@ -1467,7 +1484,6 @@ const BM = (() => {
           <input type="hidden" class="bm-type-hidden" value="${typeVal}"/>
         </div>
 
-        <!-- Video fields -->
         <div class="bm-video-fields" style="${typeVal!=='video'?'display:none;':''}">
           <div class="bm-field">
             <label>Video URL (MP4)</label>
@@ -1475,7 +1491,6 @@ const BM = (() => {
           </div>
         </div>
 
-        <!-- Image fields -->
         <div class="bm-image-fields" style="${typeVal!=='image'?'display:none;':''}">
           <div class="bm-field">
             <label>Image — Upload File or Paste URL</label>
@@ -1493,7 +1508,6 @@ const BM = (() => {
           </div>
         </div>
 
-        <!-- Gradient -->
         <div class="bm-field">
           <label>Gradient Fallback (CSS)</label>
           <input class="bm-input bm-gradient" type="text" value="${grad}" oninput="this.nextElementSibling.style.background=this.value"/>
@@ -1548,7 +1562,6 @@ const BM = (() => {
     cfg[sec].slides.push({ id:'bm-'+Date.now(), active:true, type:'image', title:'New Banner Slide',
       subtitle:'', badge:'', imageUrl:'', videoUrl:'', fallbackGradient:'linear-gradient(135deg,#001d4a,#006EE6)', overlayOpacity:0.4, textAlign:'left', cta:{label:'',url:''} });
     renderSection(sec);
-    // Scroll to last
     const container = document.getElementById('bm-slides-container');
     const cards = container.querySelectorAll('.bm-slide-card');
     if (cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth'});
@@ -1578,7 +1591,6 @@ const BM = (() => {
   function handleUpload(input, idx) {
     const file = input.files[0];
     if (!file) return;
-    // Validate: images only, max 5 MB
     if (!file.type.startsWith('image/')) { toast2('⚠ Please upload a valid image file (JPG, PNG, WebP).', '#ef4444'); return; }
     if (file.size > 5 * 1024 * 1024)    { toast2('⚠ Image too large. Max 5 MB per banner image.', '#ef4444'); return; }
 
@@ -1586,17 +1598,13 @@ const BM = (() => {
     const reader = new FileReader();
     reader.onload = function(e) {
       const dataUrl = e.target.result;
-      // Store data URL in card dataset for readCard() to pick up on save
       card.dataset.uploadedImg = dataUrl;
-      // Update the URL text field to show the filename (for display only)
       const urlInput = card.querySelector('.bm-img-url');
       if (urlInput) urlInput.value = 'data:uploaded:' + file.name;
-      // Show live preview
       const imgContainer = card.querySelector('.bm-img-container');
       const imgEl        = card.querySelector('.bm-img-preview');
       if (imgContainer) imgContainer.style.display = '';
       if (imgEl) imgEl.src = dataUrl;
-      // Update drop-zone to show success
       const dz = card.querySelector('.bm-upload-zone div');
       if (dz) dz.innerHTML =
         '<i class="fas fa-check-circle" style="font-size:18px;color:#22c55e;margin-bottom:4px;display:block;"></i>' +
@@ -1608,9 +1616,6 @@ const BM = (() => {
     reader.readAsDataURL(file);
   }
 
-  // Override readCard to pick up uploaded images
-  const _origReadCard = readCard;
-
   function moveUp(card) {
     const prev = card.previousElementSibling;
     if (prev && prev.classList.contains('bm-slide-card')) card.parentNode.insertBefore(card, prev);
@@ -1620,7 +1625,6 @@ const BM = (() => {
     if (next && next.classList.contains('bm-slide-card')) card.parentNode.insertBefore(next, card);
   }
 
-  // Init
   loadCfg();
   setTimeout(() => renderSection('homepage'), 200);
 
@@ -1629,7 +1633,6 @@ const BM = (() => {
 })();
 
 function toast2(msg, color) {
-  // Reuse showPanel toast system if available
   const t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#131720;border:1px solid rgba(255,255,255,.1);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,.5);border-left:3px solid '+(color||'#22c55e');
   t.textContent = msg;
@@ -1656,14 +1659,13 @@ const OC = (() => {
     if (!data) {
       data = {
         defaults: { WATER_DAY: 'open', AMUSEMENT_DAY: 'open' },
-        exceptions: [],   // {date:'YYYY-MM-DD', park:'WATER_DAY|AMUSEMENT_DAY|ALL', status:'open|closed|maintenance|limited', note:''}
+        exceptions: [],
         hours: { open:'10:00', lastEntry:'16:00', close:'18:00', advanceDays:90 }
       };
     }
   }
 
   function save() {
-    // collect hours
     data.hours = {
       open:        document.getElementById('oc-open-time')?.value || '10:00',
       lastEntry:   document.getElementById('oc-last-entry')?.value || '16:00',
@@ -1671,16 +1673,13 @@ const OC = (() => {
       advanceDays: parseInt(document.getElementById('oc-advance-days')?.value) || 90
     };
     localStorage.setItem(SK, JSON.stringify(data, null, 2));
-    // Build the public-facing disabled-dates list used by booking pages
     _buildPublicConfig();
     toast2('✅ Operational Calendar saved!', '#22c55e');
-    // Re-render both cals
     PARKS.forEach(p => renderCal(p));
     renderExceptions();
   }
 
   function _buildPublicConfig() {
-    // Produce wow_calendar_config for booking.js to consume
     localStorage.setItem('wow_calendar_config', JSON.stringify({
       defaults: data.defaults,
       exceptions: data.exceptions,
@@ -1698,7 +1697,6 @@ const OC = (() => {
   }
 
   function getDateStatus(park, dateStr) {
-    // Check exceptions first (exact match)
     for (const exc of (data.exceptions||[])) {
       if (exc.date === dateStr && (exc.park === park || exc.park === 'ALL' || exc.park === 'COMBO_DAY')) {
         return exc.status;
@@ -1720,7 +1718,6 @@ const OC = (() => {
     let html = '<div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:8px;">' + MONTHS[month] + ' ' + year + '</div>';
     html += '<div class="oc-mini-cal">';
     DAYS.forEach(d => html += '<div class="oc-day-hdr">' + d + '</div>');
-    // Empty cells before first day
     for (let i=0; i<firstDay; i++) html += '<div class="oc-day empty"></div>';
     for (let d=1; d<=daysInMonth; d++) {
       const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
@@ -1744,7 +1741,7 @@ const OC = (() => {
     const newStatus = cycle[currentStatus] || 'closed';
     if (existing >= 0) {
       if (newStatus === (data.defaults[park] || 'open')) {
-        data.exceptions.splice(existing, 1); // remove override if back to default
+        data.exceptions.splice(existing, 1);
       } else {
         data.exceptions[existing].status = newStatus;
       }
@@ -1837,7 +1834,6 @@ const OC = (() => {
   }
 
   function removeException(idx) {
-    // find by index in filtered list
     const today = new Date().toISOString().slice(0,10);
     const filtered = data.exceptions.map((e,i)=>({...e,_i:i})).filter(e=>e.date>=today);
     filtered.sort((a,b)=>a.date.localeCompare(b.date));
@@ -1849,7 +1845,6 @@ const OC = (() => {
 
   function init() {
     load();
-    // Set UI from data
     ['WATER_DAY','AMUSEMENT_DAY'].forEach(park => {
       const key = park==='WATER_DAY'?'water':'amuse';
       const chk = document.getElementById('oc-'+key+'-default');
@@ -1914,12 +1909,10 @@ const CA = (() => {
   }
 
   function save() {
-    // Collect global toggles
     CATS.forEach(c => {
       const chk = document.getElementById('ca-global-'+c.id);
       if (chk) data.global[c.id] = chk.checked;
     });
-    // Collect price overrides
     PARKS_CONFIG.forEach(park => {
       if (!prices[park.key]) prices[park.key] = {};
       CATS.forEach(cat => {
@@ -1932,7 +1925,6 @@ const CA = (() => {
     });
     localStorage.setItem(SK, JSON.stringify(data, null, 2));
     localStorage.setItem(SK_PRICES, JSON.stringify(prices, null, 2));
-    // Publish to shared key used by booking.js
     localStorage.setItem('wow_cat_config', JSON.stringify({ global: data.global, rules: data.rules, prices, updatedAt: new Date().toISOString() }));
     toast2('✅ Category availability saved!', '#f97316');
   }
@@ -1948,7 +1940,6 @@ const CA = (() => {
     if (!data) load();
     data.rules.push({ id:'rule-'+Date.now(), cat, from, to, park, action });
     renderRulesList();
-    // Clear inputs
     ['ca-r-from','ca-r-to'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   }
 
@@ -2031,11 +2022,6 @@ const CA = (() => {
   return { save, addRule, removeRule, updateGlobalLabel, init };
 })();
 
-// ── INIT ALL NEW PANELS ───────────────────────────────────────────────────
-// OC and CA are initialised lazily by showPanel(); calling them here
-// eagerly is harmless (they have null-checks) but avoids extra work on pages
-// that never visit those panels. Keep the call so that if the URL is bookmarked
-// to a specific panel the data is ready.
 document.addEventListener('DOMContentLoaded', function() {
   try { OC.init(); } catch(e) {}
   try { CA.init(); } catch(e) {}
@@ -2048,15 +2034,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="../js/wow-content-control.js"></script>
 <script>
 'use strict';
-/* ────────────────────────────────────────────────────────────────────────
-   PC — Products & Offerings Control
-   Lets super admin toggle any park / ticket category / offer / combo /
-   passport on or off. Changes immediately persist and are picked up by
-   every public page that loads wow-content-control.js.
-──────────────────────────────────────────────────────────────────────── */
 const PC = (() => {
 
-  /* Group definitions for the UI */
   const GROUPS = [
     {
       key: 'parks',
@@ -2089,7 +2068,6 @@ const PC = (() => {
 
   function save() {
     if (!cfg) load();
-    // Read all toggles from DOM
     Object.keys(cfg).forEach(key => {
       const chk = document.getElementById('pc-toggle-'+key);
       if (chk) cfg[key] = Object.assign({}, cfg[key], { enabled: chk.checked });
@@ -2155,9 +2133,7 @@ const PC = (() => {
     load();
     const container = document.getElementById('pc-container');
     if (!container) return;
-    // Prevent re-init if already built (re-read config but don't re-render DOM)
     if (container.dataset.init) {
-      // Just refresh the counter display
       updateSummaryCounters();
       return;
     }
@@ -2210,7 +2186,6 @@ const PC = (() => {
       html += `</div></div>`;
     });
 
-    // Summary card
     const totalOn = Object.values(cfg).filter(v=>v.enabled!==false).length;
     const totalOff = Object.values(cfg).length - totalOn;
     html = `
@@ -2239,14 +2214,8 @@ const PC = (() => {
   return { init, save, disableAll, toggleItem, toggleGroup, updateSummaryCounters };
 })();
 
-/* ────────────────────────────────────────────────────────────────────────
-   CC — Content / Section Control
-   Lets super admin toggle each page section on/off and edit its content
-   line-by-line. Saves to wow_content_cfg and wow_content_overrides.
-──────────────────────────────────────────────────────────────────────── */
 const CC = (() => {
 
-  /* Sections with editable fields */
   const SECTION_DEFS = {
     hero: {
       label: 'Hero Carousel / Banner', emoji: '🎠', page: 'homepage',
@@ -2359,7 +2328,7 @@ const CC = (() => {
     },
     bk_promo: {
       label: 'Promo / Coupon Code', emoji: '🏷', page: 'booking',
-      fields: []  // toggle-only
+      fields: []
     },
     bk_trust_strip: {
       label: 'Booking Trust Strip', emoji: '🔒', page: 'booking',
@@ -2378,11 +2347,11 @@ const CC = (() => {
     },
     weather_strip: {
       label: 'Weather & Quick Info Strip', emoji: '🌤', page: 'homepage',
-      fields: []  // toggle-only (no editable text fields)
+      fields: []
     },
     footer: {
       label: 'Site Footer', emoji: '🔻', page: 'homepage',
-      fields: []  // toggle-only
+      fields: []
     },
   };
 
@@ -2397,14 +2366,12 @@ const CC = (() => {
 
   function save() {
     if (!sectionCfg) load();
-    // Collect toggle states
     Object.keys(SECTION_DEFS).forEach(key => {
       const chk = document.getElementById('cc-toggle-'+key);
       if (chk) {
         sectionCfg[key] = Object.assign({}, sectionCfg[key] || {}, { enabled: chk.checked });
       }
     });
-    // Collect content overrides from open drawers
     Object.keys(SECTION_DEFS).forEach(sKey => {
       const def = SECTION_DEFS[sKey];
       if (!def.fields) return;
@@ -2442,7 +2409,6 @@ const CC = (() => {
     const row = document.getElementById('cc-row-'+key);
     if (!row) return;
     row.classList.toggle('cc-disabled', !enabled);
-    // Update inline badge
     const badge = document.getElementById('cc-badge-'+key);
     if (badge) {
       badge.textContent = enabled ? '● LIVE' : '○ HIDDEN';
@@ -2467,17 +2433,14 @@ const CC = (() => {
     const drawer = document.getElementById('cc-drawer-'+key);
     if (!drawer) return;
     const isOpen = drawer.classList.contains('open');
-    // Close all others
     document.querySelectorAll('.cc-editor-drawer').forEach(d => d.classList.remove('open'));
     if (!isOpen) drawer.classList.add('open');
   }
 
   function filterPage(page, btn) {
     currentPage = page;
-    // Update tab styles
     document.querySelectorAll('#p-content .bm-tab').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    // Show/hide rows
     Object.keys(SECTION_DEFS).forEach(key => {
       const def = SECTION_DEFS[key];
       const row  = document.getElementById('cc-row-wrap-'+key);
@@ -2503,7 +2466,6 @@ const CC = (() => {
       const enabled = scfg.enabled !== false;
       const isBooking = def.page === 'booking';
 
-      // Build editable fields HTML
       let fieldsHtml = '';
       if (def.fields && def.fields.length) {
         def.fields.forEach(f => {
@@ -2589,15 +2551,13 @@ const CC = (() => {
   return { init, save, showAll, toggleSection, toggleDrawer, filterPage, clearDrawer, updateCCSummary };
 })();
 
-// ── AUTO INIT on first render ──────────────────────────────────────────────
-// PC and CC panels are lazy-inited by showPanel(), but if user lands on
-// the page directly we init on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
   // PC and CC are inited lazily via showPanel
-  // Nothing to do here — they init on click
 });
 </script>
 
-<script src="../js/wow-auth-guard.js" data-portal="admin"></script>
+<!-- wow-auth-guard.js is intentionally NOT loaded here.
+     super-admin.html uses its own enforceAuth() guard (SA-PIN only, no email/PIN overlay).
+     The generic smartGuard would conflict by showing a duplicate login overlay. -->
 </body>
 </html>
