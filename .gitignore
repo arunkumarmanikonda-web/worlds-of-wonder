@@ -1,0 +1,7 @@
+# Test/scratch JSON files
+*.json
+!package.json
+!package-lock.json
+!backend/package.json
+!backend/package-lock.json
+!data/*.json
