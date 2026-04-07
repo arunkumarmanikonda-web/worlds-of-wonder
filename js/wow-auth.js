@@ -476,7 +476,7 @@ function showLoginOverlay(portal, onSuccess) {
   overlay.innerHTML = `
     <div style="width:100%;max-width:420px;padding:20px;">
       <div style="text-align:center;margin-bottom:24px;">
-        <img src="/images/logo.png" alt="WOW" style="height:54px;width:auto;object-fit:contain;"
+        <img src="${(function(){var p=window.location.pathname;if(p.includes('/admin/')||p.includes('/sales/')||p.includes('/partner/')||p.includes('/reseller/')||p.includes('/ta/')||p.includes('/portal/')||p.includes('/internal/')||p.includes('/book/')||p.includes('/groups/'))return'../images/logo.png';return'images/logo.png';})()}" alt="WOW" style="height:54px;width:auto;object-fit:contain;"
           onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='block';"
         /><div style="display:none;font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:#C9A84C;letter-spacing:3px;">WOW</div>
         <div style="font-size:9px;letter-spacing:3px;color:rgba(239,68,68,.7);text-transform:uppercase;margin-top:6px;font-weight:700;">Restricted Portal</div>
