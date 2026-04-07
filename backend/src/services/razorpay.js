@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 var crypto = require('crypto');
 var _rzp = null;
 function isPlaceholderKey(k) { return !k || k.indexOf('XXXX') !== -1 || k.indexOf('YYYY') !== -1 || k.length < 20; }

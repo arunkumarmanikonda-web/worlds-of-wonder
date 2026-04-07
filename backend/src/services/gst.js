@@ -1,5 +1,5 @@
-﻿'use strict';
-// ASCII-only GST Invoice Builder — no em-dashes, no template literals
+'use strict';
+// ASCII-only GST Invoice Builder � no em-dashes, no template literals
 var CGST_RATE = 0.09;
 var SGST_RATE = 0.09;
 var IGST_RATE = 0.18;

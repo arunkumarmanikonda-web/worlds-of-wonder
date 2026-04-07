@@ -35,3 +35,4 @@ async function generateTicketQR(booking) {
 }
 
 module.exports = { generateTicketQR };
+

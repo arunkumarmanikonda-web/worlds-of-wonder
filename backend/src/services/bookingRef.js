@@ -34,3 +34,4 @@ function generateSessionId() {
 }
 
 module.exports = { generateBookingRef, generateSessionId };
+

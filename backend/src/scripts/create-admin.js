@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 require('dotenv').config();
 var Pool=require('pg').Pool, bcrypt=require('bcryptjs'), readline=require('readline');
 var pool=new Pool({connectionString:process.env.DATABASE_URL,connectionTimeoutMillis:8000});
@@ -53,7 +53,7 @@ async function main(){
     }
     console.log('\n  Default credentials (change in production):');
     DEFAULT_STAFF.forEach(function(u){console.log('  '+u.email.padEnd(26)+' wow@2025  '+u.role);});
-    console.log('\n  Test: $r = Invoke-RestMethod http://localhost:3000/api/auth/login -Method Post -ContentType "application/json" -Body \'{"email":"rajesh@wow.in","password":"wow@2025"}\'');
+    console.log('\n  Test: $r = Invoke-RestMethod https://worlds-of-wonder-production.up.railway.app/api/auth/login -Method Post -ContentType "application/json" -Body \'{"email":"rajesh@wow.in","password":"wow@2025"}\'');
     console.log('  $token = $r.token\n');
   } else if(c==='2'){
     var email=await ask('  Email'),name=await ask('  Name'),role=await ask('  Role ('+ROLES.join(',')+')', 'admin'),pw=await ask('  Password');
